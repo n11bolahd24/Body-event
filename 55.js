@@ -50,79 +50,75 @@ function loadSofaScore(matchId, boxId, region = "Asia/Jakarta") {
 // --- Fungsi Update Live Score & Pindah Match Ended ---
 function monitorMatchStatus(matchId, boxId) {
   const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
+  const matchBox = document.getElementById("match" + boxId);
+  const liveContainer = document.getElementById("liveContainer" + boxId);
+  const countdownEl = document.getElementById("countdown" + boxId);
+  const liveScoreEl = document.getElementById("liveScore" + boxId);
+  const finishedContainer = document.getElementById("finishedMatches");
+
   const interval = setInterval(async () => {
     const res = await fetch(eventUrl);
     const data = await res.json();
     const event = data.event;
+    if (!event || !matchBox) return;
 
-    const liveContainer = document.getElementById("liveContainer" + boxId);
-    const statusEl = document.getElementById("status" + boxId);
-    const countdownEl = document.getElementById("countdown" + boxId);
-    const liveScoreEl = document.getElementById("liveScore" + boxId);
-    const matchBox = document.getElementById("match" + boxId);
-    const finishedContainer = document.getElementById("finishedMatches");
-
-    if (!event || !matchBox || !finishedContainer) return;
-
-    // Jika pertandingan LIVE
-    if (event.status.type === "inprogress") {
-      liveContainer.classList.remove("hidden");
-      liveContainer.classList.add("blink");
-      liveContainer.innerHTML = "<strong style='color:red;'>🔴 LIVE NOW</strong>";
-      countdownEl.innerText = "";
-
-      // Update skor + babak
-      let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
-      if (event.status.description) {
-        scoreText += ` <span style="font-size:12px; color:#ffcc00;">(${event.status.description})</span>`;
-      }
-      liveScoreEl.innerHTML = scoreText;
+    // Update skor selalu
+    let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
+    if (event.status.description) {
+      scoreText += ` <span style="font-size:12px; color:#ffcc00;">(${event.status.description})</span>`;
     }
+    liveScoreEl.innerHTML = scoreText;
 
-    // Jika pertandingan FINISHED
-    if (event.status.type === "finished") {
+    if (event.status.type === "inprogress") {
+      // Hentikan countdown agar tidak menulis LIVE NOW di sana
+      if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
+
+      // Tampilkan LIVE NOW
+      countdownEl.innerHTML = "";
+      liveContainer.classList.remove('hidden');
+      liveContainer.classList.add('blink');
+      liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke: 0.2px black;'>🔴 LIVE NOW</strong>";
+
+    } else if (event.status.type === "finished") {
+      // Hentikan interval
       clearInterval(interval);
-      liveContainer.classList.remove("blink");
+      if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
+
+      // Tampilkan MATCH ENDED tanpa blink
+      countdownEl.innerHTML = "";
+      liveContainer.classList.remove('blink');
       liveContainer.style.animation = "none";
-      liveContainer.innerHTML = "<strong style='color:gray;'>⛔ MATCH ENDED ⛔</strong>";
+      liveContainer.classList.remove('hidden');
+      liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke: 0.2px black;'>⛔ MATCH ENDED ⛔</strong>";
 
-      // Skor fulltime tetap tampil + babak terakhir (FT)
-      let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
-      if (event.status.description) {
-        scoreText += ` <span style="font-size:12px; color:#ffcc00;">(${event.status.description})</span>`;
-      }
-      liveScoreEl.innerHTML = scoreText;
-
-      // Pindahkan ke Match Ended
-      if (matchBox.parentNode.id !== "finishedMatches") {
+      // Pindahkan ke finished container
+      if (finishedContainer && matchBox.parentNode !== finishedContainer) {
         finishedContainer.appendChild(matchBox);
       }
+    } else {
+      // upcoming / belum kickoff
+      liveContainer.classList.add('hidden');
     }
   }, 3000);
 }
 
 // --- Fungsi Countdown ---
 function startCountdown(targetTime, boxId) {
-  var countdownId = "countdown" + boxId;
-  var statusId = "status" + boxId;
-
-  var countdown = setInterval(function () {
-    var now = new Date().getTime();
-    var distance = targetTime - now;
+  const countdownId = "countdown" + boxId;
+  window["countdown_" + boxId] = setInterval(function () {
+    const now = new Date().getTime();
+    const distance = targetTime - now;
 
     if (distance < 0) {
-      clearInterval(countdown);
-      var liveEl = document.getElementById(countdownId);
-      liveEl.innerText = "🔴 LIVE NOW";
-      liveEl.classList.add("blink");
-      document.getElementById(statusId).innerText = "";
+      clearInterval(window["countdown_" + boxId]);
+      document.getElementById(countdownId).innerHTML = ""; // jangan tulis LIVE NOW lagi
       return;
     }
 
-    var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
     document.getElementById(countdownId).innerText =
       (days > 0 ? days + "D " : "") +
