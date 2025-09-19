@@ -5,6 +5,7 @@ function createMatchBox(matchId, boxId, servers = []) {
     container.id = "match" + boxId;
 
     container.innerHTML = `
+        <div class="kotak" id="match1" class="kotak matchbox">
         <div class="countdown" id="countdown${boxId}"></div>
         <div class="live-container" id="liveContainer${boxId}" style="text-align:center; height:20px;">
             <span id="liveStatus${boxId}" style="display:inline-block; width:150px; font-weight:bold;"></span>
