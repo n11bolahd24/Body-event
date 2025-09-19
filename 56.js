@@ -1,0 +1,54 @@
+// --- Fungsi Update Live Score & Pindah Match Ended ---
+function monitorMatchStatus(matchId, boxId) {
+  const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
+  const matchBox = document.getElementById("match" + boxId);
+  const liveContainer = document.getElementById("liveContainer" + boxId);
+  const countdownEl = document.getElementById("countdown" + boxId);
+  const liveScoreEl = document.getElementById("liveScore" + boxId);
+  const statusEl = document.getElementById("status" + boxId); // <-- ini
+  const finishedContainer = document.getElementById("finishedMatches");
+
+  const interval = setInterval(async () => {
+    const res = await fetch(eventUrl);
+    const data = await res.json();
+    const event = data.event;
+    if (!event || !matchBox) return;
+
+    // Update skor selalu
+    let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
+    if (event.status.description) {
+      scoreText += ` <span style="font-size:12px; color:#ffcc00;">(${event.status.description})</span>`;
+    }
+    liveScoreEl.innerHTML = scoreText;
+
+    if (event.status.type === "inprogress") {
+      if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
+
+      countdownEl.innerHTML = "";
+      liveContainer.classList.remove('hidden');
+      liveContainer.classList.add('blink');
+      liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke: 0.2px black;'>🔴 LIVE NOW</strong>";
+
+      statusEl.innerText = "🔴 LIVE NOW";  // update status
+
+    } else if (event.status.type === "finished") {
+      clearInterval(interval);
+      if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
+
+      countdownEl.innerHTML = "";
+      liveContainer.classList.remove('blink');
+      liveContainer.style.animation = "none";
+      liveContainer.classList.remove('hidden');
+      liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke: 0.2px black;'>⛔ MATCH ENDED ⛔</strong>";
+
+      statusEl.innerText = "⛔ MATCH ENDED ⛔"; // update status juga
+
+      if (finishedContainer && matchBox.parentNode !== finishedContainer) {
+        finishedContainer.appendChild(matchBox);
+      }
+    } else {
+      liveContainer.classList.add('hidden');
+      statusEl.innerText = "Status : Upcoming"; // jaga status saat belum kickoff
+    }
+  }, 3000);
+}
