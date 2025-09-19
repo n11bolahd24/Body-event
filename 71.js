@@ -1,5 +1,5 @@
-// --- Fungsi Utama Load Sofascore + Countdown + Logo Liga ---
-function loadSofaScore(matchId, boxId, region = "Asia/Jakarta") {
+// --- Fungsi Utama Load Sofascore + Countdown ---
+function loadSofaScore(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
 
     fetch(eventUrl)
@@ -9,33 +9,11 @@ function loadSofaScore(matchId, boxId, region = "Asia/Jakarta") {
             const home = event.homeTeam;
             const away = event.awayTeam;
 
-            // --- Logo Liga + Nama Liga ---
-            const leagueEl = document.getElementById("league" + boxId);
-            leagueEl.innerHTML = "";
+            // Nama liga
+            document.getElementById("league" + boxId).innerText = event.tournament.name;
 
-            // URL logo liga
-            const leagueLogoUrl = `https://api.sofascore.app/api/v1/tournament/${event.tournament.id}/image`;
-
-            // Elemen logo
-            const logoImg = document.createElement("img");
-            logoImg.src = leagueLogoUrl;
-            logoImg.style.width = "24px";
-            logoImg.style.height = "24px";
-            logoImg.style.verticalAlign = "middle";
-            logoImg.style.marginRight = "6px";
-
-            // Elemen nama liga
-            const leagueNameSpan = document.createElement("span");
-            leagueNameSpan.innerText = event.tournament.name;
-            leagueNameSpan.style.verticalAlign = "middle";
-
-            // Tambahkan ke container
-            leagueEl.style.display = "flex";
-            leagueEl.style.alignItems = "center";
-            leagueEl.appendChild(logoImg);
-            leagueEl.appendChild(leagueNameSpan);
-
-            // --- Jadwal kickoff ---
+            // Kickoff otomatis sesuai zona waktu browser
+            const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             let kickoffDate = new Date(event.startTimestamp * 1000);
             let options = {
                 day: "2-digit",
@@ -43,32 +21,30 @@ function loadSofaScore(matchId, boxId, region = "Asia/Jakarta") {
                 year: "numeric",
                 hour: "2-digit",
                 minute: "2-digit",
+                second: "2-digit",
                 hour12: false,
-                timeZone: region
+                timeZone: userTimeZone
             };
             let kickoffString = new Intl.DateTimeFormat("id-ID", options).format(kickoffDate);
 
-            let regionAbbr = "WIB"; 
-            if (region === "Asia/Makassar") regionAbbr = "WITA";
-            if (region === "Asia/Jayapura") regionAbbr = "WIT";
+            // Tampilkan kickoff
+            document.getElementById("kickoff" + boxId).innerText = kickoffString;
 
-            document.getElementById("kickoff" + boxId).innerText =
-                kickoffString + " " + regionAbbr;
-
-            // --- Nama tim ---
+            // Nama tim
             document.getElementById("teams" + boxId).innerText = home.name + " VS " + away.name;
 
-            // --- Logo tim ---
+            // Logo tim
             document.getElementById("logoHome" + boxId).src =
                 "https://api.sofascore.app/api/v1/team/" + home.id + "/image";
             document.getElementById("logoAway" + boxId).src =
                 "https://api.sofascore.app/api/v1/team/" + away.id + "/image";
 
-            // --- Mulai countdown & monitor status ---
+            // Mulai countdown & monitor status
             startCountdown(kickoffDate.getTime(), boxId);
             monitorMatchStatus(matchId, boxId);
         });
 }
+
 
 // --- Fungsi Update Live Score & Match Status ---
 function monitorMatchStatus(matchId, boxId) {
