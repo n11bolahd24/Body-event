@@ -84,7 +84,6 @@ function monitorMatchStatus(matchId, boxId) {
       clearInterval(interval);
       liveContainer.classList.remove("blink");
       liveContainer.style.animation = "none";
-      liveContainer.classList.remove("hidden");
       liveContainer.innerHTML = "<strong style='color:gray;'>⛔ MATCH ENDED ⛔</strong>";
 
       // Skor fulltime tetap tampil + babak terakhir (FT)
