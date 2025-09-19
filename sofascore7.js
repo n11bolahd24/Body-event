@@ -104,8 +104,8 @@ function startCountdown(targetTime, boxId) {
 
     document.getElementById(countdownId).innerText =
       (days > 0 ? days + "D " : "") +
-      hours + "H -" +
-      minutes + "M -" +
+      hours + "H - " +
+      minutes + "M - " +
       seconds + "S";
   }, 1000);
 }
