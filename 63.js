@@ -56,10 +56,10 @@ function monitorMatchStatus(matchId, boxId) {
   const liveStatusEl = document.getElementById("liveStatus" + boxId);
   const finishedContainer = document.getElementById("finishedMatches");
 
-  // Awal → sembunyikan semuanya
+  // Awal → sembunyikan live container
+  liveContainer.classList.add('hidden');
   liveScoreEl.innerHTML = "";
   liveStatusEl.innerHTML = "";
-  liveContainer.classList.add('hidden');
 
   const interval = setInterval(async () => {
     const res = await fetch(eventUrl);
@@ -67,40 +67,34 @@ function monitorMatchStatus(matchId, boxId) {
     const event = data.event;
     if (!event || !matchBox) return;
 
-    // Upcoming → jangan tampilkan apapun
+    // Jika upcoming → tampilkan countdown, sembunyikan live
     if (event.status.type === "upcoming") {
-      liveScoreEl.innerHTML = "";
-      liveStatusEl.innerHTML = "";
       liveContainer.classList.add('hidden');
       return;
     }
 
-    // Pertandingan live / selesai
-    liveContainer.classList.remove('hidden');
-
-    // Skor selalu tampil
-    liveScoreEl.innerHTML = `${event.homeScore.current} - ${event.awayScore.current}`;
-
-    // Status / babak
-    let statusText = "";
+    // Pertandingan mulai → sembunyikan countdown
     if (event.status.type === "inprogress") {
-      statusText = "🔴 LIVE NOW";
+      countdownEl.innerHTML = "";
+      liveContainer.classList.remove('hidden');
       liveContainer.classList.add('blink');
-    } else if (event.status.type === "finished") {
-      statusText = "⛔ MATCH ENDED ⛔";
-      liveContainer.classList.remove('blink');
-      liveContainer.style.animation = "none";
+      liveScoreEl.innerHTML = `${event.homeScore.current} - ${event.awayScore.current}`;
+      liveStatusEl.innerHTML = `<strong style="color:white;-webkit-text-stroke: 0.2px black;">🔴 LIVE NOW</strong>`;
     }
-    liveStatusEl.innerHTML = `<strong style="color:white;-webkit-text-stroke: 0.2px black;">${statusText}</strong>`;
 
-    // Jika match ended → pindahkan ke container finished
+    // Pertandingan selesai → tampil MATCH ENDED
     if (event.status.type === "finished") {
       clearInterval(interval);
+      countdownEl.innerHTML = ""; // countdown tetap hilang
+      liveContainer.classList.remove('blink');
+      liveContainer.style.animation = "none";
+      liveContainer.classList.remove('hidden');
+      liveScoreEl.innerHTML = `${event.homeScore.current} - ${event.awayScore.current}`;
+      liveStatusEl.innerHTML = `<strong style="color:white;-webkit-text-stroke: 0.2px black;">⛔ MATCH ENDED ⛔</strong>`;
       if (finishedContainer && matchBox.parentNode !== finishedContainer) {
         finishedContainer.appendChild(matchBox);
       }
     }
 
   }, 3000);
-        }
-          
+}
