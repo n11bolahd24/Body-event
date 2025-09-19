@@ -1,4 +1,4 @@
-buat dari script saya yg ini 
+
 // --- Fungsi Utama Load Sofascore + Countdown ---
 function loadSofaScore(matchId, boxId, region = "Asia/Jakarta") {
   const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
