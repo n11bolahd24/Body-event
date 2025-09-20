@@ -12,78 +12,59 @@ function loadSofaScore(matchId, boxId) {
             // Nama & logo liga
             const leagueEl = document.getElementById("league" + boxId);
             if (leagueEl) {
-            leagueEl.innerHTML = `
-            <span style="display:inline-flex;align-items:center;">
-            <img src="https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image/dark"
-                 alt="${event.tournament.name}"
-                 style="height:18px;width:18px;margin-right:4px;">
-            <span>${event.tournament.name}</span>
-        </span>
-    `;
-}
-
+                leagueEl.innerHTML = `
+                    <span style="display:inline-flex;align-items:center;">
+                        <img src="https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image/dark"
+                             alt="${event.tournament.name}"
+                             style="height:18px;width:18px;margin-right:4px;">
+                        <span>${event.tournament.name}</span>
+                    </span>
+                `;
+            }
 
             // Jadwal kickoff otomatis zona waktu pengunjung
             const kickoffDate = new Date(event.startTimestamp * 1000);
-
-            // Format tanggal lokal pengunjung
-            const tanggal = kickoffDate.toLocaleDateString(undefined, { // undefined = gunakan locale pengunjung
+            const tanggal = kickoffDate.toLocaleDateString(undefined, {
                 day: '2-digit',
                 month: 'long',
                 year: 'numeric'
             });
-
-            // Format jam lokal pengunjung + kode zona
             const jam = kickoffDate.toLocaleTimeString(undefined, {
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false,
                 timeZoneName: 'short'
             });
-
             document.getElementById("kickoff" + boxId).innerHTML = `${tanggal} | K.O ${jam}`;
-// Nama tim
-          #teamsContainer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-}
 
-.team {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+            // Logo + Nama tim (logo di atas, nama di bawah)
+            const teamsEl = document.getElementById("teams" + boxId);
+            if (teamsEl) {
+                teamsEl.innerHTML = `
+                    <div style="display:flex;align-items:center;justify-content:center;gap:25px;">
+                        <div style="display:flex;flex-direction:column;align-items:center;">
+                            <img id="logoHome${boxId}" src="https://api.sofascore.app/api/v1/team/${home.id}/image"
+                                 alt="${home.name}" style="height:48px;width:48px;">
+                            <span style="margin-top:4px;font-size:13px;color:white;text-align:center;">${home.name}</span>
+                        </div>
 
-.team img {
-  height: 40px;
-  width: 40px;
-}
+                        <span style="font-weight:bold;font-size:14px;color:white;">VS</span>
 
-.teamName {
-  margin-top: 4px;
-  font-size: 13px;
-  color: white;
-  text-align: center;
-}
-
-          // Nama tim
-document.getElementById("teamHome" + boxId).innerText = home.name;
-document.getElementById("teamAway" + boxId).innerText = away.name;
-
-// Logo tim
-document.getElementById("logoHome" + boxId).src =
-    "https://api.sofascore.app/api/v1/team/" + home.id + "/image";
-document.getElementById("logoAway" + boxId).src =
-    "https://api.sofascore.app/api/v1/team/" + away.id + "/image";
-
+                        <div style="display:flex;flex-direction:column;align-items:center;">
+                            <img id="logoAway${boxId}" src="https://api.sofascore.app/api/v1/team/${away.id}/image"
+                                 alt="${away.name}" style="height:48px;width:48px;">
+                            <span style="margin-top:4px;font-size:13px;color:white;text-align:center;">${away.name}</span>
+                        </div>
+                    </div>
+                `;
+            }
 
             // Mulai countdown & monitor status
             startCountdown(kickoffDate.getTime(), boxId);
             monitorMatchStatus(matchId, boxId);
         });
 }
+
 
 
 // --- Fungsi Update Live Score & Match Ended ---
