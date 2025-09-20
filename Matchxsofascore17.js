@@ -13,7 +13,7 @@ function loadSofaScore(matchId, boxId) {
             const leagueEl = document.getElementById("league" + boxId);
             if (leagueEl) {
             leagueEl.innerHTML = `
-            <span style="display:inline-flex;align-items:center;">
+            <span style="display:inline-flex;align-items:center; top:60%;">
             <img src="https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image/dark"
                  alt="${event.tournament.name}"
                  style="height:18px;width:18px;margin-right:4px;">
