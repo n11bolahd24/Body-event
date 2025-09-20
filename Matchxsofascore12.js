@@ -85,7 +85,7 @@ function monitorMatchStatus(matchId, boxId) {
             countdownEl.innerHTML = "";
             liveContainer.classList.remove('hidden');
             liveContainer.classList.add('blink');
-            liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW</strong>";
+            liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
 
             let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
             liveScoreEl.innerHTML = scoreText;
