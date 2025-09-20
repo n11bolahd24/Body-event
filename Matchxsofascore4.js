@@ -15,7 +15,7 @@ function loadSofaScore(matchId, boxId) {
                 leagueEl.innerHTML = `
                     <img src="https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image"
                          alt="${event.tournament.name}"
-                         style="height:16px;width:16px;vertical-align:middle;margin-right:5px;">
+                         style="height:16px;width:16px;vertical-align:center;margin-right:5px;">
                     <span>${event.tournament.name}</span>
                 `;
             }
