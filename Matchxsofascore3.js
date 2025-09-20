@@ -1,48 +1,4 @@
-<div class="kotak" id="match1">
-  <div class="countdown" id="countdown1"></div>
-
-  <!-- Live Status -->
-  <div class="live-container" id="liveContainer1" style="text-align:center; height:20px;">
-    <span id="liveStatus1" style="display:inline-block; width:150px; font-weight:bold;"></span>
-  </div>
-
-  <div class="club">
-    <center>
-      <!-- Nama Liga + Logo -->
-      <div style="display:flex; align-items:center; justify-content:center; gap:6px;">
-        <img id="leagueLogo1" style="height:18px; width:18px; border-radius:3px;">
-        <font id="league1" style="font-weight:bold">NAMA LIGA</font>
-      </div>
-
-      <!-- Skor & Status -->
-      <div id="liveScore1" style="font-size:10px; font-weight:bold; color:orange; text-align:center; margin:1px 0;"></div>  
-      <div id="matchStatus1" style="font-size:10px; font-weight:bold; color:orange; text-align:center; margin:1px 0;"></div>   
-
-      <!-- Nama tim -->
-      <font id="teams1" style="font-weight:bold">NAMA CLUB VS NAMA CLUB</font><br>
-
-      <!-- Kickoff -->
-      <div id="kickoff1" style="font-size:12px; color:white; text-align:center; margin:1px 0;"></div>
-    </center>
-  </div>
-
-  <!-- Logo tim -->
-  <img id="logoHome1" style="position:absolute; height:50px; width:50px; top:25%; left:10%; border-radius:5px;">
-  <img id="logoAway1" style="position:absolute; height:50px; width:50px; top:25%; right:10%; border-radius:5px;">
-
-  <!-- Tombol server -->
-  <center>
-    <span style="font-size: large;">
-      <a class="tv" href="javascript:skylaliga();"><b><span>SERVER1</span></b></a>
-      <a class="tv" href="javascript:SERVER2();"><b><span>SERVER2</span></b></a>
-      <a class="tv" href="javascript:SERVER3();"><b><span>SERVER3</span></b></a>
-      <a class="tv" href="javascript:SERVER4();"><b><span>SERVER4</span></b></a>
-    </span>
-  </center><br>
-</div>
-
-<script>
-// --- Fungsi Utama Load Sofascore ---
+// --- Fungsi Utama Load Sofascore + Countdown ---
 function loadSofaScore(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
 
@@ -53,10 +9,16 @@ function loadSofaScore(matchId, boxId) {
             const home = event.homeTeam;
             const away = event.awayTeam;
 
-            // Nama liga + logo liga
-            document.getElementById("league" + boxId).innerText = event.tournament.name;
-            document.getElementById("leagueLogo" + boxId).src =
-                "https://api.sofascore.app/api/v1/unique-tournament/" + event.tournament.uniqueTournament.id + "/image";
+            // Nama & logo liga
+            const leagueEl = document.getElementById("league" + boxId);
+            if (leagueEl) {
+                leagueEl.innerHTML = `
+                    <img src="https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image"
+                         alt="${event.tournament.name}"
+                         style="height:16px;width:16px;vertical-align:middle;margin-right:5px;">
+                    <span>${event.tournament.name}</span>
+                `;
+            }
 
             // Kickoff otomatis sesuai zona waktu browser
             const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -67,11 +29,13 @@ function loadSofaScore(matchId, boxId) {
                 year: "numeric",
                 hour: "2-digit",
                 minute: "2-digit",
+                second: "2-digit",
                 hour12: false,
-                timeZone: userTimeZone,
-                timeZoneName: "short"
+                timeZone: userTimeZone
             };
             let kickoffString = new Intl.DateTimeFormat("id-ID", options).format(kickoffDate);
+
+            // Tampilkan kickoff
             document.getElementById("kickoff" + boxId).innerText = kickoffString;
 
             // Nama tim
@@ -89,28 +53,29 @@ function loadSofaScore(matchId, boxId) {
         });
 }
 
-// --- Fungsi Update Status Pertandingan ---
+
+// --- Fungsi Update Live Score & Match Ended ---
 function monitorMatchStatus(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
+    const matchBox = document.getElementById("match" + boxId);
     const liveContainer = document.getElementById("liveContainer" + boxId);
     const countdownEl = document.getElementById("countdown" + boxId);
     const liveScoreEl = document.getElementById("liveScore" + boxId);
     const matchStatusEl = document.getElementById("matchStatus" + boxId);
+    const finishedContainer = document.getElementById("finishedMatches");
 
     const interval = setInterval(async () => {
         const res = await fetch(eventUrl);
         const data = await res.json();
         const event = data.event;
-        if (!event) return;
+        if (!event || !matchBox) return;
 
-        // Sebelum kickoff
         if (event.status.type === "upcoming") {
             liveScoreEl.style.display = "none";
             matchStatusEl.style.display = "none";
             liveContainer.classList.add('hidden');
         }
 
-        // Saat pertandingan berlangsung
         if (event.status.type === "inprogress") {
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
 
@@ -123,17 +88,19 @@ function monitorMatchStatus(matchId, boxId) {
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            matchStatusEl.innerHTML = event.status.description || "1st Half";
+            let statusText = event.status.description || "1st Half";
+            matchStatusEl.innerHTML = statusText;
             matchStatusEl.style.display = "block";
         }
 
-        // Pertandingan selesai
         if (event.status.type === "finished") {
             clearInterval(interval);
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
 
             countdownEl.innerHTML = "";
             liveContainer.classList.remove('blink');
+            liveContainer.style.animation = "none";
+            liveContainer.classList.remove('hidden');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>⛔ MATCH ENDED ⛔</strong>";
 
             let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
@@ -142,6 +109,10 @@ function monitorMatchStatus(matchId, boxId) {
 
             matchStatusEl.innerHTML = "Full Time";
             matchStatusEl.style.display = "block";
+
+            if (finishedContainer && matchBox.parentNode !== finishedContainer) {
+                finishedContainer.appendChild(matchBox);
+            }
         }
     }, 3000);
 }
@@ -155,7 +126,8 @@ function startCountdown(targetTime, boxId) {
 
         if (distance < 0) {
             clearInterval(window["countdown_" + boxId]);
-            document.getElementById(countdownId).innerHTML = "";
+            const countdownEl = document.getElementById(countdownId);
+            countdownEl.innerHTML = "";
             return;
         }
 
@@ -170,8 +142,5 @@ function startCountdown(targetTime, boxId) {
             minutes + "M - " +
             seconds + "S";
     }, 1000);
-}
-
-
-</script>
-    
+                                 }
+        
