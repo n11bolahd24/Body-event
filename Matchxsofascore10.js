@@ -46,9 +46,9 @@ function loadSofaScore(matchId, boxId) {
 
             // Logo tim
             document.getElementById("logoHome" + boxId).src =
-                "https://api.sofascore.app/api/v1/team/" + home.id + "/image/dark";
+                "https://api.sofascore.app/api/v1/team/" + home.id + "/image";
             document.getElementById("logoAway" + boxId).src =
-                "https://api.sofascore.app/api/v1/team/" + away.id + "/image/dark";
+                "https://api.sofascore.app/api/v1/team/" + away.id + "/image";
 
             // Mulai countdown & monitor status
             startCountdown(kickoffDate.getTime(), boxId);
