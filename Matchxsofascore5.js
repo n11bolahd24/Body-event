@@ -12,13 +12,16 @@ function loadSofaScore(matchId, boxId) {
             // Nama & logo liga
             const leagueEl = document.getElementById("league" + boxId);
             if (leagueEl) {
-                leagueEl.innerHTML = `
-                    <img src="https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image"
-                         alt="${event.tournament.name}"
-                         style="height:16px;width:16px;vertical-align:center;margin-right:5px;">
-                    <span>${event.tournament.name}</span>
-                `;
-            }
+            leagueEl.innerHTML = `
+            <span style="display:inline-flex;align-items:center;gap:6px;">
+            <img src="https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image"
+                 alt="${event.tournament.name}"
+                 style="height:18px;width:18px;">
+            <span>${event.tournament.name}</span>
+        </span>
+    `;
+}
+
 
             // Kickoff otomatis sesuai zona waktu browser
             const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
