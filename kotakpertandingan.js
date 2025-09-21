@@ -12,7 +12,7 @@ function loadSofaScore(matchId, matchKey) {
 // --- fungsi tambahan untuk generate box ---
 function renderMatch(matchId, matchKey, serverFuncs) {
   const html = `
-  <div class="kotak2" id="match${matchKey}" class="kotak matchbox">
+  <div class="kotak" id="match${matchKey}" class="kotak matchbox">
     <div class="countdown" id="countdown${matchKey}"></div>
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
