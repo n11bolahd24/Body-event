@@ -27,7 +27,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak") {
     <div class="club">
       <center>
         <span id="league${matchKey}" style="position:relative; top:5px; left:-11px; font-weight:bold; font-size:12px; color:white;">NAMA LIGA</span>
-        <div id="liveScore${matchKey}" style="position:relative; top:5px; left:0px;font-size:20px; font-weight:bold; color:orange; text-align:center;"></div>  
+        <div id="liveScore${matchKey}" style="position:relative; top:0px; left:0px;font-size:20px; font-weight:bold; color:orange; text-align:center;"></div>  
         <div id="matchStatus${matchKey}" style="font-size:10px; font-weight:bold; color:orange; text-align:center; margin:-1px 1px;"></div>   
         <font id="teams${matchKey}" style="font-weight:bold">NAMA CLUB VS NAMA CLUB</font><br>
         <div id="kickoff${matchKey}" style="font-size:12px; color:white; text-align:center; margin:1px 0;"></div>
