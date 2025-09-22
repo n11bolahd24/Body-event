@@ -135,10 +135,22 @@ function monitorMatchStatus(matchId, boxId, kickoffTimeMs) {
             // Hitung menit perkiraan
             const elapsed = Math.floor((now - halfStartTime) / (1000 * 60));
             switch (halfType) {
-                case "1st": minutesPassed = elapsed; break;
-                case "2nd": minutesPassed = 46 + elapsed; break;
-                case "ET1": minutesPassed = 91 + elapsed; break;
-                case "ET2": minutesPassed = 106 + elapsed; break;
+                case "1st": 
+                    minutesPassed = elapsed;
+                    if (minutesPassed > 45) minutesPassed = `45+${minutesPassed - 45}`;
+                    break;
+                case "2nd": 
+                    minutesPassed = 46 + elapsed;
+                    if (minutesPassed > 90) minutesPassed = `90+${minutesPassed - 90}`;
+                    break;
+                case "ET1": 
+                    minutesPassed = 91 + elapsed;
+                    if (minutesPassed > 105) minutesPassed = `105+${minutesPassed - 105}`;
+                    break;
+                case "ET2": 
+                    minutesPassed = 106 + elapsed;
+                    if (minutesPassed > 120) minutesPassed = `120+${minutesPassed - 120}`;
+                    break;
             }
 
             matchStatusEl.innerHTML = `${statusDesc} ${minutesPassed}'`;
