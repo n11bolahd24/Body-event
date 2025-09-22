@@ -83,16 +83,19 @@ function monitorMatchStatus(matchId, boxId) {
         const event = data.event;
         if(!event || !matchBox) return;
 
+        // Hitung menit real-time
         let minute = event.status.minute || getRealTimeMinute(event);
-        if(formattedTimeEl) formattedTimeEl.innerText = minute + "'";
+        if(formattedTimeEl) formattedTimeEl.textContent = minute + "'";
 
+        // Live score + penalti
         let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
         if(event.homeScore.penalties != null && event.awayScore.penalties != null) {
             scoreText += ` (P ${event.homeScore.penalties} - ${event.awayScore.penalties})`;
         }
-
-        liveScoreEl.innerHTML = scoreText;
-        liveScoreEl.style.display = "block";
+        if(liveScoreEl) {
+            liveScoreEl.innerHTML = scoreText;
+            liveScoreEl.style.display = "block";
+        }
 
         // Status match
         let statusText = "";
@@ -158,7 +161,7 @@ function startCountdown(targetTime, boxId) {
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
         const countdownEl = document.getElementById(countdownId);
-        if(countdownEl) countdownEl.innerText =
+        if(countdownEl) countdownEl.textContent =
             (days > 0 ? days + "D - " : "") +
             hours + "H - " +
             minutes + "M - " +
