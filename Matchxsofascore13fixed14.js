@@ -26,14 +26,18 @@ function loadSofaScore(matchId, boxId) {
             const kickoffDate = new Date(event.startTimestamp * 1000);
             const tanggal = kickoffDate.toLocaleDateString(undefined, { day: '2-digit', month: 'long', year: 'numeric' });
             const jam = kickoffDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short' });
-            document.getElementById("kickoff" + boxId).innerHTML = `${tanggal} | K.O ${jam}`;
+            const kickoffEl = document.getElementById("kickoff" + boxId);
+            if(kickoffEl) kickoffEl.innerHTML = `${tanggal} | K.O ${jam}`;
 
             // Nama tim
-            document.getElementById("teams" + boxId).innerText = home.name + " VS " + away.name;
+            const teamsEl = document.getElementById("teams" + boxId);
+            if(teamsEl) teamsEl.innerText = home.name + " VS " + away.name;
 
             // Logo tim
-            document.getElementById("logoHome" + boxId).src = "https://api.sofascore.app/api/v1/team/" + home.id + "/image";
-            document.getElementById("logoAway" + boxId).src = "https://api.sofascore.app/api/v1/team/" + away.id + "/image";
+            const logoHomeEl = document.getElementById("logoHome" + boxId);
+            const logoAwayEl = document.getElementById("logoAway" + boxId);
+            if(logoHomeEl) logoHomeEl.src = "https://api.sofascore.app/api/v1/team/" + home.id + "/image";
+            if(logoAwayEl) logoAwayEl.src = "https://api.sofascore.app/api/v1/team/" + away.id + "/image";
 
             // Mulai countdown & monitor status
             startCountdown(kickoffDate.getTime(), boxId);
@@ -47,15 +51,15 @@ function getRealTimeMinute(event) {
     const start = event.startTimestamp * 1000;
     let minute = 0;
 
-    if (event.status.type === "inprogress" || event.status.type === "extraTime") {
+    if(event.status.type === "inprogress" || event.status.type === "extraTime") {
         minute = Math.floor((now - start) / 60000);
 
-        if (event.status.addedTime) minute += event.status.addedTime;
+        if(event.status.addedTime) minute += event.status.addedTime;
 
-        if (event.status.period === "firstHalf" && minute > 45 + (event.status.addedTime || 0)) {
+        if(event.status.period === "firstHalf" && minute > 45 + (event.status.addedTime || 0)) {
             minute = 45 + (event.status.addedTime || 0);
         }
-        if (event.status.period === "secondHalf" && minute > 90 + (event.status.addedTime || 0)) {
+        if(event.status.period === "secondHalf" && minute > 90 + (event.status.addedTime || 0)) {
             minute = 90 + (event.status.addedTime || 0);
         }
     }
@@ -70,70 +74,66 @@ function monitorMatchStatus(matchId, boxId) {
     const countdownEl = document.getElementById("countdown" + boxId);
     const liveScoreEl = document.getElementById("liveScore" + boxId);
     const matchStatusEl = document.getElementById("matchStatus" + boxId);
+    const formattedTimeEl = document.getElementById("formattedTime" + boxId);
     const finishedContainer = document.getElementById("finishedMatches");
 
     const interval = setInterval(async () => {
         const res = await fetch(eventUrl);
         const data = await res.json();
         const event = data.event;
-        if (!event || !matchBox) return;
+        if(!event || !matchBox) return;
 
         let minute = event.status.minute || getRealTimeMinute(event);
-        let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
-        let statusText = "";
+        if(formattedTimeEl) formattedTimeEl.innerText = minute + "'";
 
-        // Penalti
-        if (event.homeScore.penalties != null && event.awayScore.penalties != null) {
+        let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
+        if(event.homeScore.penalties != null && event.awayScore.penalties != null) {
             scoreText += ` (P ${event.homeScore.penalties} - ${event.awayScore.penalties})`;
         }
 
-        // Update status & menit
-        if (event.status.type === "inprogress") {
-            statusText = event.status.period === "firstHalf" ? `1st Half ${minute}'` :
-                         event.status.period === "secondHalf" ? `2nd Half ${minute}'` :
+        liveScoreEl.innerHTML = scoreText;
+        liveScoreEl.style.display = "block";
+
+        // Status match
+        let statusText = "";
+        if(event.status.type === "upcoming") {
+            statusText = "Upcoming";
+            liveContainer.classList.add('hidden');
+            liveScoreEl.style.display = "none";
+        } else if(event.status.type === "inprogress") {
+            statusText = event.status.period === "firstHalf" ? "1st Half" :
+                         event.status.period === "secondHalf" ? "2nd Half" :
                          event.status.description;
-
-            if (event.status.type === "extraTime") {
-                statusText = `Extra Time ${minute}'`;
-            }
-
-            countdownEl.innerHTML = "";
             liveContainer.classList.remove('hidden');
             liveContainer.classList.add('blink');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
-
-            liveScoreEl.innerHTML = scoreText;
-            liveScoreEl.style.display = "block";
-
-            matchStatusEl.innerHTML = statusText;
-            matchStatusEl.style.display = "block";
-        }
-
-        if (event.status.type === "upcoming") {
-            liveScoreEl.style.display = "none";
-            matchStatusEl.style.display = "none";
-            liveContainer.classList.add('hidden');
-        }
-
-        if (event.status.type === "finished") {
+        } else if(event.status.type === "extraTime") {
+            statusText = "Extra Time";
+            liveContainer.classList.remove('hidden');
+            liveContainer.classList.add('blink');
+            liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
+        } else if(event.status.type === "finished") {
             clearInterval(interval);
-            if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
-
-            countdownEl.innerHTML = "";
+            if(window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
+            statusText = "Full Time";
             liveContainer.classList.remove('blink');
             liveContainer.style.animation = "none";
             liveContainer.classList.remove('hidden');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>⛔ MATCH ENDED ⛔</strong>";
 
-            liveScoreEl.innerHTML = scoreText;
-            liveScoreEl.style.display = "block";
-
-            matchStatusEl.innerHTML = "Full Time";
-            matchStatusEl.style.display = "block";
-
-            if (finishedContainer && matchBox.parentNode !== finishedContainer) {
+            if(finishedContainer && matchBox.parentNode !== finishedContainer) {
                 finishedContainer.appendChild(matchBox);
             }
+        }
+
+        // Tambahkan Penalty info di status
+        if(event.homeScore.penalties != null && event.awayScore.penalties != null) {
+            statusText += " | Penalty";
+        }
+
+        if(matchStatusEl) {
+            matchStatusEl.innerHTML = statusText;
+            matchStatusEl.style.display = "block";
         }
     }, 3000);
 }
@@ -141,14 +141,14 @@ function monitorMatchStatus(matchId, boxId) {
 // --- Fungsi Countdown ---
 function startCountdown(targetTime, boxId) {
     const countdownId = "countdown" + boxId;
-    window["countdown_" + boxId] = setInterval(function () {
+    window["countdown_" + boxId] = setInterval(function() {
         const now = new Date().getTime();
         const distance = targetTime - now;
 
-        if (distance < 0) {
+        if(distance < 0) {
             clearInterval(window["countdown_" + boxId]);
             const countdownEl = document.getElementById(countdownId);
-            countdownEl.innerHTML = "";
+            if(countdownEl) countdownEl.innerHTML = "";
             return;
         }
 
@@ -157,7 +157,8 @@ function startCountdown(targetTime, boxId) {
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        document.getElementById(countdownId).innerText =
+        const countdownEl = document.getElementById(countdownId);
+        if(countdownEl) countdownEl.innerText =
             (days > 0 ? days + "D - " : "") +
             hours + "H - " +
             minutes + "M - " +
