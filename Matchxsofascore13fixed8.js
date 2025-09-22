@@ -157,4 +157,26 @@ function monitorMatchStatus(matchId, boxId) {
 // --- Fungsi Countdown ---
 function startCountdown(targetTime, boxId) {
     const countdownId = "countdown" + boxId;
-    window["countdown_" + boxId] = setInterval(f_]()
+    window["countdown_" + boxId] = setInterval(function () {
+        const now = new Date().getTime();
+        const distance = targetTime - now;
+
+        if (distance < 0) {
+            clearInterval(window["countdown_" + boxId]);
+            const countdownEl = document.getElementById(countdownId);
+            countdownEl.innerHTML = "";
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById(countdownId).innerText =
+            (days > 0 ? days + "D - " : "") +
+            hours + "H - " +
+            minutes + "M - " +
+            seconds + "S";
+    }, 1000);
+}
