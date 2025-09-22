@@ -41,7 +41,7 @@ function loadSofaScore(matchId, boxId) {
                 timeZoneName: 'short'
             });
 
-            document.getElementById("kickoff" + boxId).innerHTML = `${tanggal} | K.O ${jam}`;
+            document.getElementById("kickoff" + boxId).innerHTML = `${tanggal} | ⚽ ${jam}`;
             // Nama tim
             document.getElementById("teams" + boxId).innerText = home.name + " VS " + away.name;
 
