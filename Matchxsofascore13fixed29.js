@@ -1,4 +1,4 @@
-// --- Fungsi Update Live Score & Match Ended + Menit ---
+// --- Fungsi Update Live Score, Menit, Babak, Extra Time & Penalti ---
 function monitorMatchStatus(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -21,36 +21,46 @@ function monitorMatchStatus(matchId, boxId) {
             liveContainer.classList.add('hidden');
         }
 
-        // --- MATCH LIVE ---
+        // --- MATCH IN PROGRESS ---
         if (event.status.type === "inprogress") {
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
-
             countdownEl.innerHTML = "";
+
             liveContainer.classList.remove('hidden');
             liveContainer.classList.add('blink');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
 
-            // Score
-            let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
-            liveScoreEl.innerHTML = scoreText;
-            liveScoreEl.style.display = "block";
-
-            // --- Menit Pertandingan ---
-            let minuteText = "";
-            const statusType = event.status.description || "";
+            // Score utama
             const homeScore = event.homeScore.current;
             const awayScore = event.awayScore.current;
+            liveScoreEl.innerHTML = `${homeScore} - ${awayScore}`;
+            liveScoreEl.style.display = "block";
 
-            // Data Sofascore menyediakan currentMinute dan extraTime jika ada
-            let currentMinute = event.status.currentMinute || 0; // menit utama
-            let extraMinute = event.status.extraTime || 0;       // tambahan waktu
+            // Menit pertandingan + babak + extra time
+            let minuteText = "";
+            let currentMinute = event.status.currentMinute || 0;
+            let extraMinute = event.status.extraTime || 0;
 
-            if (currentMinute > 0) {
+            if (currentMinute <= 45) {
+                // Babak 1
                 minuteText = currentMinute;
                 if (extraMinute > 0) minuteText += "+" + extraMinute;
-                minuteText += "'";
+                minuteText += "' (1H)";
+            } else if (currentMinute > 45) {
+                // Babak 2
+                const secondHalfMinute = currentMinute - 45;
+                minuteText = secondHalfMinute;
+                if (extraMinute > 0) minuteText += "+" + extraMinute;
+                minuteText += "' (2H)";
             } else {
-                minuteText = statusType; // fallback
+                minuteText = event.status.description || "Live";
+            }
+
+            // Jika ada penalti
+            if (event.homeScore.penalties || event.awayScore.penalties) {
+                const penHome = event.homeScore.penalties || 0;
+                const penAway = event.awayScore.penalties || 0;
+                minuteText += ` | Pen: ${penHome} - ${penAway}`;
             }
 
             matchStatusEl.innerHTML = minuteText;
@@ -68,13 +78,24 @@ function monitorMatchStatus(matchId, boxId) {
             liveContainer.classList.remove('hidden');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>⛔ MATCH ENDED ⛔</strong>";
 
-            let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
-            liveScoreEl.innerHTML = scoreText;
+            // Final score
+            const homeScore = event.homeScore.current;
+            const awayScore = event.awayScore.current;
+            liveScoreEl.innerHTML = `${homeScore} - ${awayScore}`;
             liveScoreEl.style.display = "block";
 
-            matchStatusEl.innerHTML = "Full Time";
+            // Penalti jika ada
+            let statusText = "Full Time";
+            if (event.homeScore.penalties || event.awayScore.penalties) {
+                const penHome = event.homeScore.penalties || 0;
+                const penAway = event.awayScore.penalties || 0;
+                statusText += ` | Penalties: ${penHome} - ${penAway}`;
+            }
+
+            matchStatusEl.innerHTML = statusText;
             matchStatusEl.style.display = "block";
 
+            // Pindah ke container finished
             if (finishedContainer && matchBox.parentNode !== finishedContainer) {
                 finishedContainer.appendChild(matchBox);
             }
