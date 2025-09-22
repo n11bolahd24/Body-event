@@ -38,7 +38,7 @@ function loadSofaScore(matchId, boxId) {
 
             // Mulai countdown & monitor status
             startCountdown(kickoffDate.getTime(), boxId);
-            monitorMatchStatus(matchId, boxId);
+            monitorMatchStatus(matchId, boxId, kickoffDate.getTime());
         });
 }
 
@@ -68,8 +68,8 @@ function startCountdown(targetTime, boxId) {
     }, 1000);
 }
 
-// --- Fungsi Monitor Match Status Stabil ---
-function monitorMatchStatus(matchId, boxId) {
+// --- Fungsi Update Live Score & Match Status + Menit Perkiraan ---
+function monitorMatchStatus(matchId, boxId, kickoffTimeMs) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
     const liveContainer = document.getElementById("liveContainer" + boxId);
@@ -78,6 +78,11 @@ function monitorMatchStatus(matchId, boxId) {
     const matchStatusEl = document.getElementById("matchStatus" + boxId);
     const finishedContainer = document.getElementById("finishedMatches");
 
+    let halfStartTime = kickoffTimeMs;
+    let isSecondHalf = false;
+    let isET1 = false;
+    let isET2 = false;
+
     const interval = setInterval(async () => {
         const res = await fetch(eventUrl);
         const data = await res.json();
@@ -85,32 +90,20 @@ function monitorMatchStatus(matchId, boxId) {
         if (!event || !matchBox) return;
 
         const statusType = event.status.type;
+        const statusDesc = event.status.description || "";
 
-        // Skor pinalti
         const penaltiesHome = event.homeScore.penalties || 0;
         const penaltiesAway = event.awayScore.penalties || 0;
         const hasPenalties = penaltiesHome > 0 || penaltiesAway > 0;
 
-        // --- STATUS UPCOMING ---
+        // --- UPCOMING ---
         if (statusType === "upcoming") {
             liveScoreEl.style.display = "none";
             matchStatusEl.style.display = "none";
             liveContainer.classList.add('hidden');
         }
 
-        // --- STATUS HALFTIME ---
-        else if (statusType === "halftime") {
-            liveContainer.classList.remove('hidden');
-            liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>⏸️ HALF TIME ⏸️</strong>";
-
-            liveScoreEl.innerHTML = `${event.homeScore.current} - ${event.awayScore.current}`;
-            liveScoreEl.style.display = "block";
-
-            matchStatusEl.innerHTML = "Half Time";
-            matchStatusEl.style.display = "block";
-        }
-
-        // --- STATUS IN PROGRESS ---
+        // --- IN PROGRESS ---
         else if (statusType === "inprogress") {
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
             countdownEl.innerHTML = "";
@@ -119,17 +112,41 @@ function monitorMatchStatus(matchId, boxId) {
             liveContainer.classList.add('blink');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
 
-            // Update skor
             liveScoreEl.innerHTML = `${event.homeScore.current} - ${event.awayScore.current}`;
             liveScoreEl.style.display = "block";
 
-            // Update status babak langsung dari SofaScore
-            let halfDesc = event.status.description || "1st Half";
-            matchStatusEl.innerHTML = halfDesc;
+            // Tentukan menit perkiraan
+            let now = Date.now();
+            let minutesPassed = Math.floor((now - halfStartTime) / (1000 * 60));
+
+            if (!isSecondHalf && statusDesc.toLowerCase().includes("2nd")) {
+                isSecondHalf = true;
+                halfStartTime = now;
+                minutesPassed = 46; // mulai dari menit 46
+            }
+            else if (!isET1 && statusDesc.toLowerCase().includes("et 1st")) {
+                isET1 = true;
+                halfStartTime = now;
+                minutesPassed = 91; // mulai ET babak 1
+            }
+            else if (!isET2 && statusDesc.toLowerCase().includes("et 2nd")) {
+                isET2 = true;
+                halfStartTime = now;
+                minutesPassed = 106; // mulai ET babak 2
+            } 
+            else if (isSecondHalf && !isET1 && !isET2) {
+                minutesPassed += 45;
+            } else if (isET1 && !isET2) {
+                minutesPassed += 90;
+            } else if (isET2) {
+                minutesPassed += 105;
+            }
+
+            matchStatusEl.innerHTML = `${statusDesc} ${minutesPassed}'`;
             matchStatusEl.style.display = "block";
         }
 
-        // --- STATUS FINISHED ---
+        // --- FINISHED ---
         else if (statusType === "finished") {
             clearInterval(interval);
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
@@ -153,5 +170,6 @@ function monitorMatchStatus(matchId, boxId) {
                 finishedContainer.appendChild(matchBox);
             }
         }
-    }, 3000); // update tiap 3 detik cukup stabil
+
+    }, 1000);
 }
