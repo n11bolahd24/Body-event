@@ -1,4 +1,5 @@
-// --- Fungsi Utama Load Sofascore + Countdown ---
+<script>
+// --- Fungsi Utama Load SofaScore + Countdown ---
 function loadSofaScore(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
 
@@ -15,8 +16,8 @@ function loadSofaScore(matchId, boxId) {
                 leagueEl.innerHTML = `
                     <span style="display:inline-flex;align-items:center;">
                         <img src="https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image/dark"
-                            alt="${event.tournament.name}"
-                            style="height:18px;width:18px;margin-right:4px;">
+                             alt="${event.tournament.name}"
+                             style="height:18px;width:18px;margin-right:4px;">
                         <span>${event.tournament.name}</span>
                     </span>
                 `;
@@ -25,14 +26,14 @@ function loadSofaScore(matchId, boxId) {
             // Jadwal kickoff otomatis zona waktu pengunjung
             const kickoffDate = new Date(event.startTimestamp * 1000);
 
-            // Format tanggal lokal pengunjung
+            // Format tanggal lokal
             const tanggal = kickoffDate.toLocaleDateString(undefined, {
                 day: '2-digit',
                 month: 'long',
                 year: 'numeric'
             });
 
-            // Format jam lokal pengunjung + kode zona
+            // Format jam lokal
             const jam = kickoffDate.toLocaleTimeString(undefined, {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -58,7 +59,7 @@ function loadSofaScore(matchId, boxId) {
 }
 
 
-// --- Fungsi Update Live Score + Status + Menit ---
+// --- Fungsi Update Live Score & Menit Realtime ---
 function monitorMatchStatus(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -74,14 +75,12 @@ function monitorMatchStatus(matchId, boxId) {
         const event = data.event;
         if (!event || !matchBox) return;
 
-        // --- Jika masih upcoming ---
         if (event.status.type === "upcoming") {
             liveScoreEl.style.display = "none";
             matchStatusEl.style.display = "none";
             liveContainer.classList.add('hidden');
         }
 
-        // --- Jika sedang berlangsung ---
         if (event.status.type === "inprogress") {
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
 
@@ -90,45 +89,47 @@ function monitorMatchStatus(matchId, boxId) {
             liveContainer.classList.add('blink');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
 
+            // Skor
             let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            // Hitung menit berjalan (urut sampai 90+, plus injury time)
-            let statusText = event.status.description || "Live";
+            // Hitung menit pertandingan
+            let statusText = event.status.description || "1st Half";
             if (event.time && event.time.currentPeriodStartTimestamp) {
                 const now = Math.floor(Date.now() / 1000);
                 const elapsedSec = now - event.time.currentPeriodStartTimestamp;
                 let minutes = Math.floor(elapsedSec / 60);
 
-                // Offset per babak
-                if (event.status.description && event.status.description.toLowerCase().includes("2nd")) {
-                    minutes += 45;
-                } else if (event.status.description && event.status.description.toLowerCase().includes("extra time")) {
-                    minutes += 90;
+                let baseMinute = 0;
+                const desc = event.status.description.toLowerCase();
+
+                if (desc.includes("2nd")) baseMinute = 45;
+                else if (desc.includes("extra time")) baseMinute = 90;
+                else if (desc.includes("penalties")) baseMinute = 120;
+
+                let totalMinutes = baseMinute + minutes;
+
+                // Format menit: 45+ / 90+ / 120+
+                if (baseMinute === 45 && totalMinutes > 45) {
+                    minutes = `45+${totalMinutes - 45}`;
+                } else if (baseMinute === 90 && totalMinutes > 90) {
+                    minutes = `90+${totalMinutes - 90}`;
+                } else if (baseMinute === 105 && totalMinutes > 105) {
+                    minutes = `105+${totalMinutes - 105}`;
+                } else if (baseMinute === 120 && totalMinutes > 120) {
+                    minutes = `120+${totalMinutes - 120}`;
+                } else {
+                    minutes = totalMinutes;
                 }
 
-                // Tambahan waktu (injury time)
-                if (event.status.description && event.status.description.toLowerCase().includes("1st")) {
-                    if (event.time.injuryTime1 && minutes > 45) {
-                        minutes = `45+${minutes - 45}`;
-                    }
-                } else if (event.status.description && event.status.description.toLowerCase().includes("2nd")) {
-                    if (event.time.injuryTime2 && minutes > 90) {
-                        minutes = `90+${minutes - 90}`;
-                    }
-                }
-
-                if (minutes >= 0) {
-                    statusText = `${statusText} - ${minutes}'`;
-                }
+                statusText = `${event.status.description} - ${minutes}'`;
             }
 
             matchStatusEl.innerHTML = statusText;
             matchStatusEl.style.display = "block";
         }
 
-        // --- Jika sudah selesai ---
         if (event.status.type === "finished") {
             clearInterval(interval);
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
@@ -154,7 +155,7 @@ function monitorMatchStatus(matchId, boxId) {
 }
 
 
-// --- Fungsi Countdown Kickoff ---
+// --- Fungsi Countdown ---
 function startCountdown(targetTime, boxId) {
     const countdownId = "countdown" + boxId;
     window["countdown_" + boxId] = setInterval(function () {
@@ -180,3 +181,4 @@ function startCountdown(targetTime, boxId) {
             seconds + "S";
     }, 1000);
 }
+</script>
