@@ -94,7 +94,7 @@ function monitorMatchStatus(matchId, boxId) {
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            // Hitung menit berjalan (tidak reset di babak 2)
+            // Hitung menit berjalan (urut sampai 90+, plus injury time)
             let statusText = event.status.description || "Live";
             if (event.time && event.time.currentPeriodStartTimestamp) {
                 const now = Math.floor(Date.now() / 1000);
@@ -103,9 +103,20 @@ function monitorMatchStatus(matchId, boxId) {
 
                 // Offset per babak
                 if (event.status.description && event.status.description.toLowerCase().includes("2nd")) {
-                    minutes += 45; // babak kedua mulai dari menit 46
+                    minutes += 45;
                 } else if (event.status.description && event.status.description.toLowerCase().includes("extra time")) {
-                    minutes += 90; // perpanjangan waktu
+                    minutes += 90;
+                }
+
+                // Tambahan waktu (injury time)
+                if (event.status.description && event.status.description.toLowerCase().includes("1st")) {
+                    if (event.time.injuryTime1 && minutes > 45) {
+                        minutes = `45+${minutes - 45}`;
+                    }
+                } else if (event.status.description && event.status.description.toLowerCase().includes("2nd")) {
+                    if (event.time.injuryTime2 && minutes > 90) {
+                        minutes = `90+${minutes - 90}`;
+                    }
                 }
 
                 if (minutes >= 0) {
