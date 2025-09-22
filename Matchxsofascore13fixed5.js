@@ -1,4 +1,3 @@
-<script>
 // --- Fungsi Utama Load SofaScore + Countdown ---
 function loadSofaScore(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
@@ -26,14 +25,12 @@ function loadSofaScore(matchId, boxId) {
             // Jadwal kickoff otomatis zona waktu pengunjung
             const kickoffDate = new Date(event.startTimestamp * 1000);
 
-            // Format tanggal lokal
             const tanggal = kickoffDate.toLocaleDateString(undefined, {
                 day: '2-digit',
                 month: 'long',
                 year: 'numeric'
             });
 
-            // Format jam lokal
             const jam = kickoffDate.toLocaleTimeString(undefined, {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -181,4 +178,3 @@ function startCountdown(targetTime, boxId) {
             seconds + "S";
     }, 1000);
 }
-</script>
