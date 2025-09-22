@@ -86,29 +86,26 @@ function monitorMatchStatus(matchId, boxId, kickoffTimeMs) {
 
         const statusType = event.status.type;
 
-        // Hitung menit real-time sendiri berdasarkan kickoff
-        let now = Date.now();
-        let minutesPassed = Math.floor((now - kickoffTimeMs) / (1000 * 60));
-        let half = event.status.description || "1st Half";
-        if (half.toLowerCase().includes("2nd")) {
-            minutesPassed = 45 + minutesPassed;
-        }
-        if (minutesPassed < 0) minutesPassed = 0;
-
         // Skor pinalti (jika ada)
         const penaltiesHome = event.homeScore.penalties || 0;
         const penaltiesAway = event.awayScore.penalties || 0;
         const hasPenalties = penaltiesHome > 0 || penaltiesAway > 0;
 
-        if (statusType === "upcoming") {
-            liveScoreEl.style.display = "none";
-            matchStatusEl.style.display = "none";
-            liveContainer.classList.add('hidden');
-        }
+        // --- STATUS HALFTIME ---
+        if (statusType === "halftime") {
+            liveContainer.classList.remove('hidden');
+            liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>⏸️ HALF TIME ⏸️</strong>";
 
-        if (statusType === "inprogress") {
+            liveScoreEl.innerHTML = `${event.homeScore.current} - ${event.awayScore.current}`;
+            liveScoreEl.style.display = "block";
+
+            matchStatusEl.innerHTML = "Half Time";
+            matchStatusEl.style.display = "block";
+
+        } 
+        // --- STATUS IN PROGRESS ---
+        else if (statusType === "inprogress") {
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
-
             countdownEl.innerHTML = "";
             liveContainer.classList.remove('hidden');
             liveContainer.classList.add('blink');
@@ -118,16 +115,28 @@ function monitorMatchStatus(matchId, boxId, kickoffTimeMs) {
             liveScoreEl.innerHTML = `${event.homeScore.current} - ${event.awayScore.current}`;
             liveScoreEl.style.display = "block";
 
-            // Update status + menit real-time
-            let statusText = half;
-            if (minutesPassed > 0) {
-                statusText += ` ${minutesPassed}'`;
+            // Hitung menit real-time dari kickoff
+            let now = Date.now();
+            let minutesPassed = Math.floor((now - kickoffTimeMs) / (1000 * 60));
+
+            let half = event.status.description || "1st Half";
+            if (half.toLowerCase().includes("2nd")) {
+                minutesPassed = 45 + minutesPassed;
             }
+            if (minutesPassed < 0) minutesPassed = 0;
+
+            let statusText = half + " " + minutesPassed + "'";
             matchStatusEl.innerHTML = statusText;
             matchStatusEl.style.display = "block";
-        }
-
-        if (statusType === "finished") {
+        } 
+        // --- STATUS UPCOMING ---
+        else if (statusType === "upcoming") {
+            liveScoreEl.style.display = "none";
+            matchStatusEl.style.display = "none";
+            liveContainer.classList.add('hidden');
+        } 
+        // --- STATUS FINISHED ---
+        else if (statusType === "finished") {
             clearInterval(interval);
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
 
@@ -152,5 +161,5 @@ function monitorMatchStatus(matchId, boxId, kickoffTimeMs) {
                 finishedContainer.appendChild(matchBox);
             }
         }
-    }, 1000); // update setiap 1 detik supaya menit real-time berjalan mulus
+    }, 1000); // update setiap 1 detik
 }
