@@ -1,46 +1,4 @@
-// --- Fungsi format menit pertandingan ---
-function formatMatchMinute(rawMinute, period) {
-    if (!rawMinute) return "";
-
-    let minuteText = rawMinute.toString();
-
-    // Kalau ada tanda tambah (misal 45+X atau 90+X)
-    if (minuteText.includes("+")) {
-        let [base, extra] = minuteText.split("+").map(n => parseInt(n, 10));
-
-        if (period.includes("1st half")) {
-            return `${base}+${extra}'`;
-
-        } else if (period.includes("2nd half")) {
-            let totalMinute = 45 + extra;
-            if (totalMinute > 90) return `90+${totalMinute - 90}'`;
-            return `${totalMinute}'`;
-
-        } else if (period.includes("et 1st half")) {
-            let totalMinute = 90 + extra;
-            if (totalMinute > 105) return `105+${totalMinute - 105}'`;
-            return `${totalMinute}'`;
-
-        } else if (period.includes("et 2nd half")) {
-            let totalMinute = 105 + extra;
-            if (totalMinute > 120) return `120+${totalMinute - 120}'`;
-            return `${totalMinute}'`;
-        }
-    } else {
-        let minute = parseInt(minuteText, 10);
-
-        if (period.includes("2nd half") && minute <= 45) {
-            return (45 + minute) + "'";
-        } else if (period.includes("et 1st half") && minute <= 15) {
-            return (90 + minute) + "'";
-        } else if (period.includes("et 2nd half") && minute <= 15) {
-            return (105 + minute) + "'";
-        }
-        return minute + "'";
-    }
-}
-
-// --- Fungsi Utama Load Sofascore + Countdown ---
+// --- Fungsi Utama Load SofaScore + Countdown ---
 function loadSofaScore(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
 
@@ -79,19 +37,55 @@ function loadSofaScore(matchId, boxId) {
             });
 
             document.getElementById("kickoff" + boxId).innerHTML = `${tanggal} | K.O ${jam}`;
+
+            // Nama tim
             document.getElementById("teams" + boxId).innerText = home.name + " VS " + away.name;
 
+            // Logo tim
             document.getElementById("logoHome" + boxId).src =
                 "https://api.sofascore.app/api/v1/team/" + home.id + "/image";
             document.getElementById("logoAway" + boxId).src =
                 "https://api.sofascore.app/api/v1/team/" + away.id + "/image";
 
+            // Mulai countdown & monitor status
             startCountdown(kickoffDate.getTime(), boxId);
             monitorMatchStatus(matchId, boxId);
         });
 }
 
-// --- Fungsi Update Live Score & Menit Realtime ---
+// --- Fungsi Format Menit Pertandingan ---
+function formatMatchMinute(event) {
+    if (!event.time || !event.time.currentPeriodStartTimestamp) return null;
+
+    const now = Math.floor(Date.now() / 1000);
+    const elapsedSec = now - event.time.currentPeriodStartTimestamp;
+    let minutes = Math.floor(elapsedSec / 60);
+
+    let baseMinute = 0;
+    const desc = event.status.description.toLowerCase();
+
+    if (desc.includes("2nd")) baseMinute = 45;
+    else if (desc.includes("extra time") && desc.includes("1st")) baseMinute = 90;
+    else if (desc.includes("extra time") && desc.includes("2nd")) baseMinute = 105;
+    else if (desc.includes("penalties")) baseMinute = 120;
+
+    let totalMinutes = baseMinute + minutes;
+
+    // Format menit injury time
+    if (baseMinute === 45 && totalMinutes > 45) {
+        return `45+${totalMinutes - 45}`;
+    } else if (baseMinute === 90 && totalMinutes > 90) {
+        return `90+${totalMinutes - 90}`;
+    } else if (baseMinute === 105 && totalMinutes > 105) {
+        return `105+${totalMinutes - 105}`;
+    } else if (baseMinute === 120 && totalMinutes > 120) {
+        return `120+${totalMinutes - 120}`;
+    } else {
+        return totalMinutes;
+    }
+}
+
+// --- Fungsi Update Live Score & Status Realtime ---
 function monitorMatchStatus(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -123,22 +117,20 @@ function monitorMatchStatus(matchId, boxId) {
 
             // Skor utama
             let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
-            // Tambah skor penalti kalau ada
-            if (event.homeScore.penalties !== undefined && event.awayScore.penalties !== undefined) {
-                scoreText += ` (P: ${event.homeScore.penalties}-${event.awayScore.penalties})`;
+
+            // Tambahkan skor penalti jika ada
+            if (event.status.description.toLowerCase().includes("penalties")) {
+                scoreText += ` (P ${event.homeScore.penalties || 0}-${event.awayScore.penalties || 0})`;
             }
+
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            // Status & menit
+            // Status + menit realtime
             let statusText = event.status.description || "1st Half";
-            if (event.status.minute) {
-                statusText = `${statusText} - ${formatMatchMinute(event.status.minute, event.status.description.toLowerCase())}`;
-            }
-
-            // Kalau fase adu penalti
-            if (event.status.description.toLowerCase().includes("penalties")) {
-                statusText = "Penalties Shootout";
+            const menitFormatted = formatMatchMinute(event);
+            if (menitFormatted) {
+                statusText = `${statusText} - ${menitFormatted}'`;
             }
 
             matchStatusEl.innerHTML = statusText;
@@ -156,9 +148,10 @@ function monitorMatchStatus(matchId, boxId) {
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>⛔ MATCH ENDED ⛔</strong>";
 
             let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
-            if (event.homeScore.penalties !== undefined && event.awayScore.penalties !== undefined) {
-                scoreText += ` (P: ${event.homeScore.penalties}-${event.awayScore.penalties})`;
+            if (event.homeScore.penalties || event.awayScore.penalties) {
+                scoreText += ` (P ${event.homeScore.penalties || 0}-${event.awayScore.penalties || 0})`;
             }
+
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
