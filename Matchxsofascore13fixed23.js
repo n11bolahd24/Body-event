@@ -79,9 +79,7 @@ function monitorMatchStatus(matchId, boxId, kickoffTimeMs) {
     const finishedContainer = document.getElementById("finishedMatches");
 
     let halfStartTime = kickoffTimeMs;
-    let isSecondHalf = false;
-    let isET1 = false;
-    let isET2 = false;
+    let halfType = "1st"; // 1st, 2nd, ET1, ET2
 
     const interval = setInterval(async () => {
         const res = await fetch(eventUrl);
@@ -103,8 +101,8 @@ function monitorMatchStatus(matchId, boxId, kickoffTimeMs) {
             liveContainer.classList.add('hidden');
         }
 
-        // --- IN PROGRESS ---
-        else if (statusType === "inprogress") {
+        // --- IN PROGRESS / HALF TIME / EXTRA TIME ---
+        else if (statusType === "inprogress" || statusType === "halftime") {
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
             countdownEl.innerHTML = "";
 
@@ -116,30 +114,31 @@ function monitorMatchStatus(matchId, boxId, kickoffTimeMs) {
             liveScoreEl.style.display = "block";
 
             // Tentukan menit perkiraan
-            let now = Date.now();
-            let minutesPassed = Math.floor((now - halfStartTime) / (1000 * 60));
+            const now = Date.now();
+            let minutesPassed = 0;
 
-            if (!isSecondHalf && statusDesc.toLowerCase().includes("2nd")) {
-                isSecondHalf = true;
+            // Deteksi babak
+            if (statusDesc.toLowerCase().includes("1st half") && halfType !== "1st") {
+                halfType = "1st";
                 halfStartTime = now;
-                minutesPassed = 46; // mulai dari menit 46
+            } else if (statusDesc.toLowerCase().includes("2nd half") && halfType !== "2nd") {
+                halfType = "2nd";
+                halfStartTime = now;
+            } else if (statusDesc.toLowerCase().includes("et 1st half") && halfType !== "ET1") {
+                halfType = "ET1";
+                halfStartTime = now;
+            } else if (statusDesc.toLowerCase().includes("et 2nd half") && halfType !== "ET2") {
+                halfType = "ET2";
+                halfStartTime = now;
             }
-            else if (!isET1 && statusDesc.toLowerCase().includes("et 1st")) {
-                isET1 = true;
-                halfStartTime = now;
-                minutesPassed = 91; // mulai ET babak 1
-            }
-            else if (!isET2 && statusDesc.toLowerCase().includes("et 2nd")) {
-                isET2 = true;
-                halfStartTime = now;
-                minutesPassed = 106; // mulai ET babak 2
-            } 
-            else if (isSecondHalf && !isET1 && !isET2) {
-                minutesPassed += 45;
-            } else if (isET1 && !isET2) {
-                minutesPassed += 90;
-            } else if (isET2) {
-                minutesPassed += 105;
+
+            // Hitung menit perkiraan
+            const elapsed = Math.floor((now - halfStartTime) / (1000 * 60));
+            switch (halfType) {
+                case "1st": minutesPassed = elapsed; break;
+                case "2nd": minutesPassed = 46 + elapsed; break;
+                case "ET1": minutesPassed = 91 + elapsed; break;
+                case "ET2": minutesPassed = 106 + elapsed; break;
             }
 
             matchStatusEl.innerHTML = `${statusDesc} ${minutesPassed}'`;
