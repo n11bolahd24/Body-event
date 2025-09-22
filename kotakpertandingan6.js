@@ -30,7 +30,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak") {
         <div id="liveScore${matchKey}" style="position:relative; top:0px; left:0px;font-size:20px; font-weight:bold; color:orange; text-align:center;"></div>  
         <div id="matchStatus${matchKey}" style="font-size:10px; font-weight:bold; color:orange; text-align:center; margin:-1px 1px;"></div>   
         <font id="teams${matchKey}" style="font-size:15px; font-weight:bold">NAMA CLUB VS NAMA CLUB</font><br>
-        <div id="kickoff${matchKey}" style="font-size:12px; color:white; text-align:center; margin:1px 0;"></div>
+        <div id="kickoff${matchKey}" style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;"></div>
       </center>
     </div>
     <img id="logoHome${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
