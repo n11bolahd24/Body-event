@@ -1,4 +1,4 @@
-// --- Fungsi Utama Load SofaScore + Countdown ---
+// --- Fungsi Utama Load Sofascore + Countdown + Real-Time Minut & Extra Time ---
 function loadSofaScore(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
 
@@ -24,28 +24,16 @@ function loadSofaScore(matchId, boxId) {
 
             // Jadwal kickoff otomatis zona waktu pengunjung
             const kickoffDate = new Date(event.startTimestamp * 1000);
-            const tanggal = kickoffDate.toLocaleDateString(undefined, {
-                day: '2-digit',
-                month: 'long',
-                year: 'numeric'
-            });
-            const jam = kickoffDate.toLocaleTimeString(undefined, {
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false,
-                timeZoneName: 'short'
-            });
-
+            const tanggal = kickoffDate.toLocaleDateString(undefined, { day: '2-digit', month: 'long', year: 'numeric' });
+            const jam = kickoffDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short' });
             document.getElementById("kickoff" + boxId).innerHTML = `${tanggal} | K.O ${jam}`;
 
             // Nama tim
             document.getElementById("teams" + boxId).innerText = home.name + " VS " + away.name;
 
             // Logo tim
-            document.getElementById("logoHome" + boxId).src =
-                "https://api.sofascore.app/api/v1/team/" + home.id + "/image";
-            document.getElementById("logoAway" + boxId).src =
-                "https://api.sofascore.app/api/v1/team/" + away.id + "/image";
+            document.getElementById("logoHome" + boxId).src = "https://api.sofascore.app/api/v1/team/" + home.id + "/image";
+            document.getElementById("logoAway" + boxId).src = "https://api.sofascore.app/api/v1/team/" + away.id + "/image";
 
             // Mulai countdown & monitor status
             startCountdown(kickoffDate.getTime(), boxId);
@@ -53,39 +41,7 @@ function loadSofaScore(matchId, boxId) {
         });
 }
 
-// --- Fungsi Format Menit Pertandingan ---
-function formatMatchMinute(event) {
-    if (!event.time || !event.time.currentPeriodStartTimestamp) return null;
-
-    const now = Math.floor(Date.now() / 1000);
-    const elapsedSec = now - event.time.currentPeriodStartTimestamp;
-    let minutes = Math.floor(elapsedSec / 60);
-
-    let baseMinute = 0;
-    const desc = event.status.description.toLowerCase();
-
-    if (desc.includes("2nd")) baseMinute = 45;
-    else if (desc.includes("extra time") && desc.includes("1st")) baseMinute = 90;
-    else if (desc.includes("extra time") && desc.includes("2nd")) baseMinute = 105;
-    else if (desc.includes("penalties")) baseMinute = 120;
-
-    let totalMinutes = baseMinute + minutes;
-
-    // Format menit injury time
-    if (baseMinute === 45 && totalMinutes > 45) {
-        return `45+${totalMinutes - 45}`;
-    } else if (baseMinute === 90 && totalMinutes > 90) {
-        return `90+${totalMinutes - 90}`;
-    } else if (baseMinute === 105 && totalMinutes > 105) {
-        return `105+${totalMinutes - 105}`;
-    } else if (baseMinute === 120 && totalMinutes > 120) {
-        return `120+${totalMinutes - 120}`;
-    } else {
-        return totalMinutes;
-    }
-}
-
-// --- Fungsi Update Live Score & Status Realtime ---
+// --- Fungsi Update Live Score & Menit Real-Time ---
 function monitorMatchStatus(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -101,40 +57,51 @@ function monitorMatchStatus(matchId, boxId) {
         const event = data.event;
         if (!event || !matchBox) return;
 
-        if (event.status.type === "upcoming") {
-            liveScoreEl.style.display = "none";
-            matchStatusEl.style.display = "none";
-            liveContainer.classList.add('hidden');
-        }
+        let statusText = "";
+        let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
 
+        // Real-time menit & extra time
         if (event.status.type === "inprogress") {
-            if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
+            let minute = event.status.minute; // menit normal
+            let extra = 0;
 
-            countdownEl.innerHTML = "";
-            liveContainer.classList.remove('hidden');
-            liveContainer.classList.add('blink');
-            liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
+            // Tambahan waktu babak 1 atau 2
+            if (event.status.period === "firstHalf" && event.status.addedTime) extra = event.status.addedTime;
+            if (event.status.period === "secondHalf" && event.status.addedTime) extra = event.status.addedTime;
 
-            // Skor utama
-            let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
+            if (extra) minute += extra;
 
-            // Tambahkan skor penalti jika ada
-            if (event.status.description.toLowerCase().includes("penalties")) {
-                scoreText += ` (P ${event.homeScore.penalties || 0}-${event.awayScore.penalties || 0})`;
+            statusText = event.status.period === "firstHalf" ? `1st Half ${minute}'` :
+                         event.status.period === "secondHalf" ? `2nd Half ${minute}'` :
+                         event.status.description;
+
+            // Extra time
+            if (event.status.type === "extraTime") {
+                statusText = `Extra Time ${minute}'`;
+            }
+
+            // Penalti
+            if (event.homeScore.penalties != null && event.awayScore.penalties != null) {
+                scoreText += ` (P ${event.homeScore.penalties} - ${event.awayScore.penalties})`;
+                statusText += " | Penalty";
             }
 
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            // Status + menit realtime
-            let statusText = event.status.description || "1st Half";
-            const menitFormatted = formatMatchMinute(event);
-            if (menitFormatted) {
-                statusText = `${statusText} - ${menitFormatted}'`;
-            }
-
             matchStatusEl.innerHTML = statusText;
             matchStatusEl.style.display = "block";
+
+            countdownEl.innerHTML = "";
+            liveContainer.classList.remove('hidden');
+            liveContainer.classList.add('blink');
+            liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
+        }
+
+        if (event.status.type === "upcoming") {
+            liveScoreEl.style.display = "none";
+            matchStatusEl.style.display = "none";
+            liveContainer.classList.add('hidden');
         }
 
         if (event.status.type === "finished") {
@@ -147,9 +114,9 @@ function monitorMatchStatus(matchId, boxId) {
             liveContainer.classList.remove('hidden');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>⛔ MATCH ENDED ⛔</strong>";
 
-            let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
-            if (event.homeScore.penalties || event.awayScore.penalties) {
-                scoreText += ` (P ${event.homeScore.penalties || 0}-${event.awayScore.penalties || 0})`;
+            // Cek penalti saat full time
+            if (event.homeScore.penalties != null && event.awayScore.penalties != null) {
+                scoreText += ` (P ${event.homeScore.penalties} - ${event.awayScore.penalties})`;
             }
 
             liveScoreEl.innerHTML = scoreText;
