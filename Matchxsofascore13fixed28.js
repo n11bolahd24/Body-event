@@ -1,4 +1,4 @@
-// --- Fungsi Update Live Score, Match Ended & Menit Realtime ---
+// --- Fungsi Update Live Score & Match Ended + Menit ---
 function monitorMatchStatus(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -6,7 +6,6 @@ function monitorMatchStatus(matchId, boxId) {
     const countdownEl = document.getElementById("countdown" + boxId);
     const liveScoreEl = document.getElementById("liveScore" + boxId);
     const matchStatusEl = document.getElementById("matchStatus" + boxId);
-    const matchMinuteEl = document.getElementById("matchMinute" + boxId); // Tambahkan elemen untuk menit
     const finishedContainer = document.getElementById("finishedMatches");
 
     const interval = setInterval(async () => {
@@ -15,15 +14,14 @@ function monitorMatchStatus(matchId, boxId) {
         const event = data.event;
         if (!event || !matchBox) return;
 
-        // --- Status Upcoming ---
+        // --- MATCH UPCOMING ---
         if (event.status.type === "upcoming") {
             liveScoreEl.style.display = "none";
             matchStatusEl.style.display = "none";
-            if (matchMinuteEl) matchMinuteEl.innerText = "";
             liveContainer.classList.add('hidden');
         }
 
-        // --- Status In Progress ---
+        // --- MATCH LIVE ---
         if (event.status.type === "inprogress") {
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
 
@@ -32,38 +30,34 @@ function monitorMatchStatus(matchId, boxId) {
             liveContainer.classList.add('blink');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
 
+            // Score
             let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            // Status text (1st Half, 2nd Half, Extra Time)
-            let statusText = event.status.description || "1st Half";
-            matchStatusEl.innerHTML = statusText;
-            matchStatusEl.style.display = "block";
+            // --- Menit Pertandingan ---
+            let minuteText = "";
+            const statusType = event.status.description || "";
+            const homeScore = event.homeScore.current;
+            const awayScore = event.awayScore.current;
 
-            // --- Hitung menit pertandingan ---
-            let minute = 0;
-            if (event.status.minute !== undefined && event.status.minute !== null) {
-                minute = event.status.minute;
+            // Data Sofascore menyediakan currentMinute dan extraTime jika ada
+            let currentMinute = event.status.currentMinute || 0; // menit utama
+            let extraMinute = event.status.extraTime || 0;       // tambahan waktu
+
+            if (currentMinute > 0) {
+                minuteText = currentMinute;
+                if (extraMinute > 0) minuteText += "+" + extraMinute;
+                minuteText += "'";
             } else {
-                // fallback: hitung manual dari kickoff
-                const kickoff = new Date(event.startTimestamp * 1000).getTime();
-                const now = new Date().getTime();
-                const diff = Math.floor((now - kickoff) / 60000);
-                minute = diff > 0 ? diff : 0;
+                minuteText = statusType; // fallback
             }
 
-            // Tambahkan format menit extra time
-            if (minute > 45 && statusText.toLowerCase().includes("1st")) {
-                minute = "45+" + (minute - 45);
-            } else if (minute > 90 && statusText.toLowerCase().includes("2nd")) {
-                minute = "90+" + (minute - 90);
-            }
-
-            if (matchMinuteEl) matchMinuteEl.innerText = minute + "'";
+            matchStatusEl.innerHTML = minuteText;
+            matchStatusEl.style.display = "block";
         }
 
-        // --- Status Finished ---
+        // --- MATCH FINISHED ---
         if (event.status.type === "finished") {
             clearInterval(interval);
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
@@ -80,8 +74,6 @@ function monitorMatchStatus(matchId, boxId) {
 
             matchStatusEl.innerHTML = "Full Time";
             matchStatusEl.style.display = "block";
-
-            if (matchMinuteEl) matchMinuteEl.innerText = "FT";
 
             if (finishedContainer && matchBox.parentNode !== finishedContainer) {
                 finishedContainer.appendChild(matchBox);
