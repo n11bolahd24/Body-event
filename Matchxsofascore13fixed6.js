@@ -98,6 +98,7 @@ function monitorMatchStatus(matchId, boxId) {
                 const elapsedSec = now - event.time.currentPeriodStartTimestamp;
                 let minutes = Math.floor(elapsedSec / 60);
 
+                // Tentukan menit dasar (mulai dari mana)
                 let baseMinute = 0;
                 const desc = event.status.description.toLowerCase();
 
@@ -107,7 +108,7 @@ function monitorMatchStatus(matchId, boxId) {
 
                 let totalMinutes = baseMinute + minutes;
 
-                // Format menit: 45+ / 90+ / 120+
+                // Format menit: 45+ / 90+ / 105+ / 120+
                 if (baseMinute === 45 && totalMinutes > 45) {
                     minutes = `45+${totalMinutes - 45}`;
                 } else if (baseMinute === 90 && totalMinutes > 90) {
