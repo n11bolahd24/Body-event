@@ -38,7 +38,7 @@ function loadSofaScore(matchId, boxId) {
 
             // Mulai countdown & monitor status
             startCountdown(kickoffDate.getTime(), boxId);
-            monitorMatchStatus(matchId, boxId);
+            monitorMatchStatus(matchId, boxId, kickoffDate.getTime());
         });
 }
 
@@ -69,7 +69,7 @@ function startCountdown(targetTime, boxId) {
 }
 
 // --- Fungsi Update Live Score & Match Status + Menit Real-Time ---
-function monitorMatchStatus(matchId, boxId) {
+function monitorMatchStatus(matchId, boxId, kickoffTimeMs) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
     const liveContainer = document.getElementById("liveContainer" + boxId);
@@ -86,18 +86,14 @@ function monitorMatchStatus(matchId, boxId) {
 
         const statusType = event.status.type;
 
-        // Ambil menit real-time
-        let elapsed = event.status.elapsed;
-        let extraTime = event.status.extraTime || 0;
-
-        // fallback: parsing menit dari description jika elapsed kosong
-        if (!elapsed && event.status.description) {
-            const match = event.status.description.match(/(\d+)'/);
-            if (match) {
-                elapsed = parseInt(match[1]);
-            }
+        // Hitung menit real-time sendiri berdasarkan kickoff
+        let now = Date.now();
+        let minutesPassed = Math.floor((now - kickoffTimeMs) / (1000 * 60));
+        let half = event.status.description || "1st Half";
+        if (half.toLowerCase().includes("2nd")) {
+            minutesPassed = 45 + minutesPassed;
         }
-        const totalMinutes = (elapsed || 0) + extraTime;
+        if (minutesPassed < 0) minutesPassed = 0;
 
         // Skor pinalti (jika ada)
         const penaltiesHome = event.homeScore.penalties || 0;
@@ -123,9 +119,9 @@ function monitorMatchStatus(matchId, boxId) {
             liveScoreEl.style.display = "block";
 
             // Update status + menit real-time
-            let statusText = event.status.description || "1st Half";
-            if (totalMinutes > 0 && !statusText.includes(`${totalMinutes}'`)) {
-                statusText += ` ${totalMinutes}'`;
+            let statusText = half;
+            if (minutesPassed > 0) {
+                statusText += ` ${minutesPassed}'`;
             }
             matchStatusEl.innerHTML = statusText;
             matchStatusEl.style.display = "block";
@@ -156,5 +152,5 @@ function monitorMatchStatus(matchId, boxId) {
                 finishedContainer.appendChild(matchBox);
             }
         }
-    }, 3000); // update setiap 3 detik
+    }, 1000); // update setiap 1 detik supaya menit real-time berjalan mulus
 }
