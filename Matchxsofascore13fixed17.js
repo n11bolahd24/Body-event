@@ -24,11 +24,7 @@ function loadSofaScore(matchId, boxId) {
 
             // Jadwal kickoff otomatis zona waktu pengunjung
             const kickoffDate = new Date(event.startTimestamp * 1000);
-
-            // Format tanggal lokal pengunjung
             const tanggal = kickoffDate.toLocaleDateString(undefined, { day: '2-digit', month: 'long', year: 'numeric' });
-
-            // Format jam lokal pengunjung + kode zona
             const jam = kickoffDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short' });
 
             document.getElementById("kickoff" + boxId).innerHTML = `${tanggal} | K.O ${jam}`;
@@ -72,7 +68,7 @@ function startCountdown(targetTime, boxId) {
     }, 1000);
 }
 
-// --- Fungsi Update Live Score & Match Status + Real-Time Menit ---
+// --- Fungsi Update Live Score & Match Status + Menit Real-Time ---
 function monitorMatchStatus(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -89,11 +85,21 @@ function monitorMatchStatus(matchId, boxId) {
         if (!event || !matchBox) return;
 
         const statusType = event.status.type;
-        const elapsed = event.status.elapsed || 0;      // menit normal
-        const extraTime = event.status.extraTime || 0;  // injury/extra time
-        const totalMinutes = elapsed + extraTime;
 
-        // Pinalti (jika ada)
+        // Ambil menit real-time
+        let elapsed = event.status.elapsed;
+        let extraTime = event.status.extraTime || 0;
+
+        // fallback: parsing menit dari description jika elapsed kosong
+        if (!elapsed && event.status.description) {
+            const match = event.status.description.match(/(\d+)'/);
+            if (match) {
+                elapsed = parseInt(match[1]);
+            }
+        }
+        const totalMinutes = (elapsed || 0) + extraTime;
+
+        // Skor pinalti (jika ada)
         const penaltiesHome = event.homeScore.penalties || 0;
         const penaltiesAway = event.awayScore.penalties || 0;
         const hasPenalties = penaltiesHome > 0 || penaltiesAway > 0;
@@ -118,7 +124,7 @@ function monitorMatchStatus(matchId, boxId) {
 
             // Update status + menit real-time
             let statusText = event.status.description || "1st Half";
-            if (totalMinutes > 0) {
+            if (totalMinutes > 0 && !statusText.includes(`${totalMinutes}'`)) {
                 statusText += ` ${totalMinutes}'`;
             }
             matchStatusEl.innerHTML = statusText;
