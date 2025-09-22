@@ -65,7 +65,7 @@ function startCountdown(targetTime, boxId) {
     }, 1000);
 }
 
-// --- Monitor Match + Menit Real-Time ---
+// --- Monitor Match + Menit Real-Time Halus ---
 function monitorMatchStatusRealTime(matchId, boxId, kickoffTimeMs) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -78,18 +78,19 @@ function monitorMatchStatusRealTime(matchId, boxId, kickoffTimeMs) {
     let halfType = null; // 1st, 2nd, ET1, ET2
     let halfStartTime = null; // waktu mulai tiap babak
     let lastStatusDesc = "";
+    let apiEvent = null;
 
-    // Interval fetch API tiap 3 detik
+    // Fetch API tiap 3 detik untuk update skor & status
     setInterval(async () => {
         const res = await fetch(eventUrl);
         const data = await res.json();
-        const event = data.event;
-        if (!event || !matchBox) return;
+        apiEvent = data.event;
+        if (!apiEvent || !matchBox) return;
 
-        const statusType = event.status.type;
-        const statusDesc = event.status.description || "";
-        const penaltiesHome = event.homeScore.penalties || 0;
-        const penaltiesAway = event.awayScore.penalties || 0;
+        const statusType = apiEvent.status.type;
+        const statusDesc = apiEvent.status.description || "";
+        const penaltiesHome = apiEvent.homeScore.penalties || 0;
+        const penaltiesAway = apiEvent.awayScore.penalties || 0;
         const hasPenalties = penaltiesHome > 0 || penaltiesAway > 0;
 
         // --- UPCOMING ---
@@ -97,38 +98,54 @@ function monitorMatchStatusRealTime(matchId, boxId, kickoffTimeMs) {
             liveScoreEl.style.display = "none";
             matchStatusEl.style.display = "none";
             liveContainer.classList.add('hidden');
+            return;
         }
 
         // --- IN PROGRESS / HALF TIME / EXTRA TIME ---
-        else if (statusType === "inprogress" || statusType === "halftime") {
-            if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
-            countdownEl.innerHTML = "";
+        liveContainer.classList.remove('hidden');
+        liveContainer.classList.add('blink');
+        liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
+        liveScoreEl.innerHTML = `${apiEvent.homeScore.current} - ${apiEvent.awayScore.current}`;
+        liveScoreEl.style.display = "block";
 
+        // Deteksi pergantian babak
+        if (statusDesc !== lastStatusDesc) {
+            if (statusDesc.toLowerCase().includes("1st half")) { halfType = "1st"; halfStartTime = Date.now(); }
+            else if (statusDesc.toLowerCase().includes("2nd half")) { halfType = "2nd"; halfStartTime = Date.now(); }
+            else if (statusDesc.toLowerCase().includes("et 1st half")) { halfType = "ET1"; halfStartTime = Date.now(); }
+            else if (statusDesc.toLowerCase().includes("et 2nd half")) { halfType = "ET2"; halfStartTime = Date.now(); }
+            lastStatusDesc = statusDesc;
+        }
+
+        // --- FINISHED ---
+        if (statusType === "finished") {
+            liveContainer.classList.remove('blink');
+            liveContainer.style.animation = "none";
             liveContainer.classList.remove('hidden');
-            liveContainer.classList.add('blink');
-            liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
+            liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>⛔ MATCH ENDED ⛔</strong>";
 
-            liveScoreEl.innerHTML = `${event.homeScore.current} - ${event.awayScore.current}`;
+            let scoreText = `${apiEvent.homeScore.current} - ${apiEvent.awayScore.current}`;
+            if (hasPenalties) scoreText += ` (${penaltiesHome}-${penaltiesAway} p)`;
+            liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            // Deteksi pergantian babak
-            if (statusDesc !== lastStatusDesc) {
-                if (statusDesc.toLowerCase().includes("1st half")) { halfType = "1st"; halfStartTime = Date.now(); }
-                else if (statusDesc.toLowerCase().includes("2nd half")) { halfType = "2nd"; halfStartTime = Date.now(); }
-                else if (statusDesc.toLowerCase().includes("et 1st half")) { halfType = "ET1"; halfStartTime = Date.now(); }
-                else if (statusDesc.toLowerCase().includes("et 2nd half")) { halfType = "ET2"; halfStartTime = Date.now(); }
+            matchStatusEl.innerHTML = "Full Time";
+            matchStatusEl.style.display = "block";
 
-                lastStatusDesc = statusDesc;
+            if (finishedContainer && matchBox.parentNode !== finishedContainer) {
+                finishedContainer.appendChild(matchBox);
             }
-
+            return;
         }
+
     }, 3000);
 
-    // Interval update menit real-time setiap 1 detik
+    // Interval update menit real-time setiap 1 detik (halus)
     setInterval(() => {
         if (!halfType || !halfStartTime) return;
         const now = Date.now();
         let minutesPassed = Math.floor((now - halfStartTime) / (1000 * 60));
+
         switch (halfType) {
             case "1st":
                 if (minutesPassed > 45) minutesPassed = `45+${minutesPassed - 45}`;
@@ -146,35 +163,7 @@ function monitorMatchStatusRealTime(matchId, boxId, kickoffTimeMs) {
                 if (minutesPassed > 120) minutesPassed = `120+${minutesPassed - 120}`;
                 break;
         }
+
         if (halfType) matchStatusEl.innerHTML = `${lastStatusDesc} ${minutesPassed}'`;
     }, 1000);
-
-    // --- FINISHED ---
-    setInterval(async () => {
-        const res = await fetch(eventUrl);
-        const data = await res.json();
-        const event = data.event;
-        if (!event || !matchBox) return;
-
-        if (event.status.type === "finished") {
-            liveContainer.classList.remove('blink');
-            liveContainer.style.animation = "none";
-            liveContainer.classList.remove('hidden');
-            liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>⛔ MATCH ENDED ⛔</strong>";
-
-            let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
-            if (event.homeScore.penalties || event.awayScore.penalties) {
-                scoreText += ` (${event.homeScore.penalties}-${event.awayScore.penalties} p)`;
-            }
-            liveScoreEl.innerHTML = scoreText;
-            liveScoreEl.style.display = "block";
-
-            matchStatusEl.innerHTML = "Full Time";
-            matchStatusEl.style.display = "block";
-
-            if (finishedContainer && matchBox.parentNode !== finishedContainer) {
-                finishedContainer.appendChild(matchBox);
-            }
-        }
-    }, 3000);
 }
