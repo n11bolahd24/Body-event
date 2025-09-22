@@ -1,4 +1,4 @@
-// --- Fungsi Utama Load SofaScore + Countdown ---
+// --- Fungsi Utama Load Sofascore + Countdown ---
 function loadSofaScore(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
 
@@ -55,8 +55,38 @@ function loadSofaScore(matchId, boxId) {
         });
 }
 
+// --- Fungsi Format Menit ---
+function formatMatchMinute(event) {
+    if (!event.time || !event.time.currentPeriodStartTimestamp) return "";
 
-// --- Fungsi Update Live Score & Menit Realtime ---
+    const now = Math.floor(Date.now() / 1000);
+    const elapsedSec = now - event.time.currentPeriodStartTimestamp;
+    let minutes = Math.floor(elapsedSec / 60);
+
+    let baseMinute = 0;
+    const desc = (event.status.description || "").toLowerCase();
+
+    if (desc.includes("2nd")) baseMinute = 45;
+    else if (desc.includes("extra time")) baseMinute = 90;
+    else if (desc.includes("penalties")) baseMinute = 120;
+
+    let totalMinutes = baseMinute + minutes;
+
+    // Format menit: 45+ / 90+ / 120+
+    if (baseMinute === 45 && totalMinutes > 45) {
+        return `45+${totalMinutes - 45}'`;
+    } else if (baseMinute === 90 && totalMinutes > 90) {
+        return `90+${totalMinutes - 90}'`;
+    } else if (baseMinute === 105 && totalMinutes > 105) {
+        return `105+${totalMinutes - 105}'`;
+    } else if (baseMinute === 120 && totalMinutes > 120) {
+        return `120+${totalMinutes - 120}'`;
+    } else {
+        return totalMinutes + "'";
+    }
+}
+
+// --- Fungsi Update Live Score & Match Ended ---
 function monitorMatchStatus(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -91,38 +121,10 @@ function monitorMatchStatus(matchId, boxId) {
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            // Hitung menit pertandingan
-            let statusText = event.status.description || "1st Half";
-            if (event.time && event.time.currentPeriodStartTimestamp) {
-                const now = Math.floor(Date.now() / 1000);
-                const elapsedSec = now - event.time.currentPeriodStartTimestamp;
-                let minutes = Math.floor(elapsedSec / 60);
-
-                // Tentukan menit dasar (mulai dari mana)
-                let baseMinute = 0;
-                const desc = event.status.description.toLowerCase();
-
-                if (desc.includes("2nd")) baseMinute = 45;
-                else if (desc.includes("extra time")) baseMinute = 90;
-                else if (desc.includes("penalties")) baseMinute = 120;
-
-                let totalMinutes = baseMinute + minutes;
-
-                // Format menit: 45+ / 90+ / 105+ / 120+
-                if (baseMinute === 45 && totalMinutes > 45) {
-                    minutes = `45+${totalMinutes - 45}`;
-                } else if (baseMinute === 90 && totalMinutes > 90) {
-                    minutes = `90+${totalMinutes - 90}`;
-                } else if (baseMinute === 105 && totalMinutes > 105) {
-                    minutes = `105+${totalMinutes - 105}`;
-                } else if (baseMinute === 120 && totalMinutes > 120) {
-                    minutes = `120+${totalMinutes - 120}`;
-                } else {
-                    minutes = totalMinutes;
-                }
-
-                statusText = `${event.status.description} - ${minutes}'`;
-            }
+            // Menit pertandingan pakai format baru
+            let minutes = formatMatchMinute(event);
+            let statusText = event.status.description || "";
+            if (minutes) statusText += " - " + minutes;
 
             matchStatusEl.innerHTML = statusText;
             matchStatusEl.style.display = "block";
@@ -152,30 +154,7 @@ function monitorMatchStatus(matchId, boxId) {
     }, 3000);
 }
 
-
 // --- Fungsi Countdown ---
 function startCountdown(targetTime, boxId) {
     const countdownId = "countdown" + boxId;
-    window["countdown_" + boxId] = setInterval(function () {
-        const now = new Date().getTime();
-        const distance = targetTime - now;
-
-        if (distance < 0) {
-            clearInterval(window["countdown_" + boxId]);
-            const countdownEl = document.getElementById(countdownId);
-            countdownEl.innerHTML = "";
-            return;
-        }
-
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-        document.getElementById(countdownId).innerText =
-            (days > 0 ? days + "D - " : "") +
-            hours + "H - " +
-            minutes + "M - " +
-            seconds + "S";
-    }, 1000);
-}
+    window["countdown_" + boxId] = setInterval(f_]()
