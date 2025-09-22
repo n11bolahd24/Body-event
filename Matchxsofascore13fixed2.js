@@ -94,12 +94,20 @@ function monitorMatchStatus(matchId, boxId) {
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            // Hitung menit berjalan
+            // Hitung menit berjalan (tidak reset di babak 2)
             let statusText = event.status.description || "Live";
             if (event.time && event.time.currentPeriodStartTimestamp) {
-                const now = Math.floor(Date.now() / 1000); // detik sekarang
+                const now = Math.floor(Date.now() / 1000);
                 const elapsedSec = now - event.time.currentPeriodStartTimestamp;
-                const minutes = Math.floor(elapsedSec / 60);
+                let minutes = Math.floor(elapsedSec / 60);
+
+                // Offset per babak
+                if (event.status.description && event.status.description.toLowerCase().includes("2nd")) {
+                    minutes += 45; // babak kedua mulai dari menit 46
+                } else if (event.status.description && event.status.description.toLowerCase().includes("extra time")) {
+                    minutes += 90; // perpanjangan waktu
+                }
+
                 if (minutes >= 0) {
                     statusText = `${statusText} - ${minutes}'`;
                 }
