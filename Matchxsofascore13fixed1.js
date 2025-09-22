@@ -12,22 +12,21 @@ function loadSofaScore(matchId, boxId) {
             // Nama & logo liga
             const leagueEl = document.getElementById("league" + boxId);
             if (leagueEl) {
-            leagueEl.innerHTML = `
-            <span style="display:inline-flex;align-items:center;">
-            <img src="https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image/dark"
-                 alt="${event.tournament.name}"
-                 style="height:18px;width:18px;margin-right:4px;">
-            <span>${event.tournament.name}</span>
-        </span>
-    `;
-}
-
+                leagueEl.innerHTML = `
+                    <span style="display:inline-flex;align-items:center;">
+                        <img src="https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image/dark"
+                            alt="${event.tournament.name}"
+                            style="height:18px;width:18px;margin-right:4px;">
+                        <span>${event.tournament.name}</span>
+                    </span>
+                `;
+            }
 
             // Jadwal kickoff otomatis zona waktu pengunjung
             const kickoffDate = new Date(event.startTimestamp * 1000);
 
             // Format tanggal lokal pengunjung
-            const tanggal = kickoffDate.toLocaleDateString(undefined, { // undefined = gunakan locale pengunjung
+            const tanggal = kickoffDate.toLocaleDateString(undefined, {
                 day: '2-digit',
                 month: 'long',
                 year: 'numeric'
@@ -41,7 +40,8 @@ function loadSofaScore(matchId, boxId) {
                 timeZoneName: 'short'
             });
 
-            document.getElementById("kickoff" + boxId).innerHTML = `${tanggal} | &#x26BD; ${jam}`;
+            document.getElementById("kickoff" + boxId).innerHTML = `${tanggal} | K.O ${jam}`;
+
             // Nama tim
             document.getElementById("teams" + boxId).innerText = home.name + " VS " + away.name;
 
@@ -58,7 +58,7 @@ function loadSofaScore(matchId, boxId) {
 }
 
 
-// --- Fungsi Update Live Score & Match Ended ---
+// --- Fungsi Update Live Score + Status + Menit ---
 function monitorMatchStatus(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -74,12 +74,14 @@ function monitorMatchStatus(matchId, boxId) {
         const event = data.event;
         if (!event || !matchBox) return;
 
+        // --- Jika masih upcoming ---
         if (event.status.type === "upcoming") {
             liveScoreEl.style.display = "none";
             matchStatusEl.style.display = "none";
             liveContainer.classList.add('hidden');
         }
 
+        // --- Jika sedang berlangsung ---
         if (event.status.type === "inprogress") {
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
 
@@ -92,11 +94,22 @@ function monitorMatchStatus(matchId, boxId) {
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            let statusText = event.status.description || "1st Half";
+            // Hitung menit berjalan
+            let statusText = event.status.description || "Live";
+            if (event.time && event.time.currentPeriodStartTimestamp) {
+                const now = Math.floor(Date.now() / 1000); // detik sekarang
+                const elapsedSec = now - event.time.currentPeriodStartTimestamp;
+                const minutes = Math.floor(elapsedSec / 60);
+                if (minutes >= 0) {
+                    statusText = `${statusText} - ${minutes}'`;
+                }
+            }
+
             matchStatusEl.innerHTML = statusText;
             matchStatusEl.style.display = "block";
         }
 
+        // --- Jika sudah selesai ---
         if (event.status.type === "finished") {
             clearInterval(interval);
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
@@ -121,7 +134,8 @@ function monitorMatchStatus(matchId, boxId) {
     }, 3000);
 }
 
-// --- Fungsi Countdown ---
+
+// --- Fungsi Countdown Kickoff ---
 function startCountdown(targetTime, boxId) {
     const countdownId = "countdown" + boxId;
     window["countdown_" + boxId] = setInterval(function () {
@@ -146,5 +160,4 @@ function startCountdown(targetTime, boxId) {
             minutes + "M - " +
             seconds + "S";
     }, 1000);
-                                 }
-        
+}
