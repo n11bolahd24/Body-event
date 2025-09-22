@@ -68,7 +68,7 @@ function startCountdown(targetTime, boxId) {
     }, 1000);
 }
 
-// --- Fungsi Update Live Score & Match Status + Menit Real-Time ---
+// --- Fungsi Update Live Score & Match Status + Menit Real-Time Akurat ---
 function monitorMatchStatus(matchId, boxId, kickoffTimeMs) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -78,6 +78,10 @@ function monitorMatchStatus(matchId, boxId, kickoffTimeMs) {
     const matchStatusEl = document.getElementById("matchStatus" + boxId);
     const finishedContainer = document.getElementById("finishedMatches");
 
+    // Timestamp mulai babak
+    let halfStartTime = kickoffTimeMs;
+    let isSecondHalf = false;
+
     const interval = setInterval(async () => {
         const res = await fetch(eventUrl);
         const data = await res.json();
@@ -86,13 +90,20 @@ function monitorMatchStatus(matchId, boxId, kickoffTimeMs) {
 
         const statusType = event.status.type;
 
-        // Skor pinalti (jika ada)
+        // Skor pinalti
         const penaltiesHome = event.homeScore.penalties || 0;
         const penaltiesAway = event.awayScore.penalties || 0;
         const hasPenalties = penaltiesHome > 0 || penaltiesAway > 0;
 
+        // --- STATUS UPCOMING ---
+        if (statusType === "upcoming") {
+            liveScoreEl.style.display = "none";
+            matchStatusEl.style.display = "none";
+            liveContainer.classList.add('hidden');
+        }
+
         // --- STATUS HALFTIME ---
-        if (statusType === "halftime") {
+        else if (statusType === "halftime") {
             liveContainer.classList.remove('hidden');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>⏸️ HALF TIME ⏸️</strong>";
 
@@ -101,12 +112,13 @@ function monitorMatchStatus(matchId, boxId, kickoffTimeMs) {
 
             matchStatusEl.innerHTML = "Half Time";
             matchStatusEl.style.display = "block";
+        }
 
-        } 
         // --- STATUS IN PROGRESS ---
         else if (statusType === "inprogress") {
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
             countdownEl.innerHTML = "";
+
             liveContainer.classList.remove('hidden');
             liveContainer.classList.add('blink');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
@@ -115,26 +127,23 @@ function monitorMatchStatus(matchId, boxId, kickoffTimeMs) {
             liveScoreEl.innerHTML = `${event.homeScore.current} - ${event.awayScore.current}`;
             liveScoreEl.style.display = "block";
 
-            // Hitung menit real-time dari kickoff
-            let now = Date.now();
-            let minutesPassed = Math.floor((now - kickoffTimeMs) / (1000 * 60));
-
-            let half = event.status.description || "1st Half";
-            if (half.toLowerCase().includes("2nd")) {
-                minutesPassed = 45 + minutesPassed;
+            // Reset timestamp babak kedua saat mulai 2nd Half
+            let halfDesc = event.status.description || "1st Half";
+            if (!isSecondHalf && halfDesc.toLowerCase().includes("2nd")) {
+                isSecondHalf = true;
+                halfStartTime = Date.now(); // reset start time babak 2
             }
-            if (minutesPassed < 0) minutesPassed = 0;
 
-            let statusText = half + " " + minutesPassed + "'";
+            // Hitung menit real-time
+            let now = Date.now();
+            let minutesPassed = Math.floor((now - halfStartTime) / (1000 * 60));
+            if (isSecondHalf) minutesPassed += 45; // babak 2 dimulai dari menit 46
+
+            let statusText = halfDesc + " " + minutesPassed + "'";
             matchStatusEl.innerHTML = statusText;
             matchStatusEl.style.display = "block";
-        } 
-        // --- STATUS UPCOMING ---
-        else if (statusType === "upcoming") {
-            liveScoreEl.style.display = "none";
-            matchStatusEl.style.display = "none";
-            liveContainer.classList.add('hidden');
-        } 
+        }
+
         // --- STATUS FINISHED ---
         else if (statusType === "finished") {
             clearInterval(interval);
@@ -161,5 +170,5 @@ function monitorMatchStatus(matchId, boxId, kickoffTimeMs) {
                 finishedContainer.appendChild(matchBox);
             }
         }
-    }, 1000); // update setiap 1 detik
+    }, 1000);
 }
