@@ -1,4 +1,4 @@
-l// --- Fungsi Utama Load Sofascore + Countdown ---
+// --- Fungsi Utama Load Sofascore + Countdown ---
 function loadSofaScore(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
 
@@ -54,7 +54,7 @@ function loadSofaScore(matchId, boxId) {
         });
 }
 
-// --- Fungsi Update Live Score & Menit Berjalan ---
+// --- Fungsi Update Live Score & Menit Real-time ---
 function monitorMatchStatus(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -92,19 +92,19 @@ function monitorMatchStatus(matchId, boxId) {
                 liveScoreEl.innerHTML = scoreText;
                 liveScoreEl.style.display = "block";
 
-                // Hitung menit real-time
+                // Hitung menit realtime
                 const initial = event.time.initial || 0;
                 const periodStart = event.time.currentPeriodStartTimestamp || 0;
                 const nowSec = Math.floor(Date.now() / 1000);
                 const elapsed = Math.floor((nowSec - periodStart) / 60);
                 let minute = initial + elapsed;
 
-                let desc = event.status.description || "LIVE";
-                if (desc.includes("1st") && minute > 45) minute = "45+";
-                else if (desc.includes("2nd") && minute > 90) minute = "90+";
-                else if (desc.includes("1st extra") && minute > 105) minute = "105+";
-                else if (desc.includes("2nd extra") && minute > 120) minute = "120+";
+                // Cek injuryTime dari API
+                if (event.time.injuryTime && minute >= initial) {
+                    minute = `${initial}+${elapsed}`;
+                }
 
+                let desc = event.status.description || "LIVE";
                 matchStatusEl.innerHTML = `${desc} - ${minute}'`;
                 matchStatusEl.style.display = "block";
             }
@@ -133,7 +133,7 @@ function monitorMatchStatus(matchId, boxId) {
         } catch (e) {
             console.error("Error monitor match:", e);
         }
-    }, 1000); // update per detik biar menit jalan real-time
+    }, 1000); // update per detik
 }
 
 // --- Fungsi Countdown ---
@@ -161,5 +161,4 @@ function startCountdown(targetTime, boxId) {
             minutes + "M - " +
             seconds + "S";
     }, 1000);
-                    }
-                    
+}
