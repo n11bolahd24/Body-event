@@ -75,7 +75,12 @@ function monitorMatchStatus(matchId, boxId) {
             liveContainer.classList.add('hidden');
         }
 
-        if (event.status.type === "inprogress" || event.status.type === "halftime" || event.status.type === "extraTime" || event.status.type === "penalties") {
+        if (
+            event.status.type === "inprogress" ||
+            event.status.type === "halftime" ||
+            event.status.type === "extraTime" ||
+            event.status.type === "penalties"
+        ) {
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
 
             countdownEl.innerHTML = "";
@@ -174,9 +179,14 @@ function getMinute(event) {
         case "penalties": statusText = "PEN"; break;
     }
 
-    // --- Sofascore description langsung ---
-    if (desc && desc.trim() !== "") {
+    // --- Kalau Sofascore kasih menit langsung ---
+    if (desc && desc.includes("'")) {
         return desc + " " + statusText;
+    }
+
+    // --- Kalau Sofascore cuma kasih teks (HT, 2nd half, dsb.) ---
+    if (desc && !desc.includes("'")) {
+        return statusText;
     }
 
     // --- Hitung manual ---
