@@ -38,49 +38,39 @@ function loadSofaScore(matchId, boxId) {
         });
 }
 
-// --- Hitung menit real-time ---
+// --- Hitung menit real-time dengan offset ---
 function getMinute(event) {
     if (!event.status) return "";
 
     const type = event.status.type;
-    const now = Date.now() / 1000;
-    let minute = 0;
-
-    if (type === "inprogress" || type === "extraTime") {
-        if (event.time && event.time.currentPeriodStartTimestamp) {
-            const elapsed = Math.floor((now - event.time.currentPeriodStartTimestamp) / 60);
-
-            switch (event.time.currentPeriod) {
-                case 1: // 1st half
-                    minute = elapsed;
-                    break;
-                case 2: // 2nd half
-                    minute = 45 + elapsed;
-                    break;
-                case 3: // 1st ET
-                    minute = 90 + elapsed;
-                    break;
-                case 4: // 2nd ET
-                    minute = 105 + elapsed;
-                    break;
-                default:
-                    minute = elapsed;
-            }
-
-            if (minute > 45 && event.time.currentPeriod === 1) return "45+";
-            if (minute > 90 && event.time.currentPeriod === 2) return "90+";
-            if (minute > 105 && event.time.currentPeriod === 3) return "105+";
-            if (minute > 120 && event.time.currentPeriod === 4) return "120+";
-
-            return minute + "'";
-        }
-    }
-
     if (type === "halftime") return "HT";
     if (type === "finished") return "FT";
     if (type === "penalties") return "PEN";
 
-    return "";
+    if (!(type === "inprogress" || type === "extraTime")) return "";
+
+    if (!(event.time && event.time.currentPeriodStartTimestamp)) return "";
+
+    const now = Date.now() / 1000;
+    let elapsed = Math.floor((now - event.time.currentPeriodStartTimestamp) / 60);
+    let minute = elapsed;
+
+    switch (event.time.currentPeriod) {
+        case 1: // 1st half
+            minute = elapsed;
+            break;
+        case 2: // 2nd half
+            minute = 45 + elapsed;
+            break;
+        case 3: // Extra time 1st half
+            minute = 90 + elapsed;
+            break;
+        case 4: // Extra time 2nd half
+            minute = 105 + elapsed;
+            break;
+    }
+
+    return minute + "'";
 }
 
 // --- Update status & skor ---
