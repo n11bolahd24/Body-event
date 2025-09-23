@@ -1,71 +1,10 @@
-// --- Fungsi ambil menit ---
-function getMinute(event) {
-    if (!event || !event.status) return "";
-
-    const type = event.status.type;
-    const desc = event.status.description;
-
-    console.log("➡️ getMinute() dipanggil:", { type, desc, time: event.time });
-
-    // Pakai Sofascore description kalau ada (misal "80'", "90+3'")
-    if (desc && desc.trim() !== "") {
-        console.log("✅ Pakai description langsung:", desc);
-        return desc;
-    }
-
-    // Kalau tidak ada description, fallback ke kalkulasi manual
-    if (!(event.time && event.time.currentPeriodStartTimestamp)) {
-        console.log("⚠️ Tidak ada currentPeriodStartTimestamp, fallback ke status type");
-        if (type === "halftime") return "HT";
-        if (type === "finished") return "FT";
-        if (type === "penalties") return "PEN";
-        return "";
-    }
-
-    const now = Date.now() / 1000;
-    let elapsed = Math.floor((now - event.time.currentPeriodStartTimestamp) / 60);
-    let minute = elapsed;
-
-    switch (event.time.currentPeriod) {
-        case 1: minute = elapsed; break;          // 1st half
-        case 2: minute = 45 + elapsed; break;     // 2nd half
-        case 3: minute = 90 + elapsed; break;     // ET 1st half
-        case 4: minute = 105 + elapsed; break;    // ET 2nd half
-    }
-
-    console.log("⏱️ Kalkulasi manual:", {
-        currentPeriod: event.time.currentPeriod,
-        elapsed,
-        hasil: minute
-    });
-
-    // Pastikan tidak lebih dari batas babak
-    if (event.time.currentPeriod === 1 && minute > 45) {
-        return "45+" + (minute - 45);
-    }
-    if (event.time.currentPeriod === 2 && minute > 90) {
-        return "90+" + (minute - 90);
-    }
-    if (event.time.currentPeriod === 3 && minute > 105) {
-        return "105+" + (minute - 105);
-    }
-    if (event.time.currentPeriod === 4 && minute > 120) {
-        return "120+" + (minute - 120);
-    }
-
-    return minute + "'";
-}
-
 // --- Fungsi Utama Load Sofascore + Countdown ---
 function loadSofaScore(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
 
-    console.log("🔄 Load awal untuk matchId:", matchId, "boxId:", boxId);
-
     fetch(eventUrl)
         .then(res => res.json())
         .then(data => {
-            console.log("📦 Data load awal:", data);
             const event = data.event;
             const home = event.homeTeam;
             const away = event.awayTeam;
@@ -74,28 +13,37 @@ function loadSofaScore(matchId, boxId) {
             const leagueEl = document.getElementById("league" + boxId);
             if (leagueEl) {
                 leagueEl.innerHTML = `
-                    <span style="display:inline-flex;align-items:center;">
-                        <img src="https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image/dark"
-                             alt="${event.tournament.name}"
-                             style="height:18px;width:18px;margin-right:4px;">
-                        <span>${event.tournament.name}</span>
-                    </span>
-                `;
+                <span style="display:inline-flex;align-items:center;">
+                  <img src="https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image/dark"
+                       alt="${event.tournament.name}"
+                       style="height:18px;width:18px;margin-right:4px;">
+                  <span>${event.tournament.name}</span>
+                </span>`;
             }
 
             // Jadwal kickoff otomatis zona waktu pengunjung
             const kickoffDate = new Date(event.startTimestamp * 1000);
             const tanggal = kickoffDate.toLocaleDateString(undefined, {
-                day: '2-digit', month: 'long', year: 'numeric'
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
             });
             const jam = kickoffDate.toLocaleTimeString(undefined, {
-                hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short'
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+                timeZoneName: 'short'
             });
-
             document.getElementById("kickoff" + boxId).innerHTML = `${tanggal} | K.O ${jam}`;
+
+            // Nama tim
             document.getElementById("teams" + boxId).innerText = home.name + " VS " + away.name;
-            document.getElementById("logoHome" + boxId).src = "https://api.sofascore.app/api/v1/team/" + home.id + "/image";
-            document.getElementById("logoAway" + boxId).src = "https://api.sofascore.app/api/v1/team/" + away.id + "/image";
+
+            // Logo tim
+            document.getElementById("logoHome" + boxId).src =
+                "https://api.sofascore.app/api/v1/team/" + home.id + "/image";
+            document.getElementById("logoAway" + boxId).src =
+                "https://api.sofascore.app/api/v1/team/" + away.id + "/image";
 
             // Mulai countdown & monitor status
             startCountdown(kickoffDate.getTime(), boxId);
@@ -103,7 +51,7 @@ function loadSofaScore(matchId, boxId) {
         });
 }
 
-// --- Fungsi Update Live Score & Match Ended ---
+// --- Fungsi Update Live Score & Match Status ---
 function monitorMatchStatus(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -113,48 +61,73 @@ function monitorMatchStatus(matchId, boxId) {
     const matchStatusEl = document.getElementById("matchStatus" + boxId);
     const finishedContainer = document.getElementById("finishedMatches");
 
-    console.log("👀 Start monitor matchId:", matchId, "boxId:", boxId);
-
     const interval = setInterval(async () => {
         const res = await fetch(eventUrl);
         const data = await res.json();
         const event = data.event;
-
-        console.log("📡 Update event:", event);
-
         if (!event || !matchBox) return;
 
         if (event.status.type === "upcoming") {
-            console.log("⌛ Status: upcoming");
             liveScoreEl.style.display = "none";
             matchStatusEl.style.display = "none";
             liveContainer.classList.add('hidden');
         }
 
-        if (event.status.type === "inprogress" || event.status.type === "extraTime" || event.status.type === "penalties") {
-            console.log("🔥 Status: live");
+        if (event.status.type === "inprogress" || event.status.type === "penalties") {
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
-
             countdownEl.innerHTML = "";
+
             liveContainer.classList.remove('hidden');
             liveContainer.classList.add('blink');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
 
+            // --- Skor realtime ---
             let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
-            if (event.homeScore.penalties !== undefined) {
-                scoreText += ` (${event.homeScore.penalties} - ${event.awayScore.penalties})`;
+
+            // Tambahkan penalti kalau ada
+            if (event.homeScore.penalties !== undefined && event.awayScore.penalties !== undefined) {
+                scoreText += ` <span style="font-size:12px;">(P: ${event.homeScore.penalties} - ${event.awayScore.penalties})</span>`;
             }
+
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            let statusText = getMinute(event);
-            console.log("📍 Menit tampil:", statusText);
+            // --- Status menit & penalti ---
+            let statusText = "";
+            if (event.status.type === "penalties") {
+                statusText = "PENALTIES";
+            } else if (event.time && event.time.currentPeriodStartTimestamp) {
+                const startTs = event.time.currentPeriodStartTimestamp * 1000;
+                const elapsed = Math.floor((Date.now() - startTs) / 60000);
+
+                switch (event.status.description) {
+                    case "1st half":
+                        statusText = elapsed >= 45 ? "45+'" : `${elapsed}'`;
+                        break;
+                    case "2nd half":
+                        let m2 = 45 + elapsed;
+                        statusText = m2 >= 90 ? "90+'" : `${m2}'`;
+                        break;
+                    case "1st extra":
+                        let m3 = 90 + elapsed;
+                        statusText = m3 >= 105 ? "105+'" : `${m3}'`;
+                        break;
+                    case "2nd extra":
+                        let m4 = 105 + elapsed;
+                        statusText = m4 >= 120 ? "120+'" : `${m4}'`;
+                        break;
+                    default:
+                        statusText = event.status.description || "LIVE";
+                }
+            } else {
+                statusText = event.status.description || "LIVE";
+            }
+
             matchStatusEl.innerHTML = statusText;
             matchStatusEl.style.display = "block";
         }
 
         if (event.status.type === "finished") {
-            console.log("🏁 Status: finished");
             clearInterval(interval);
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
 
@@ -165,9 +138,10 @@ function monitorMatchStatus(matchId, boxId) {
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>⛔ MATCH ENDED ⛔</strong>";
 
             let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
-            if (event.homeScore.penalties !== undefined) {
-                scoreText += ` (${event.homeScore.penalties} - ${event.awayScore.penalties})`;
+            if (event.homeScore.penalties !== undefined && event.awayScore.penalties !== undefined) {
+                scoreText += ` <span style="font-size:12px;">(P: ${event.homeScore.penalties} - ${event.awayScore.penalties})</span>`;
             }
+
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
