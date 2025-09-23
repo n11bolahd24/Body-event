@@ -41,7 +41,7 @@ function loadSofaScore(matchId, boxId) {
         });
 }
 
-// --- Fungsi Update Live Score & Menit Real-Time (Sinkron Babak) ---
+// --- Fungsi Update Live Score & Menit Real-Time Sinkron Babak ---
 function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -56,6 +56,8 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
         const data = await res.json();
         const event = data.event;
         if (!event || !matchBox || !matchStatusEl) return;
+
+        const statusDesc = event.status.description || "";
 
         // --- upcoming ---
         if (event.status.type === "upcoming") {
@@ -85,21 +87,24 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            // Hitung menit real-time berdasarkan babak
+            // Hitung menit realtime berdasarkan babak
             const now = new Date().getTime();
-            let elapsedMinutes = Math.floor((now - kickoffTime) / 60000); // hanya menit
             let displayMinute = 0;
-
-            const statusDesc = event.status.description || "";
+            const firstHalfDuration = 45 * 60 * 1000; // 45 menit
 
             if (statusDesc.includes("1st Half")) {
-                displayMinute = Math.min(elapsedMinutes + 1, 45); // batasi sampai 45
-                if (elapsedMinutes >= 45) displayMinute = `45+${elapsedMinutes-45}`;
-            } else if (statusDesc.includes("2nd Half")) {
-                displayMinute = Math.min(elapsedMinutes - 45 + 1, 45) + 45; // babak 2
-                if (elapsedMinutes > 90) displayMinute = `90+${elapsedMinutes-90}`;
+                let elapsed = now - kickoffTime;
+                displayMinute = Math.floor(elapsed / 60000) + 1;
+                if (displayMinute > 45) displayMinute = `45+${displayMinute-45}`;
             } else if (statusDesc.includes("Half Time")) {
                 displayMinute = 45;
+            } else if (statusDesc.includes("2nd Half")) {
+                // Babak 2 dimulai 45 menit setelah kickoff + extra time babak 1
+                let extraFirstHalf = (event.extraTimeFirstHalf || 0) * 60000;
+                let secondHalfStart = kickoffTime + firstHalfDuration + extraFirstHalf;
+                let elapsed = now - secondHalfStart;
+                displayMinute = 46 + Math.floor(elapsed / 60000);
+                if (displayMinute > 90) displayMinute = `90+${displayMinute-90}`;
             } else if (statusDesc.includes("Full Time")) {
                 displayMinute = 90;
             }
