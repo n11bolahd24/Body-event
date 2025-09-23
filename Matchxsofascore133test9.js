@@ -71,13 +71,12 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
         // --- inprogress ---
         if (event.status.type === "inprogress") {
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
-
             countdownEl.innerHTML = "";
             liveContainer.classList.remove('hidden');
             liveContainer.classList.add('blink');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
 
-            // Skor utama
+            // Skor utama + HT + Penalty
             let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
             if (event.homeScore.halfTime !== undefined && event.awayScore.halfTime !== undefined) {
                 scoreText += ` (HT: ${event.homeScore.halfTime}-${event.awayScore.halfTime})`;
@@ -88,7 +87,7 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            // Hitung menit realtime aman
+            // Hitung menit realtime
             let displayMinute = 0;
             const elapsedMinutes = Math.floor((now - kickoffTime) / 60000) + 1;
 
@@ -98,19 +97,26 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
             } else if (statusDesc.includes("Half Time")) {
                 displayMinute = 45;
             } else if (statusDesc.includes("2nd Half")) {
-                displayMinute = Math.max(elapsedMinutes, 46); // Babak 2 selalu minimal 46
+                displayMinute = Math.max(elapsedMinutes, 46);
                 if (elapsedMinutes > 90) displayMinute = `90+${elapsedMinutes-90}`;
-            } else if (statusDesc.includes("Full Time")) {
-                displayMinute = 90;
+            } else if (statusDesc.includes("Extra Time 1")) {
+                let et1Minute = elapsedMinutes - 90;
+                displayMinute = `EXTRATIME1 (${et1Minute}')`;
+            } else if (statusDesc.includes("Extra Time 2")) {
+                let et2Minute = elapsedMinutes - 105;
+                displayMinute = `EXTRATIME2 (${et2Minute}')`;
+            } else if (statusDesc.includes("Penalty")) {
+                displayMinute = "PENALTY";
             }
 
-            matchStatusEl.innerHTML = `${statusDesc} (${displayMinute}')`;
+            matchStatusEl.innerHTML = statusDesc.includes("Extra Time") || statusDesc.includes("Penalty")
+                ? displayMinute
+                : `${statusDesc} (${displayMinute}')`;
         }
 
         // --- finished ---
         if (event.status.type === "finished") {
             clearInterval(interval);
-
             countdownEl.innerHTML = "";
             liveContainer.classList.remove('blink');
             liveContainer.style.animation = "none";
@@ -133,7 +139,6 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
                 finishedContainer.appendChild(matchBox);
             }
         }
-
     }, 3000);
 }
 
@@ -162,4 +167,26 @@ function startCountdown(targetTime, boxId) {
             minutes + "M - " +
             seconds + "S";
     }, 1000);
+}
+
+// --- Fungsi Tambahan: Render Match Box ---
+function renderMatch(matchId, matchKey, servers = ["SERVER"], boxType = "kotak") {
+    const container = document.getElementById("matchesContainer");
+    if (!container) return;
+
+    const matchHTML = `
+        <div class="matchBox" id="match${matchKey}">
+            <div id="league${matchKey}"></div>
+            <div id="kickoff${matchKey}"></div>
+            <div id="teams${matchKey}"></div>
+            <img id="logoHome${matchKey}" style="height:32px;width:32px;">
+            <img id="logoAway${matchKey}" style="height:32px;width:32px;">
+            <div id="countdown${matchKey}"></div>
+            <div id="liveContainer${matchKey}" class="hidden"></div>
+            <div id="liveScore${matchKey}"></div>
+            <div id="matchStatus${matchKey}"></div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', matchHTML);
+    loadSofaScore(matchId, matchKey);
 }
