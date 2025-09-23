@@ -169,24 +169,3 @@ function startCountdown(targetTime, boxId) {
     }, 1000);
 }
 
-// --- Fungsi Tambahan: Render Match Box ---
-function renderMatch(matchId, matchKey, servers = ["SERVER"], boxType = "kotak") {
-    const container = document.getElementById("matchesContainer");
-    if (!container) return;
-
-    const matchHTML = `
-        <div class="matchBox" id="match${matchKey}">
-            <div id="league${matchKey}"></div>
-            <div id="kickoff${matchKey}"></div>
-            <div id="teams${matchKey}"></div>
-            <img id="logoHome${matchKey}" style="height:32px;width:32px;">
-            <img id="logoAway${matchKey}" style="height:32px;width:32px;">
-            <div id="countdown${matchKey}"></div>
-            <div id="liveContainer${matchKey}" class="hidden"></div>
-            <div id="liveScore${matchKey}"></div>
-            <div id="matchStatus${matchKey}"></div>
-        </div>
-    `;
-    container.insertAdjacentHTML('beforeend', matchHTML);
-    loadSofaScore(matchId, matchKey);
-}
