@@ -92,16 +92,16 @@ function monitorMatchStatus(matchId, boxId) {
             liveContainer.classList.add('blink');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
 
-            // Pakai description asli dari SofaScore (lebih akurat)
-            let minuteText = statusDesc;
-
-            // Kalau kosong (fallback jarang dipakai)
-            if (!minuteText || minuteText.trim() === "") {
-                const kickoffTimestamp = event.startTimestamp * 1000;
-                let elapsed = Math.floor((Date.now() - kickoffTimestamp) / 60000);
-                if (elapsed > 45 && elapsed <= 90) elapsed = "45+" + (elapsed - 45);
-                if (elapsed > 90) elapsed = "90+" + (elapsed - 90);
-                minuteText = elapsed + "'";
+            // --- Ambil menit/status dari SofaScore ---
+            let minuteText = "";
+            if (statusDesc && statusDesc.trim() !== "") {
+                // pakai langsung dari SofaScore (contoh: "85'", "HT", "ET 105'", "Penalties")
+                minuteText = statusDesc;
+            } else {
+                // fallback kalau kosong
+                if (statusType === "inprogress") minuteText = "LIVE";
+                if (statusType === "extraTime") minuteText = "Extra Time";
+                if (statusType === "penalties") minuteText = "Penalties";
             }
 
             // Update score
