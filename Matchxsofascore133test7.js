@@ -41,7 +41,7 @@ function loadSofaScore(matchId, boxId) {
         });
 }
 
-// --- Fungsi Update Live Score & Menit Real-Time Aman ---
+// --- Fungsi Update Live Score & Menit Realtime Aman Babak 2 ---
 function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -50,6 +50,8 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
     const liveScoreEl = document.getElementById("liveScore" + boxId);
     const matchStatusEl = document.getElementById("matchStatus" + boxId);
     const finishedContainer = document.getElementById("finishedMatches");
+
+    let secondHalfStartTime = null; // simpan waktu mulai babak 2
 
     const interval = setInterval(async () => {
         const res = await fetch(eventUrl);
@@ -88,7 +90,7 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            // Hitung menit realtime aman
+            // Hitung menit realtime
             let displayMinute = 0;
             const elapsedMinutes = Math.floor((now - kickoffTime) / 60000) + 1;
 
@@ -98,8 +100,11 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
             } else if (statusDesc.includes("Half Time")) {
                 displayMinute = 45;
             } else if (statusDesc.includes("2nd Half")) {
-                // Babak 2 mulai menit 46
-                displayMinute = Math.max(elapsedMinutes, 46);
+                if (!secondHalfStartTime) {
+                    secondHalfStartTime = now; // catat saat pertama kali babak 2
+                }
+                let elapsed = Math.floor((now - secondHalfStartTime)/60000);
+                displayMinute = 46 + elapsed;
                 if (displayMinute > 90) displayMinute = `90+${displayMinute-90}`;
             } else if (statusDesc.includes("Full Time")) {
                 displayMinute = 90;
@@ -135,7 +140,7 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
             }
         }
 
-    }, 3000); // fetch API tiap 3 detik
+    }, 3000);
 }
 
 // --- Fungsi Countdown ---
