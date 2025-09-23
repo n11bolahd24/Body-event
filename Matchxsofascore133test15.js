@@ -92,17 +92,16 @@ function monitorMatchStatus(matchId, boxId) {
             liveContainer.classList.add('blink');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
 
-            // Hitung menit real-time
+            // Pakai description asli dari SofaScore (lebih akurat)
             let minuteText = statusDesc;
-            if (statusType === "inprogress" || statusType === "extraTime") {
-                if (!minuteText.includes("'")) {
-                    // Tambahkan menit otomatis jika belum ada
-                    const kickoffTimestamp = event.startTimestamp * 1000;
-                    let elapsed = Math.floor((Date.now() - kickoffTimestamp) / 60000); // menit
-                    if (elapsed > 45 && elapsed <= 90) elapsed = "45+" + (elapsed - 45);
-                    if (elapsed > 90) elapsed = "90+" + (elapsed - 90);
-                    minuteText = elapsed + "'";
-                }
+
+            // Kalau kosong (fallback jarang dipakai)
+            if (!minuteText || minuteText.trim() === "") {
+                const kickoffTimestamp = event.startTimestamp * 1000;
+                let elapsed = Math.floor((Date.now() - kickoffTimestamp) / 60000);
+                if (elapsed > 45 && elapsed <= 90) elapsed = "45+" + (elapsed - 45);
+                if (elapsed > 90) elapsed = "90+" + (elapsed - 90);
+                minuteText = elapsed + "'";
             }
 
             // Update score
