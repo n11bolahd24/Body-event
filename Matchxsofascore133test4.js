@@ -41,7 +41,7 @@ function loadSofaScore(matchId, boxId) {
         });
 }
 
-// --- Fungsi Update Live Score & Menit Real-Time (Menit Saja) ---
+// --- Fungsi Update Live Score & Menit Real-Time (Sinkron Babak) ---
 function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -85,16 +85,26 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            // Hitung menit real-time dari kickoff
+            // Hitung menit real-time berdasarkan babak
             const now = new Date().getTime();
             let elapsedMinutes = Math.floor((now - kickoffTime) / 60000); // hanya menit
-            let displayMinute = elapsedMinutes + 1; // mulai dari menit 1
+            let displayMinute = 0;
 
-            // Extra time / injury time
-            if (displayMinute > 45 && event.status.description.includes("1st")) displayMinute = `45+${displayMinute-45}`;
-            if (displayMinute > 90 && event.status.description.includes("2nd")) displayMinute = `90+${displayMinute-90}`;
+            const statusDesc = event.status.description || "";
 
-            matchStatusEl.innerHTML = `${event.status.description} (${displayMinute}')`;
+            if (statusDesc.includes("1st Half")) {
+                displayMinute = Math.min(elapsedMinutes + 1, 45); // batasi sampai 45
+                if (elapsedMinutes >= 45) displayMinute = `45+${elapsedMinutes-45}`;
+            } else if (statusDesc.includes("2nd Half")) {
+                displayMinute = Math.min(elapsedMinutes - 45 + 1, 45) + 45; // babak 2
+                if (elapsedMinutes > 90) displayMinute = `90+${elapsedMinutes-90}`;
+            } else if (statusDesc.includes("Half Time")) {
+                displayMinute = 45;
+            } else if (statusDesc.includes("Full Time")) {
+                displayMinute = 90;
+            }
+
+            matchStatusEl.innerHTML = `${statusDesc} (${displayMinute}')`;
         }
 
         // --- finished ---
@@ -117,7 +127,7 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
 
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
-            matchStatusEl.innerHTML = "Full Time";
+            matchStatusEl.innerHTML = "Full Time (90')";
 
             if (finishedContainer && matchBox.parentNode !== finishedContainer) {
                 finishedContainer.appendChild(matchBox);
