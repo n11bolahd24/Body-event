@@ -13,13 +13,12 @@ function loadSofaScore(matchId, boxId) {
             const leagueEl = document.getElementById("league" + boxId);
             if (leagueEl) {
                 leagueEl.innerHTML = `
-                    <span style="display:inline-flex;align-items:center;">
-                        <img src="https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image/dark"
-                            alt="${event.tournament.name}"
-                            style="height:18px;width:18px;margin-right:4px;">
-                        <span>${event.tournament.name}</span>
-                    </span>
-                `;
+                <span style="display:inline-flex;align-items:center;">
+                  <img src="https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image/dark"
+                       alt="${event.tournament.name}"
+                       style="height:18px;width:18px;margin-right:4px;">
+                  <span>${event.tournament.name}</span>
+                </span>`;
             }
 
             // Jadwal kickoff otomatis zona waktu pengunjung
@@ -35,7 +34,6 @@ function loadSofaScore(matchId, boxId) {
                 hour12: false,
                 timeZoneName: 'short'
             });
-
             document.getElementById("kickoff" + boxId).innerHTML = `${tanggal} | K.O ${jam}`;
 
             // Nama tim
@@ -53,7 +51,7 @@ function loadSofaScore(matchId, boxId) {
         });
 }
 
-// --- Fungsi Update Live Score & Match Ended ---
+// --- Fungsi Update Live Score & Match Status ---
 function monitorMatchStatus(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -75,30 +73,57 @@ function monitorMatchStatus(matchId, boxId) {
             liveContainer.classList.add('hidden');
         }
 
-        if (
-            event.status.type === "inprogress" ||
-            event.status.type === "halftime" ||
-            event.status.type === "extraTime" ||
-            event.status.type === "penalties"
-        ) {
+        if (event.status.type === "inprogress" || event.status.type === "penalties") {
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
-
             countdownEl.innerHTML = "";
+
             liveContainer.classList.remove('hidden');
             liveContainer.classList.add('blink');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
 
-            // Skor
+            // --- Skor realtime ---
             let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
-            const penScore = getPenaltyScore(event);
-            if (penScore) {
-                scoreText += ` (${penScore})`;
+
+            // Tambahkan penalti kalau ada
+            if (event.homeScore.penalties !== undefined && event.awayScore.penalties !== undefined) {
+                scoreText += ` <span style="font-size:12px;">(P: ${event.homeScore.penalties} - ${event.awayScore.penalties})</span>`;
             }
+
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            // Menit + status
-            matchStatusEl.innerHTML = getMinute(event);
+            // --- Status menit & penalti ---
+            let statusText = "";
+            if (event.status.type === "penalties") {
+                statusText = "PENALTIES";
+            } else if (event.time && event.time.currentPeriodStartTimestamp) {
+                const startTs = event.time.currentPeriodStartTimestamp * 1000;
+                const elapsed = Math.floor((Date.now() - startTs) / 60000);
+
+                switch (event.status.description) {
+                    case "1st half":
+                        statusText = elapsed >= 45 ? "45+'" : `${elapsed}'`;
+                        break;
+                    case "2nd half":
+                        let m2 = 45 + elapsed;
+                        statusText = m2 >= 90 ? "90+'" : `${m2}'`;
+                        break;
+                    case "1st extra":
+                        let m3 = 90 + elapsed;
+                        statusText = m3 >= 105 ? "105+'" : `${m3}'`;
+                        break;
+                    case "2nd extra":
+                        let m4 = 105 + elapsed;
+                        statusText = m4 >= 120 ? "120+'" : `${m4}'`;
+                        break;
+                    default:
+                        statusText = event.status.description || "LIVE";
+                }
+            } else {
+                statusText = event.status.description || "LIVE";
+            }
+
+            matchStatusEl.innerHTML = statusText;
             matchStatusEl.style.display = "block";
         }
 
@@ -113,14 +138,14 @@ function monitorMatchStatus(matchId, boxId) {
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>⛔ MATCH ENDED ⛔</strong>";
 
             let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
-            const penScore = getPenaltyScore(event);
-            if (penScore) {
-                scoreText += ` (${penScore})`;
+            if (event.homeScore.penalties !== undefined && event.awayScore.penalties !== undefined) {
+                scoreText += ` <span style="font-size:12px;">(P: ${event.homeScore.penalties} - ${event.awayScore.penalties})</span>`;
             }
+
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            matchStatusEl.innerHTML = "FT";
+            matchStatusEl.innerHTML = "Full Time";
             matchStatusEl.style.display = "block";
 
             if (finishedContainer && matchBox.parentNode !== finishedContainer) {
@@ -155,79 +180,4 @@ function startCountdown(targetTime, boxId) {
             minutes + "M - " +
             seconds + "S";
     }, 1000);
-}
-
-// --- Fungsi Ambil Menit + Status ---
-function getMinute(event) {
-    if (!event || !event.status) return "";
-
-    const type = event.status.type;
-    const desc = event.status.description;
-
-    // --- Status teks ---
-    let statusText = "";
-    switch (type) {
-        case "inprogress":
-            if (event.time.currentPeriod === 1) statusText = "1st Half";
-            if (event.time.currentPeriod === 2) statusText = "2nd Half";
-            if (event.time.currentPeriod === 3) statusText = "ET 1st";
-            if (event.time.currentPeriod === 4) statusText = "ET 2nd";
-            break;
-        case "halftime": statusText = "HT"; break;
-        case "finished": statusText = "FT"; break;
-        case "afterextra": statusText = "AET"; break;
-        case "penalties": statusText = "PEN"; break;
-    }
-
-    // --- Kalau Sofascore kasih menit langsung ---
-    if (desc && desc.includes("'")) {
-        return desc + " " + statusText;
-    }
-
-    // --- Kalau Sofascore cuma kasih teks (HT, 2nd half, dsb.) ---
-    if (desc && !desc.includes("'")) {
-        return statusText;
-    }
-
-    // --- Hitung manual ---
-    if (!(event.time && event.time.currentPeriodStartTimestamp)) {
-        return statusText;
-    }
-
-    const now = Date.now() / 1000;
-    let elapsed = Math.floor((now - event.time.currentPeriodStartTimestamp) / 60);
-    let minute = elapsed;
-
-    switch (event.time.currentPeriod) {
-        case 1: minute = elapsed; break;
-        case 2: minute = 45 + elapsed; break;
-        case 3: minute = 90 + elapsed; break;
-        case 4: minute = 105 + elapsed; break;
-    }
-
-    if (event.time.currentPeriod === 1 && minute > 45) {
-        return "45+" + (minute - 45) + " " + statusText;
-    }
-    if (event.time.currentPeriod === 2 && minute > 90) {
-        return "90+" + (minute - 90) + " " + statusText;
-    }
-    if (event.time.currentPeriod === 3 && minute > 105) {
-        return "105+" + (minute - 105) + " " + statusText;
-    }
-    if (event.time.currentPeriod === 4 && minute > 120) {
-        return "120+" + (minute - 120) + " " + statusText;
-    }
-
-    return minute + "' " + statusText;
-}
-
-// --- Fungsi Ambil Skor Penalti ---
-function getPenaltyScore(event) {
-    if (!event.homeScore || !event.awayScore) return "";
-    if (event.homeScore.penalties != null || event.awayScore.penalties != null) {
-        const homePen = event.homeScore.penalties ?? 0;
-        const awayPen = event.awayScore.penalties ?? 0;
-        return `${homePen} – ${awayPen}`;
-    }
-    return "";
 }
