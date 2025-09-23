@@ -1,17 +1,17 @@
-// --- Fungsi Ambil Menit Pertandingan ---
+// --- Fungsi ambil menit ---
 function getMinute(event) {
-    if (!event.status) return "";
+    if (!event || !event.status) return "";
 
     const type = event.status.type;
     const desc = event.status.description;
 
-    // Sofascore sudah kasih menit (contoh: "80'", "90+3'")
+    // Pakai Sofascore description kalau ada (misal "80'", "90+3'")
     if (desc && desc.trim() !== "") {
         return desc;
     }
 
-    // fallback manual
-    if (type !== "inprogress" && type !== "extraTime") {
+    // Kalau tidak ada description, fallback ke kalkulasi manual
+    if (!(event.time && event.time.currentPeriodStartTimestamp)) {
         if (type === "halftime") return "HT";
         if (type === "finished") return "FT";
         if (type === "penalties") return "PEN";
@@ -19,8 +19,6 @@ function getMinute(event) {
     }
 
     const now = Date.now() / 1000;
-    if (!(event.time && event.time.currentPeriodStartTimestamp)) return "";
-
     let elapsed = Math.floor((now - event.time.currentPeriodStartTimestamp) / 60);
     let minute = elapsed;
 
@@ -29,6 +27,20 @@ function getMinute(event) {
         case 2: minute = 45 + elapsed; break;     // 2nd half
         case 3: minute = 90 + elapsed; break;     // ET 1st half
         case 4: minute = 105 + elapsed; break;    // ET 2nd half
+    }
+
+    // Pastikan tidak lebih dari batas babak
+    if (event.time.currentPeriod === 1 && minute > 45) {
+        return "45+" + (minute - 45);
+    }
+    if (event.time.currentPeriod === 2 && minute > 90) {
+        return "90+" + (minute - 90);
+    }
+    if (event.time.currentPeriod === 3 && minute > 105) {
+        return "105+" + (minute - 105);
+    }
+    if (event.time.currentPeriod === 4 && minute > 120) {
+        return "120+" + (minute - 120);
     }
 
     return minute + "'";
@@ -51,8 +63,8 @@ function loadSofaScore(matchId, boxId) {
                 leagueEl.innerHTML = `
                     <span style="display:inline-flex;align-items:center;">
                         <img src="https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image/dark"
-                            alt="${event.tournament.name}"
-                            style="height:18px;width:18px;margin-right:4px;">
+                             alt="${event.tournament.name}"
+                             style="height:18px;width:18px;margin-right:4px;">
                         <span>${event.tournament.name}</span>
                     </span>
                 `;
@@ -61,12 +73,14 @@ function loadSofaScore(matchId, boxId) {
             // Jadwal kickoff otomatis zona waktu pengunjung
             const kickoffDate = new Date(event.startTimestamp * 1000);
 
-            // Format tanggal & jam lokal
+            // Format tanggal lokal pengunjung
             const tanggal = kickoffDate.toLocaleDateString(undefined, {
                 day: '2-digit',
                 month: 'long',
                 year: 'numeric'
             });
+
+            // Format jam lokal pengunjung + kode zona
             const jam = kickoffDate.toLocaleTimeString(undefined, {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -75,7 +89,6 @@ function loadSofaScore(matchId, boxId) {
             });
 
             document.getElementById("kickoff" + boxId).innerHTML = `${tanggal} | K.O ${jam}`;
-
             // Nama tim
             document.getElementById("teams" + boxId).innerText = home.name + " VS " + away.name;
 
@@ -91,7 +104,7 @@ function loadSofaScore(matchId, boxId) {
         });
 }
 
-// --- Fungsi Update Live Score & Match Status ---
+// --- Fungsi Update Live Score & Match Ended ---
 function monitorMatchStatus(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -107,15 +120,13 @@ function monitorMatchStatus(matchId, boxId) {
         const event = data.event;
         if (!event || !matchBox) return;
 
-        const statusType = event.status.type;
-
-        if (statusType === "upcoming" || statusType === "notstarted") {
+        if (event.status.type === "upcoming") {
             liveScoreEl.style.display = "none";
             matchStatusEl.style.display = "none";
             liveContainer.classList.add('hidden');
         }
 
-        if (statusType === "inprogress" || statusType === "extraTime" || statusType === "penalties") {
+        if (event.status.type === "inprogress" || event.status.type === "extraTime" || event.status.type === "penalties") {
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
 
             countdownEl.innerHTML = "";
@@ -123,7 +134,6 @@ function monitorMatchStatus(matchId, boxId) {
             liveContainer.classList.add('blink');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
 
-            // Skor (plus penalti jika ada)
             let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
             if (event.homeScore.penalties !== undefined) {
                 scoreText += ` (${event.homeScore.penalties} - ${event.awayScore.penalties})`;
@@ -131,12 +141,12 @@ function monitorMatchStatus(matchId, boxId) {
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            // Menit pertandingan
-            matchStatusEl.innerHTML = getMinute(event);
+            let statusText = getMinute(event);
+            matchStatusEl.innerHTML = statusText;
             matchStatusEl.style.display = "block";
         }
 
-        if (statusType === "finished" || statusType === "cancelled" || statusType === "postponed") {
+        if (event.status.type === "finished") {
             clearInterval(interval);
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
 
@@ -144,7 +154,7 @@ function monitorMatchStatus(matchId, boxId) {
             liveContainer.classList.remove('blink');
             liveContainer.style.animation = "none";
             liveContainer.classList.remove('hidden');
-            liveContainer.innerHTML = `<strong style='color:white;-webkit-text-stroke:0.2px black;'>⛔ ${event.status.description || "MATCH ENDED"} ⛔</strong>`;
+            liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>⛔ MATCH ENDED ⛔</strong>";
 
             let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
             if (event.homeScore.penalties !== undefined) {
@@ -153,7 +163,7 @@ function monitorMatchStatus(matchId, boxId) {
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            matchStatusEl.innerHTML = event.status.description || "FT";
+            matchStatusEl.innerHTML = "Full Time";
             matchStatusEl.style.display = "block";
 
             if (finishedContainer && matchBox.parentNode !== finishedContainer) {
