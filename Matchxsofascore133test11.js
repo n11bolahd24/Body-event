@@ -1,3 +1,27 @@
+// --- Fungsi Render Match Box & Load Data ---
+function renderMatch(matchId, matchKey) {
+    const container = document.getElementById("matchesContainer");
+    if (!container) return;
+
+    const matchHTML = `
+        <div class="matchBox" id="match${matchKey}">
+            <div id="league${matchKey}"></div>
+            <div id="kickoff${matchKey}"></div>
+            <div id="teams${matchKey}"></div>
+            <img id="logoHome${matchKey}" style="height:32px;width:32px;">
+            <img id="logoAway${matchKey}" style="height:32px;width:32px;">
+            <div id="countdown${matchKey}"></div>
+            <div id="liveContainer${matchKey}" class="hidden"></div>
+            <div id="liveScore${matchKey}"></div>
+            <div id="matchStatus${matchKey}">Kickoff (0')</div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', matchHTML);
+
+    // Setelah HTML siap, load data
+    loadSofaScore(matchId, matchKey);
+}
+
 // --- Fungsi Utama Load Sofascore + Countdown ---
 function loadSofaScore(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
@@ -22,7 +46,7 @@ function loadSofaScore(matchId, boxId) {
                 `;
             }
 
-            // Jadwal kickoff
+            // Kickoff date & time
             const kickoffDate = new Date(event.startTimestamp * 1000);
             const tanggal = kickoffDate.toLocaleDateString(undefined, { day: '2-digit', month: 'long', year: 'numeric' });
             const jam = kickoffDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short' });
@@ -41,7 +65,7 @@ function loadSofaScore(matchId, boxId) {
         });
 }
 
-// --- Fungsi Update Live Score & Menit Realtime Aman ---
+// --- Fungsi Update Live Score & Menit Realtime ---
 function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -51,6 +75,7 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
     const matchStatusEl = document.getElementById("matchStatus" + boxId);
     const finishedContainer = document.getElementById("finishedMatches");
 
+    // Update tiap 2 detik agar match paling bawah ikut update cepat
     const interval = setInterval(async () => {
         const res = await fetch(eventUrl);
         const data = await res.json();
@@ -100,10 +125,10 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
                 displayMinute = Math.max(elapsedMinutes, 46);
                 if (elapsedMinutes > 90) displayMinute = `90+${elapsedMinutes-90}`;
             } else if (statusDesc.includes("Extra Time 1")) {
-                let et1Minute = elapsedMinutes - 90;
+                const et1Minute = elapsedMinutes - 90;
                 displayMinute = `EXTRATIME1 (${et1Minute}')`;
             } else if (statusDesc.includes("Extra Time 2")) {
-                let et2Minute = elapsedMinutes - 105;
+                const et2Minute = elapsedMinutes - 105;
                 displayMinute = `EXTRATIME2 (${et2Minute}')`;
             } else if (statusDesc.includes("Penalty")) {
                 displayMinute = "PENALTY";
@@ -139,7 +164,7 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
                 finishedContainer.appendChild(matchBox);
             }
         }
-    }, 3000);
+    }, 2000); // Update tiap 2 detik
 }
 
 // --- Fungsi Countdown ---
@@ -168,4 +193,3 @@ function startCountdown(targetTime, boxId) {
             seconds + "S";
     }, 1000);
 }
-
