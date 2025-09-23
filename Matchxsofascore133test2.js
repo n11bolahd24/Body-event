@@ -51,15 +51,14 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
     const matchStatusEl = document.getElementById("matchStatus" + boxId);
     const finishedContainer = document.getElementById("finishedMatches");
 
-    let lastAPIMinute = 0; // menit terakhir dari API
-    let currentMinute = 0; // menit berjalan detik-per-detik
+    let currentMinute = 0;
     let minuteInterval;
 
     const fetchInterval = setInterval(async () => {
         const res = await fetch(eventUrl);
         const data = await res.json();
         const event = data.event;
-        if (!event || !matchBox) return;
+        if (!event || !matchBox || !matchStatusEl) return;
 
         // --- upcoming ---
         if (event.status.type === "upcoming") {
@@ -72,6 +71,7 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
         // --- inprogress ---
         if (event.status.type === "inprogress") {
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
+
             countdownEl.innerHTML = "";
             liveContainer.classList.remove('hidden');
             liveContainer.classList.add('blink');
@@ -89,17 +89,20 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
             liveScoreEl.style.display = "block";
 
             // Menit real-time
-            lastAPIMinute = event.stats && event.stats.minute ? event.stats.minute : lastAPIMinute;
+            currentMinute = event.stats && event.stats.minute ? event.stats.minute : currentMinute;
+
             if (!minuteInterval) {
-                currentMinute = lastAPIMinute;
                 minuteInterval = setInterval(() => {
+                    if (!matchStatusEl) return;
+
                     let displayMinute = currentMinute;
                     // Extra time / injury time
                     if (currentMinute > 45 && event.status.description.includes("1st")) displayMinute = `45+${currentMinute-45}`;
                     if (currentMinute > 90 && event.status.description.includes("2nd")) displayMinute = `90+${currentMinute-90}`;
-                    matchStatusEl.innerHTML = `${event.status.description} (${displayMinute}')`;
+
+                    matchStatusEl.innerHTML = `${event.status.description || "In Progress"} (${displayMinute}')`;
                     currentMinute += 1;
-                }, 60000); // +1 menit tiap 60 detik
+                }, 1000); // update tiap 1 detik
             }
         }
 
@@ -107,6 +110,7 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
         if (event.status.type === "finished") {
             clearInterval(fetchInterval);
             if (minuteInterval) clearInterval(minuteInterval);
+
             countdownEl.innerHTML = "";
             liveContainer.classList.remove('blink');
             liveContainer.style.animation = "none";
@@ -120,6 +124,7 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
             if (event.homeScore.penalty !== undefined && event.awayScore.penalty !== undefined) {
                 scoreText += ` [P: ${event.homeScore.penalty}-${event.awayScore.penalty}]`;
             }
+
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
             matchStatusEl.innerHTML = "Full Time";
