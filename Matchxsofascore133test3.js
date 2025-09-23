@@ -41,7 +41,7 @@ function loadSofaScore(matchId, boxId) {
         });
 }
 
-// --- Fungsi Update Live Score & Menit Real-Time ---
+// --- Fungsi Update Live Score & Menit Real-Time (Menit Saja) ---
 function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
     const matchBox = document.getElementById("match" + boxId);
@@ -51,10 +51,7 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
     const matchStatusEl = document.getElementById("matchStatus" + boxId);
     const finishedContainer = document.getElementById("finishedMatches");
 
-    let currentMinute = 0;
-    let minuteInterval;
-
-    const fetchInterval = setInterval(async () => {
+    const interval = setInterval(async () => {
         const res = await fetch(eventUrl);
         const data = await res.json();
         const event = data.event;
@@ -65,7 +62,7 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
             liveScoreEl.style.display = "none";
             matchStatusEl.style.display = "none";
             liveContainer.classList.add('hidden');
-            if (minuteInterval) clearInterval(minuteInterval);
+            return;
         }
 
         // --- inprogress ---
@@ -88,28 +85,21 @@ function monitorMatchStatusRealtime(matchId, boxId, kickoffTime) {
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            // Menit real-time
-            currentMinute = event.stats && event.stats.minute ? event.stats.minute : currentMinute;
+            // Hitung menit real-time dari kickoff
+            const now = new Date().getTime();
+            let elapsedMinutes = Math.floor((now - kickoffTime) / 60000); // hanya menit
+            let displayMinute = elapsedMinutes + 1; // mulai dari menit 1
 
-            if (!minuteInterval) {
-                minuteInterval = setInterval(() => {
-                    if (!matchStatusEl) return;
+            // Extra time / injury time
+            if (displayMinute > 45 && event.status.description.includes("1st")) displayMinute = `45+${displayMinute-45}`;
+            if (displayMinute > 90 && event.status.description.includes("2nd")) displayMinute = `90+${displayMinute-90}`;
 
-                    let displayMinute = currentMinute;
-                    // Extra time / injury time
-                    if (currentMinute > 45 && event.status.description.includes("1st")) displayMinute = `45+${currentMinute-45}`;
-                    if (currentMinute > 90 && event.status.description.includes("2nd")) displayMinute = `90+${currentMinute-90}`;
-
-                    matchStatusEl.innerHTML = `${event.status.description || "In Progress"} (${displayMinute}')`;
-                    currentMinute += 1;
-                }, 1000); // update tiap 1 detik
-            }
+            matchStatusEl.innerHTML = `${event.status.description} (${displayMinute}')`;
         }
 
         // --- finished ---
         if (event.status.type === "finished") {
-            clearInterval(fetchInterval);
-            if (minuteInterval) clearInterval(minuteInterval);
+            clearInterval(interval);
 
             countdownEl.innerHTML = "";
             liveContainer.classList.remove('blink');
