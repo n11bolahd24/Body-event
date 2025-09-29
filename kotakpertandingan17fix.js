@@ -38,7 +38,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak") {
     <center>
       <span style="font-size: large;">
         ${serverFuncs.map((fn, i) => `
-          <a class="tv" href="javascript:${fn}();"><b><span>SERVER${i+1}</span></b></a>
+          <a class="tv" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
         `).join(" ")}
       </span>
     </center><br>
