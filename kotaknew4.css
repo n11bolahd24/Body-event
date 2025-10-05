@@ -439,10 +439,6 @@ a:hover, a:visited, a:link, a:active
   width: 100%;
   border-radius: 7px;
   margin-top: 15px;
-  color: white;
-  padding: 10px;
-  text-align: center;
-  font-weight: bold;
 
   /* Warna gradasi */
   background: linear-gradient(270deg, #b30000, #0290b0, #0044cc, #ba0202);
