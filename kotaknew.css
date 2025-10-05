@@ -444,32 +444,30 @@ a:hover, a:visited, a:link, a:active
   text-align: center;
   font-weight: bold;
 
-  /* Warna api gradasi */
-  background: linear-gradient(270deg, #ff0000, #ff6a00, #ffcc00, #ff6a00, #ff0000);
+  /* Gradasi biru + hitam + merah */
+  background: linear-gradient(270deg, #000428, #004e92, #ff0000, #000000);
   background-size: 800% 800%;
-  animation: apiMenari 4s ease infinite, nyalaApi 1.5s infinite alternate;
-  box-shadow: 0 0 20px rgba(255, 80, 0, 0.6);
+  animation: warnaBergerak 5s ease infinite, cahayaNyala 2s infinite alternate;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
 }
 
-/* Animasi gradasi bergerak seperti lidah api */
-@keyframes apiMenari {
+/* Animasi gerakan gradasi */
+@keyframes warnaBergerak {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
-/* Efek nyala kecil-kecil (seolah berkedip seperti api) */
-@keyframes nyalaApi {
-  from { box-shadow: 0 0 10px rgba(255, 120, 0, 0.6), 0 0 30px rgba(255, 0, 0, 0.4); }
-  to { box-shadow: 0 0 25px rgba(255, 200, 0, 0.9), 0 0 50px rgba(255, 80, 0, 0.8); }
+/* Efek nyala biru-merah halus */
+@keyframes cahayaNyala {
+  from { box-shadow: 0 0 10px rgba(0, 80, 255, 0.6), 0 0 25px rgba(255, 0, 0, 0.3); }
+  to { box-shadow: 0 0 25px rgba(255, 0, 0, 0.8), 0 0 50px rgba(0, 80, 255, 0.8); }
 }
 
-/* Saat hover jadi lebih panas 🔥 */
+/* Saat hover: makin terang */
 .kotak4:hover {
-  background: linear-gradient(270deg, #ff6600, #ff0000, #ffcc00);
-  background-size: 400% 400%;
-  animation: apiMenari 2s linear infinite, nyalaApi 0.8s infinite alternate;
   transform: scale(1.03);
+  animation: warnaBergerak 3s linear infinite, cahayaNyala 1s infinite alternate;
 }
 
 
