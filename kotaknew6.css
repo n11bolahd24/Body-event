@@ -506,10 +506,13 @@ a:hover, a:visited, a:link, a:active
   }
 }
 
-/* Hover — hanya percepat animasi, tanpa zoom */
+/* Hover — tidak percepat animasi, hanya gelapkan warna */
 .kotak5:hover {
-  animation: benderaNaikTurun 2.5s ease-in-out infinite alternate,
-             cahayaLembut 1.8s infinite alternate;
+  background: linear-gradient(171deg,
+              #7a0101 0%,
+              #7a0101 50%,
+              #7c7b7b 50%,
+              #7c7b7b 100%);
 }
 
 
