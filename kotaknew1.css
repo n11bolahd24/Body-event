@@ -407,9 +407,15 @@ a:hover, a:visited, a:link, a:active
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+
+/* Efek nyala biru-merah halus */
+@keyframes cahayaNyala {
+  from { box-shadow: 0 0 10px rgba(0, 80, 255, 0.6), 0 0 25px rgba(255, 0, 0, 0.3); }
+  to { box-shadow: 0 0 25px rgba(255, 0, 0, 0.8), 0 0 50px rgba(0, 80, 255, 0.8); }
+	
 .kotak2:hover {
   border-radius: 7px;
-  background: linear-gradient(to left top, #850000, #016a82);
+  animation: warnaBergerak 3s linear infinite, cahayaNyala 1s infinite alternate;
 }
 
 .kotak3 {
