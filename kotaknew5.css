@@ -467,6 +467,50 @@ a:hover, a:visited, a:link, a:active
   animation: gradienBergerak 2.5s linear infinite, cahayaNyala 1.5s infinite alternate;
 }
 
+.kotak5 {
+  position: relative;
+  width: 100%;
+  border-radius: 7px;
+  margin-top: 15px;
+
+  /* Merah-putih tegas dengan sudut 171° */
+  background: linear-gradient(171deg,
+              #ab0202 0%,
+              #ab0202 50%,
+              #a8a7a7 50%,
+              #a8a7a7 100%);
+  background-size: 200% 200%;
+  animation: benderaNaikTurun 4s ease-in-out infinite alternate,
+             cahayaLembut 2.5s infinite alternate;
+
+  /* Efek awal cahaya */
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.4),
+              0 0 25px rgba(0, 100, 255, 0.3);
+}
+
+/* Animasi background bolak-balik */
+@keyframes benderaNaikTurun {
+  0%   { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+/* Animasi cahaya halus biru-merah */
+@keyframes cahayaLembut {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.3),
+                0 0 25px rgba(0, 80, 255, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 25px rgba(255, 80, 0, 0.7),
+                0 0 50px rgba(0, 120, 255, 0.6);
+  }
+}
+
+/* Hover — hanya percepat animasi, tanpa zoom */
+.kotak5:hover {
+  animation: benderaNaikTurun 2.5s ease-in-out infinite alternate,
+             cahayaLembut 1.8s infinite alternate;
+}
 
 
 .btn {
