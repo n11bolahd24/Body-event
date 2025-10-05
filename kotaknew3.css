@@ -444,30 +444,31 @@ a:hover, a:visited, a:link, a:active
   text-align: center;
   font-weight: bold;
 
-  /* Gradasi biru + hitam + merah */
-  background: linear-gradient(270deg, #b30000, #0290b0, #0044cc, #ba0202);;
-  background-size: 800% 800%;
-  animation: warnaBergerak 5s ease infinite, cahayaNyala 2s infinite alternate;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+  /* Warna gradasi */
+  background: linear-gradient(270deg, #b30000, #0290b0, #0044cc, #ba0202);
+  background-size: 600% 600%;
+  animation: gradienBergerak 4s ease infinite, cahayaNyala 2s infinite alternate;
+
+  /* Efek glow lembut */
+  box-shadow: 0 0 15px rgba(0, 100, 255, 0.4), 0 0 30px rgba(255, 0, 0, 0.4);
 }
 
-/* Animasi gerakan gradasi */
-@keyframes warnaBergerak {
+/* Animasi pergerakan gradasi */
+@keyframes gradienBergerak {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
-/* Efek nyala biru-merah halus */
+/* Animasi cahaya biru-merah halus */
 @keyframes cahayaNyala {
-  from { box-shadow: 0 0 10px rgba(0, 80, 255, 0.6), 0 0 25px rgba(255, 0, 0, 0.3); }
-  to { box-shadow: 0 0 25px rgba(255, 0, 0, 0.8), 0 0 50px rgba(0, 80, 255, 0.8); }
+  from { box-shadow: 0 0 10px rgba(0, 100, 255, 0.3), 0 0 25px rgba(255, 0, 0, 0.3); }
+  to { box-shadow: 0 0 25px rgba(255, 50, 0, 0.8), 0 0 50px rgba(0, 120, 255, 0.7); }
 }
 
-/* Saat hover: makin terang */
+/* Hover tanpa zoom — hanya mempercepat efek */
 .kotak4:hover {
-  transform: scale(1.03);
-  animation: warnaBergerak 3s linear infinite, cahayaNyala 1s infinite alternate;
+  animation: gradienBergerak 2.5s linear infinite, cahayaNyala 1.5s infinite alternate;
 }
 
 
