@@ -7,10 +7,24 @@ function loadSofaScore(matchId, matchKey) {
 }
 
 // --- fungsi tambahan untuk generate box ---
-function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoffTime = "2025-10-14T18:00:00+07:00") {
+function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoffTime = "18:00") {
+  // konversi kickoffTime menjadi Date lengkap
+  const now = new Date();
+  let kickoff;
+  if (/^\d{1,2}:\d{2}$/.test(kickoffTime)) {
+    // format "HH:MM"
+    const [h, m] = kickoffTime.split(":").map(Number);
+    kickoff = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
+  } else {
+    // format lengkap
+    kickoff = new Date(kickoffTime);
+  }
+
+  const kickoffMs = kickoff.getTime();
+
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
-    <div class="countdown" id="countdown${matchKey}"></div>
+    <div class="countdown" id="countdown${matchKey}" style="color:white; font-weight:bold;"></div>
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
     </div>
@@ -42,19 +56,29 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
   </div>
   <script>
     loadSofaScore(${matchId}, "${matchKey}");
+
     (function() {
-      const kickoff = new Date("${kickoffTime}").getTime();
       const serverEl = document.getElementById("serverLinks${matchKey}");
       const countdownEl = document.getElementById("countdown${matchKey}");
+      const kickoffEl = document.getElementById("kickoff${matchKey}");
+
       function checkKickoff() {
-        const now = Date.now();
-        if (now >= kickoff) {
+        const nowMs = Date.now();
+        if (nowMs >= ${kickoffMs}) {
           serverEl.style.display = "inline-block";
           countdownEl.style.display = "none";
+
+          // tampilkan jam saja HH:MM
+          const dateObj = new Date(${kickoffMs});
+          const jam = dateObj.getHours().toString().padStart(2, "0");
+          const menit = dateObj.getMinutes().toString().padStart(2, "0");
+          kickoffEl.innerText = jam + ":" + menit;
+
           clearInterval(timer);
         }
       }
-      const timer = setInterval(checkKickoff, 10000);
+
+      const timer = setInterval(checkKickoff, 1000);
       checkKickoff();
     })();
   <\/script>
