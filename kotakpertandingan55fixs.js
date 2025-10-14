@@ -51,32 +51,44 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
     </div>
   `;
 
-  // Sisipkan ke dalam container
+  // Sisipkan ke dalam container secara langsung (FIX untuk match 2+)
   const container = document.getElementById("matches");
   if (container) {
-    const wrapper = document.createElement("div");
-    wrapper.innerHTML = html;
-    while (wrapper.firstChild) {
-      container.appendChild(wrapper.firstChild);
-    }
+    container.insertAdjacentHTML("beforeend", html);
   }
 
   // Jalankan SofaScore setelah elemen ditambahkan
   loadSofaScore(matchId, matchKey);
 
-  // Jalankan countdown server secara dinamis
+  // Jalankan countdown server secara dinamis dengan multi-bahasa
   const kickoff = new Date(kickoffTime).getTime();
   const serverEl = document.getElementById(`serverLinks${matchKey}`);
   const countdownServerEl = document.getElementById(`countdownServer${matchKey}`);
+
+  // Deteksi bahasa pengguna
+  const userLang = navigator.language || navigator.userLanguage;
+  const isIndonesian = userLang.toLowerCase().startsWith("id");
 
   function updateServerCountdown() {
     const now = Date.now();
     const diff = kickoff - now;
 
     if (diff > 0) {
-      const minutes = Math.floor(diff / 60000);
-      const seconds = Math.floor((diff % 60000) / 1000);
-      countdownServerEl.textContent = "Server aktif dalam " + minutes + "m " + seconds + "s";
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      let timeStr = "";
+      if (days > 0) timeStr += days + "d ";
+      if (hours > 0 || days > 0) timeStr += hours + "h ";
+      timeStr += minutes + "m " + seconds + "s";
+
+      const label = isIndonesian
+        ? "Server aktif dalam " + timeStr
+        : "Server will be active in " + timeStr;
+
+      countdownServerEl.textContent = label;
     } else {
       countdownServerEl.style.display = "none";
       serverEl.style.display = "inline-block";
