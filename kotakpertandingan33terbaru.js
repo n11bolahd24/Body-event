@@ -156,12 +156,17 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvStart
   </div>
   <script>loadSofaScore(${matchId}, "${matchKey}");<\/script>
   `;
-  document.write(html);
+// >>> ganti ini <<<
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = html;
+  document.body.appendChild(wrapper);
 
-  if (tvStartTime) {
-    const target = new Date(tvStartTime).getTime();
+  loadSofaScore(matchId, matchKey);
 
-    function setupCountdown() {
+  if (tvStartTime) activateTVServerAt(matchKey, tvStartTime);
+}
+
+     function setupCountdown() {
       const container = document.getElementById(`tvContainer${matchKey}`);
       const countdownEl = document.getElementById(`tvCountdown${matchKey}`);
       if (!container || !countdownEl) {
