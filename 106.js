@@ -1,7 +1,6 @@
 // --- isi asli Matchxsofascore13.js ---
 // (biarkan semua fungsi loadSofaScore dan utility-nya tetap ada di sini)
 
-// contoh placeholder (punya Anda pasti lebih panjang)
 function loadSofaScore(matchId, matchKey) {
   // ... isi asli dari script Anda ...
   console.log("Load SofaScore untuk matchId=" + matchId + " key=" + matchKey);
@@ -12,15 +11,10 @@ function loadSofaScore(matchId, matchKey) {
 // --- fungsi tambahan untuk generate box ---
 function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak") {
   const html = `
-  <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox" style="position:relative;">
-    <!-- countdown overlay -->
-    <div id="countdown${matchKey}" 
-         style="position:absolute; top:0; left:0; width:100%; height:100%; 
-         background:rgba(0,0,0,0.85); color:orange; display:flex; 
-         align-items:center; justify-content:center; font-weight:bold; font-size:20px; z-index:5;">
-      <span id="counttext${matchKey}">Menunggu server...</span>
+  <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
+    <div class="countdown" id="countdown${matchKey}" 
+         style="text-align:center; font-size:14px; color:orange; font-weight:bold; margin-bottom:5px;">
     </div>
-
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
     </div>
@@ -43,9 +37,9 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak") {
     <img id="logoHome${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
     <img id="logoAway${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; right:10%; border-radius:5px;">
     <center>
-      <span style="font-size: large;">
+      <span id="tvContainer${matchKey}" style="font-size: large; pointer-events:none; opacity:0.5;">
         ${serverFuncs.map((fn, i) => `
-          <a class="tv" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
+          <a class="tv" href="javascript:${fn}();" style="pointer-events:none;"><b><span>SERVER ${i+1}</span></b></a>
         `).join(" ")}
       </span>
     </center><br>
@@ -57,30 +51,41 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak") {
 }
 
 
-// --- fungsi untuk aktifkan countdown ---
+
+// --- fungsi untuk countdown dan aktifkan TV server ---
 function activateTVServerAt(matchKey, targetTimeString) {
   const targetTime = new Date(targetTimeString).getTime();
+  const countdownEl = document.getElementById("countdown" + matchKey);
+  const tvContainer = document.getElementById("tvContainer" + matchKey);
+
+  if (!countdownEl || !tvContainer) return;
 
   function updateCountdown() {
     const now = new Date().getTime();
     const diff = targetTime - now;
-    const countdownBox = document.getElementById("countdown" + matchKey);
-    const counttext = document.getElementById("counttext" + matchKey);
-
-    if (!countdownBox || !counttext) return;
 
     if (diff <= 0) {
-      countdownBox.style.display = "none"; // sembunyikan overlay
+      countdownEl.innerHTML = "Server sudah aktif!";
+      tvContainer.style.pointerEvents = "auto";
+      tvContainer.style.opacity = "1";
+      // aktifkan semua link
+      tvContainer.querySelectorAll("a.tv").forEach(a => {
+        a.style.pointerEvents = "auto";
+      });
       return;
     }
 
     const hrs = Math.floor((diff / (1000 * 60 * 60)) % 24);
     const mins = Math.floor((diff / (1000 * 60)) % 60);
     const secs = Math.floor((diff / 1000) % 60);
-    counttext.innerHTML = `Server aktif dalam ${hrs} jam ${mins} menit ${secs} detik`;
+
+    countdownEl.innerHTML = `Server aktif dalam ${hrs} jam ${mins} menit ${secs} detik`;
 
     requestAnimationFrame(updateCountdown);
   }
 
+  // pastikan tombol TV disabled di awal
+  tvContainer.style.pointerEvents = "none";
+  tvContainer.style.opacity = "0.5";
   updateCountdown();
 }
