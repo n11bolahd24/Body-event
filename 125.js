@@ -32,11 +32,13 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     </div>
     <img id="logoHome${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
     <img id="logoAway${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; right:10%; border-radius:5px;">
+    
+    <!-- TV server countdown -->
     <center>
       <div id="tvCountdown${matchKey}" style="margin-bottom:5px; color: yellow; font-weight:bold;"></div>
       <span style="font-size: large;">
         ${serverFuncs.map((fn, i) => `
-          <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:void(0);"><b><span>SERVER ${i+1}</span></b></a>
+          <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
         `).join(" ")}
       </span>
     </center><br>
@@ -45,7 +47,6 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     loadSofaScore(${matchId}, "${matchKey}");
 
     ${tvServerTime ? `
-    // Countdown khusus TV server
     (function(){
       const tvCountdownEl = document.getElementById("tvCountdown${matchKey}");
       const tvServers = [${serverFuncs.map((_, i) => `"tvServer${matchKey}_${i}"`).join(",")}].map(id => document.getElementById(id));
@@ -59,13 +60,15 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
           const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
           const seconds = Math.floor((distance % (1000 * 60)) / 1000);
           tvCountdownEl.innerHTML = hours + "h " + minutes + "m " + seconds + "s";
+          // Nonaktifkan klik sementara
           tvServers.forEach(s => s.style.pointerEvents = "none");
         } else {
           tvCountdownEl.innerHTML = "TV Server Ready!";
-          tvServers.forEach((s, i) => s.href = "javascript:" + serverFuncs[i] + "();");
+          tvServers.forEach(s => s.style.pointerEvents = "auto"); // aktifkan klik
           clearInterval(interval);
         }
       }
+
       const interval = setInterval(updateTvCountdown, 1000);
       updateTvCountdown();
     })();
