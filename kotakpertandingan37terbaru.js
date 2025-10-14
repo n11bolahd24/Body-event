@@ -95,8 +95,11 @@ function loadSofaScore(matchId, matchKey) {
 
 // --- fungsi renderMatch (versi aman Blogger) ---
 function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvStartTime = null) {
-  const html = `
-  <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
+  // buat wrapper elemen match
+  const wrapper = document.createElement("div");
+  wrapper.className = boxClass;
+  wrapper.id = "match" + matchKey;
+  wrapper.innerHTML = `
     <div class="countdown" id="countdown${matchKey}"></div>
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
@@ -111,9 +114,9 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvStart
     <div class="club">
       <center>
         <span id="league${matchKey}" style="position:relative; top:5px; left:-11px; font-weight:bold; font-size:12px; color:white;">NAMA LIGA</span>
-        <div id="liveScore${matchKey}" style="font-size:20px; font-weight:bold; color:orange; text-align:center;"></div>  
-        <div id="matchStatus${matchKey}" style="font-size:10px; font-weight:bold; color:orange; text-align:center;"></div>   
-        <font id="teams${matchKey}" style="font-size:15px; font-weight:bold;">NAMA CLUB VS NAMA CLUB</font><br>
+        <div id="liveScore${matchKey}" style="position:relative; top:0px; left:0px;font-size:20px; font-family:'Arial', sans-serif; font-weight:bold; color:orange; text-align:center;"></div>  
+        <div id="matchStatus${matchKey}" style="font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange; text-align:center; margin:-1px 1px;"></div>   
+        <font id="teams${matchKey}" style="font-size:15px; font-weight:bold">NAMA CLUB VS NAMA CLUB</font><br>
         <div id="kickoff${matchKey}" style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;"></div>
       </center>
     </div>
@@ -127,58 +130,37 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvStart
       </span>
       <div id="tvCountdown${matchKey}"></div>
     </center><br>
-  </div>
   `;
 
-  // === INI BAGIAN FIX ===
-  const wrapper = document.createElement("div");
-  wrapper.innerHTML = html.trim();
-  document.currentScript.insertAdjacentElement("beforebegin", wrapper);
+  // sisipkan ke dalam post-body (aman untuk Blogger)
+  const postBody = document.querySelector('.post-body') || document.body;
+  postBody.appendChild(wrapper);
 
+  // panggil fungsi sofascore
   loadSofaScore(matchId, matchKey);
 
-  if (tvStartTime) activateTVServerAt(matchKey, tvStartTime);
-}
-
-// --- fungsi countdown TV Server ---
-function activateTVServerAt(matchKey, targetTime) {
-  const target = new Date(targetTime).getTime();
-
-  function waitForMatchBox() {
-    const matchBox = document.getElementById(`match${matchKey}`);
-    if (!matchBox) { setTimeout(waitForMatchBox, 300); return; }
-    setupCountdownForMatch(matchBox);
-  }
-
-  function setupCountdownForMatch(matchBox) {
-    const tvButtons = Array.from(matchBox.querySelectorAll('.tv'));
-    tvButtons.forEach(btn => {
-      btn.dataset._origDisplay = btn.style.display || '';
-      btn.style.display = 'none';
-    });
-
-    const countdownEl = matchBox.querySelector(`#tvCountdown${matchKey}`);
+  // countdown aktif
+  if (tvStartTime) {
+    const target = new Date(tvStartTime).getTime();
+    const container = wrapper.querySelector(`#tvContainer${matchKey}`);
+    const countdownEl = wrapper.querySelector(`#tvCountdown${matchKey}`);
 
     function updateCountdown() {
       const now = Date.now();
       const diff = target - now;
-
       if (diff <= 0) {
-        countdownEl.innerHTML = "";
-        tvButtons.forEach(btn => btn.style.display = btn.dataset._origDisplay || 'inline-block');
+        countdownEl.textContent = "";
+        container.style.display = "inline";
         clearInterval(timer);
         return;
       }
-
       const h = Math.floor(diff / (1000 * 60 * 60));
       const m = Math.floor((diff / (1000 * 60)) % 60);
       const s = Math.floor((diff / 1000) % 60);
-      countdownEl.innerHTML = `Server aktif dalam ${h.toString().padStart(2,"0")}:${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
+      countdownEl.textContent = `Server aktif dalam ${h.toString().padStart(2,"0")}:${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
     }
 
     updateCountdown();
     const timer = setInterval(updateCountdown, 1000);
   }
-
-  waitForMatchBox();
 }
