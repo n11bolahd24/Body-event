@@ -1,4 +1,3 @@
-
 // --- isi asli Matchxsofascore13.js ---
 // (biarkan semua fungsi loadSofaScore dan utility-nya tetap ada di sini)
 
@@ -45,14 +44,14 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
       </span>
     </center><br>
   </div>
-  <script>loadSofaScore(${matchId}, "${matchKey}");<\/script>
   `;
 
   document.write(html);
 
-  // setelah ditulis ke halaman, aktifkan countdown & kontrol tampilan server
+  // setelah HTML ditulis, aktifkan countdown & kontrol tampilan server
   setTimeout(function() {
     if (kickoffTime) setupKickoffDisplay(matchKey, kickoffTime);
+    loadSofaScore(matchId, matchKey); // <--- panggil langsung di sini
   }, 500);
 }
 
@@ -84,4 +83,3 @@ function setupKickoffDisplay(matchKey, kickoffTime) {
   updateCountdown();
   const timer = setInterval(updateCountdown, 1000);
 }
-
