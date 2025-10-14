@@ -32,7 +32,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
 
     <!-- Countdown 2 khusus TV Server -->
     <center>
-      <div id="tvCountdown${matchKey}" style="font-size:13px; color:yellow; margin:5px;">Countdown TV: --:--</div>
+      <div id="tvCountdown${matchKey}" style="font-size:13px; color:yellow; margin:5px;"></div>
       <span id="tvServerContainer${matchKey}" style="font-size: large;">
         ${serverFuncs.map((fn, i) => `
           <a class="tv tv-disabled" id="tv${matchKey}_${i}" href="javascript:void(0)" style="pointer-events:none; opacity:0.5;">
