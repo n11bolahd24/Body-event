@@ -7,17 +7,13 @@ function loadSofaScore(matchId, matchKey) {
 }
 
 // --- fungsi tambahan untuk generate box ---
-function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoffTime ) {
+function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoffTime = "2025-10-14T19:45:00+07:00") {
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
-
-    <!-- Countdown SofaScore (tetap seperti semula) -->
-    <div class="countdown" id="countdown${matchKey}" style="color:white; font-weight:bold;"></div>
-
+    <div class="countdown" id="countdown${matchKey}"></div>
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
     </div>
-
     <div class="club1" style="position: relative; z-index: 1;">
       <br/>
       <div style="position: absolute; top: 0%; left: 50%; transform: translateX(-50%); z-index: 0; font-size: 29px;">
@@ -25,7 +21,6 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
         <strong id="formattedTime${matchKey}" style="color: red;"></strong>
       </div>
     </div>
-
     <div class="club">
       <center>
         <span id="league${matchKey}" style="position:relative; top:5px; left:-11px; font-weight:bold; font-size:12px; color:white;">NAMA LIGA</span>
@@ -35,13 +30,9 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
         <div id="kickoff${matchKey}" style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;"></div>
       </center>
     </div>
-
     <img id="logoHome${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
     <img id="logoAway${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; right:10%; border-radius:5px;">
-
-    <!-- Countdown & link server (countdown sendiri) -->
     <center>
-      <div id="countdownServer${matchKey}" style="color:yellow; font-weight:bold; margin-top:5px;"></div>
       <span id="serverLinks${matchKey}" style="font-size: large; display:none;">
         ${serverFuncs.map((fn, i) => `
           <a class="tv" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
@@ -49,33 +40,22 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
       </span>
     </center><br>
   </div>
-
   <script>
-    // Jalankan load SofaScore seperti biasa
     loadSofaScore(${matchId}, "${matchKey}");
-
     (function() {
       const kickoff = new Date("${kickoffTime}").getTime();
       const serverEl = document.getElementById("serverLinks${matchKey}");
-      const countdownServerEl = document.getElementById("countdownServer${matchKey}");
-
-      function updateServerCountdown() {
+      const countdownEl = document.getElementById("countdown${matchKey}");
+      function checkKickoff() {
         const now = Date.now();
-        const diff = kickoff - now;
-
-        if (diff > 0) {
-          const minutes = Math.floor(diff / 60000);
-          const seconds = Math.floor((diff % 60000) / 1000);
-          countdownServerEl.textContent = "Server aktif dalam " + minutes + "m " + seconds + "s";
-        } else {
-          countdownServerEl.style.display = "none";
+        if (now >= kickoff) {
           serverEl.style.display = "inline-block";
-          clearInterval(timerServer);
+          countdownEl.style.display = "none";
+          clearInterval(timer);
         }
       }
-
-      updateServerCountdown();
-      const timerServer = setInterval(updateServerCountdown, 1000);
+      const timer = setInterval(checkKickoff, 10000);
+      checkKickoff();
     })();
   <\/script>
   `;
