@@ -11,8 +11,8 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
 
-    <!-- Countdown SofaScore (asli, jangan diubah) -->
-    <div class="countdown" id="countdown${matchKey}" style="color:white; font-weight:bold;"></div>
+    <!-- Countdown SofaScore (tetap seperti semula) -->
+    <div class="countdown" id="countdown${matchKey}" style="color:yellow; font-weight:bold;"></div>
 
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
@@ -39,9 +39,9 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
     <img id="logoHome${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
     <img id="logoAway${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; right:10%; border-radius:5px;">
 
-    <!-- Countdown & link server -->
+    <!-- Countdown & link server (countdown sendiri) -->
     <center>
-      <div id="countdownServer${matchKey}" style="color:yellow; font-weight:bold; margin-top:5px; display:none;"></div>
+      <div id="countdownServer${matchKey}" style="color:yellow; font-weight:bold; margin-top:5px;"></div>
       <span id="serverLinks${matchKey}" style="font-size: large; display:none;">
         ${serverFuncs.map((fn, i) => `
           <a class="tv" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
@@ -51,36 +51,23 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
   </div>
 
   <script>
+    // Jalankan load SofaScore seperti biasa
     loadSofaScore(${matchId}, "${matchKey}");
 
     (function() {
       const kickoff = new Date("${kickoffTime}").getTime();
-      const showServerAt = kickoff - (15 * 60 * 1000); // 15 menit sebelum kickoff
       const serverEl = document.getElementById("serverLinks${matchKey}");
       const countdownServerEl = document.getElementById("countdownServer${matchKey}");
 
       function updateServerCountdown() {
         const now = Date.now();
-        const diffToShow = showServerAt - now;
-        const diffToKickoff = kickoff - now;
+        const diff = kickoff - now;
 
-        // Belum masuk 15 menit terakhir → countdown server belum tampil
-        if (diffToShow > 0) {
-          countdownServerEl.style.display = "none";
-          serverEl.style.display = "none";
-          return;
-        }
-
-        // Sudah masuk 15 menit terakhir tapi belum kickoff → tampilkan countdown server
-        if (diffToKickoff > 0) {
-          countdownServerEl.style.display = "block";
-          const minutes = Math.floor(diffToKickoff / 60000);
-          const seconds = Math.floor((diffToKickoff % 60000) / 1000);
+        if (diff > 0) {
+          const minutes = Math.floor(diff / 60000);
+          const seconds = Math.floor((diff % 60000) / 1000);
           countdownServerEl.textContent = "Server aktif dalam " + minutes + "m " + seconds + "s";
-          serverEl.style.display = "none";
-        } 
-        // Setelah kickoff → countdown hilang, server muncul
-        else {
+        } else {
           countdownServerEl.style.display = "none";
           serverEl.style.display = "inline-block";
           clearInterval(timerServer);
