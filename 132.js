@@ -28,21 +28,24 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
         <div id="matchStatus${matchKey}" style="font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange; text-align:center; margin:-1px 1px;"></div>   
         <font id="teams${matchKey}" style="font-size:15px; font-weight:bold">NAMA CLUB VS NAMA CLUB</font><br>
         <div id="kickoff${matchKey}" style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;"></div>
+
+        <!-- Countdown TV server langsung di bawah kickoff -->
+        <div id="tvCountdown${matchKey}" style="margin-top:0px; margin-bottom:0px; color: yellow; font-weight:bold;"></div>
+
+        <!-- Tombol TV server -->
+        <span style="font-size: large;">
+          ${serverFuncs.map((fn, i) => `
+            <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
+          `).join(" ")}
+        </span>
       </center>
     </div>
+
     <img id="logoHome${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
     <img id="logoAway${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; right:10%; border-radius:5px;">
-    
-    <!-- TV server countdown -->
-    <center>
-      <div id="tvCountdown${matchKey}" style="margin-top:5px; margin-bottom:0px; color: yellow; font-weight:bold;"></div>
-      <span style="font-size: large;">
-        ${serverFuncs.map((fn, i) => `
-          <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
-        `).join(" ")}
-      </span>
-    </center><br>
+
   </div>
+
   <script>
     loadSofaScore(${matchId}, "${matchKey}");
 
@@ -60,7 +63,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
           const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
           const seconds = Math.floor((distance % (1000 * 60)) / 1000);
           tvCountdownEl.innerHTML = "TV Server starts in: " + hours + "h " + minutes + "m " + seconds + "s";
-          // Nonaktifkan klik & bikin transparan
+          // Nonaktifkan klik & transparan
           tvServers.forEach(s => {
             s.style.pointerEvents = "none";
             s.style.opacity = "0.5";
@@ -68,8 +71,8 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
         } else {
           tvCountdownEl.innerHTML = "TV Server Ready!";
           tvServers.forEach(s => {
-            s.style.pointerEvents = "auto"; // aktifkan klik
-            s.style.opacity = "1"; // normal
+            s.style.pointerEvents = "auto";
+            s.style.opacity = "1";
           });
           clearInterval(interval);
         }
