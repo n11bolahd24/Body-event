@@ -8,7 +8,7 @@ function loadSofaScore(matchId, matchKey) {
 
 
 
-// --- fungsi tambahan untuk generate box + kontrol waktu tombol server ---
+// --- fungsi tambahan render box dengan kontrol waktu server ---
 function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoffTime = null) {
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
@@ -46,37 +46,40 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
   <script>loadSofaScore(${matchId}, "${matchKey}");<\/script>
   `;
 
+  // tulis ke dokumen
   document.write(html);
 
-  // --- logika waktu tampil tombol server ---
-  if (kickoffTime) {
+  // aktifkan logika setelah halaman siap
+  window.addEventListener("load", function () {
+    if (!kickoffTime) return;
+
     const [hour, minute] = kickoffTime.split(":").map(Number);
     const now = new Date();
     const kickoff = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute);
-    const showTime = new Date(kickoff.getTime() - 15 * 60 * 1000); // 15 menit sebelum kickoff
+    const showTime = new Date(kickoff.getTime() - 15 * 60 * 1000);
 
-    const serverEl = () => document.getElementById("serverButtons" + matchKey);
-    const countdownEl = () => document.getElementById("serverCountdown" + matchKey);
+    const serverEl = document.getElementById("serverButtons" + matchKey);
+    const countdownEl = document.getElementById("serverCountdown" + matchKey);
+
+    if (!serverEl || !countdownEl) return;
 
     function updateVisibility() {
       const now = new Date();
-      const el = serverEl();
-      const cd = countdownEl();
-      if (!el || !cd) return;
-
       if (now >= showTime) {
-        el.style.display = "inline";
-        cd.innerHTML = "";
+        serverEl.style.display = "inline";
+        countdownEl.innerHTML = "";
       } else {
-        el.style.display = "none";
+        serverEl.style.display = "none";
         const diff = Math.floor((showTime - now) / 1000);
-        const mins = Math.floor(diff / 60);
-        const secs = diff % 60;
-        cd.innerHTML = `Server aktif dalam ${mins}:${secs.toString().padStart(2, "0")}`;
+        if (diff > 0) {
+          const mins = Math.floor(diff / 60);
+          const secs = diff % 60;
+          countdownEl.innerHTML = `Server aktif dalam ${mins}:${secs.toString().padStart(2, "0")}`;
+        }
       }
     }
 
-    updateVisibility(); // cek awal
-    setInterval(updateVisibility, 1000); // update tiap 1 detik
-  }
+    updateVisibility();
+    setInterval(updateVisibility, 1000);
+  });
 }
