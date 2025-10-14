@@ -58,7 +58,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak") {
 
 
 
-// --- fungsi untuk countdown terpisah (tidak ikut SofaScore) ---
+// --- fungsi countdown untuk TV server ---
 function activateTVServerAt(matchKey, targetTimeString) {
   const targetTime = new Date(targetTimeString).getTime();
   const countdownEl = document.getElementById("countdown" + matchKey);
@@ -71,16 +71,20 @@ function activateTVServerAt(matchKey, targetTimeString) {
     const diff = targetTime - now;
 
     if (diff <= 0) {
-      countdownEl.innerHTML = "🎬 TV Server Aktif!";
+      countdownEl.innerHTML = "🎬 Server aktif!";
       tvContainer.style.pointerEvents = "auto";
       tvContainer.style.opacity = "1";
       tvContainer.querySelectorAll("a.tv").forEach(a => a.style.pointerEvents = "auto");
       return;
     }
 
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
     const mins = Math.floor((diff / (1000 * 60)) % 60);
     const secs = Math.floor((diff / 1000) % 60);
-    countdownEl.innerHTML = `Tunggu ${mins}m ${secs}d sebelum server aktif...`;
+
+    countdownEl.innerHTML = 
+      `Server on progress... ${days}D - ${hours}H - ${mins}M - ${secs}S`;
 
     requestAnimationFrame(updateCountdown);
   }
