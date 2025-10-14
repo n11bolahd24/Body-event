@@ -49,43 +49,53 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak") {
   document.write(html);
 }
 
-// --- countdown manual untuk tv server ---
+// --- fungsi tambahan: countdown manual untuk TV Server ---
 function activateTVServerAt(matchKey, targetTime) {
-  const container = document.querySelector(`#match${matchKey} center span`);
-  if (!container) return;
-
-  // bungkus TV server dan countdown
-  const tvHTML = container.innerHTML;
-  container.innerHTML = `
-    <div id="tvServerBox${matchKey}">
-      <div id="tvCountdown${matchKey}" style="font-size:12px; color:yellow; margin-top:4px;"></div>
-      <div id="tvLinks${matchKey}" style="display:none;">${tvHTML}</div>
-    </div>
-  `;
-
-  const countdownEl = document.getElementById(`tvCountdown${matchKey}`);
-  const tvLinksEl = document.getElementById(`tvLinks${matchKey}`);
-  const target = new Date(targetTime).getTime();
-
-  function updateCountdown() {
-    const now = new Date().getTime();
-    const diff = target - now;
-
-    if (diff <= 0) {
-      countdownEl.innerHTML = "<span style='color:red; font-weight:bold;'>SERVER AKTIF 🔴</span>";
-      tvLinksEl.style.display = "inline";
-      clearInterval(timer);
+  function tryActivate() {
+    const matchBox = document.getElementById(`match${matchKey}`);
+    if (!matchBox) {
+      // tunggu sampai elemen match muncul di DOM
+      setTimeout(tryActivate, 300);
       return;
     }
 
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((diff / (1000 * 60)) % 60);
-    const seconds = Math.floor((diff / 1000) % 60);
+    const tvSpan = matchBox.querySelector("center span");
+    if (!tvSpan) return;
 
-    countdownEl.innerHTML = `Server aktif dalam ${hours.toString().padStart(2,'0')}:${minutes
-      .toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+    // simpan HTML tombol TV
+    const tvHTML = tvSpan.innerHTML;
+    tvSpan.innerHTML = `
+      <div id="tvCountdown${matchKey}" style="font-size:12px; color:yellow; margin-bottom:5px;"></div>
+      <div id="tvButtons${matchKey}" style="display:none;">${tvHTML}</div>
+    `;
+
+    const countdownEl = document.getElementById(`tvCountdown${matchKey}`);
+    const buttonsEl = document.getElementById(`tvButtons${matchKey}`);
+    const target = new Date(targetTime).getTime();
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const diff = target - now;
+
+      if (diff <= 0) {
+        countdownEl.innerHTML = "<span style='color:red;font-weight:bold;'>SERVER AKTIF 🔴</span>";
+        buttonsEl.style.display = "inline";
+        clearInterval(timer);
+        return;
+      }
+
+      const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const m = Math.floor((diff / (1000 * 60)) % 60);
+      const s = Math.floor((diff / 1000) % 60);
+
+      countdownEl.innerHTML = `Server aktif dalam ${h.toString().padStart(2, "0")}:${m
+        .toString()
+        .padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+    }
+
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 1000);
   }
 
-  updateCountdown();
-  const timer = setInterval(updateCountdown, 1000);
-}
+  tryActivate();
+          }
