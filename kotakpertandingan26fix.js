@@ -1,33 +1,38 @@
 
-// --- isi asli Matchxsofascore13.js ---
-// (biarkan semua fungsi loadSofaScore dan utility-nya tetap ada di sini)
-
-// contoh placeholder (punya Anda pasti lebih panjang)
+// --- fungsi asli (placeholder, tetap ada) ---
 function loadSofaScore(matchId, matchKey) {
-  // ... isi asli dari script Anda ...
   console.log("Load SofaScore untuk matchId=" + matchId + " key=" + matchKey);
 }
 
 
 
-// --- fungsi tambahan untuk generate box dengan logika waktu tampil ---
+// --- fungsi render dengan logika tampil 15 menit sebelum kickoff ---
 function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoffTime) {
   const now = new Date();
   const kickoff = new Date(kickoffTime); // contoh: "2025-10-14T18:00:00+07:00"
-  const tampilSebelumMenit = 15; // tampil 15 menit sebelum kickoff
+  const tampilSebelumMenit = 15;
 
   // hitung selisih waktu (ms)
   const selisih = kickoff - now;
 
-  // kalau belum waktunya tampil (lebih dari 15 menit sebelum kickoff), jangan render apa pun
+  // kalau belum waktunya, jangan render dulu
   if (selisih > tampilSebelumMenit * 60 * 1000) {
-    console.log(`Belum waktunya tampil untuk matchKey=${matchKey}`);
+    console.log(`⏳ Belum waktunya tampil untuk match ${matchKey}`);
     return;
   }
 
-  // kalau sudah waktunya tampil, render box
-  const html = `
-  <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
+  // buat elemen container utama
+  const container = document.getElementById("matches");
+  if (!container) {
+    console.error("❌ Tidak ada div#matches di halaman");
+    return;
+  }
+
+  // buat elemen HTML match
+  const matchBox = document.createElement("div");
+  matchBox.className = `${boxClass} matchbox`;
+  matchBox.id = `match${matchKey}`;
+  matchBox.innerHTML = `
     <div class="countdown" id="countdown${matchKey}"></div>
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
@@ -57,21 +62,22 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
         `).join(" ")}
       </span>
     </center><br>
-  </div>
-  <script>loadSofaScore(${matchId}, "${matchKey}");<\/script>
   `;
 
-  document.write(html);
+  // masukkan ke halaman
+  container.appendChild(matchBox);
+
+  // jalankan fungsi loadSofaScore
+  loadSofaScore(matchId, matchKey);
 }
 
 
 
 // --- fungsi auto-refresh supaya match muncul tepat waktu ---
 (function autoRefresh() {
-  // setiap 1 menit cek ulang (60.000 ms)
-  setTimeout(function() {
+  setTimeout(() => {
     console.log("⟳ Cek ulang waktu tampil...");
     location.reload();
-  }, 60000);
+  }, 60000); // cek tiap 1 menit
 })();
 
