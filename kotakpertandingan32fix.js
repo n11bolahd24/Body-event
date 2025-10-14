@@ -9,7 +9,6 @@ function loadSofaScore(matchId, matchKey) {
 
 
 // --- fungsi tambahan untuk generate box ---
-// tambahkan parameter kickoffTime
 function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoffTime) {
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
@@ -36,7 +35,6 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
     <img id="logoHome${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
     <img id="logoAway${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; right:10%; border-radius:5px;">
     <center>
-      <!-- link server disembunyikan dulu -->
       <span id="serverContainer${matchKey}" style="font-size: large; display:none;">
         ${serverFuncs.map((fn, i) => `
           <a class="tv" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
@@ -48,32 +46,34 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
 
   document.write(html);
 
-  // setelah HTML ditulis, aktifkan countdown & kontrol tampilan server
+  // setelah HTML ditulis, aktifkan countdown
   setTimeout(function() {
-    if (kickoffTime) setupKickoffDisplay(matchKey, kickoffTime);
-    loadSofaScore(matchId, matchKey); // <--- panggil langsung di sini
+    if (kickoffTime) setupKickoffDisplay(matchId, matchKey, kickoffTime);
   }, 500);
 }
 
 
 
-// --- fungsi tambahan: tampilkan link saat kickoff ---
-function setupKickoffDisplay(matchKey, kickoffTime) {
+// --- fungsi tambahan: link + loadSofaScore saat kickoff ---
+function setupKickoffDisplay(matchId, matchKey, kickoffTime) {
   const countdownEl = document.getElementById("countdown" + matchKey);
   const serverContainer = document.getElementById("serverContainer" + matchKey);
   const kickoff = new Date(kickoffTime).getTime();
+  let sudahKickoff = false;
 
   function updateCountdown() {
     const now = new Date().getTime();
     const selisih = kickoff - now;
 
-    if (selisih <= 0) {
-      // Sudah kickoff, tampilkan link
+    if (selisih <= 0 && !sudahKickoff) {
+      sudahKickoff = true;
       countdownEl.innerText = "KICKOFF!";
       serverContainer.style.display = "inline-block";
+
+      // baru load data SofaScore di sini
+      loadSofaScore(matchId, matchKey);
       clearInterval(timer);
-    } else {
-      // Belum kickoff, tampilkan hitung mundur
+    } else if (!sudahKickoff) {
       const menit = Math.floor(selisih / 60000);
       const detik = Math.floor((selisih % 60000) / 1000);
       countdownEl.innerText = `Kickoff dalam ${menit}m ${detik}s`;
