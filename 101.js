@@ -1,18 +1,19 @@
 // --- isi asli Matchxsofascore13.js ---
 // (biarkan semua fungsi loadSofaScore dan utility-nya tetap ada di sini)
 
-// contoh placeholder (punya Anda pasti lebih panjang)
 function loadSofaScore(matchId, matchKey) {
-  // ... isi asli dari script Anda ...
   console.log("Load SofaScore untuk matchId=" + matchId + " key=" + matchKey);
 }
 
 
 
-// --- fungsi tambahan untuk generate box + countdown ---
+// --- fungsi renderMatch dengan countdown aman untuk Blogger ---
 function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvStartTime = null) {
-  const html = `
-  <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
+  const wrapper = document.createElement("div");
+  wrapper.className = boxClass;
+  wrapper.id = "match" + matchKey;
+
+  wrapper.innerHTML = `
     <div class="countdown" id="countdown${matchKey}" style="text-align:center; color:yellow; font-weight:bold; margin-bottom:5px;"></div>
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
@@ -27,9 +28,9 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvStart
     <div class="club">
       <center>
         <span id="league${matchKey}" style="position:relative; top:5px; left:-11px; font-weight:bold; font-size:12px; color:white;">NAMA LIGA</span>
-        <div id="liveScore${matchKey}" style="position:relative; top:0px; left:0px;font-size:20px; font-family:'Arial', sans-serif; font-weight:bold; color:orange; text-align:center;"></div>  
+        <div id="liveScore${matchKey}" style="position:relative; top:0px; left:0px; font-size:20px; font-family:'Arial', sans-serif; font-weight:bold; color:orange; text-align:center;"></div>  
         <div id="matchStatus${matchKey}" style="font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange; text-align:center; margin:-1px 1px;"></div>   
-        <font id="teams${matchKey}" style="font-size:15px; font-weight:bold">NAMA CLUB VS NAMA CLUB</font><br>
+        <font id="teams${matchKey}" style="font-size:15px; font-weight:bold;">NAMA CLUB VS NAMA CLUB</font><br>
         <div id="kickoff${matchKey}" style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;"></div>
       </center>
     </div>
@@ -38,38 +39,40 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvStart
     <center>
       <span id="tvContainer${matchKey}" style="font-size: large; display:none;">
         ${serverFuncs.map((fn, i) => `
-          <a class="tv" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
+          <a class="tv" href="javascript:${fn}();" style="display:inline-block;">
+            <b><span>SERVER ${i+1}</span></b>
+          </a>
         `).join(" ")}
       </span>
     </center><br>
-  </div>
-  <script>loadSofaScore(${matchId}, "${matchKey}");<\/script>
   `;
 
-  document.write(html);
+  document.body.appendChild(wrapper);
 
-  // jalankan countdown kalau ada waktu target
+  // load sofascore setelah box muncul
+  loadSofaScore(matchId, matchKey);
+
+  // countdown handling
   if (tvStartTime) {
     setupCountdown(matchKey, tvStartTime);
   } else {
-    // kalau ga dikasih waktu, langsung tampilkan server
-    const tvContainer = document.getElementById(`tvContainer${matchKey}`);
+    const tvContainer = document.getElementById("tvContainer" + matchKey);
     if (tvContainer) tvContainer.style.display = "inline-block";
   }
 }
 
 
 
-// --- fungsi countdown untuk munculin tv server ---
+// --- fungsi countdown ---
 function setupCountdown(matchKey, tvStartTime) {
-  const countdownEl = document.getElementById(`countdown${matchKey}`);
-  const tvContainer = document.getElementById(`tvContainer${matchKey}`);
+  const countdownEl = document.getElementById("countdown" + matchKey);
+  const tvContainer = document.getElementById("tvContainer" + matchKey);
   if (!countdownEl || !tvContainer) return;
 
   const targetTime = new Date(tvStartTime).getTime();
 
   const timer = setInterval(() => {
-    const now = new Date().getTime();
+    const now = Date.now();
     const diff = targetTime - now;
 
     if (diff <= 0) {
