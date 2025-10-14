@@ -7,7 +7,7 @@ function loadSofaScore(matchId, matchKey) {
 }
 
 // --- fungsi tambahan untuk generate box ---
-function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoffTime = "2025-10-14T19:45:00+07:00") {
+function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoffTime) {
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
     <div class="countdown" id="countdown${matchKey}"></div>
