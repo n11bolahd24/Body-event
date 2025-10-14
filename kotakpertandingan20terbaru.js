@@ -7,7 +7,10 @@ function loadSofaScore(matchId, matchKey) {
   console.log("Load SofaScore untuk matchId=" + matchId + " key=" + matchKey);
 }
 
-function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", serverVisibleTime = null) {
+// --- fungsi tambahan untuk generate box + countdown server (otomatis zona waktu lokal) ---
+function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", showTime) {
+  // showTime = waktu (format "YYYY-MM-DD HH:mm:ss") dalam zona WIB atau lokal server Anda
+
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
     <div class="countdown" id="countdown${matchKey}"></div>
@@ -32,59 +35,54 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", serverV
     </div>
     <img id="logoHome${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
     <img id="logoAway${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; right:10%; border-radius:5px;">
+    
     <center>
-      <div id="serverCountdown${matchKey}" style="color:yellow; font-weight:bold; margin-top:5px;"></div>
-      <div id="serverLinks${matchKey}" style="font-size: large; display:none;">
-        ${serverFuncs.map((fn, i) => `
-          <a class="tv" href="javascript:${fn}();"><b><span>SERVER ${i + 1}</span></b></a>
-        `).join(" ")}
+      <div id="serverContainer${matchKey}" style="margin-top:10px;">
+        <span id="serverCountdown${matchKey}" style="color:yellow; font-weight:bold; font-size:14px;"></span>
+        <div id="serverButtons${matchKey}" style="display:none; font-size:large;">
+          ${serverFuncs.map((fn, i) => `
+            <a class="tv" href="javascript:${fn}();"><b><span>SERVER ${i + 1}</span></b></a>
+          `).join(" ")}
+        </div>
       </div>
     </center><br>
   </div>
-  `;
+  <script>
+    loadSofaScore(${matchId}, "${matchKey}");
+    (function() {
+      // parsing waktu showTime sesuai lokal pengguna
+      const localShowTime = new Date("${showTime}".replace(" ", "T")); 
+      const countdownEl = document.getElementById("serverCountdown${matchKey}");
+      const serverEl = document.getElementById("serverButtons${matchKey}");
 
-  // ✅ Tambahkan ke elemen container, misal <div id="matches"></div>
-  const container = document.getElementById("matches");
-  if (container) {
-    container.insertAdjacentHTML("beforeend", html);
-  } else {
-    console.warn("renderMatch: container #matches tidak ditemukan");
-  }
+      function updateCountdown() {
+        const now = new Date();
+        const diff = localShowTime - now;
 
-  // Panggil loadSofaScore (pasti sudah terdefinisi di script utama)
-  if (typeof loadSofaScore === "function") {
-    loadSofaScore(matchId, matchKey);
-  } else {
-    console.error("Fungsi loadSofaScore belum tersedia");
-  }
+        if (diff <= 0) {
+          countdownEl.style.display = "none";
+          serverEl.style.display = "block";
+          clearInterval(timer);
+        } else {
+          const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+          
+          let text = "Server aktif dalam ";
+          if (days > 0) text += days + "h ";
+          if (hours > 0) text += hours + "j ";
+          text += minutes + "m " + seconds + "d";
 
-  // --- Countdown ke waktu tampil server ---
-  if (serverVisibleTime) {
-    const targetTime = new Date(serverVisibleTime).getTime();
-    const countdownEl = () => document.getElementById("serverCountdown" + matchKey);
-    const serverLinksEl = () => document.getElementById("serverLinks" + matchKey);
-
-    const updateCountdown = () => {
-      const now = Date.now();
-      const diff = targetTime - now;
-
-      if (diff <= 0) {
-        clearInterval(timer);
-        if (countdownEl()) countdownEl().style.display = "none";
-        if (serverLinksEl()) serverLinksEl().style.display = "inline-block";
-        return;
+          countdownEl.textContent = text + " (waktu lokal)";
+        }
       }
 
-      const minutes = String(Math.floor(diff / 60000)).padStart(2, '0');
-      const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
-      const text = `Server aktif dalam ${minutes}:${seconds}`;
-      if (countdownEl()) countdownEl().textContent = text;
-    };
+      updateCountdown();
+      const timer = setInterval(updateCountdown, 1000);
+    })();
+  <\/script>
+  `;
 
-    updateCountdown();
-    const timer = setInterval(updateCountdown, 1000);
-  } else {
-    const el = document.getElementById("serverLinks" + matchKey);
-    if (el) el.style.display = "inline-block";
-  }
+  document.write(html);
 }
