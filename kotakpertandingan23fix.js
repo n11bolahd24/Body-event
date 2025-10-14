@@ -8,8 +8,9 @@ function loadSofaScore(matchId, matchKey) {
 
 
 
-// --- fungsi tambahan render box dengan waktu muncul server ---
+// --- fungsi renderMatch dengan waktu muncul server ---
 function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoffTime = null) {
+
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
     <div class="countdown" id="countdown${matchKey}"></div>
@@ -46,26 +47,32 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
   <script>loadSofaScore(${matchId}, "${matchKey}");<\/script>
   `;
 
-  // gunakan insertAdjacentHTML agar DOM stabil di Blogger
-  document.body.insertAdjacentHTML("beforeend", html);
+  // Tunggu DOM siap
+  function insertWhenReady() {
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", insertHTML);
+    } else {
+      insertHTML();
+    }
+  }
 
-  // jalankan logika waktu setelah elemen dimasukkan
-  setTimeout(() => {
+  function insertHTML() {
+    document.body.insertAdjacentHTML("beforeend", html);
+    initServerTimer();
+  }
+
+  function initServerTimer() {
     if (!kickoffTime) return;
 
     const [hour, minute] = kickoffTime.split(":").map(Number);
-
-    // waktu sekarang (zona waktu lokal)
     const now = new Date();
 
-    // buat waktu kickoff (anggap input dalam WIB)
+    // Buat waktu kickoff (anggap input dalam WIB)
     const kickoff = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute);
-    // sesuaikan ke WIB (jika browser bukan GMT+7)
-    const offsetWIB = 7 * 60; // menit
-    const localOffset = now.getTimezoneOffset(); // menit (misal -420 utk GMT+7)
+    const offsetWIB = 7 * 60;
+    const localOffset = now.getTimezoneOffset();
     kickoff.setMinutes(kickoff.getMinutes() + (offsetWIB + localOffset));
 
-    // waktu muncul tombol = 15 menit sebelum kickoff
     const showTime = new Date(kickoff.getTime() - 15 * 60 * 1000);
 
     const serverEl = document.getElementById("serverButtons" + matchKey);
@@ -90,5 +97,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
 
     updateVisibility();
     setInterval(updateVisibility, 1000);
-  }, 500); // beri jeda agar elemen benar-benar render
+  }
+
+  insertWhenReady();
 }
