@@ -1,8 +1,7 @@
-
+<script>
 // --- isi asli Matchxsofascore13.js ---
 // (biarkan semua fungsi loadSofaScore dan utility-nya tetap ada di sini)
 
-// contoh placeholder (punya Anda pasti lebih panjang)
 function loadSofaScore(matchId, matchKey) {
   // ... isi asli dari script Anda ...
   console.log("Load SofaScore untuk matchId=" + matchId + " key=" + matchKey);
@@ -11,7 +10,7 @@ function loadSofaScore(matchId, matchKey) {
 
 
 // --- fungsi tambahan untuk generate box ---
-// tambah parameter kickoffTime
+// tambahkan parameter kickoffTime
 function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoffTime) {
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
@@ -38,6 +37,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
     <img id="logoHome${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
     <img id="logoAway${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; right:10%; border-radius:5px;">
     <center>
+      <!-- link server disembunyikan dulu -->
       <span id="serverContainer${matchKey}" style="font-size: large; display:none;">
         ${serverFuncs.map((fn, i) => `
           <a class="tv" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
@@ -50,29 +50,31 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
 
   document.write(html);
 
-  // setelah kotak ditulis, atur timer munculnya link
+  // setelah ditulis ke halaman, aktifkan countdown & kontrol tampilan server
   setTimeout(function() {
-    setupKickoffCountdown(matchKey, kickoffTime);
+    if (kickoffTime) setupKickoffDisplay(matchKey, kickoffTime);
   }, 500);
 }
 
 
 
-// --- fungsi countdown & show server ---
-function setupKickoffCountdown(matchKey, kickoffTime) {
+// --- fungsi tambahan: tampilkan link saat kickoff ---
+function setupKickoffDisplay(matchKey, kickoffTime) {
   const countdownEl = document.getElementById("countdown" + matchKey);
   const serverContainer = document.getElementById("serverContainer" + matchKey);
-  const kickoff = new Date(kickoffTime);
+  const kickoff = new Date(kickoffTime).getTime();
 
   function updateCountdown() {
-    const now = new Date();
+    const now = new Date().getTime();
     const selisih = kickoff - now;
 
     if (selisih <= 0) {
+      // Sudah kickoff, tampilkan link
       countdownEl.innerText = "KICKOFF!";
-      serverContainer.style.display = "inline-block"; // link muncul saat kickoff
+      serverContainer.style.display = "inline-block";
       clearInterval(timer);
     } else {
+      // Belum kickoff, tampilkan hitung mundur
       const menit = Math.floor(selisih / 60000);
       const detik = Math.floor((selisih % 60000) / 1000);
       countdownEl.innerText = `Kickoff dalam ${menit}m ${detik}s`;
@@ -82,4 +84,4 @@ function setupKickoffCountdown(matchKey, kickoffTime) {
   updateCountdown();
   const timer = setInterval(updateCountdown, 1000);
 }
-
+</script>
