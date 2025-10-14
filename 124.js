@@ -7,15 +7,13 @@ function loadSofaScore(matchId, matchKey) {
 }
 
 // --- fungsi tambahan untuk generate box ---
-function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvActiveTime = null) {
+function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServerTime = null) {
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
     <div class="countdown" id="countdown${matchKey}"></div>
-
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
     </div>
-
     <div class="club1" style="position: relative; z-index: 1;">
       <br/>
       <div style="position: absolute; top: 0%; left: 50%; transform: translateX(-50%); z-index: 0; font-size: 29px;">
@@ -23,7 +21,6 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvActiv
         <strong id="formattedTime${matchKey}" style="color: red;"></strong>
       </div>
     </div>
-
     <div class="club">
       <center>
         <span id="league${matchKey}" style="position:relative; top:5px; left:-11px; font-weight:bold; font-size:12px; color:white;">NAMA LIGA</span>
@@ -33,28 +30,48 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvActiv
         <div id="kickoff${matchKey}" style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;"></div>
       </center>
     </div>
-
     <img id="logoHome${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
     <img id="logoAway${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; right:10%; border-radius:5px;">
-
-    <!-- Countdown khusus TV Server -->
-    <div id="tvCountdown${matchKey}" style="text-align:center; font-weight:bold; color:yellow; font-size:14px; margin-top:10px;"></div>
-
     <center>
-      <span style="font-size: large;" id="tvButtons${matchKey}">
+      <div id="tvCountdown${matchKey}" style="margin-bottom:5px; color: yellow; font-weight:bold;"></div>
+      <span style="font-size: large;">
         ${serverFuncs.map((fn, i) => `
-          <a class="tv" href="javascript:${fn}();" id="tvBtn${matchKey}_${i}" 
-             style="pointer-events:none; opacity:0.5;">
-             <b><span>SERVER ${i+1}</span></b>
-          </a>
+          <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:void(0);"><b><span>SERVER ${i+1}</span></b></a>
         `).join(" ")}
       </span>
     </center><br>
   </div>
-
   <script>
     loadSofaScore(${matchId}, "${matchKey}");
 
-    // === Countdown TV berdasarkan waktu aktif ===
+    ${tvServerTime ? `
+    // Countdown khusus TV server
     (function(){
-      const targetTime = new Date("${tvActiveTime.replace(/-/g, '/')}").getTime(); // pastikan format JS kompatibel
+      const tvCountdownEl = document.getElementById("tvCountdown${matchKey}");
+      const tvServers = [${serverFuncs.map((_, i) => `"tvServer${matchKey}_${i}"`).join(",")}].map(id => document.getElementById(id));
+      const targetTime = new Date("${tvServerTime}").getTime();
+
+      function updateTvCountdown() {
+        const now = new Date().getTime();
+        const distance = targetTime - now;
+        if(distance > 0){
+          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+          tvCountdownEl.innerHTML = hours + "h " + minutes + "m " + seconds + "s";
+          tvServers.forEach(s => s.style.pointerEvents = "none");
+        } else {
+          tvCountdownEl.innerHTML = "TV Server Ready!";
+          tvServers.forEach((s, i) => s.href = "javascript:" + serverFuncs[i] + "();");
+          clearInterval(interval);
+        }
+      }
+      const interval = setInterval(updateTvCountdown, 1000);
+      updateTvCountdown();
+    })();
+    ` : ""}
+  <\/script>
+  `;
+
+  document.write(html);
+}
