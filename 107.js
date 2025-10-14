@@ -12,12 +12,11 @@ function loadSofaScore(matchId, matchKey) {
 function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak") {
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
-    <div class="countdown" id="countdown${matchKey}" 
-         style="text-align:center; font-size:14px; color:orange; font-weight:bold; margin-bottom:5px;">
-    </div>
+    
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
     </div>
+
     <div class="club1" style="position: relative; z-index: 1;">
       <br/>
       <div style="position: absolute; top: 0%; left: 50%; transform: translateX(-50%); z-index: 0; font-size: 29px;">
@@ -25,6 +24,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak") {
         <strong id="formattedTime${matchKey}" style="color: red;"></strong>
       </div>
     </div>
+
     <div class="club">
       <center>
         <span id="league${matchKey}" style="position:relative; top:5px; left:-11px; font-weight:bold; font-size:12px; color:white;">NAMA LIGA</span>
@@ -34,15 +34,21 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak") {
         <div id="kickoff${matchKey}" style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;"></div>
       </center>
     </div>
+
     <img id="logoHome${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
     <img id="logoAway${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; right:10%; border-radius:5px;">
+    
     <center>
+      <div id="countdown${matchKey}" 
+           style="font-size:13px; color:orange; font-weight:bold; margin:6px 0;">
+      </div>
       <span id="tvContainer${matchKey}" style="font-size: large; pointer-events:none; opacity:0.5;">
         ${serverFuncs.map((fn, i) => `
           <a class="tv" href="javascript:${fn}();" style="pointer-events:none;"><b><span>SERVER ${i+1}</span></b></a>
         `).join(" ")}
       </span>
     </center><br>
+
   </div>
   <script>loadSofaScore(${matchId}, "${matchKey}");<\/script>
   `;
@@ -52,7 +58,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak") {
 
 
 
-// --- fungsi untuk countdown dan aktifkan TV server ---
+// --- fungsi untuk countdown terpisah (tidak ikut SofaScore) ---
 function activateTVServerAt(matchKey, targetTimeString) {
   const targetTime = new Date(targetTimeString).getTime();
   const countdownEl = document.getElementById("countdown" + matchKey);
@@ -65,26 +71,21 @@ function activateTVServerAt(matchKey, targetTimeString) {
     const diff = targetTime - now;
 
     if (diff <= 0) {
-      countdownEl.innerHTML = "Server sudah aktif!";
+      countdownEl.innerHTML = "🎬 TV Server Aktif!";
       tvContainer.style.pointerEvents = "auto";
       tvContainer.style.opacity = "1";
-      // aktifkan semua link
-      tvContainer.querySelectorAll("a.tv").forEach(a => {
-        a.style.pointerEvents = "auto";
-      });
+      tvContainer.querySelectorAll("a.tv").forEach(a => a.style.pointerEvents = "auto");
       return;
     }
 
-    const hrs = Math.floor((diff / (1000 * 60 * 60)) % 24);
     const mins = Math.floor((diff / (1000 * 60)) % 60);
     const secs = Math.floor((diff / 1000) % 60);
-
-    countdownEl.innerHTML = `Server aktif dalam ${hrs} jam ${mins} menit ${secs} detik`;
+    countdownEl.innerHTML = `Tunggu ${mins}m ${secs}d sebelum server aktif...`;
 
     requestAnimationFrame(updateCountdown);
   }
 
-  // pastikan tombol TV disabled di awal
+  // disable tombol di awal
   tvContainer.style.pointerEvents = "none";
   tvContainer.style.opacity = "0.5";
   updateCountdown();
