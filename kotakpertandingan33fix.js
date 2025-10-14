@@ -6,13 +6,11 @@ function loadSofaScore(matchId, matchKey) {
   console.log("Load SofaScore untuk matchId=" + matchId + " key=" + matchKey);
 }
 
-
-
 // --- fungsi tambahan untuk generate box ---
-function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoffTime) {
+function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoffTime = "2025-10-14T18:00:00+07:00") {
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
-    <div class="countdown" id="countdown${matchKey}" style="color:white; font-weight:bold;"></div>
+    <div class="countdown" id="countdown${matchKey}"></div>
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
     </div>
@@ -35,51 +33,32 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
     <img id="logoHome${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
     <img id="logoAway${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; right:10%; border-radius:5px;">
     <center>
-      <span id="serverContainer${matchKey}" style="font-size: large; display:none;">
+      <span id="serverLinks${matchKey}" style="font-size: large; display:none;">
         ${serverFuncs.map((fn, i) => `
           <a class="tv" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
         `).join(" ")}
       </span>
     </center><br>
   </div>
+  <script>
+    loadSofaScore(${matchId}, "${matchKey}");
+    (function() {
+      const kickoff = new Date("${kickoffTime}").getTime();
+      const serverEl = document.getElementById("serverLinks${matchKey}");
+      const countdownEl = document.getElementById("countdown${matchKey}");
+      function checkKickoff() {
+        const now = Date.now();
+        if (now >= kickoff) {
+          serverEl.style.display = "inline-block";
+          countdownEl.style.display = "none";
+          clearInterval(timer);
+        }
+      }
+      const timer = setInterval(checkKickoff, 10000);
+      checkKickoff();
+    })();
+  <\/script>
   `;
 
   document.write(html);
-
-  // setelah HTML ditulis, aktifkan countdown
-  setTimeout(function() {
-    if (kickoffTime) setupKickoffDisplay(matchId, matchKey, kickoffTime);
-  }, 500);
-}
-
-
-
-// --- fungsi tambahan: link + loadSofaScore saat kickoff ---
-function setupKickoffDisplay(matchId, matchKey, kickoffTime) {
-  const countdownEl = document.getElementById("countdown" + matchKey);
-  const serverContainer = document.getElementById("serverContainer" + matchKey);
-  const kickoff = new Date(kickoffTime).getTime();
-  let sudahKickoff = false;
-
-  function updateCountdown() {
-    const now = new Date().getTime();
-    const selisih = kickoff - now;
-
-    if (selisih <= 0 && !sudahKickoff) {
-      sudahKickoff = true;
-      countdownEl.innerText = "KICKOFF!";
-      serverContainer.style.display = "inline-block";
-
-      // baru load data SofaScore di sini
-      loadSofaScore(matchId, matchKey);
-      clearInterval(timer);
-    } else if (!sudahKickoff) {
-      const menit = Math.floor(selisih / 60000);
-      const detik = Math.floor((selisih % 60000) / 1000);
-      countdownEl.innerText = `Kickoff dalam ${menit}m ${detik}s`;
-    }
-  }
-
-  updateCountdown();
-  const timer = setInterval(updateCountdown, 1000);
 }
