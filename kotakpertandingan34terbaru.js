@@ -156,10 +156,27 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvStart
   </div>
   <script>loadSofaScore(${matchId}, "${matchKey}");<\/script>
   `;
-// >>> ganti ini <<<
-  const wrapper = document.createElement("div");
-  wrapper.innerHTML = html;
-  document.body.appendChild(wrapper);
+// >>> ganti bagian bawah renderMatch <<<
+
+const wrapper = document.createElement("div");
+wrapper.innerHTML = html;
+
+function appendWhenReady() {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.appendChild(wrapper);
+      loadSofaScore(matchId, matchKey);
+      if (tvStartTime) activateTVServerAt(matchKey, tvStartTime);
+    });
+  } else {
+    document.body.appendChild(wrapper);
+    loadSofaScore(matchId, matchKey);
+    if (tvStartTime) activateTVServerAt(matchKey, tvStartTime);
+  }
+}
+appendWhenReady();
+}
+
 
   loadSofaScore(matchId, matchKey);
 
