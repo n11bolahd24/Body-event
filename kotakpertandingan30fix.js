@@ -1,4 +1,4 @@
-<script>
+
 // --- isi asli Matchxsofascore13.js ---
 // (biarkan semua fungsi loadSofaScore dan utility-nya tetap ada di sini)
 
@@ -84,4 +84,4 @@ function setupKickoffDisplay(matchKey, kickoffTime) {
   updateCountdown();
   const timer = setInterval(updateCountdown, 1000);
 }
-</script>
+
