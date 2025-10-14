@@ -99,4 +99,3 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
     clearInterval(timerServer);
   }
 }
-
