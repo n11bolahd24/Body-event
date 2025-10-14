@@ -1,5 +1,5 @@
 // --- Fungsi Utama Load Sofascore + Countdown ---
-function loadSofaScore(matchId, boxId, status, servers, containerId, showBeforeMinutes = 0) {
+function loadSofaScore(matchId, boxId, showBeforeMinutes = 0, servers = [], containerId = "") {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
 
     fetch(eventUrl)
@@ -45,32 +45,35 @@ function loadSofaScore(matchId, boxId, status, servers, containerId, showBeforeM
             document.getElementById("logoAway" + boxId).src =
                 "https://api.sofascore.app/api/v1/team/" + away.id + "/image";
 
-            // --- FITUR TAMBAHAN: Delay tampil link server ---
-            if (typeof renderMatch === "function") {
-                const now = new Date();
-                const diff = kickoffDate - now;
-                const showBefore = showBeforeMinutes * 60 * 1000;
-
-                if (showBeforeMinutes <= 0 || diff <= showBefore) {
-                    // langsung tampil
-                    renderMatch(matchId, status, servers, containerId);
-                } else {
-                    const box = document.getElementById(containerId);
-                    if (box) {
-                        box.innerHTML = `<div style="color:gray;text-align:center;padding:5px;">
-                            Link akan muncul ${Math.floor((diff - showBefore)/60000)} menit lagi
-                        </div>`;
-                    }
-                    // tampil otomatis nanti
-                    setTimeout(() => {
-                        renderMatch(matchId, status, servers, containerId);
-                    }, diff - showBefore);
-                }
-            }
-
-            // Mulai countdown & monitor status
+            // Countdown & status
             startCountdown(kickoffDate.getTime(), boxId);
             monitorMatchStatus(matchId, boxId);
+
+            // --- ATUR TAMPIL LINK SERVER SEBELUM KICKOFF ---
+            if (servers.length > 0 && containerId) {
+                const now = new Date();
+                const diff = kickoffDate - now;
+                const tampilSebelum = showBeforeMinutes * 60 * 1000;
+
+                if (diff <= tampilSebelum) {
+                    renderMatch(matchId, "live", servers, containerId);
+                } else {
+                    const info = document.createElement("div");
+                    info.id = `infoServer${boxId}`;
+                    info.style.color = "gray";
+                    info.style.fontSize = "13px";
+                    info.style.textAlign = "center";
+                    info.style.marginTop = "4px";
+                    info.textContent = `Link akan muncul ${showBeforeMinutes} menit sebelum kickoff`;
+                    document.getElementById("countdown" + boxId).after(info);
+
+                    setTimeout(() => {
+                        const el = document.getElementById(`infoServer${boxId}`);
+                        if (el) el.remove();
+                        renderMatch(matchId, "live", servers, containerId);
+                    }, diff - tampilSebelum);
+                }
+            }
         });
 }
 
@@ -105,7 +108,6 @@ function monitorMatchStatus(matchId, boxId) {
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
 
             let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
-
             if (event.homeScore.penalties !== undefined && event.awayScore.penalties !== undefined) {
                 scoreText += ` <span style="font-size:12px;">(P: ${event.homeScore.penalties} - ${event.awayScore.penalties})</span>`;
             }
@@ -122,20 +124,16 @@ function monitorMatchStatus(matchId, boxId) {
 
                 switch (event.status.description) {
                     case "1st half":
-                        statusText = elapsed >= 45 ? "45+'" : `${elapsed}'`;
-                        break;
+                        statusText = elapsed >= 45 ? "45+'" : `${elapsed}'`; break;
                     case "2nd half":
                         let m2 = 45 + elapsed;
-                        statusText = m2 >= 90 ? "90+'" : `${m2}'`;
-                        break;
+                        statusText = m2 >= 90 ? "90+'" : `${m2}'`; break;
                     case "1st extra":
                         let m3 = 90 + elapsed;
-                        statusText = m3 >= 105 ? "105+'" : `${m3}'`;
-                        break;
+                        statusText = m3 >= 105 ? "105+'" : `${m3}'`; break;
                     case "2nd extra":
                         let m4 = 105 + elapsed;
-                        statusText = m4 >= 120 ? "120+'" : `${m4}'`;
-                        break;
+                        statusText = m4 >= 120 ? "120+'" : `${m4}'`; break;
                     default:
                         statusText = event.status.description || "LIVE";
                 }
@@ -150,7 +148,6 @@ function monitorMatchStatus(matchId, boxId) {
         if (event.status.type === "finished") {
             clearInterval(interval);
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
-
             countdownEl.innerHTML = "";
             liveContainer.classList.remove('blink');
             liveContainer.style.animation = "none";
@@ -164,7 +161,6 @@ function monitorMatchStatus(matchId, boxId) {
 
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
-
             matchStatusEl.innerHTML = "Full Time";
             matchStatusEl.style.display = "block";
 
