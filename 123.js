@@ -58,37 +58,3 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvActiv
     // === Countdown TV berdasarkan waktu aktif ===
     (function(){
       const targetTime = new Date("${tvActiveTime.replace(/-/g, '/')}").getTime(); // pastikan format JS kompatibel
-      const countdownEl = document.getElementById("tvCountdown${matchKey}");
-      const tvButtons = document.querySelectorAll("#tvButtons${matchKey} a");
-
-      function updateCountdown() {
-        const now = new Date().getTime();
-        const diff = targetTime - now;
-
-        if (diff > 0) {
-          const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-          const minutes = Math.floor((diff / (1000 * 60)) % 60);
-          const seconds = Math.floor((diff / 1000) % 60);
-          const timeStr = 
-            (hours > 0 ? hours + "j " : "") + 
-            (minutes > 0 ? minutes + "m " : "") + 
-            seconds + "d";
-
-          countdownEl.textContent = "TV Server aktif dalam " + timeStr + " ...";
-          setTimeout(updateCountdown, 1000);
-        } else {
-          countdownEl.textContent = "✅ TV Server sudah bisa diakses!";
-          tvButtons.forEach(btn => {
-            btn.style.pointerEvents = "auto";
-            btn.style.opacity = "1";
-          });
-        }
-      }
-
-      updateCountdown();
-    })();
-  <\/script>
-  `;
-
-  document.write(html);
-}
