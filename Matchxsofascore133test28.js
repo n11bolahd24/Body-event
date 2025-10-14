@@ -1,5 +1,7 @@
+<!-- === SCRIPT SOFASCORE + DELAY SERVER === -->
+<script>
 // --- Fungsi Utama Load Sofascore + Countdown ---
-function loadSofaScore(matchId, boxId, showBeforeMinutes = 0, servers = [], containerId = "") {
+function loadSofaScore(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
 
     fetch(eventUrl)
@@ -45,35 +47,9 @@ function loadSofaScore(matchId, boxId, showBeforeMinutes = 0, servers = [], cont
             document.getElementById("logoAway" + boxId).src =
                 "https://api.sofascore.app/api/v1/team/" + away.id + "/image";
 
-            // Countdown & status
+            // Mulai countdown & monitor status
             startCountdown(kickoffDate.getTime(), boxId);
             monitorMatchStatus(matchId, boxId);
-
-            // --- ATUR TAMPIL LINK SERVER SEBELUM KICKOFF ---
-            if (servers.length > 0 && containerId) {
-                const now = new Date();
-                const diff = kickoffDate - now;
-                const tampilSebelum = showBeforeMinutes * 60 * 1000;
-
-                if (diff <= tampilSebelum) {
-                    renderMatch(matchId, "live", servers, containerId);
-                } else {
-                    const info = document.createElement("div");
-                    info.id = `infoServer${boxId}`;
-                    info.style.color = "gray";
-                    info.style.fontSize = "13px";
-                    info.style.textAlign = "center";
-                    info.style.marginTop = "4px";
-                    info.textContent = `Link akan muncul ${showBeforeMinutes} menit sebelum kickoff`;
-                    document.getElementById("countdown" + boxId).after(info);
-
-                    setTimeout(() => {
-                        const el = document.getElementById(`infoServer${boxId}`);
-                        if (el) el.remove();
-                        renderMatch(matchId, "live", servers, containerId);
-                    }, diff - tampilSebelum);
-                }
-            }
         });
 }
 
@@ -107,7 +83,10 @@ function monitorMatchStatus(matchId, boxId) {
             liveContainer.classList.add('blink');
             liveContainer.innerHTML = "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW 🔥</strong>";
 
+            // --- Skor realtime ---
             let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
+
+            // Tambahkan penalti kalau ada
             if (event.homeScore.penalties !== undefined && event.awayScore.penalties !== undefined) {
                 scoreText += ` <span style="font-size:12px;">(P: ${event.homeScore.penalties} - ${event.awayScore.penalties})</span>`;
             }
@@ -115,6 +94,7 @@ function monitorMatchStatus(matchId, boxId) {
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
+            // --- Status menit & penalti ---
             let statusText = "";
             if (event.status.type === "penalties") {
                 statusText = "PENALTIES";
@@ -124,16 +104,20 @@ function monitorMatchStatus(matchId, boxId) {
 
                 switch (event.status.description) {
                     case "1st half":
-                        statusText = elapsed >= 45 ? "45+'" : `${elapsed}'`; break;
+                        statusText = elapsed >= 45 ? "45+'" : `${elapsed}'`;
+                        break;
                     case "2nd half":
                         let m2 = 45 + elapsed;
-                        statusText = m2 >= 90 ? "90+'" : `${m2}'`; break;
+                        statusText = m2 >= 90 ? "90+'" : `${m2}'`;
+                        break;
                     case "1st extra":
                         let m3 = 90 + elapsed;
-                        statusText = m3 >= 105 ? "105+'" : `${m3}'`; break;
+                        statusText = m3 >= 105 ? "105+'" : `${m3}'`;
+                        break;
                     case "2nd extra":
                         let m4 = 105 + elapsed;
-                        statusText = m4 >= 120 ? "120+'" : `${m4}'`; break;
+                        statusText = m4 >= 120 ? "120+'" : `${m4}'`;
+                        break;
                     default:
                         statusText = event.status.description || "LIVE";
                 }
@@ -148,6 +132,7 @@ function monitorMatchStatus(matchId, boxId) {
         if (event.status.type === "finished") {
             clearInterval(interval);
             if (window["countdown_" + boxId]) clearInterval(window["countdown_" + boxId]);
+
             countdownEl.innerHTML = "";
             liveContainer.classList.remove('blink');
             liveContainer.style.animation = "none";
@@ -161,6 +146,7 @@ function monitorMatchStatus(matchId, boxId) {
 
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
+
             matchStatusEl.innerHTML = "Full Time";
             matchStatusEl.style.display = "block";
 
@@ -197,3 +183,58 @@ function startCountdown(targetTime, boxId) {
             seconds + "S";
     }, 1000);
 }
+
+// --- Tambahan: Delay Tampil Link Server ---
+if (!window.originalRenderMatch) {
+  window.originalRenderMatch = window.renderMatch;
+}
+
+window.renderMatch = function(matchId, status, servers, containerId, tampilMenit = 15) {
+  const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  fetch(eventUrl)
+    .then(res => res.json())
+    .then(data => {
+      const kickoff = new Date(data.event.startTimestamp * 1000);
+      const now = new Date();
+      const selisih = kickoff - now;
+      const tampilSebelum = tampilMenit * 60 * 1000;
+
+      // buat pesan info kecil
+      let info = document.getElementById("infoLink" + containerId);
+      if (!info) {
+        info = document.createElement("div");
+        info.id = "infoLink" + containerId;
+        info.style.textAlign = "center";
+        info.style.fontSize = "12px";
+        info.style.color = "gray";
+        info.style.marginTop = "5px";
+        container.appendChild(info);
+      }
+
+      if (selisih > tampilSebelum) {
+        const menitTunggu = Math.ceil((selisih - tampilSebelum) / 60000);
+        info.textContent = `🔒 Link muncul ${menitTunggu} menit sebelum kickoff`;
+
+        // render pertandingan dulu tapi tanpa link server
+        window.originalRenderMatch(matchId, status, [], containerId);
+
+        // otomatis ganti ke versi penuh saat waktunya
+        setTimeout(() => {
+          info.remove();
+          window.originalRenderMatch(matchId, status, servers, containerId);
+        }, selisih - tampilSebelum);
+      } else {
+        // sudah waktunya tampil link server
+        info.remove();
+        window.originalRenderMatch(matchId, status, servers, containerId);
+      }
+    })
+    .catch(() => {
+      // jika error, langsung tampil normal
+      window.originalRenderMatch(matchId, status, servers, containerId);
+    });
+};
+</script>
