@@ -1,16 +1,19 @@
 // --- isi asli Matchxsofascore13.js ---
-// Semua fungsi loadSofaScore dan utility tetap di sini
+// (biarkan semua fungsi loadSofaScore dan utility-nya tetap ada di sini)
 
+// contoh placeholder (punya Anda pasti lebih panjang)
 function loadSofaScore(matchId, matchKey) {
+  // ... isi asli dari script Anda ...
   console.log("Load SofaScore untuk matchId=" + matchId + " key=" + matchKey);
-  // ... fungsi asli Anda ...
 }
 
+
+
 // --- fungsi tambahan untuk generate box ---
-function renderMatch(matchId, matchKey, serverFuncs, kickoffTime, boxClass = "kotak") {
+function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak") {
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
-    <div class="countdown" id="countdown${matchKey}" style="font-size:13px; color:#fff; text-align:center; margin-top:2px;"></div>
+    <div class="countdown" id="countdown${matchKey}"></div>
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
     </div>
@@ -32,60 +35,57 @@ function renderMatch(matchId, matchKey, serverFuncs, kickoffTime, boxClass = "ko
     </div>
     <img id="logoHome${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
     <img id="logoAway${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; right:10%; border-radius:5px;">
-    <div id="tvServers${matchKey}" style="text-align:center; margin-top:10px;"></div>
+    <center>
+      <span style="font-size: large;">
+        ${serverFuncs.map((fn, i) => `
+          <a class="tv" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
+        `).join(" ")}
+      </span>
+    </center><br>
   </div>
-  <script>
-    loadSofaScore(${matchId}, "${matchKey}");
-    startCountdown("${kickoffTime}", "countdown${matchKey}");
-    renderTVServers("${matchKey}", ${JSON.stringify(serverFuncs)});
-  <\/script>
+  <script>loadSofaScore(${matchId}, "${matchKey}");<\/script>
   `;
 
   document.write(html);
 }
 
-// --- countdown function ---
-function startCountdown(kickoffTime, countdownId) {
-  const kickoff = new Date(kickoffTime).getTime();
-  const el = document.getElementById(countdownId);
+// --- countdown manual untuk tv server ---
+function activateTVServerAt(matchKey, targetTime) {
+  const container = document.querySelector(`#match${matchKey} center span`);
+  if (!container) return;
 
-  if (!el) return;
+  // bungkus TV server dan countdown
+  const tvHTML = container.innerHTML;
+  container.innerHTML = `
+    <div id="tvServerBox${matchKey}">
+      <div id="tvCountdown${matchKey}" style="font-size:12px; color:yellow; margin-top:4px;"></div>
+      <div id="tvLinks${matchKey}" style="display:none;">${tvHTML}</div>
+    </div>
+  `;
 
-  const timer = setInterval(() => {
+  const countdownEl = document.getElementById(`tvCountdown${matchKey}`);
+  const tvLinksEl = document.getElementById(`tvLinks${matchKey}`);
+  const target = new Date(targetTime).getTime();
+
+  function updateCountdown() {
     const now = new Date().getTime();
-    const distance = kickoff - now;
+    const diff = target - now;
 
-    if (distance <= 0) {
-      el.innerHTML = "<span style='color:red;font-weight:bold;'>LIVE</span>";
+    if (diff <= 0) {
+      countdownEl.innerHTML = "<span style='color:red; font-weight:bold;'>SERVER AKTIF 🔴</span>";
+      tvLinksEl.style.display = "inline";
       clearInterval(timer);
       return;
     }
 
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
 
-    el.innerHTML = `Kickoff in ${hours.toString().padStart(2, '0')}:${minutes
-      .toString()
-      .padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  }, 1000);
+    countdownEl.innerHTML = `Server aktif dalam ${hours.toString().padStart(2,'0')}:${minutes
+      .toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+  }
+
+  updateCountdown();
+  const timer = setInterval(updateCountdown, 1000);
 }
-
-// File ini khusus untuk fungsi TV Server agar terpisah dari SofaScore
-function renderTVServers(matchKey, serverFuncs) {
-  const container = document.getElementById(`tvServers${matchKey}`);
-  if (!container) return;
-
-  container.innerHTML = `
-    <center>
-      <span style="font-size: large;">
-        ${serverFuncs
-          .map((fn, i) => `<a class="tv" href="javascript:${fn}();" style="margin:0 5px;">
-              <b><span>SERVER ${i + 1}</span></b>
-            </a>`)
-          .join(" ")}
-      </span>
-    </center>
-  `;
-                                          }
-      
