@@ -1,3 +1,12 @@
+// --- isi asli Matchxsofascore13.js ---
+// (biarkan semua fungsi loadSofaScore dan utility-nya tetap ada di sini)
+
+// contoh placeholder (punya Anda pasti lebih panjang)
+function loadSofaScore(matchId, matchKey) {
+  // ... isi asli dari script Anda ...
+  console.log("Load SofaScore untuk matchId=" + matchId + " key=" + matchKey);
+}
+
 function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", serverVisibleTime = null) {
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
