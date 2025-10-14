@@ -1,6 +1,6 @@
-<script>
 // --- isi asli Matchxsofascore13.js ---
 // (biarkan semua fungsi loadSofaScore dan utility-nya tetap ada di sini)
+
 function loadSofaScore(matchId, matchKey) {
   // ... isi asli dari script Anda ...
   console.log("Load SofaScore untuk matchId=" + matchId + " key=" + matchKey);
@@ -9,10 +9,10 @@ function loadSofaScore(matchId, matchKey) {
 
 
 // --- fungsi tambahan untuk generate box ---
-function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvStartTime = null) {
+function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak") {
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
-    <div class="countdown" id="countdown${matchKey}"></div> <!-- countdown kickoff sofascore -->
+    
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
     </div>
@@ -37,61 +37,56 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvStart
 
     <img id="logoHome${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
     <img id="logoAway${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; right:10%; border-radius:5px;">
-
+    
     <center>
-      <div id="tvCountdown${matchKey}" style="font-size:13px; color:yellow; margin-top:6px; margin-bottom:4px;"></div>
-      <span id="tvContainer${matchKey}" style="font-size: large;">
+      <div id="countdown${matchKey}" 
+           style="font-size:13px; color:orange; font-weight:bold; margin:6px 0;">
+      </div>
+      <span id="tvContainer${matchKey}" style="font-size: large; pointer-events:none; opacity:0.5;">
         ${serverFuncs.map((fn, i) => `
-          <a class="tv" id="tv${matchKey}_${i}" href="javascript:${fn}();" style="pointer-events:auto; opacity:1;">
-            <b><span>SERVER ${i+1}</span></b>
-          </a>
+          <a class="tv" href="javascript:${fn}();" style="pointer-events:none;"><b><span>SERVER ${i+1}</span></b></a>
         `).join(" ")}
       </span>
     </center><br>
-  </div>
 
+  </div>
   <script>loadSofaScore(${matchId}, "${matchKey}");<\/script>
   `;
 
   document.write(html);
-
-  // aktifkan countdown tv kalau ada waktu mulai server
-  if (tvStartTime) startTVServerCountdown(matchKey, tvStartTime);
 }
 
 
 
-// --- fungsi untuk countdown TV server ---
-function startTVServerCountdown(matchKey, startTime) {
-  const targetTime = new Date(startTime).getTime();
-  const tvCountdownEl = document.getElementById("tvCountdown" + matchKey);
+// --- fungsi untuk countdown terpisah (tidak ikut SofaScore) ---
+function activateTVServerAt(matchKey, targetTimeString) {
+  const targetTime = new Date(targetTimeString).getTime();
+  const countdownEl = document.getElementById("countdown" + matchKey);
   const tvContainer = document.getElementById("tvContainer" + matchKey);
+
+  if (!countdownEl || !tvContainer) return;
 
   function updateCountdown() {
     const now = new Date().getTime();
-    const distance = targetTime - now;
+    const diff = targetTime - now;
 
-    if (distance <= 0) {
-      tvCountdownEl.textContent = "Server Aktif Sekarang!";
+    if (diff <= 0) {
+      countdownEl.innerHTML = "🎬 TV Server Aktif!";
       tvContainer.style.pointerEvents = "auto";
       tvContainer.style.opacity = "1";
-      clearInterval(timer);
+      tvContainer.querySelectorAll("a.tv").forEach(a => a.style.pointerEvents = "auto");
       return;
     }
 
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    const mins = Math.floor((diff / (1000 * 60)) % 60);
+    const secs = Math.floor((diff / 1000) % 60);
+    countdownEl.innerHTML = `Tunggu ${mins}m ${secs}d sebelum server aktif...`;
 
-    tvCountdownEl.textContent = 
-      `Server on progress... ${days}D - ${hours}H - ${minutes}M - ${seconds}S`;
-
-    tvContainer.style.pointerEvents = "none";
-    tvContainer.style.opacity = "0.5";
+    requestAnimationFrame(updateCountdown);
   }
 
+  // disable tombol di awal
+  tvContainer.style.pointerEvents = "none";
+  tvContainer.style.opacity = "0.5";
   updateCountdown();
-  const timer = setInterval(updateCountdown, 1000);
 }
-</script>
