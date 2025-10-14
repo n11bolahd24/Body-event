@@ -76,7 +76,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
     if (diff > 0) {
       const minutes = Math.floor(diff / 60000);
       const seconds = Math.floor((diff % 60000) / 1000);
-      countdownServerEl.textContent = "Server aktif dalam " + minutes + "m " + seconds + "s";
+      countdownServerEl.textContent = "Server aktif dalam "+ hours + minutes + "m " + seconds + "s";
     } else {
       countdownServerEl.style.display = "none";
       serverEl.style.display = "inline-block";
