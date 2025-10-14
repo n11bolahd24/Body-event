@@ -35,7 +35,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     
     <!-- TV server countdown -->
     <center>
-      <div id="tvCountdown${matchKey}" style="margin-bottom:2px; color: yellow; font-weight:bold;"></div>
+      <div id="tvCountdown${matchKey}" style="margin-bottom:0px; color: yellow; font-weight:italic;"></div>
       <span style="font-size: large;">
         ${serverFuncs.map((fn, i) => `
           <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
