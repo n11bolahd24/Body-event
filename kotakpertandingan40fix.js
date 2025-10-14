@@ -13,7 +13,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
   container.className = boxClass + " matchbox";
   container.innerHTML = `
     <!-- Countdown SofaScore (tetap seperti semula) -->
-    <div class="countdown" id="countdown${matchKey}" style="font-weight:bold;"></div>
+    <div class="countdown" id="countdown${matchKey}" style="color:white; font-weight:bold;"></div>
 
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
@@ -55,28 +55,26 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
   // Jalankan load SofaScore seperti biasa
   loadSofaScore(matchId, matchKey);
 
-  // Jalankan timer server setelah DOM render
-  setTimeout(() => {
-    const kickoff = new Date(kickoffTime).getTime();
-    const serverEl = document.getElementById("serverLinks" + matchKey);
-    const countdownServerEl = document.getElementById("countdownServer" + matchKey);
+  // Jalankan timer server setelah DOM benar-benar tersedia
+  const kickoff = new Date(kickoffTime).getTime();
+  const serverEl = container.querySelector("#serverLinks" + matchKey);
+  const countdownServerEl = container.querySelector("#countdownServer" + matchKey);
 
-    function updateServerCountdown() {
-      const now = Date.now();
-      const diff = kickoff - now;
+  function updateServerCountdown() {
+    const now = Date.now();
+    const diff = kickoff - now;
 
-      if (diff > 0) {
-        const minutes = Math.floor(diff / 60000);
-        const seconds = Math.floor((diff % 60000) / 1000);
-        countdownServerEl.textContent = "Server aktif dalam " + minutes + "m " + seconds + "s";
-      } else {
-        countdownServerEl.style.display = "none";
-        serverEl.style.display = "inline-block";
-        clearInterval(timerServer);
-      }
+    if (diff > 0) {
+      const minutes = Math.floor(diff / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+      countdownServerEl.textContent = "Server aktif dalam " + minutes + "m " + seconds + "s";
+    } else {
+      countdownServerEl.style.display = "none";
+      serverEl.style.display = "inline-block";
+      clearInterval(timerServer);
     }
+  }
 
-    updateServerCountdown();
-    const timerServer = setInterval(updateServerCountdown, 1000);
-  }, 0);
+  updateServerCountdown();
+  const timerServer = setInterval(updateServerCountdown, 1000);
 }
