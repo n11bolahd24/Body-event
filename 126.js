@@ -60,11 +60,17 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
           const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
           const seconds = Math.floor((distance % (1000 * 60)) / 1000);
           tvCountdownEl.innerHTML = hours + "h " + minutes + "m " + seconds + "s";
-          // Nonaktifkan klik sementara
-          tvServers.forEach(s => s.style.pointerEvents = "none");
+          // Nonaktifkan klik & bikin transparan
+          tvServers.forEach(s => {
+            s.style.pointerEvents = "none";
+            s.style.opacity = "0.5";
+          });
         } else {
           tvCountdownEl.innerHTML = "TV Server Ready!";
-          tvServers.forEach(s => s.style.pointerEvents = "auto"); // aktifkan klik
+          tvServers.forEach(s => {
+            s.style.pointerEvents = "auto"; // aktifkan klik
+            s.style.opacity = "1"; // normal
+          });
           clearInterval(interval);
         }
       }
