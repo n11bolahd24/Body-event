@@ -70,20 +70,33 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
   const countdownServerEl = document.getElementById(`countdownServer${matchKey}`);
 
   function updateServerCountdown() {
-    const now = Date.now();
-    const diff = kickoff - now;
+  const now = Date.now();
+  const diff = kickoff - now;
 
-    if (diff > 0) {
-      const minutes = Math.floor(diff / 60000);
-      const seconds = Math.floor((diff % 60000) / 1000);
-      countdownServerEl.textContent = "Server aktif dalam "+ hours + minutes + "m " + seconds + "s";
-    } else {
-      countdownServerEl.style.display = "none";
-      serverEl.style.display = "inline-block";
-      clearInterval(timerServer);
-    }
+  // Deteksi bahasa browser
+  const userLang = navigator.language || navigator.userLanguage;
+  const isIndonesian = userLang.toLowerCase().startsWith("id");
+
+  if (diff > 0) {
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    let timeStr = "";
+    if (days > 0) timeStr += days + "d ";
+    if (hours > 0 || days > 0) timeStr += hours + "h ";
+    timeStr += minutes + "m " + seconds + "s";
+
+    const text = isIndonesian
+      ? "Server aktif dalam " + timeStr
+      : "Server will be active in " + timeStr;
+
+    countdownServerEl.textContent = text;
+  } else {
+    countdownServerEl.style.display = "none";
+    serverEl.style.display = "inline-block";
+    clearInterval(timerServer);
   }
-
-  updateServerCountdown();
-  const timerServer = setInterval(updateServerCountdown, 1000);
 }
+
