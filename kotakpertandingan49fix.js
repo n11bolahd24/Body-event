@@ -73,10 +73,6 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
   const now = Date.now();
   const diff = kickoff - now;
 
-  // Deteksi bahasa browser
-  const userLang = navigator.language || navigator.userLanguage;
-  const isIndonesian = userLang.toLowerCase().startsWith("id");
-
   if (diff > 0) {
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -88,11 +84,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
     if (hours > 0 || days > 0) timeStr += hours + "h ";
     timeStr += minutes + "m " + seconds + "s";
 
-    const text = isIndonesian
-      ? "Server aktif dalam " + timeStr
-      : "Server will be active in " + timeStr;
-
-    countdownServerEl.textContent = text;
+    countdownServerEl.textContent = "Server will be active in " + timeStr;
   } else {
     countdownServerEl.style.display = "none";
     serverEl.style.display = "inline-block";
