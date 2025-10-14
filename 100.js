@@ -1,5 +1,7 @@
 // --- isi asli Matchxsofascore13.js ---
 // (biarkan semua fungsi loadSofaScore dan utility-nya tetap ada di sini)
+
+// contoh placeholder (punya Anda pasti lebih panjang)
 function loadSofaScore(matchId, matchKey) {
   // ... isi asli dari script Anda ...
   console.log("Load SofaScore untuk matchId=" + matchId + " key=" + matchKey);
@@ -7,11 +9,11 @@ function loadSofaScore(matchId, matchKey) {
 
 
 
-// --- fungsi tambahan untuk generate box + countdown TV server ---
-function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", startTime = null) {
+// --- fungsi tambahan untuk generate box + countdown ---
+function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvStartTime = null) {
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
-    <div class="countdown" id="countdown${matchKey}" style="font-size:16px; color:yellow; text-align:center; margin-bottom:5px;"></div>
+    <div class="countdown" id="countdown${matchKey}" style="text-align:center; color:yellow; font-weight:bold; margin-bottom:5px;"></div>
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
     </div>
@@ -36,7 +38,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", startTi
     <center>
       <span id="tvContainer${matchKey}" style="font-size: large; display:none;">
         ${serverFuncs.map((fn, i) => `
-          <a class="tv" href="javascript:${fn}();" style="margin:0 4px;"><b><span>SERVER ${i+1}</span></b></a>
+          <a class="tv" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
         `).join(" ")}
       </span>
     </center><br>
@@ -46,11 +48,11 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", startTi
 
   document.write(html);
 
-  // kalau ada waktu start, jalankan countdown
-  if (startTime) {
-    startCountdown(matchKey, startTime);
+  // jalankan countdown kalau ada waktu target
+  if (tvStartTime) {
+    setupCountdown(matchKey, tvStartTime);
   } else {
-    // kalau tidak ada waktu start, langsung tampilkan TV server
+    // kalau ga dikasih waktu, langsung tampilkan server
     const tvContainer = document.getElementById(`tvContainer${matchKey}`);
     if (tvContainer) tvContainer.style.display = "inline-block";
   }
@@ -58,31 +60,29 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", startTi
 
 
 
-// --- fungsi countdown untuk munculkan TV server ---
-function startCountdown(matchKey, startTime) {
+// --- fungsi countdown untuk munculin tv server ---
+function setupCountdown(matchKey, tvStartTime) {
   const countdownEl = document.getElementById(`countdown${matchKey}`);
   const tvContainer = document.getElementById(`tvContainer${matchKey}`);
   if (!countdownEl || !tvContainer) return;
 
-  const targetTime = new Date(startTime).getTime();
+  const targetTime = new Date(tvStartTime).getTime();
 
   const timer = setInterval(() => {
     const now = new Date().getTime();
-    const distance = targetTime - now;
+    const diff = targetTime - now;
 
-    if (distance <= 0) {
+    if (diff <= 0) {
       clearInterval(timer);
-      countdownEl.style.display = "none";
+      countdownEl.textContent = "";
       tvContainer.style.display = "inline-block";
       return;
     }
 
-    const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((distance / (1000 * 60)) % 60);
-    const seconds = Math.floor((distance / 1000) % 60);
-    countdownEl.textContent =
-      (hours > 0 ? hours.toString().padStart(2, "0") + ":" : "") +
-      minutes.toString().padStart(2, "0") + ":" +
-      seconds.toString().padStart(2, "0");
+    const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const m = Math.floor((diff / (1000 * 60)) % 60);
+    const s = Math.floor((diff / 1000) % 60);
+
+    countdownEl.textContent = `Server aktif dalam ${h.toString().padStart(2,"0")}:${m.toString().padStart(2,"0")}:${s.toString().padStart(2,"0")}`;
   }, 1000);
 }
