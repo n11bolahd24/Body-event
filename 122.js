@@ -6,18 +6,11 @@ function loadSofaScore(matchId, matchKey) {
   console.log("Load SofaScore untuk matchId=" + matchId + " key=" + matchKey);
 }
 
-
-
-// --- fungsi tambahan untuk generate box + countdown TV ---
-function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak") {
+// --- fungsi tambahan untuk generate box ---
+function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvActiveTime = null) {
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
-
-    <!-- Countdown SofaScore -->
     <div class="countdown" id="countdown${matchKey}"></div>
-
-    <!-- Countdown TV Server -->
-    <div class="tv-countdown" id="tvCountdown${matchKey}" style="color:yellow; font-weight:bold; text-align:center; margin-top:5px;"></div>
 
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
@@ -44,38 +37,56 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak") {
     <img id="logoHome${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
     <img id="logoAway${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; right:10%; border-radius:5px;">
 
+    <!-- Countdown khusus TV Server -->
+    <div id="tvCountdown${matchKey}" style="text-align:center; font-weight:bold; color:yellow; font-size:14px; margin-top:10px;"></div>
+
     <center>
-      <span id="tvButtons${matchKey}" style="font-size: large;">
+      <span style="font-size: large;" id="tvButtons${matchKey}">
         ${serverFuncs.map((fn, i) => `
-          <a class="tv" id="tvBtn${matchKey}_${i}" href="javascript:void(0);" style="pointer-events:none; opacity:0.4;"><b><span>SERVER ${i+1}</span></b></a>
+          <a class="tv" href="javascript:${fn}();" id="tvBtn${matchKey}_${i}" 
+             style="pointer-events:none; opacity:0.5;">
+             <b><span>SERVER ${i+1}</span></b>
+          </a>
         `).join(" ")}
       </span>
     </center><br>
   </div>
 
   <script>
-    // Jalankan SofaScore
     loadSofaScore(${matchId}, "${matchKey}");
 
-    // Countdown untuk TV server (contoh: 15 detik)
-    let tvCountdown${matchKey} = 15;
-    const tvCountdownEl${matchKey} = document.getElementById("tvCountdown${matchKey}");
-    const tvBtns${matchKey} = document.querySelectorAll("#tvButtons${matchKey} a.tv");
+    // === Countdown TV berdasarkan waktu aktif ===
+    (function(){
+      const targetTime = new Date("${tvActiveTime.replace(/-/g, '/')}").getTime(); // pastikan format JS kompatibel
+      const countdownEl = document.getElementById("tvCountdown${matchKey}");
+      const tvButtons = document.querySelectorAll("#tvButtons${matchKey} a");
 
-    const intervalTV${matchKey} = setInterval(() => {
-      if (tvCountdown${matchKey} > 0) {
-        tvCountdownEl${matchKey}.innerHTML = "Server aktif dalam: " + tvCountdown${matchKey} + " detik";
-        tvCountdown${matchKey}--;
-      } else {
-        clearInterval(intervalTV${matchKey});
-        tvCountdownEl${matchKey}.innerHTML = "Server sudah aktif!";
-        tvBtns${matchKey}.forEach((btn, i) => {
-          btn.href = "javascript:${serverFuncs[i]}();";
-          btn.style.pointerEvents = "auto";
-          btn.style.opacity = "1";
-        });
+      function updateCountdown() {
+        const now = new Date().getTime();
+        const diff = targetTime - now;
+
+        if (diff > 0) {
+          const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+          const minutes = Math.floor((diff / (1000 * 60)) % 60);
+          const seconds = Math.floor((diff / 1000) % 60);
+          const timeStr = 
+            (hours > 0 ? hours + "j " : "") + 
+            (minutes > 0 ? minutes + "m " : "") + 
+            seconds + "d";
+
+          countdownEl.textContent = "TV Server aktif dalam " + timeStr + " ...";
+          setTimeout(updateCountdown, 1000);
+        } else {
+          countdownEl.textContent = "✅ TV Server sudah bisa diakses!";
+          tvButtons.forEach(btn => {
+            btn.style.pointerEvents = "auto";
+            btn.style.opacity = "1";
+          });
+        }
       }
-    }, 1000);
+
+      updateCountdown();
+    })();
   <\/script>
   `;
 
