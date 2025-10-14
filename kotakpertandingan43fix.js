@@ -7,18 +7,11 @@ function loadSofaScore(matchId, matchKey) {
 }
 
 // --- fungsi tambahan untuk generate box ---
-function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoffTime) {
-  // Kalau kickoffTime tidak diset, otomatis buat 1 jam dari sekarang
-  if (!kickoffTime) {
-    const now = new Date();
-    now.setHours(now.getHours() + 1);
-    kickoffTime = now.toISOString();
-  }
-
+function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoffTime ) {
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
 
-    <!-- Countdown SofaScore -->
+    <!-- Countdown SofaScore (tetap seperti semula) -->
     <div class="countdown" id="countdown${matchKey}" style="color:white; font-weight:bold;"></div>
 
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
@@ -46,7 +39,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
     <img id="logoHome${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
     <img id="logoAway${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; right:10%; border-radius:5px;">
 
-    <!-- Countdown & link server -->
+    <!-- Countdown & link server (countdown sendiri) -->
     <center>
       <div id="countdownServer${matchKey}" style="color:yellow; font-weight:bold; margin-top:5px;"></div>
       <span id="serverLinks${matchKey}" style="font-size: large; display:none;">
@@ -58,24 +51,14 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
   </div>
 
   <script>
+    // Jalankan load SofaScore seperti biasa
     loadSofaScore(${matchId}, "${matchKey}");
 
     (function() {
-      const kickoffDate = new Date("${kickoffTime}");
-      const kickoff = kickoffDate.getTime();
-
+      const kickoff = new Date("${kickoffTime}").getTime();
       const serverEl = document.getElementById("serverLinks${matchKey}");
       const countdownServerEl = document.getElementById("countdownServer${matchKey}");
-      const kickoffTextEl = document.getElementById("kickoff${matchKey}");
-      const formattedTimeEl = document.getElementById("formattedTime${matchKey}");
 
-      // Format waktu tampil (local time)
-      const options = { weekday: 'short', hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' };
-      const localTimeStr = kickoffDate.toLocaleString('id-ID', options);
-      if (kickoffTextEl) kickoffTextEl.textContent = "Kickoff: " + localTimeStr;
-      if (formattedTimeEl) formattedTimeEl.textContent = localTimeStr;
-
-      // Hitung mundur server aktif
       function updateServerCountdown() {
         const now = Date.now();
         const diff = kickoff - now;
