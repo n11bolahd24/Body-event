@@ -81,10 +81,10 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvStart
   }
 }
 // activateTVServerAt - versi robust: sembunyikan semua tombol .tv dalam match box sampai waktunya
+// --- fungsi: countdown manual untuk TV Server (tanpa teks 'SERVER AKTIF') ---
 function activateTVServerAt(matchKey, targetTime) {
   const target = new Date(targetTime).getTime();
 
-  // retry sampai #match{matchKey} muncul
   function waitForMatchBox() {
     const matchBox = document.getElementById(`match${matchKey}`);
     if (!matchBox) {
@@ -95,9 +95,7 @@ function activateTVServerAt(matchKey, targetTime) {
   }
 
   function setupCountdownForMatch(matchBox) {
-    // cari semua tombol server di dalam matchBox (selector bebas: a.tv, .tv, button.tv)
     const tvButtons = Array.from(matchBox.querySelectorAll('a.tv, button.tv, .tv'));
-    // jika gak ketemu tombol sama sekali, kita mencoba mencari <a> yang berisi "SERVER" teks
     if (tvButtons.length === 0) {
       const maybe = Array.from(matchBox.querySelectorAll('a,button,span'));
       maybe.forEach(el => {
@@ -107,12 +105,8 @@ function activateTVServerAt(matchKey, targetTime) {
       });
     }
 
-    // jika masih kosong, buat log dan tetap lanjut buat countdown di area tvCountdown{key}
-    console.log('activateTVServerAt:', matchKey, 'found tvButtons count=', tvButtons.length);
-
-    // sembunyikan tombol-tombol langsung (pakai inline style + data attr utk restore)
+    // sembunyikan tombol server
     tvButtons.forEach(btn => {
-      // simpan display lama supaya bisa restore; gunakan data attribute
       if (!btn.dataset._origDisplay) {
         btn.dataset._origDisplay = btn.style.display || '';
       }
@@ -121,11 +115,10 @@ function activateTVServerAt(matchKey, targetTime) {
       btn.style.opacity = '0.0';
     });
 
-    // siapkan element countdown: jika sudah ada gunakan, kalau tidak buat di bawah matchBox
+    // buat elemen countdown
     let countdownEl = document.getElementById(`tvCountdown${matchKey}`);
     if (!countdownEl) {
-      // coba tempatkan di lokasi yang wajar: cari container center atau akhir matchBox
-      const placeAfter = matchBox.querySelector(`#tvContainer${matchKey}`) || matchBox.querySelector('center') || matchBox;
+      const placeAfter = matchBox.querySelector('center') || matchBox;
       countdownEl = document.createElement('div');
       countdownEl.id = `tvCountdown${matchKey}`;
       countdownEl.style.fontSize = '12px';
@@ -134,22 +127,18 @@ function activateTVServerAt(matchKey, targetTime) {
       placeAfter.appendChild(countdownEl);
     }
 
-    // fungsi update
     function updateCountdown() {
       const now = Date.now();
       const diff = target - now;
 
       if (diff <= 0) {
-        countdownEl.innerHTML = "<span style='color:red;font-weight:bold;'>SERVER AKTIF 🔴</span>";
-        // tampilkan lagi semua tombol (restore display)
+        // waktu sudah tiba → tampilkan tombol, hapus countdown
+        countdownEl.innerHTML = "";
         tvButtons.forEach(btn => {
-          // restore original display or inline-block as fallback
           const orig = btn.dataset._origDisplay;
           btn.style.display = orig === '' ? 'inline-block' : orig;
           btn.style.pointerEvents = '';
           btn.style.opacity = '';
-          // cleanup data attr
-          try { delete btn.dataset._origDisplay; } catch(e){ btn.removeAttribute('data-_orig-display'); }
         });
         clearInterval(timer);
         return;
