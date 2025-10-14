@@ -69,7 +69,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", kickoff
   const serverEl = document.getElementById(`serverLinks${matchKey}`);
   const countdownServerEl = document.getElementById(`countdownServer${matchKey}`);
 
-  function updateServerCountdown() {
+    function updateServerCountdown() {
     const now = Date.now();
     const diff = kickoff - now;
 
