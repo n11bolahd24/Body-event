@@ -32,10 +32,22 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", serverV
       </div>
     </center><br>
   </div>
-  <script>loadSofaScore(${matchId}, "${matchKey}");<\/script>
   `;
 
-  document.write(html);
+  // ✅ Tambahkan ke elemen container, misal <div id="matches"></div>
+  const container = document.getElementById("matches");
+  if (container) {
+    container.insertAdjacentHTML("beforeend", html);
+  } else {
+    console.warn("renderMatch: container #matches tidak ditemukan");
+  }
+
+  // Panggil loadSofaScore (pasti sudah terdefinisi di script utama)
+  if (typeof loadSofaScore === "function") {
+    loadSofaScore(matchId, matchKey);
+  } else {
+    console.error("Fungsi loadSofaScore belum tersedia");
+  }
 
   // --- Countdown ke waktu tampil server ---
   if (serverVisibleTime) {
@@ -48,7 +60,6 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", serverV
       const diff = targetTime - now;
 
       if (diff <= 0) {
-        // Waktu sudah tiba: tampilkan link, sembunyikan countdown
         clearInterval(timer);
         if (countdownEl()) countdownEl().style.display = "none";
         if (serverLinksEl()) serverLinksEl().style.display = "inline-block";
@@ -61,10 +72,9 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", serverV
       if (countdownEl()) countdownEl().textContent = text;
     };
 
-    updateCountdown(); // Panggil langsung pertama kali
+    updateCountdown();
     const timer = setInterval(updateCountdown, 1000);
   } else {
-    // Jika tidak pakai waktu, langsung tampilkan
     const el = document.getElementById("serverLinks" + matchKey);
     if (el) el.style.display = "inline-block";
   }
