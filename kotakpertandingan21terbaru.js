@@ -3,9 +3,10 @@
 
 // contoh placeholder (punya Anda pasti lebih panjang)
 function loadSofaScore(matchId, matchKey) {
-  // ... isi asli dari script Anda ...
   console.log("Load SofaScore untuk matchId=" + matchId + " key=" + matchKey);
+  // kode asli fetch / API SofaScore kamu di sini
 }
+
 
 // --- fungsi tambahan untuk generate box + countdown server (otomatis zona waktu lokal) ---
 function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", showTime) {
