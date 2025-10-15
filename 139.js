@@ -30,7 +30,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
         <div id="kickoff${matchKey}" style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;"></div>
 
         <!-- Countdown TV server langsung di bawah kickoff -->
-        <div id="tvCountdown${matchKey}" style="margin-top:0px; margin-bottom:0px; color: yellow; font-weight:bold;"></div>
+        <div id="tvCountdown${matchKey}" style="margin-top:0px; margin-bottom:0px; color: yellow; font-weight:bold; font-style:italic"></div>
 
         <!-- Tombol TV server -->
         <span style="font-size: large;">
