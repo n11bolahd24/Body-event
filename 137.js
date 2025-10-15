@@ -59,10 +59,11 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
         const now = new Date().getTime();
         const distance = targetTime - now;
         if(distance > 0){
+          const days = Math.floor(distance / (1000 * 60 * 60 * 24));
           const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
           const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
           const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-          tvCountdownEl.innerHTML = "⏳ Waiting for server : " + hours + "h " + minutes + "m " + seconds + "s";
+          tvCountdownEl.innerHTML = "⏳ Waiting for server : "+ days + "d" + hours + "h " + minutes + "m " + seconds + "s";
           // Nonaktifkan klik & transparan
           tvServers.forEach(s => {
             s.style.pointerEvents = "none";
