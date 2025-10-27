@@ -56,7 +56,7 @@ function initChannelButton(player, streams) {
 
   // Tombol reload
   const reloadItem = document.createElement("div");
-  reloadItem.innerText = "🔄 RELOAD LIST CHANNEL";
+  reloadItem.innerText = "🔄 UPDATE CHANNEL";
   Object.assign(reloadItem.style, {
     padding: "8px 12px",
     cursor: "pointer",
