@@ -59,7 +59,7 @@ function monitorMatchStatus(matchId, boxId) {
     const countdownEl = document.getElementById("countdown" + boxId);
     const liveScoreEl = document.getElementById("liveScore" + boxId);
     const matchStatusEl = document.getElementById("matchStatus" + boxId);
-    const finishedContainer = document.getElementById("finishedMatches");
+    const finishedContainer = document.getElementById("finishedMatches1");
 
     const interval = setInterval(async () => {
         const res = await fetch(eventUrl);
