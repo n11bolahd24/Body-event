@@ -14,6 +14,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     <div class="countdown" id="countdown${matchKey}"></div>
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
+     <div id="league${matchKey}" style="font-weight:bold; font-size:12px; color:white;">Refresh Or Setting Your DNS</div>  
     </div>
 
     <div class="club1" style="position: relative; z-index: 1;">
@@ -21,21 +22,9 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
         <strong id="formattedTime${matchKey}" style="color: red;"></strong>
       </div>
     </div>
-    
-    
-      <!-- Tengah (Skor & Status) -->
-      <div style="
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      width:100%;
-      max-width:420px;
-      margin-top:10px;
-      margin-bottom:5px;
-    ">
+
       
-      <div id="league${matchKey}" style="font-weight:bold; font-size:12px; color:white;">Refresh Or Setting Your DNS</div>     
-      </div>
+          
     
     
     <!-- 🔹 Bagian Tengah: Nama & Logo Tim Seimbang di Tengah -->
