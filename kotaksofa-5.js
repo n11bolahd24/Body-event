@@ -1,11 +1,3 @@
-// --- isi asli Matchxsofascore13.js ---
-// (biarkan semua fungsi loadSofaScore dan utility-nya tetap ada di sini)
-
-function loadSofaScore(matchId, matchKey) {
-  console.log("Load SofaScore untuk matchId=" + matchId + " key=" + matchKey);
-}
-
-// --- fungsi tambahan untuk generate box ---
 function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServerTime = null) {
   const html = `
   <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
@@ -29,25 +21,26 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
               Refresh Or Setting Your DNS
         </span>
 
-        <!-- 🔹 Bagian Tengah: Nama & Logo Tim Seimbang di Tengah -->
+        <!-- 🔹 Bagian Tengah: Logo dan Nama Tim terkunci di tengah -->
         <div style="
           display:flex;
-          justify-content:space-between;
+          justify-content:center;
           align-items:center;
           width:100%;
-          max-width:420px;
-          margin-top:5px;
-          margin-bottom:0px;
+          max-width:450px;
+          margin:8px auto 0 auto;
+          gap:40px; /* jarak antar tim */
         ">
           <!-- Tim Home -->
-          <div style="flex:1; display:flex; justify-content:flex-end; align-items:center; gap:6px;">
+          <div style="display:flex; align-items:center; gap:6px; text-align:right;">
             <span id="teamshome${matchKey}" 
-                  style="font-weight:bold; color:white; font-size:14px; text-align:right; white-space:nowrap;"></span>
-            <img id="logoHome${matchKey}" style="height:45px; width:45px; border-radius:5px;">
+                  style="font-weight:bold; color:white; font-size:14px; white-space:nowrap;"></span>
+            <img id="logoHome${matchKey}" 
+                 style="height:45px; width:45px; border-radius:5px; object-fit:contain;">
           </div>
 
           <!-- Tengah (Skor dan Status) -->
-          <div style="text-align:center;">
+          <div style="text-align:center; min-width:60px;">
             <div id="liveScore${matchKey}" 
                  style="font-size:20px; font-weight:bold; color:orange;"></div>
             <br>
@@ -57,21 +50,22 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
           </div>
 
           <!-- Tim Away -->
-          <div style="flex:1; display:flex; justify-content:flex-start; align-items:center; gap:6px;">
-            <img id="logoAway${matchKey}" style="height:45px; width:45px; border-radius:5px;">
+          <div style="display:flex; align-items:center; gap:6px; text-align:left;">
+            <img id="logoAway${matchKey}" 
+                 style="height:45px; width:45px; border-radius:5px; object-fit:contain;">
             <span id="teamsaway${matchKey}" 
-                  style="font-weight:bold; color:white; font-size:14px; text-align:left; white-space:nowrap;"></span>
+                  style="font-weight:bold; color:white; font-size:14px; white-space:nowrap;"></span>
           </div>
         </div>
 
         <div id="kickoff${matchKey}" 
-             style="font-size:12px; color:white; text-align:center; margin:3px 0; font-style:italic;">
+             style="font-size:12px; color:white; text-align:center; margin:5px 0; font-style:italic;">
         </div>
 
-        <!-- Countdown TV server langsung di bawah kickoff (TIDAK DIUBAH) -->
-        <div id="tvCountdown${matchKey}" style="margin-top:0px; margin-bottom:0px; color: yellow; font-weight:bold; font-style:italic"></div>
+        <div id="tvCountdown${matchKey}" 
+             style="margin-top:0px; margin-bottom:4px; color: yellow; font-weight:bold; font-style:italic"></div>
 
-        <!-- Tombol TV server (TIDAK DIUBAH) -->
+        <!-- Tombol SERVER (tidak diubah) -->
         <span style="font-size: large;">
           ${serverFuncs.map((fn, i) => `
             <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();">
@@ -102,17 +96,10 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
           const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
           const seconds = Math.floor((distance % (1000 * 60)) / 1000);
           tvCountdownEl.innerHTML = "⏳ Waiting for server : "+ days + "d " + hours + "h " + minutes + "m " + seconds + "s";
-          // Nonaktifkan klik & transparan
-          tvServers.forEach(s => {
-            s.style.pointerEvents = "none";
-            s.style.opacity = "0.5";
-          });
+          tvServers.forEach(s => { s.style.pointerEvents = "none"; s.style.opacity = "0.5"; });
         } else {
           tvCountdownEl.innerHTML = "✅ Server Is Ready!";
-          tvServers.forEach(s => {
-            s.style.pointerEvents = "auto";
-            s.style.opacity = "1";
-          });
+          tvServers.forEach(s => { s.style.pointerEvents = "auto"; s.style.opacity = "1"; });
           clearInterval(interval);
         }
       }
