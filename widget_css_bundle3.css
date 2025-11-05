@@ -1793,7 +1793,7 @@ html .post-body object,html .post-body embed {
     zoom:.3}
 
 html .post-body,html .post-header,html .post-footer,html .description {
-    font-size: 14px
+    font-size: 30px
 }
 
 html .description {
@@ -1846,3 +1846,4 @@ html body #outer-wrapper {
     -ie-box-shadow: none;
     box-shadow: none
 }
+
