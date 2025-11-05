@@ -379,7 +379,7 @@ a:hover, a:visited, a:link, a:active
 
 .kotak {
   position: relative;
-  width: 100%;
+  width: 95%;
   background: #1c1b1b;	
   border: 2px solid #ff0000; /*  Garis  */
   border-radius: 7px;
