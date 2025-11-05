@@ -33,7 +33,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       margin-top:10px;
       margin-bottom:5px;
     ">
-  
+      <div id="league${matchKey}" style="font-weight:bold; font-size:12px; color:white;">Refresh Or Setting Your DNS</div>
       <div id="matchStatus${matchKey}" style="font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange;"></div>     
       </div>
 
@@ -47,9 +47,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       margin-top:10px;
       margin-bottom:5px;
     ">
-      <div id="league${matchKey}" style="font-weight:bold; font-size:12px; color:white;">Refresh Or Setting Your DNS</div>
-
-    
+          
       <!-- Tim Home -->
       <div style="flex:1; display:flex; justify-content:flex-end; align-items:center; gap:6px;">
         <span id="teamshome${matchKey}" style="font-weight:bold; color:white; font-size:14px; text-align:right; white-space:nowrap;"></span>
