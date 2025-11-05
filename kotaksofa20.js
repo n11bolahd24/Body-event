@@ -33,7 +33,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       margin-bottom:5px;
     ">
   
-        <div id="matchStatus${matchKey}" style="font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange;"></div>   
+           
       </div>
 
     <!-- 🔹 Bagian Tengah: Nama & Logo Tim Seimbang di Tengah -->
@@ -53,6 +53,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       </div>
 
       <div id="liveScore${matchKey}" style="font-size:20px; font-weight:bold; color:orange;"></div>
+      <div id="matchStatus${matchKey}" style="font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange;"></div>
 
       <!-- Tim Away -->
       <div style="flex:1; display:flex; justify-content:flex-start; align-items:center; gap:6px;">
