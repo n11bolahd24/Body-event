@@ -71,7 +71,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
 
     <!-- Countdown TV server -->
     <div id="tvCountdown${matchKey}" style="margin-top:3px; margin-bottom:3px; color: yellow; font-weight:bold; font-style:italic;"></div>
-
+</div>
     <!-- Tombol TV server -->
     <span style="font-size: large;">
       ${serverFuncs.map((fn, i) => `
