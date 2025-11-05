@@ -64,22 +64,23 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
         <span id="teamsaway${matchKey}" style="font-weight:bold; color:white; font-size:14px; text-align:left; white-space:nowrap;"></span>
       </div>
     </div>
-
+<div class="club">
+      <center>
     <!-- Info Lain -->
     <div id="matchStatus${matchKey}" style="font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange;"></div>
     <div id="kickoff${matchKey}" style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;"></div>
 
     <!-- Countdown TV server -->
     <div id="tvCountdown${matchKey}" style="margin-top:3px; margin-bottom:3px; color: yellow; font-weight:bold; font-style:italic;"></div>
-</div>
+
     <!-- Tombol TV server -->
     <span style="font-size: large;">
       ${serverFuncs.map((fn, i) => `
         <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();" 
            style="margin:0 3px; color:aqua;"><b>SERVER ${i+1}</b></a>
       `).join("")}
-    </span>
-
+    </span></center>
+</div>
   
 
   <script>
