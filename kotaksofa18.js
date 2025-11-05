@@ -23,7 +23,15 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     </div>
 
       <!-- Tengah (Skor & Status) -->
-      <div style="width:80px; text-align:center;">
+      <div style="
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      width:100%;
+      max-width:420px;
+      margin-top:10px;
+      margin-bottom:5px;
+    ">
         <div id="liveScore${matchKey}" style="font-size:20px; font-weight:bold; color:orange;"></div>  
         <div id="matchStatus${matchKey}" style="font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange;"></div>   
       </div>
