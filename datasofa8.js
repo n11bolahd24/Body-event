@@ -167,7 +167,7 @@ if (liveScoreEl && !liveScoreEl.textContent.trim()) {
                 finishedContainer.appendChild(matchBox);
             }
         }
-    }, 3000);
+    }, 10000);
 }
 
 // --- Fungsi Countdown ---
