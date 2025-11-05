@@ -26,7 +26,6 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
         <span id="league${matchKey}" style="position:relative; top:5px; left:-11px; font-weight:bold; font-size:12px; color:white;">Refresh Or Setting Your DNS</span>
         <div id="liveScore${matchKey}" style="position:relative; top:0px; left:0px;font-size:20px; font-family:'Arial', sans-serif; font-weight:bold; color:orange; text-align:center;"></div>  
         <div id="matchStatus${matchKey}" style="font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange; text-align:center; margin:-1px 1px;"></div>   
-
         <div id="kickoff${matchKey}" style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;"></div>
 
         <!-- Countdown TV server langsung di bawah kickoff -->
@@ -41,12 +40,12 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       </center>
     </div>
 
-    <div style="position:absolute; top:20%; left:8%; display:flex; align-items:center; gap:8px;">
+    <div id="teams${matchKey}" style="position:absolute; top:20%; left:8%; display:flex; align-items:center; gap:8px;">
   <img id="logoHome${matchKey}" style="height:55px; width:55px; border-radius:5px;">
   <span id="homeName${matchKey}" style="font-weight:bold; color:white; font-size:14px; white-space:nowrap;"></span>
 </div>
 
-<div style="position:absolute; top:20%; right:8%; display:flex; align-items:center; gap:8px; flex-direction:row-reverse;">
+  <div id="teams${matchKey}" style="position:absolute; top:20%; right:8%; display:flex; align-items:center; gap:8px; flex-direction:row-reverse;">
   <img id="logoAway${matchKey}" style="height:55px; width:55px; border-radius:5px;">
   <span id="awayName${matchKey}" style="font-weight:bold; color:white; font-size:14px; white-space:nowrap; text-align:right;"></span>
 </div>
