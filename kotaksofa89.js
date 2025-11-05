@@ -53,8 +53,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       
       <!-- Skor -->
       <div id="liveScore${matchKey}" 
-      style="min-width:30px; text-align:center; font-size:20px; font-weight:bold; color:orange;">
-      </div>
+      style="min-width:30px; text-align:center; font-size:20px; font-weight:bold; color:orange;">VS</div>
 
       <!-- Tim Away -->
       <div style="flex:1; display:flex; justify-content:flex-start; align-items:center; gap:8px;">
