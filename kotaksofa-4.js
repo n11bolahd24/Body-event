@@ -8,11 +8,10 @@ function loadSofaScore(matchId, matchKey) {
 // --- fungsi tambahan untuk generate box ---
 function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServerTime = null) {
   const html = `
-  <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox" 
-       style="position:relative; display:flex; flex-direction:column; align-items:center; text-align:center;">
+  <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
     
     <div class="countdown" id="countdown${matchKey}" style="margin-bottom:10px;"></div>
-    
+
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
       <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
     </div>
@@ -47,8 +46,8 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
             <img id="logoHome${matchKey}" style="height:45px; width:45px; border-radius:5px;">
           </div>
 
-          <!-- Skor -->
-          <div>
+          <!-- Tengah (Skor dan Status) -->
+          <div style="text-align:center;">
             <div id="liveScore${matchKey}" 
                  style="font-size:20px; font-weight:bold; color:orange;"></div>
             <br>
@@ -69,26 +68,14 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
              style="font-size:12px; color:white; text-align:center; margin:3px 0; font-style:italic;">
         </div>
 
-        <!-- Countdown TV server -->
-        <div id="tvCountdown${matchKey}" 
-             style="margin-top:5px; margin-bottom:5px; color: yellow; font-weight:bold; font-style:italic;">
-        </div>
+        <!-- Countdown TV server langsung di bawah kickoff (TIDAK DIUBAH) -->
+        <div id="tvCountdown${matchKey}" style="margin-top:0px; margin-bottom:0px; color: yellow; font-weight:bold; font-style:italic"></div>
 
-        <!-- Tombol TV server -->
+        <!-- Tombol TV server (TIDAK DIUBAH) -->
         <span style="font-size: large;">
           ${serverFuncs.map((fn, i) => `
-            <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();" 
-               style="
-                 margin:0 4px; 
-                 color:aqua; 
-                 background:none; 
-                 text-decoration:none; 
-                 border:1px solid aqua; 
-                 border-radius:6px; 
-                 padding:2px 6px; 
-                 display:inline-block;
-               ">
-               <b>SERVER ${i+1}</b>
+            <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();">
+              <b><span>SERVER ${i+1}</span></b>
             </a>
           `).join(" ")}
         </span>
@@ -103,8 +90,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     ${tvServerTime ? `
     (function(){
       const tvCountdownEl = document.getElementById("tvCountdown${matchKey}");
-      const tvServers = [${serverFuncs.map((_, i) => `"tvServer${matchKey}_${i}"`).join(",")}]
-        .map(id => document.getElementById(id));
+      const tvServers = [${serverFuncs.map((_, i) => `"tvServer${matchKey}_${i}"`).join(",")}].map(id => document.getElementById(id));
       const targetTime = new Date("${tvServerTime}").getTime();
 
       function updateTvCountdown() {
@@ -116,6 +102,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
           const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
           const seconds = Math.floor((distance % (1000 * 60)) / 1000);
           tvCountdownEl.innerHTML = "⏳ Waiting for server : "+ days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+          // Nonaktifkan klik & transparan
           tvServers.forEach(s => {
             s.style.pointerEvents = "none";
             s.style.opacity = "0.5";
