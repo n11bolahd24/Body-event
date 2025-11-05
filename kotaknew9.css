@@ -380,11 +380,9 @@ a:hover, a:visited, a:link, a:active
 .kotak {
   position: relative;
   width: 100%;
-  background: #363535;
-  border: 2px solid #0055ff; /*  Garis  */
+  border: 2px solid #ff0000; /*  Garis  */
   border-radius: 7px;
   margin-top: 15px;
-  box-shadow: 0 0 10px rgba(255, 0, 0, 0.4); /* Efek cahaya halus */
   transition: 0.25s all ease-in-out;
 }
 
@@ -396,6 +394,7 @@ a:hover, a:visited, a:link, a:active
 .kotak2 {
   position: relative;
   width: 100%;
+  border: 2px solid #ff0000; /*  Garis  */
   border-radius: 7px;
   margin-top: 15px;
 
@@ -417,6 +416,7 @@ a:hover, a:visited, a:link, a:active
 .kotak3 {
   position: relative;
   width: 100%;
+  border: 2px solid #ff0000; /*  Garis  */	
   border-radius: 7px;
   margin-top: 15px;
 
@@ -439,6 +439,7 @@ a:hover, a:visited, a:link, a:active
 .kotak4 {
   position: relative;
   width: 100%;
+  border: 2px solid #ff0000; /*  Garis  */	
   border-radius: 7px;
   margin-top: 15px;
 
@@ -472,6 +473,7 @@ a:hover, a:visited, a:link, a:active
 .kotak5 {
   position: relative;
   width: 100%;
+  border: 2px solid #ff0000; /*  Garis  */
   border-radius: 7px;
   margin-top: 15px;
 
