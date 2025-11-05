@@ -36,14 +36,27 @@ function loadSofaScore(matchId, boxId) {
             });
             document.getElementById("kickoff" + boxId).innerHTML = `${tanggal} | K.O ${jam}`;
 
-            // Nama tim
-            document.getElementById("teams" + boxId).innerText = home.name + " VS " + away.name;
+            // Gabungkan logo + nama tim (home & away)
+const teamsEl = document.getElementById("teams" + boxId);
+if (teamsEl) {
+    teamsEl.innerHTML = `
+    <span style="display:inline-flex;align-items:center;gap:10px;justify-content:center;">
+      <span style="display:inline-flex;align-items:center;gap:6px;">
+        <img src="https://api.sofascore.app/api/v1/team/${home.id}/image"
+             alt="${home.name}" style="width:22px;height:22px;border-radius:50%;">
+        <span style="font-weight:600;">${home.name}</span>
+      </span>
 
-            // Logo tim
-            document.getElementById("logoHome" + boxId).src =
-                "https://api.sofascore.app/api/v1/team/" + home.id + "/image";
-            document.getElementById("logoAway" + boxId).src =
-                "https://api.sofascore.app/api/v1/team/" + away.id + "/image";
+      <span style="font-weight:bold;">VS</span>
+
+      <span style="display:inline-flex;align-items:center;gap:6px;">
+        <span style="font-weight:600;">${away.name}</span>
+        <img src="https://api.sofascore.app/api/v1/team/${away.id}/image"
+             alt="${away.name}" style="width:22px;height:22px;border-radius:50%;">
+      </span>
+    </span>`;
+}
+
 
             // Mulai countdown & monitor status
             startCountdown(kickoffDate.getTime(), boxId);
