@@ -32,7 +32,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       margin-top:10px;
       margin-bottom:5px;
     ">
-        <div id="liveScore${matchKey}" style="font-size:20px; font-weight:bold; color:orange;"></div>  
+  
         <div id="matchStatus${matchKey}" style="font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange;"></div>   
       </div>
 
@@ -52,7 +52,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
         <img id="logoHome${matchKey}" style="height:45px; width:45px; border-radius:5px;">
       </div>
 
-
+      <div id="liveScore${matchKey}" style="font-size:20px; font-weight:bold; color:orange;"></div>
 
       <!-- Tim Away -->
       <div style="flex:1; display:flex; justify-content:flex-start; align-items:center; gap:6px;">
