@@ -13,8 +13,8 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     
     <div class="countdown" id="countdown${matchKey}"></div>
     <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
-      <span id="liveStatus${matchKey}" 
-      style="display:inline-block; width:150px; font-weight:bold; margin-top:-20px;"></span>
+    <span id="liveStatus${matchKey}" 
+      style="display:inline-block; width:150px; font-weight:bold; position:relative; top:-5px;"></span>
     </div>
 
     <div class="club1" style="position: relative; z-index: 1;">
