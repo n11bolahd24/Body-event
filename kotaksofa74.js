@@ -47,7 +47,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       <!-- Tim Home -->
       <div style="flex:1; display:flex; justify-content:flex-end; align-items:center; gap:8px;">
         <span id="teamshome${matchKey}" style="font-weight:bold; color:white; font-size:14px; text-align:right; white-space:nowrap;"></span>
-        <img id="logoHome${matchKey}" style="height:45px; width:45px; border-radius:5px; margin-left:5px;">
+        <img id="logoHome${matchKey}" style="height:45px; width:45px; border-radius:5px; margin-left:10px;">
       </div>
 
       
@@ -55,7 +55,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
 
       <!-- Tim Away -->
       <div style="flex:1; display:flex; justify-content:flex-start; align-items:center; gap:8px;">
-        <img id="logoAway${matchKey}" style="height:45px; width:45px; border-radius:5px; margin-left:5px;">
+        <img id="logoAway${matchKey}" style="height:45px; width:45px; border-radius:5px; margin-left:10px;">
         <span id="teamsaway${matchKey}" style="font-weight:bold; color:white; font-size:14px; text-align:left; white-space:nowrap;"></span>
       </div>
 
