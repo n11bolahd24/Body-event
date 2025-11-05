@@ -1,5 +1,4 @@
-<!-- ✅ Matchxsofascore13.js FINAL -->
-<script>
+
 // --- Fungsi Utama Load Sofascore + Countdown ---
 function loadSofaScore(matchId, boxId) {
   const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
@@ -129,4 +128,3 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
   document.body.appendChild(container);
   loadSofaScore(matchId, matchKey);
 }
-</script>
