@@ -22,7 +22,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       </div>
     </div>
     
-    <center>
+    
       <!-- Tengah (Skor & Status) -->
       <div style="
       display:flex;
@@ -73,6 +73,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     <div id="tvCountdown${matchKey}" style="margin-top:3px; margin-bottom:3px; color: yellow; font-weight:bold; font-style:italic;"></div>
 
     <!-- Tombol TV server -->
+    <center>
         <span style="font-size: large;">
           ${serverFuncs.map((fn, i) => `
             <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
