@@ -42,11 +42,10 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       max-width:420px;
       margin-top:5px;
       margin-bottom:0px;
-      padding:0 15px; /* ⬅️ jarak kiri-kanan supaya tidak mepet */
     ">
      
       <!-- Tim Home -->
-      <div style="flex:1; display:flex; justify-content:flex-end; align-items:center; gap:6px;">
+      <div style="flex:1; display:flex; justify-content:flex-end; align-items:center; gap:8px;">
         <span id="teamshome${matchKey}" style="font-weight:bold; color:white; font-size:14px; text-align:right; white-space:nowrap;"></span>
         <img id="logoHome${matchKey}" style="height:45px; width:45px; border-radius:5px;">
       </div>
@@ -55,7 +54,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       <div id="liveScore${matchKey}" style="font-size:20px; font-weight:bold; color:orange;"></div>
 
       <!-- Tim Away -->
-      <div style="flex:1; display:flex; justify-content:flex-start; align-items:center; gap:6px;">
+      <div style="flex:1; display:flex; justify-content:flex-start; align-items:center; gap:8px;">
         <img id="logoAway${matchKey}" style="height:45px; width:45px; border-radius:5px;">
         <span id="teamsaway${matchKey}" style="font-weight:bold; color:white; font-size:14px; text-align:left; white-space:nowrap;"></span>
       </div>
