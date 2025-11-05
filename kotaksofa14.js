@@ -43,14 +43,14 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
 
     <!-- Tim Home (kiri) -->
     <div style="position:absolute; top:35%; left:5%; display:flex; align-items:center; gap:8px;">
-      <img id="logoHome${matchKey}" style="height:50px; width:50px; border-radius:5px;">
       <span id="teamshome${matchKey}" style="font-weight:bold; color:white; font-size:14px; white-space:nowrap;"></span>
+      <img id="logoHome${matchKey}" style="height:50px; width:50px; border-radius:5px;">
     </div>
 
     <!-- Tim Away (kanan) -->
-    <div style="position:absolute; top:35%; right:5%; display:flex; align-items:center; gap:8px; flex-direction:row-reverse;">
+    <div style="position:absolute; top:35%; right:5%; display:flex; align-items:center; gap:8px;">
       <img id="logoAway${matchKey}" style="height:50px; width:50px; border-radius:5px;">
-      <span id="teamsaway${matchKey}" style="font-weight:bold; color:white; font-size:14px; white-space:nowrap; text-align:right;"></span>
+      <span id="teamsaway${matchKey}" style="font-weight:bold; color:white; font-size:14px; white-space:nowrap;"></span>
     </div>
       </div>
 
