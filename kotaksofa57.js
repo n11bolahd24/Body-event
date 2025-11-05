@@ -37,7 +37,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       <div id="league${matchKey}" style="font-weight:bold; font-size:12px; color:white;">Refresh Or Setting Your DNS</div>     
       </div>
     
-     <div class="club">
+
       <center>    
     <!-- 🔹 Bagian Tengah: Nama & Logo Tim Seimbang di Tengah -->
     <div style="
