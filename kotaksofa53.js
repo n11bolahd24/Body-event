@@ -80,7 +80,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       `).join("")}
     </span>
 
-  </div>
+  
 
   <script>
     loadSofaScore(${matchId}, "${matchKey}");
