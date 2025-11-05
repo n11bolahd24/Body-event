@@ -395,10 +395,12 @@ a:hover, a:visited, a:link, a:active
 
 .kotak2 {
   position: relative;
-  width: 100%;
+  width: 97%;
   border: 2px solid #ff0000; /*  Garis  */
   border-radius: 7px;
   margin-top: 15px;
+  margin: 15px auto 0 auto; /* margin atas 15px, kiri-kanan auto */
+  transition: 0.25s all ease-in-out;
 
   background: linear-gradient(270deg, #b30000, #0290b0, #0044cc, #ba0202);;
   background-size: 600% 600%;
@@ -417,10 +419,12 @@ a:hover, a:visited, a:link, a:active
 
 .kotak3 {
   position: relative;
-  width: 100%;
+  width: 97%;
   border: 2px solid #ff0000; /*  Garis  */	
   border-radius: 7px;
   margin-top: 15px;
+  margin: 15px auto 0 auto; /* margin atas 15px, kiri-kanan auto */
+  transition: 0.25s all ease-in-out;
 
   /* merah putih tegas dengan sudut 171° */
   background: linear-gradient(171deg,
