@@ -25,7 +25,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       <div class="club">
       <center>
       <div id="league${matchKey}" 
-     style="position:relative; top:10px; font-weight:bold; font-size:12px; color:white; text-align:center;">
+     style="position:relative; top:15px; font-weight:bold; font-size:12px; color:white; text-align:center;">
   Refresh Or Setting Your DNS
 </div>
 
