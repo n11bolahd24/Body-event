@@ -80,7 +80,8 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
         <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();" 
            style="margin:0 3px; color:aqua;"><b>SERVER ${i+1}</b></a>
       `).join("")}
-    </span></center>
+    </span>
+    </center>
 </div>
   
 
