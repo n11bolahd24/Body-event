@@ -22,7 +22,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
         <strong id="formattedTime${matchKey}" style="color: red;"></strong>
       </div>
     </div>
-    <center>
+
 
       
     <div style="
