@@ -40,12 +40,12 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       </center>
     </div>
 
-    <div id="teams${matchKey}" style="position:absolute; top:20%; left:8%; display:flex; align-items:center; gap:8px;">
+    <div style="position:absolute; top:20%; left:8%; display:flex; align-items:center; gap:8px;">
   <img id="logoHome${matchKey}" style="height:55px; width:55px; border-radius:5px;">
   <span id="homeName${matchKey}" style="font-weight:bold; color:white; font-size:14px; white-space:nowrap;"></span>
 </div>
 
-  <div id="teams${matchKey}" style="position:absolute; top:20%; right:8%; display:flex; align-items:center; gap:8px; flex-direction:row-reverse;">
+  <div style="position:absolute; top:20%; right:8%; display:flex; align-items:center; gap:8px; flex-direction:row-reverse;">
   <img id="logoAway${matchKey}" style="height:55px; width:55px; border-radius:5px;">
   <span id="awayName${matchKey}" style="font-weight:bold; color:white; font-size:14px; white-space:nowrap; text-align:right;"></span>
 </div>
