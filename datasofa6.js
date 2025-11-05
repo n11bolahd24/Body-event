@@ -60,7 +60,13 @@ function monitorMatchStatus(matchId, boxId) {
     const countdownEl = document.getElementById("countdown" + boxId);
     const liveScoreEl = document.getElementById("liveScore" + boxId);
     const matchStatusEl = document.getElementById("matchStatus" + boxId);
-    // 🔽 Tambahkan logika ini
+    // 🔸 Jika elemen matchStatus belum ada teks, tampilkan "UP COMING"
+if (matchStatusEl && !matchStatusEl.textContent.trim()) {
+    matchStatusEl.innerHTML = "UP COMING";
+    matchStatusEl.style.display = "block";
+}
+
+    // 🔽 Nomor match 1-100 di Event kalo di atasnya di abroad
     const finishedContainer = document.getElementById(
         boxId < 100 ? "finishedMatches1" : "finishedMatches2"
     );
