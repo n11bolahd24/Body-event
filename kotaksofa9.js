@@ -1,9 +1,18 @@
+// --- isi asli Matchxsofascore13.js ---
+// (biarkan semua fungsi loadSofaScore dan utility-nya tetap ada di sini)
+
+function loadSofaScore(matchId, matchKey) {
+  // ... isi asli dari script Anda ...
+  console.log("Load SofaScore untuk matchId=" + matchId + " key=" + matchKey);
+}
+
+// --- fungsi tambahan untuk generate box ---
 function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServerTime = null) {
   const html = `
-  <div id="match${matchKey}" class="${boxClass} matchbox">
+  <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox">
     <div class="countdown" id="countdown${matchKey}"></div>
-    <div id="liveContainer${matchKey}" style="text-align:center; height:20px;">
-      <span style="display:inline-block; width:150px; font-weight:bold;"></span>
+    <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
+      <span id="liveStatus${matchKey}" style="display:inline-block; width:150px; font-weight:bold;"></span>
     </div>
     <div class="club1" style="position: relative; z-index: 1;">
       <br/>
@@ -14,25 +23,66 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     </div>
     <div class="club">
       <center>
-        <span id="league${matchKey}" style="font-weight:bold; font-size:12px; color:white;">Loading...</span>
-        <div id="liveScore${matchKey}" style="font-size:20px; font-weight:bold; color:orange;"></div>
-        <div id="matchStatus${matchKey}" style="font-size:10px; font-weight:bold; color:orange;"></div>
-        <font id="teams${matchKey}" style="font-size:15px; font-weight:bold;">Fetching match...</font><br>
-        <div id="kickoff${matchKey}" style="font-size:12px; color:white; font-style:italic;"></div>
+        <span id="league${matchKey}" style="position:relative; top:5px; left:-11px; font-weight:bold; font-size:12px; color:white;">Refresh Or Setting Your DNS</span>
+        <div id="liveScore${matchKey}" style="position:relative; top:0px; left:0px;font-size:20px; font-family:'Arial', sans-serif; font-weight:bold; color:orange; text-align:center;"></div>  
+        <div id="matchStatus${matchKey}" style="font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange; text-align:center; margin:-1px 1px;"></div>   
+        <font id="teams${matchKey}" style="font-size:15px; font-weight:bold">Failed To Load !</font><br>
+        <div id="kickoff${matchKey}" style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;"></div>
 
-        <div id="tvCountdown${matchKey}" style="color:yellow; font-weight:bold; font-style:italic;"></div>
+        <!-- Countdown TV server langsung di bawah kickoff -->
+        <div id="tvCountdown${matchKey}" style="margin-top:0px; margin-bottom:0px; color: yellow; font-weight:bold; font-style:italic"></div>
 
+        <!-- Tombol TV server -->
         <span style="font-size: large;">
           ${serverFuncs.map((fn, i) => `
-            <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();"><b>SERVER ${i+1}</b></a>
+            <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
           `).join(" ")}
         </span>
       </center>
     </div>
+
+    <img id="logoHome${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
+    <img id="logoAway${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; right:10%; border-radius:5px;">
+
   </div>
 
   <script>
-    setTimeout(function(){ loadSofaScore(${matchId}, "${matchKey}"); }, 500);
+    loadSofaScore(${matchId}, "${matchKey}");
+
+    ${tvServerTime ? `
+    (function(){
+      const tvCountdownEl = document.getElementById("tvCountdown${matchKey}");
+      const tvServers = [${serverFuncs.map((_, i) => `"tvServer${matchKey}_${i}"`).join(",")}].map(id => document.getElementById(id));
+      const targetTime = new Date("${tvServerTime}").getTime();
+
+      function updateTvCountdown() {
+        const now = new Date().getTime();
+        const distance = targetTime - now;
+        if(distance > 0){
+          const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+          tvCountdownEl.innerHTML = "⏳ Waiting for server : "+ days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+          // Nonaktifkan klik & transparan
+          tvServers.forEach(s => {
+            s.style.pointerEvents = "none";
+            s.style.opacity = "0.5";
+          });
+        } else {
+          tvCountdownEl.innerHTML = "✅ Server Is Ready!";
+          tvServers.forEach(s => {
+            s.style.pointerEvents = "auto";
+            s.style.opacity = "1";
+          });
+          clearInterval(interval);
+        }
+      }
+
+      const interval = setInterval(updateTvCountdown, 1000);
+      updateTvCountdown();
+    })();
+    ` : ""}
   <\/script>
   `;
 
