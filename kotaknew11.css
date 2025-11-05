@@ -279,7 +279,7 @@ a:hover, a:visited, a:link, a:active
   
 .embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: scroll; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%!important; height: 100%; } 
   
-.doctor-profile-tabs button{border:none;background-color: #fff;color:#000000!important;font-size:15px;border-bottom:1px solid #222;border-top:1px solid #222;padding:5px 8px}.doctor-profile-tabs button.active{color:#fff!important;border-bottom:3px solid;font-weight:500;background:#006eff;border-top:1px solid #222}.review-profile{width:35px}.offcanvas{border-top-left-radius:2rem;border-top-right-radius:2rem}
+.doctor-profile-tabs button{border:none;background-color: #fff;color:#000000!important;font-size:15px;border-bottom:1px solid #222;border-top:1px solid #222;padding:5px 8px}.doctor-profile-tabs button.active{color:#fff!important;border-bottom:3px solid;font-weight:500;background:#000000eff;border-top:1px solid #222}.review-profile{width:35px}.offcanvas{border-top-left-radius:2rem;border-top-right-radius:2rem}
  
 .navbar-expand-lg a{color:#8B008B;}
 .nav-scroller a {color:#ccc;padding: 0.7rem 1rem;}
