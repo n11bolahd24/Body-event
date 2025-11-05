@@ -33,7 +33,8 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       margin-top:10px;
       margin-bottom:5px;
     ">
-      
+      <div class="club">
+      <center>
       <div id="league${matchKey}" style="font-weight:bold; font-size:12px; color:white;">Refresh Or Setting Your DNS</div>     
       </div>
     
@@ -73,21 +74,13 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     <div id="tvCountdown${matchKey}" style="margin-top:3px; margin-bottom:3px; color: yellow; font-weight:bold; font-style:italic;"></div>
 
     <!-- Tombol TV server -->
-    <span style="font-size: large;">
-      ${serverFuncs.map((fn, i) => `
-        <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();" 
-   style="
-     margin:0 3px;
-     color:aqua;
-     background:none;
-     text-decoration:none;
-     border:1px solid aqua;
-     border-radius:6px;
-     padding:2px 6px;
-     display:inline-block;
-   "><b>SERVER ${i+1}</b></a>
-      `).join("")}
-    </span>
+        <span style="font-size: large;">
+          ${serverFuncs.map((fn, i) => `
+            <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
+          `).join(" ")}
+        </span>
+      </center>
+    </div>
 
   </div>
 
