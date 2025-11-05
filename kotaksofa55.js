@@ -48,7 +48,8 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       margin-top:5px;
       margin-bottom:0px;
     ">
-          
+     <div class="club">
+      <center>     
       <!-- Tim Home -->
       <div style="flex:1; display:flex; justify-content:flex-end; align-items:center; gap:6px;">
         <span id="teamshome${matchKey}" style="font-weight:bold; color:white; font-size:14px; text-align:right; white-space:nowrap;"></span>
@@ -64,8 +65,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
         <span id="teamsaway${matchKey}" style="font-weight:bold; color:white; font-size:14px; text-align:left; white-space:nowrap;"></span>
       </div>
     </div>
-<div class="club">
-      <center>
+
     <!-- Info Lain -->
     <div id="matchStatus${matchKey}" style="font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange;"></div>
     <div id="kickoff${matchKey}" style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;"></div>
