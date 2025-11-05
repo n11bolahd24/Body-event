@@ -20,6 +20,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     <div class="club1" style="position: relative; z-index: 1;">
       <div style="position: absolute; top: 0%; left: 50%; transform: translateX(-50%); z-index: 0; font-size: 29px;">
         <strong id="formattedTime${matchKey}" style="color: red;"></strong>
+        <div id="league${matchKey}" style="font-weight:bold; font-size:12px; color:white;">Refresh Or Setting Your DNS</div>
       </div>
     </div>
 
@@ -37,8 +38,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       margin-top:5px;
       margin-bottom:0px;
     ">
-      <div id="league${matchKey}" style="font-weight:bold; font-size:12px; color:white;">Refresh Or Setting Your DNS</div>
-
+      
       <!-- Tim Home -->
       <div style="flex:1; display:flex; justify-content:flex-end; align-items:center; gap:6px;">
         <span id="teamshome${matchKey}" style="font-weight:bold; color:white; font-size:14px; text-align:right; white-space:nowrap;"></span>
