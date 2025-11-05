@@ -12,7 +12,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
        style="position:relative; display:flex; flex-direction:column; align-items:center; text-align:center;">
     
     <div class="countdown" id="countdown${matchKey}"></div>
-    <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
+    <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:10px;">
     <div id="liveStatus${matchKey}" 
       style="display:inline-block; width:150px; font-weight:bold; position:relative; margin-top:-5px;"></div>
     </div>
