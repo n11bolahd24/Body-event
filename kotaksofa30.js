@@ -57,8 +57,6 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
 
       
       <div id="liveScore${matchKey}" style="font-size:20px; font-weight:bold; color:orange;"></div>
-      <br>
-      <div id="matchStatus${matchKey}" style="font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange;"></div>
 
       <!-- Tim Away -->
       <div style="flex:1; display:flex; justify-content:flex-start; align-items:center; gap:6px;">
@@ -68,6 +66,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     </div>
 
     <!-- Info Lain -->
+    <div id="matchStatus${matchKey}" style="font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange;"></div>
     <div id="kickoff${matchKey}" style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;"></div>
 
     <!-- Countdown TV server -->
