@@ -22,17 +22,6 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       </div>
     </div>
     
-    
-      <!-- Tengah (Skor & Status) -->
-      <div style="
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      width:100%;
-      max-width:420px;
-      margin-top:10px;
-      margin-bottom:5px;
-    ">
       
       <div id="league${matchKey}" style="font-weight:bold; font-size:12px; color:white;">Refresh Or Setting Your DNS</div>     
       </div>
