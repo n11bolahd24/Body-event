@@ -38,7 +38,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       </div>
     
 
-      <center>    
+          
     <!-- 🔹 Bagian Tengah: Nama & Logo Tim Seimbang di Tengah -->
     <div style="
       display:flex;
@@ -74,6 +74,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     <div id="tvCountdown${matchKey}" style="margin-top:3px; margin-bottom:3px; color: yellow; font-weight:bold; font-style:italic;"></div>
 
     <!-- Tombol TV server -->
+    <center>
     <span style="font-size: large;">
       ${serverFuncs.map((fn, i) => `
         <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();" 
