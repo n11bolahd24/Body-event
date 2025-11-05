@@ -65,6 +65,11 @@ if (matchStatusEl && !matchStatusEl.textContent.trim()) {
     matchStatusEl.innerHTML = "UP COMING";
     matchStatusEl.style.display = "block";
 }
+    // 🔸 Jika skor belum ada → tampilkan "VS"
+if (liveScoreEl && !liveScoreEl.textContent.trim()) {
+    liveScoreEl.innerHTML = "VS";
+    liveScoreEl.style.display = "block";
+}
 
     // 🔽 Nomor match 1-100 di Event kalo di atasnya di abroad
     const finishedContainer = document.getElementById(
