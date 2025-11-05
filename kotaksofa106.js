@@ -17,9 +17,6 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       style="display:inline-block; width:150px; font-weight:bold; position:relative; margin-top:-5px;"></div>
     </div>
 
-
-    </div>
-
     <div class="club1" style="position: relative; z-index: 1;">
       <div style="position: absolute; top: 0%; left: 50%; transform: translateX(-50%); z-index: 0; font-size: 29px;">
         <strong id="formattedTime${matchKey}" style="color: red;"></strong>
@@ -134,4 +131,3 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
 
   document.write(html);
 }
-
