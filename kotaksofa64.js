@@ -64,14 +64,12 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     <div id="tvCountdown${matchKey}" style="margin-top:3px; margin-bottom:3px; color: yellow; font-weight:bold; font-style:italic;"></div>
 
     <!-- Tombol TV server -->
-    <center>
-    <span style="font-size: large;">
-      ${serverFuncs.map((fn, i) => `
-        <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();" 
-           style="margin:0 3px; color:aqua;"><b>SERVER ${i+1}</b></a>
-      `).join("")}
-    </span>
-    </center>
+        <span style="font-size: large;">
+          ${serverFuncs.map((fn, i) => `
+            <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();"><b><span>SERVER ${i+1}</span></b></a>
+          `).join(" ")}
+        </span>
+      </center>
 </div>
   
 
