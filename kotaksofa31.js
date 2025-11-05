@@ -46,7 +46,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       width:100%;
       max-width:420px;
       margin-top:10px;
-      margin-bottom:5px;
+      margin-bottom:10px;
     ">
           
       <!-- Tim Home -->
