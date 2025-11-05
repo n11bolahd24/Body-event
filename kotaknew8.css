@@ -381,7 +381,7 @@ a:hover, a:visited, a:link, a:active
   position: relative;
   width: 100%;
   background: #363535;
-  border: 2px solid #ff0000; /* 🔴 Garis merah */
+  border: 2px solid #0055ff; /*  Garis  */
   border-radius: 7px;
   margin-top: 15px;
   box-shadow: 0 0 10px rgba(255, 0, 0, 0.4); /* Efek cahaya halus */
