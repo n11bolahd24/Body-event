@@ -16,7 +16,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     <div id="liveStatus${matchKey}" 
       style="display:inline-block; width:150px; font-weight:bold; position:relative; margin-top:-5px;"></div>
     </div>
-</div>
+
 
     </div>
 
