@@ -41,11 +41,18 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       </center>
     </div>
 
-    <img id="logoHome${matchKey}" id="teams${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; left:10%; border-radius:5px;">
-    <span id="teamshome${matchKey}" style="font-weight:bold; color:white; font-size:14px; white-space:nowrap;"></span>
-    <img id="logoAway${matchKey}" id="teams${matchKey}" style="position:absolute; height:55px; width:55px; top:20%; right:10%; border-radius:5px;">
-    <span id="teamsaway${matchKey}" style="font-weight:bold; color:white; font-size:14px; white-space:nowrap; text-align:right;"></span>
-  </div>
+    <!-- Tim Home (kiri) -->
+    <div style="position:absolute; top:35%; left:5%; display:flex; align-items:center; gap:8px;">
+      <img id="logoHome${matchKey}" style="height:50px; width:50px; border-radius:5px;">
+      <span id="teamshome${matchKey}" style="font-weight:bold; color:white; font-size:14px; white-space:nowrap;"></span>
+    </div>
+
+    <!-- Tim Away (kanan) -->
+    <div style="position:absolute; top:35%; right:5%; display:flex; align-items:center; gap:8px; flex-direction:row-reverse;">
+      <img id="logoAway${matchKey}" style="height:50px; width:50px; border-radius:5px;">
+      <span id="teamsaway${matchKey}" style="font-weight:bold; color:white; font-size:14px; white-space:nowrap; text-align:right;"></span>
+    </div>
+      </div>
 
   <script>
     loadSofaScore(${matchId}, "${matchKey}");
