@@ -33,7 +33,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       margin-bottom:5px;
     ">
   
-           
+      <div id="matchStatus${matchKey}" style="font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange;"></div>     
       </div>
 
     <!-- 🔹 Bagian Tengah: Nama & Logo Tim Seimbang di Tengah -->
