@@ -8,14 +8,19 @@ function loadSofaScore(matchId, matchKey) {
 // --- fungsi tambahan untuk generate box ---
 function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServerTime = null) {
   const html = `
-  <div class="${boxClass}" id="match${matchKey}" class="kotak matchbox" 
-       style="position:relative; display:flex; flex-direction:column; align-items:center; text-align:center;">
-    
-    <div class="countdown" id="countdown${matchKey}"></div>
-    <div class="live-container" id="liveContainer${matchKey}" style="text-align:center; height:20px;">
+  <div class="${boxClass}" id="match${matchKey}" 
+     style="position:relative; display:flex; flex-direction:column; align-items:center; text-align:center;">
+
+  <!-- Countdown / Live -->
+  <div class="countdown" id="countdown${matchKey}" 
+       style="position:absolute; top:8px; text-align:center;"></div>
+
+  <div class="live-container" id="liveContainer${matchKey}" 
+       style="position:absolute; top:8px; text-align:center;">
     <div id="liveStatus${matchKey}" 
-      style="display:inline-block; width:150px; font-weight:bold; position:relative; margin-top:-5px;"></div>
+         style="display:inline-block; font-weight:bold; color:red; font-size:16px;">
     </div>
+  </div>
 
     <div class="club1" style="position: relative; z-index: 1;">
       <div style="position: absolute; top: 0%; left: 50%; transform: translateX(-50%); z-index: 0; font-size: 29px;">
