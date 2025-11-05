@@ -21,7 +21,8 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
         <strong id="formattedTime${matchKey}" style="color: red;"></strong>
       </div>
     </div>
-
+    <div id="league${matchKey}" style="font-weight:bold; font-size:12px; color:white;">Refresh Or Setting Your DNS</div>
+    
       <!-- Tengah (Skor & Status) -->
       <div style="
       display:flex;
@@ -63,7 +64,6 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     </div>
 
     <!-- Info Lain -->
-    <div id="league${matchKey}" style="font-weight:bold; font-size:12px; color:white;">Refresh Or Setting Your DNS</div>
     <div id="kickoff${matchKey}" style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;"></div>
 
     <!-- Countdown TV server -->
