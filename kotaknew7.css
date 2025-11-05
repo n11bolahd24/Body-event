@@ -381,9 +381,11 @@ a:hover, a:visited, a:link, a:active
   position: relative;
   width: 100%;
   background: #363535;
+  border: 2px solid #ff0000; /* 🔴 Garis merah */
   border-radius: 7px;
   margin-top: 15px;
-  transition: 0.2s all;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.4); /* Efek cahaya halus */
+  transition: 0.25s all ease-in-out;
 }
 
 .kotak:hover {
