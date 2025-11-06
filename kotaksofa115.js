@@ -25,9 +25,9 @@ function loadSofaScore(matchId, matchKey) {
       });
 
       if (home && away) {
-        possessionEl.innerHTML = `⚽ Possession: <b style="color:#fff;">${home}% - ${away}%</b>`;
+        possessionEl.innerHTML = `⚽ Ball Possession: <b style="color:#fff;">${home}% - ${away}%</b>`;
       } else {
-        possessionEl.innerHTML = `⏳ Possession: <span style="color:gray;">waiting</span>`;
+        possessionEl.innerHTML = `⏳ Ball Possession: <span style="color:gray;">waiting</span>`;
       }
     })
     .catch(err => {
@@ -46,7 +46,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     <!-- 🔹 Ball Possession (atas kiri tapi tidak menabrak LIVE) -->
     <div id="possession${matchKey}" 
          style="position:absolute; top:3px; left:8px; font-size:12px; font-weight:bold; color:cyan; text-align:left;">
-      ⚽ Possession: <span style="color:#aaa;">⏳</span>
+      ⚽ Ball Possession: <span style="color:#aaa;">⏳</span>
     </div>
 
     <!-- Countdown / Live -->
