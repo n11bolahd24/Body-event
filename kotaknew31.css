@@ -448,35 +448,35 @@ a:hover, a:visited, a:link, a:active
   margin: 15px auto 0 auto;
   border: 1px solid #ff0000;
   border-radius: 7px;
-  overflow: hidden; /* penting biar overlay nggak keluar dari border */
+  overflow: hidden;
   transition: border-color 0.25s ease-in-out;
   background: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhn_491Bk_AZrJdHWOkCoL9CGLVYB8NTg2VbqgubCOEofQno0e-aUWNjm_Xj0eN1_fTgrGBUbjBDigaaTPv3HTRbvgVGy7wd8aa5-RJJMkMr1PfuJ2s1oU06NHPaqAVoH5v-vRo8VjPuCQHuSFsfSbwURSE7RPzRSvJ6yLkXVX0n1lLccmuV8yUH8ayz2ey/s320/11111.webp')
     center/cover no-repeat;
 }
 
-/* lapisan gelap — hanya background */
+/* overlay dasar — GELAP saat tidak hover */
 .kotak3::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(20, 20, 20, 0.75); /* warna dasar gelap */
-  transition: background 0.3s ease-in-out;
+  background: rgba(0, 0, 0, 0.9); /* gelap */
+  transition: background 0.4s ease-in-out;
   z-index: 0;
 }
 
-/* isi elemen di atas overlay */
+/* isi tetap di atas overlay */
 .kotak3 > * {
   position: relative;
   z-index: 1;
 }
 
-/* efek hover: background makin gelap */
+/* saat hover — TERANG */
 .kotak3:hover::before {
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(20, 20, 20, 0.75); /* lebih terang */
 }
 
 .kotak3:hover {
-  border-color: #b30000;
+  border-color: #ff4d4d;
 }
 
 .kotak4 {
