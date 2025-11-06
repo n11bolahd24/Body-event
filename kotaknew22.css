@@ -401,19 +401,18 @@ a:hover, a:visited, a:link, a:active
   overflow: hidden;
   transition: 0.25s all ease-in-out;
 
-  /* Gambar background tetap */
   background-image: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhWa0fVYPtBjwsKE1msW4czZvSNdLeN_HWAYlnoJC-U6sWTRf_cBCmjNCRxRfxlBF9N1wE9t6wyaLU7UaBDwVGv04GYJtspXjquAk4OJogaacK4cbYJs0FC9HQQRtTX2U1Q73lGE6po-X0RRmFVpttLCN_n9rZfQXzQrVORbBaHYx2dnGRHyRnAhLJGLegh/s320/Vector-black-abstract-background-free-vector-download-01-scaled.webp');
-  background-repeat: no-repeat; /* biar gak numpuk */
-  background-size: cover;       /* isi penuh */
-  background-position: center;  /* posisi tengah */
-  background-color: rgba(20, 20, 20, 0.8);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-color: rgba(20, 20, 20, 0.75);
   background-blend-mode: overlay;
 }
 
 .kotak1:hover {
-  background-color: rgba(60, 60, 60, 0.4);
-  background-blend-mode: lighten;
-  filter: brightness(1.2); /* terangin dikit, tapi gak bikin putih */
+  background-color: rgba(255, 255, 255, 0.15); /* lapisan terang lembut */
+  background-blend-mode: overlay; /* bukan lighten */
+  filter: none; /* hilangkan brightness */
   border-color: #ff4d4d;
 }
 
