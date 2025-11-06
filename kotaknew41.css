@@ -460,8 +460,8 @@ a:hover, a:visited, a:link, a:active
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.9); /* gelap */
-  transition: background 0.4s ease-in-out;
+  background: rgba(5, 5, 5, 0.9); /* gelap */
+  transition: background 0.25s ease-in-out;
   z-index: 0;
 }
 
@@ -499,8 +499,8 @@ a:hover, a:visited, a:link, a:active
   content: "";
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.9); /* gelap */
-  transition: background 0.4s ease-in-out;
+  background: rgba(5, 5, 5, 0.9); /* gelap */
+  transition: background 0.25s ease-in-out;
   z-index: 0;
 }
 
