@@ -486,23 +486,37 @@ a:hover, a:visited, a:link, a:active
   margin: 15px auto 0 auto;
   border: 1px solid #ff0000;
   border-radius: 7px;
-  transition: 0.25s all ease-in-out;
+  overflow: hidden;
+  transition: border-color 0.25s ease-in-out;
 
-  /* Background dasar dengan GIF baru */
-  background: rgba(01, 01, 01, 0.8)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPfX6IIsJn0NLJk7JPoE7j1gS1ktU45wV2f8e_sZqVlMIuzFhQHHcO1k7h1gOOI6vCuNvtcnI_pDlW1HKg2leq7LWYt0J6Ed_KZqmSvMeIOwvO2mIcKSUbpdBjKhAkGncqwuRORU9hUUO33oe3hV2wej8G-zmOoQpMB-MYKWDgtarFcOd8JFpELb4B6RY7/s1280/96239bf09550b1cc00a38ebfbc2776b1.gif')
+  /* background diganti ke GIF baru */
+  background: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPfX6IIsJn0NLJk7JPoE7j1gS1ktU45wV2f8e_sZqVlMIuzFhQHHcO1k7h1gOOI6vCuNvtcnI_pDlW1HKg2leq7LWYt0J6Ed_KZqmSvMeIOwvO2mIcKSUbpdBjKhAkGncqwuRORU9hUUO33oe3hV2wej8G-zmOoQpMB-MYKWDgtarFcOd8JFpELb4B6RY7/s1280/96239bf09550b1cc00a38ebfbc2776b1.gif')
     center/cover no-repeat;
-  background-blend-mode: overlay;
 }
 
-/* Saat hover — sedikit lebih terang */
+/* overlay dasar — GELAP saat tidak hover */
+.kotakepl::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9); /* gelap */
+  transition: background 0.4s ease-in-out;
+  z-index: 0;
+}
+
+/* isi tetap di atas overlay */
+.kotakepl > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* saat hover — TERANG */
+.kotak3:hover::before {
+  background: rgba(40, 40, 40, 0.7); /* lebih terang */
+}
+
 .kotakepl:hover {
-  background: rgba(10, 10, 10, 0.7)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPfX6IIsJn0NLJk7JPoE7j1gS1ktU45wV2f8e_sZqVlMIuzFhQHHcO1k7h1gOOI6vCuNvtcnI_pDlW1HKg2leq7LWYt0J6Ed_KZqmSvMeIOwvO2mIcKSUbpdBjKhAkGncqwuRORU9hUUO33oe3hV2wej8G-zmOoQpMB-MYKWDgtarFcOd8JFpELb4B6RY7/s1280/96239bf09550b1cc00a38ebfbc2776b1.gif')
-    center/cover no-repeat;
-  background-blend-mode: lighten;
   border-color: #ff4d4d;
-  filter: brightness(0.5);
 }
 
 
