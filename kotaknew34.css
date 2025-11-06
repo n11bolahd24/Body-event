@@ -473,7 +473,7 @@ a:hover, a:visited, a:link, a:active
 
 /* saat hover — TERANG */
 .kotak3:hover::before {
-  background: rgba(20, 20, 20, 0.75); /* lebih terang */
+  background: rgba(30, 30, 30, 0.75); /* lebih terang */
 }
 
 .kotak3:hover {
