@@ -421,25 +421,26 @@ a:hover, a:visited, a:link, a:active
 .kotak2 {
   position: relative;
   width: 97%;
-  border: 1px solid #ff0000; /*  Garis  */
+  margin: 15px auto 0 auto;
+  border: 1px solid #ff0000;
   border-radius: 7px;
-  margin-top: 15px;
-  margin: 15px auto 0 auto; /* margin atas 15px, kiri-kanan auto */
   transition: 0.25s all ease-in-out;
 
-  background: linear-gradient(270deg, #b30000, #0290b0, #0044cc, #ba0202);;
-  background-size: 600% 600%;
-  animation: gradienBergerak 3s ease infinite;
+  /* Background dasar dengan gambar WebP */
+  background: rgba(20, 20, 20, 0.8)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj6k7v7YLFzc5JBDGuh5u5gK9mZbnpdxzztESMHtaYQlG99aYRYFQuz8zQU3obT8PsHxqgWKMx8IuZyXd9dByVZNseGT4PWG0EH5bFttEwQAJvGyk5Z2dQqIdLb60TAJvF4IxiIhOc4gzBNEzwbJSN8XrxOPRN9pYBumgf5Udj5Usnd6aFAVtH-UnDiHGhj/s320/2222.webp')
+    center/cover no-repeat;
+  background-blend-mode: overlay;
 }
 
-@keyframes gradienBergerak {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
+/* Saat hover — terangin background */
 .kotak2:hover {
-  border-radius: 7px;
-  background: linear-gradient(to left top, #850000, #016a82);
+  background: rgba(60, 60, 60, 0.4)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj6k7v7YLFzc5JBDGuh5u5gK9mZbnpdxzztESMHtaYQlG99aYRYFQuz8zQU3obT8PsHxqgWKMx8IuZyXd9dByVZNseGT4PWG0EH5bFttEwQAJvGyk5Z2dQqIdLb60TAJvF4IxiIhOc4gzBNEzwbJSN8XrxOPRN9pYBumgf5Udj5Usnd6aFAVtH-UnDiHGhj/s320/2222.webp')
+    center/cover no-repeat;
+  background-blend-mode: lighten; /* bikin efek lebih terang */
+  border-color: #ff4d4d;
+  filter: brightness(1.3); /* tambahkan efek pencerahan */
 }
 
 .kotak3 {
