@@ -480,87 +480,29 @@ a:hover, a:visited, a:link, a:active
   border-color: #ff4d4d;
 }
 
-.kotak4 {
+.kotakepl {
   position: relative;
-  width: 100%;
-  border: 1px solid #ff0000; /*  Garis  */	
+  width: 97%;
+  margin: 15px auto 0 auto;
+  border: 1px solid #ff0000;
   border-radius: 7px;
-  margin-top: 15px;
+  transition: 0.25s all ease-in-out;
 
-  /* Warna gradasi */
-  background: linear-gradient(270deg, #b30000, #0290b0, #0044cc, #ba0202);
-  background-size: 600% 600%;
-  animation: gradienBergerak 4s ease infinite, cahayaNyala 2s infinite alternate;
-
-  /* Efek glow lembut */
-  box-shadow: 0 0 15px rgba(0, 100, 255, 0.4), 0 0 30px rgba(255, 0, 0, 0.4);
+  /* Background dasar dengan GIF baru */
+  background: rgba(20, 20, 20, 0.8)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPfX6IIsJn0NLJk7JPoE7j1gS1ktU45wV2f8e_sZqVlMIuzFhQHHcO1k7h1gOOI6vCuNvtcnI_pDlW1HKg2leq7LWYt0J6Ed_KZqmSvMeIOwvO2mIcKSUbpdBjKhAkGncqwuRORU9hUUO33oe3hV2wej8G-zmOoQpMB-MYKWDgtarFcOd8JFpELb4B6RY7/s1280/96239bf09550b1cc00a38ebfbc2776b1.gif')
+    center/cover no-repeat;
+  background-blend-mode: overlay;
 }
 
-/* Animasi pergerakan gradasi */
-@keyframes gradienBergerak {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* Animasi cahaya biru-merah halus */
-@keyframes cahayaNyala {
-  from { box-shadow: 0 0 10px rgba(0, 100, 255, 0.3), 0 0 25px rgba(255, 0, 0, 0.3); }
-  to { box-shadow: 0 0 25px rgba(255, 50, 0, 0.8), 0 0 50px rgba(0, 120, 255, 0.7); }
-}
-
-/* Hover tanpa zoom — hanya mempercepat efek */
-.kotak4:hover {
-  animation: gradienBergerak 2.5s linear infinite, cahayaNyala 1.5s infinite alternate;
-}
-
-.kotak5 {
-  position: relative;
-  width: 100%;
-  border: 1px solid #ff0000; /*  Garis  */
-  border-radius: 7px;
-  margin-top: 15px;
-
-  /* Merah-putih tegas dengan sudut 171° */
-  background: linear-gradient(171deg,
-              #ab0202 0%,
-              #ab0202 50%,
-              #a8a7a7 50%,
-              #a8a7a7 100%);
-  background-size: 200% 200%;
-  animation: benderaNaikTurun 4s ease-in-out infinite alternate,
-             cahayaLembut 2.5s infinite alternate;
-
-  /* Efek awal cahaya */
-  box-shadow: 0 0 15px rgba(255, 0, 0, 0.4),
-              0 0 25px rgba(0, 100, 255, 0.3);
-}
-
-/* Animasi background bolak-balik */
-@keyframes benderaNaikTurun {
-  0%   { background-position: 0% 0%; }
-  100% { background-position: 100% 100%; }
-}
-
-/* Animasi cahaya halus biru-merah */
-@keyframes cahayaLembut {
-  0% {
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.3),
-                0 0 25px rgba(0, 80, 255, 0.3);
-  }
-  100% {
-    box-shadow: 0 0 25px rgba(255, 80, 0, 0.7),
-                0 0 50px rgba(0, 120, 255, 0.6);
-  }
-}
-
-/* Hover — tidak percepat animasi, hanya gelapkan warna */
-.kotak5:hover {
-  background: linear-gradient(171deg,
-              #7a0101 0%,
-              #7a0101 50%,
-              #7c7b7b 50%,
-              #7c7b7b 100%);
+/* Saat hover — sedikit lebih terang */
+.kotakepl:hover {
+  background: rgba(40, 40, 40, 0.7)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPfX6IIsJn0NLJk7JPoE7j1gS1ktU45wV2f8e_sZqVlMIuzFhQHHcO1k7h1gOOI6vCuNvtcnI_pDlW1HKg2leq7LWYt0J6Ed_KZqmSvMeIOwvO2mIcKSUbpdBjKhAkGncqwuRORU9hUUO33oe3hV2wej8G-zmOoQpMB-MYKWDgtarFcOd8JFpELb4B6RY7/s1280/96239bf09550b1cc00a38ebfbc2776b1.gif')
+    center/cover no-repeat;
+  background-blend-mode: lighten;
+  border-color: #ff4d4d;
+  filter: brightness(1.1);
 }
 
 
