@@ -399,35 +399,20 @@ a:hover, a:visited, a:link, a:active
   border: 1px solid #ff0000;
   border-radius: 7px;
   transition: 0.25s all ease-in-out;
-  overflow: hidden; /* supaya background pseudo-element gak keluar */
 
-  /* gradasi dasar merah ke biru */
-  background: linear-gradient(90deg, #1a0000 0%, #00111a 100%);
+  /* Gunakan gambar WebP yang ringan */
+  background: rgba(20, 20, 20, 0.8)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhWa0fVYPtBjwsKE1msW4czZvSNdLeN_HWAYlnoJC-U6sWTRf_cBCmjNCRxRfxlBF9N1wE9t6wyaLU7UaBDwVGv04GYJtspXjquAk4OJogaacK4cbYJs0FC9HQQRtTX2U1Q73lGE6po-X0RRmFVpttLCN_n9rZfQXzQrVORbBaHYx2dnGRHyRnAhLJGLegh/s320/Vector-black-abstract-background-free-vector-download-01-scaled.webp')
+    center/cover no-repeat;
+  background-blend-mode: overlay; /* supaya gambar sedikit gelap & teks tetap jelas */
 }
 
-/* lapisan pola hexagon */
-.kotak1::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    radial-gradient(rgba(255, 0, 0, 0.15) 1px, transparent 1px),
-    radial-gradient(rgba(0, 140, 255, 0.15) 1px, transparent 1px);
-  background-position: 0 0, 20px 20px;
-  background-size: 40px 40px;
-  opacity: 0.25;
-  pointer-events: none;
-}
-
-/* efek hover biar lebih gelap */
-.kotak1:hover::before {
-  opacity: 0.4;
-}
 .kotak1:hover {
-  background: linear-gradient(90deg, #000000 0%, #001a33 100%);
+  background: rgba(0, 0, 0, 0.85)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhWa0fVYPtBjwsKE1msW4czZvSNdLeN_HWAYlnoJC-U6sWTRf_cBCmjNCRxRfxlBF9N1wE9t6wyaLU7UaBDwVGv04GYJtspXjquAk4OJogaacK4cbYJs0FC9HQQRtTX2U1Q73lGE6po-X0RRmFVpttLCN_n9rZfQXzQrVORbBaHYx2dnGRHyRnAhLJGLegh/s320/Vector-black-abstract-background-free-vector-download-01-scaled.webp')
+    center/cover no-repeat;
+  background-blend-mode: overlay;
+  border-color: #ff4d4d; /* sedikit lebih terang saat hover */
 }
 
 
