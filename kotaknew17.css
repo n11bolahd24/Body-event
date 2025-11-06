@@ -396,7 +396,7 @@ a:hover, a:visited, a:link, a:active
 .kotak2 {
   position: relative;
   width: 97%;
-  border: 2px solid #ff0000; /*  Garis  */
+  border: 1px solid #ff0000; /*  Garis  */
   border-radius: 7px;
   margin-top: 15px;
   margin: 15px auto 0 auto; /* margin atas 15px, kiri-kanan auto */
@@ -420,7 +420,7 @@ a:hover, a:visited, a:link, a:active
 .kotak3 {
   position: relative;
   width: 97%;
-  border: 2px solid #ff0000; /*  Garis  */	
+  border: 1px solid #ff0000; /*  Garis  */	
   border-radius: 7px;
   margin-top: 15px;
   margin: 15px auto 0 auto; /* margin atas 15px, kiri-kanan auto */
@@ -445,7 +445,7 @@ a:hover, a:visited, a:link, a:active
 .kotak4 {
   position: relative;
   width: 100%;
-  border: 2px solid #ff0000; /*  Garis  */	
+  border: 1px solid #ff0000; /*  Garis  */	
   border-radius: 7px;
   margin-top: 15px;
 
@@ -479,7 +479,7 @@ a:hover, a:visited, a:link, a:active
 .kotak5 {
   position: relative;
   width: 100%;
-  border: 2px solid #ff0000; /*  Garis  */
+  border: 1px solid #ff0000; /*  Garis  */
   border-radius: 7px;
   margin-top: 15px;
 
