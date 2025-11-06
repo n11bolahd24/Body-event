@@ -381,7 +381,7 @@ a:hover, a:visited, a:link, a:active
   position: relative;
   width: 97%;
   background: #1c1b1b;	
-  border: 2px solid #ff0000; /* Garis */
+  border: 1px solid #ff0000; /* Garis */
   border-radius: 7px;
   margin: 15px auto 0 auto; /* margin atas 15px, kiri-kanan auto */
   transition: 0.25s all ease-in-out;
