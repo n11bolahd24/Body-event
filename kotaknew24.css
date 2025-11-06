@@ -398,24 +398,22 @@ a:hover, a:visited, a:link, a:active
   margin: 15px auto 0 auto;
   border: 1px solid #ff0000;
   border-radius: 7px;
-  overflow: hidden;
   transition: 0.25s all ease-in-out;
+  overflow: hidden;
 
-  background-image: 
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhWa0fVYPtBjwsKE1msW4czZvSNdLeN_HWAYlnoJC-U6sWTRf_cBCmjNCRxRfxlBF9N1wE9t6wyaLU7UaBDwVGv04GYJtspXjquAk4OJogaacK4cbYJs0FC9HQQRtTX2U1Q73lGE6po-X0RRmFVpttLCN_n9rZfQXzQrVORbBaHYx2dnGRHyRnAhLJGLegh/s320/Vector-black-abstract-background-free-vector-download-01-scaled.webp');
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  background-color: rgba(20, 20, 20, 0.8);
+  /* Background utama */
+  background: rgba(20, 20, 20, 0.8)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh7MSssV5FOpj36izZZLxYZ2B-vGJODXaVTTuHGZZTJEfLUl-DKRosBHqfmSur040aCSoQQgMMyJnTOc0mXmiWCQWHnsTmFxK5YXs3XQZ6zfxK_BRkHr3YEfZjCSBZa6it9KNWSKLnxffpsRKUUiZK_Jnz9KMWP9vNMIAB8H9997XfIByi_Y_hVfy2lfCr7/s320/Vector-black-abstract-background-free-vector-download-01-scaled.webp')
+    center/cover no-repeat;
   background-blend-mode: overlay;
 }
 
-/* Efek hover dengan spotlight di tengah */
+/* Efek hover: terang di tengah aja */
 .kotak1:hover {
   border-color: #ff4d4d;
   background-image:
-    radial-gradient(circle at center, rgba(255, 255, 255, 0.3) 0%, rgba(0, 0, 0, 0.4) 80%),
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhWa0fVYPtBjwsKE1msW4czZvSNdLeN_HWAYlnoJC-U6sWTRf_cBCmjNCRxRfxlBF9N1wE9t6wyaLU7UaBDwVGv04GYJtspXjquAk4OJogaacK4cbYJs0FC9HQQRtTX2U1Q73lGE6po-X0RRmFVpttLCN_n9rZfQXzQrVORbBaHYx2dnGRHyRnAhLJGLegh/s320/Vector-black-abstract-background-free-vector-download-01-scaled.webp');
+    radial-gradient(circle at center, rgba(255,255,255,0.3) 0%, rgba(0,0,0,0.6) 80%),
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh7MSssV5FOpj36izZZLxYZ2B-vGJODXaVTTuHGZZTJEfLUl-DKRosBHqfmSur040aCSoQQgMMyJnTOc0mXmiWCQWHnsTmFxK5YXs3XQZ6zfxK_BRkHr3YEfZjCSBZa6it9KNWSKLnxffpsRKUUiZK_Jnz9KMWP9vNMIAB8H9997XfIByi_Y_hVfy2lfCr7/s320/Vector-black-abstract-background-free-vector-download-01-scaled.webp');
   background-blend-mode: lighten;
   filter: brightness(1.05);
 }
