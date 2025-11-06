@@ -11,14 +11,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
   <div class="${boxClass}" id="match${matchKey}" 
      style="position:relative; display:flex; flex-direction:column; align-items:center; text-align:center;">
 
-  <!-- Countdown / Live -->
-<div class="countdown" id="countdown${matchKey}" 
-     style="position:absolute; top:8px; text-align:center; 
-            border:2px solid red; 
-            background:rgba(255, 0, 0, 0.2); 
-            border-radius:6px; 
-            padding:2px 6px;">
-</div>
+  <!-- Countdown / Live --> <div class="countdown" id="countdown${matchKey}" style="position:absolute; top:8px; text-align:center;"></div>
 
 
   <div class="live-container" id="liveContainer${matchKey}" 
