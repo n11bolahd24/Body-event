@@ -489,7 +489,7 @@ a:hover, a:visited, a:link, a:active
   transition: 0.25s all ease-in-out;
 
   /* Background dasar dengan GIF baru */
-  background: rgba(05, 05, 05, 0.8)
+  background: rgba(01, 01, 01, 0.8)
     url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPfX6IIsJn0NLJk7JPoE7j1gS1ktU45wV2f8e_sZqVlMIuzFhQHHcO1k7h1gOOI6vCuNvtcnI_pDlW1HKg2leq7LWYt0J6Ed_KZqmSvMeIOwvO2mIcKSUbpdBjKhAkGncqwuRORU9hUUO33oe3hV2wej8G-zmOoQpMB-MYKWDgtarFcOd8JFpELb4B6RY7/s1280/96239bf09550b1cc00a38ebfbc2776b1.gif')
     center/cover no-repeat;
   background-blend-mode: overlay;
@@ -497,12 +497,12 @@ a:hover, a:visited, a:link, a:active
 
 /* Saat hover — sedikit lebih terang */
 .kotakepl:hover {
-  background: rgba(20, 20, 20, 0.7)
+  background: rgba(10, 10, 10, 0.7)
     url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPfX6IIsJn0NLJk7JPoE7j1gS1ktU45wV2f8e_sZqVlMIuzFhQHHcO1k7h1gOOI6vCuNvtcnI_pDlW1HKg2leq7LWYt0J6Ed_KZqmSvMeIOwvO2mIcKSUbpdBjKhAkGncqwuRORU9hUUO33oe3hV2wej8G-zmOoQpMB-MYKWDgtarFcOd8JFpELb4B6RY7/s1280/96239bf09550b1cc00a38ebfbc2776b1.gif')
     center/cover no-repeat;
   background-blend-mode: lighten;
   border-color: #ff4d4d;
-  filter: brightness(1.1);
+  filter: brightness(0.5);
 }
 
 
