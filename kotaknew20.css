@@ -400,19 +400,21 @@ a:hover, a:visited, a:link, a:active
   border-radius: 7px;
   transition: 0.25s all ease-in-out;
 
-  /* Gunakan gambar WebP yang ringan */
+  /* Background dasar dengan gambar WebP */
   background: rgba(20, 20, 20, 0.8)
     url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhWa0fVYPtBjwsKE1msW4czZvSNdLeN_HWAYlnoJC-U6sWTRf_cBCmjNCRxRfxlBF9N1wE9t6wyaLU7UaBDwVGv04GYJtspXjquAk4OJogaacK4cbYJs0FC9HQQRtTX2U1Q73lGE6po-X0RRmFVpttLCN_n9rZfQXzQrVORbBaHYx2dnGRHyRnAhLJGLegh/s320/Vector-black-abstract-background-free-vector-download-01-scaled.webp')
     center/cover no-repeat;
-  background-blend-mode: overlay; /* supaya gambar sedikit gelap & teks tetap jelas */
+  background-blend-mode: overlay;
 }
 
+/* Saat hover — terangin background */
 .kotak1:hover {
-  background: rgba(0, 0, 0, 0.85)
+  background: rgba(60, 60, 60, 0.4)
     url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhWa0fVYPtBjwsKE1msW4czZvSNdLeN_HWAYlnoJC-U6sWTRf_cBCmjNCRxRfxlBF9N1wE9t6wyaLU7UaBDwVGv04GYJtspXjquAk4OJogaacK4cbYJs0FC9HQQRtTX2U1Q73lGE6po-X0RRmFVpttLCN_n9rZfQXzQrVORbBaHYx2dnGRHyRnAhLJGLegh/s320/Vector-black-abstract-background-free-vector-download-01-scaled.webp')
     center/cover no-repeat;
-  background-blend-mode: overlay;
-  border-color: #ff4d4d; /* sedikit lebih terang saat hover */
+  background-blend-mode: lighten; /* bikin efek lebih terang */
+  border-color: #ff4d4d;
+  filter: brightness(1.3); /* tambahkan efek pencerahan */
 }
 
 
