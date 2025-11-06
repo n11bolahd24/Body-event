@@ -448,23 +448,35 @@ a:hover, a:visited, a:link, a:active
   margin: 15px auto 0 auto;
   border: 1px solid #ff0000;
   border-radius: 7px;
-  transition: 0.25s all ease-in-out;
-
-  /* Background dasar dengan gambar WebP */
-  background: rgba(20, 20, 20, 0.8)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhn_491Bk_AZrJdHWOkCoL9CGLVYB8NTg2VbqgubCOEofQno0e-aUWNjm_Xj0eN1_fTgrGBUbjBDigaaTPv3HTRbvgVGy7wd8aa5-RJJMkMr1PfuJ2s1oU06NHPaqAVoH5v-vRo8VjPuCQHuSFsfSbwURSE7RPzRSvJ6yLkXVX0n1lLccmuV8yUH8ayz2ey/s320/11111.webp')
+  overflow: hidden; /* penting biar overlay nggak keluar dari border */
+  transition: border-color 0.25s ease-in-out;
+  background: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhn_491Bk_AZrJdHWOkCoL9CGLVYB8NTg2VbqgubCOEofQno0e-aUWNjm_Xj0eN1_fTgrGBUbjBDigaaTPv3HTRbvgVGy7wd8aa5-RJJMkMr1PfuJ2s1oU06NHPaqAVoH5v-vRo8VjPuCQHuSFsfSbwURSE7RPzRSvJ6yLkXVX0n1lLccmuV8yUH8ayz2ey/s320/11111.webp')
     center/cover no-repeat;
-  background-blend-mode: overlay;
 }
 
-/* Saat hover — efek gelap */
+/* lapisan gelap — hanya background */
+.kotak3::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 20, 20, 0.75); /* warna dasar gelap */
+  transition: background 0.3s ease-in-out;
+  z-index: 0;
+}
+
+/* isi elemen di atas overlay */
+.kotak3 > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* efek hover: background makin gelap */
+.kotak3:hover::before {
+  background: rgba(0, 0, 0, 0.9);
+}
+
 .kotak3:hover {
-  background: rgba(10, 10, 10, 0.85)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhn_491Bk_AZrJdHWOkCoL9CGLVYB8NTg2VbqgubCOEofQno0e-aUWNjm_Xj0eN1_fTgrGBUbjBDigaaTPv3HTRbvgVGy7wd8aa5-RJJMkMr1PfuJ2s1oU06NHPaqAVoH5v-vRo8VjPuCQHuSFsfSbwURSE7RPzRSvJ6yLkXVX0n1lLccmuV8yUH8ayz2ey/s320/11111.webp')
-    center/cover no-repeat;
-  background-blend-mode: multiply; /* efek gelap */
-  border-color: #b30000; /* warna border sedikit lebih tua */
-  filter: brightness(0.7); /* efek gelap */
+  border-color: #b30000;
 }
 
 .kotak4 {
