@@ -399,23 +399,22 @@ a:hover, a:visited, a:link, a:active
   border: 1px solid #ff0000;
   border-radius: 7px;
   transition: 0.25s all ease-in-out;
-  overflow: hidden;
 
-  /* Background utama */
+  /* Background dasar dengan gambar WebP */
   background: rgba(20, 20, 20, 0.8)
     url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh7MSssV5FOpj36izZZLxYZ2B-vGJODXaVTTuHGZZTJEfLUl-DKRosBHqfmSur040aCSoQQgMMyJnTOc0mXmiWCQWHnsTmFxK5YXs3XQZ6zfxK_BRkHr3YEfZjCSBZa6it9KNWSKLnxffpsRKUUiZK_Jnz9KMWP9vNMIAB8H9997XfIByi_Y_hVfy2lfCr7/s320/Vector-black-abstract-background-free-vector-download-01-scaled.webp')
     center/cover no-repeat;
   background-blend-mode: overlay;
 }
 
-/* Efek hover: terang di tengah aja */
+/* Saat hover — terangin background */
 .kotak1:hover {
+  background: rgba(60, 60, 60, 0.4)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh7MSssV5FOpj36izZZLxYZ2B-vGJODXaVTTuHGZZTJEfLUl-DKRosBHqfmSur040aCSoQQgMMyJnTOc0mXmiWCQWHnsTmFxK5YXs3XQZ6zfxK_BRkHr3YEfZjCSBZa6it9KNWSKLnxffpsRKUUiZK_Jnz9KMWP9vNMIAB8H9997XfIByi_Y_hVfy2lfCr7/s320/Vector-black-abstract-background-free-vector-download-01-scaled.webp')
+    center/cover no-repeat;
+  background-blend-mode: lighten; /* bikin efek lebih terang */
   border-color: #ff4d4d;
-  background-image:
-    radial-gradient(circle at center, rgba(255,255,255,0.3) 0%, rgba(0,0,0,0.6) 80%),
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh7MSssV5FOpj36izZZLxYZ2B-vGJODXaVTTuHGZZTJEfLUl-DKRosBHqfmSur040aCSoQQgMMyJnTOc0mXmiWCQWHnsTmFxK5YXs3XQZ6zfxK_BRkHr3YEfZjCSBZa6it9KNWSKLnxffpsRKUUiZK_Jnz9KMWP9vNMIAB8H9997XfIByi_Y_hVfy2lfCr7/s320/Vector-black-abstract-background-free-vector-download-01-scaled.webp');
-  background-blend-mode: lighten;
-  filter: brightness(1.05);
+  filter: brightness(1.3); /* tambahkan efek pencerahan */
 }
 
 
