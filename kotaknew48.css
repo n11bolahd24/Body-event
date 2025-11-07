@@ -551,7 +551,7 @@ a:hover, a:visited, a:link, a:active
 
 /* Saat hover — terangin background */
 .kotakseriea:hover {
-  background: rgba(60, 60, 60, 0.4)
+  background: rgba(30, 30, 30, 0.4)
     url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhcWiWLMtQRSPSctsT5HJcPopka6o0-eEuWMS2a62vBrPc65x4Sd9XTW4lRxyIjKi70dZoYL3lwT50KtwJoLqp0OgQcKKLESwN2mm5YcmQ76qVQmtgtJXWTNrDALu_ZrLU9OSa1cVrTuLIsPDwp-VNY8Y678lwk5HD7w-Wnh-DzircbIiRdPLHd-5-0VTVW/s320/Cover_SERIE%20A_alta.webp')
     center/cover no-repeat;
   background-blend-mode: lighten; /* bikin efek lebih terang */
