@@ -14,7 +14,7 @@ function loadSofaScore(matchId, boxId) {
             if (leagueEl) {
                 leagueEl.innerHTML = `
                 <span style="display:inline-flex;align-items:center;">
-                  <img src="https://sofascoreproxy.novendibagus5.workers.dev/api/v1/unique-tournament/" + event.tournament.uniqueTournament.id + "/image/dark"
+                  <img src="https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image/dark"
                        alt="${event.tournament.name}"
                        style="height:18px;width:18px;margin-right:4px;">
                   <span>${event.tournament.name}</span>
@@ -40,10 +40,10 @@ function loadSofaScore(matchId, boxId) {
 
             // Logo nama tim
             document.getElementById("logoHome" + boxId).src =
-                "https://sofascoreproxy.novendibagus5.workers.dev/api/v1/team/" + home.id + "/image";
+                "https://api.sofascore.app/api/v1/team/" + home.id + "/image";
             document.getElementById("teamshome" + boxId).innerText = home.name;
             document.getElementById("logoAway" + boxId).src =
-                "https://sofascoreproxy.novendibagus5.workers.dev/api/v1/team/" + away.id + "/image";
+                "https://api.sofascore.app/api/v1/team/" + away.id + "/image";
             document.getElementById("teamsaway" + boxId).innerText = away.name;
 
             // Mulai countdown & monitor status
