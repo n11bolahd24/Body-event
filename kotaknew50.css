@@ -537,26 +537,39 @@ a:hover, a:visited, a:link, a:active
 .kotakseriea {
   position: relative;
   width: 97%;
-  margin: 15px auto 0 auto;
+  margin: 15px auto 0;
   border: 1px solid #ff0000;
   border-radius: 7px;
-  transition: 0.25s all ease-in-out;
-
-  /* Background dasar dengan gambar WebP */
-  background: rgba(5, 5, 5, 0.8)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhcWiWLMtQRSPSctsT5HJcPopka6o0-eEuWMS2a62vBrPc65x4Sd9XTW4lRxyIjKi70dZoYL3lwT50KtwJoLqp0OgQcKKLESwN2mm5YcmQ76qVQmtgtJXWTNrDALu_ZrLU9OSa1cVrTuLIsPDwp-VNY8Y678lwk5HD7w-Wnh-DzircbIiRdPLHd-5-0VTVW/s320/Cover_SERIE%20A_alta.webp')
+  overflow: hidden;
+  background: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhcWiWLMtQRSPSctsT5HJcPopka6o0-eEuWMS2a62vBrPc65x4Sd9XTW4lRxyIjKi70dZoYL3lwT50KtwJoLqp0OgQcKKLESwN2mm5YcmQ76qVQmtgtJXWTNrDALu_ZrLU9OSa1cVrTuLIsPDwp-VNY8Y678lwk5HD7w-Wnh-DzircbIiRdPLHd-5-0VTVW/s320/Cover_SERIE%20A_alta.webp')
     center/cover no-repeat;
-  background-blend-mode: overlay;
 }
 
-/* Saat hover — terangin background */
+/* Lapisan gelap di atas background */
+.kotakseriea::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 5, 5, 0.8);
+  transition: background 0.6s ease, filter 0.6s ease;
+  z-index: 0;
+  border-radius: inherit;
+}
+
+/* Efek hover lebih terang dan smooth */
+.kotakseriea:hover::before {
+  background: rgba(50, 50, 50, 0.3);
+  filter: brightness(1.1);
+}
+
+/* Konten tetap normal di atas overlay */
+.kotakseriea > * {
+  position: relative;
+  z-index: 1;
+  transition: color 0.3s ease;
+}
 .kotakseriea:hover {
-  background: rgba(50, 50, 50, 0.4)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhcWiWLMtQRSPSctsT5HJcPopka6o0-eEuWMS2a62vBrPc65x4Sd9XTW4lRxyIjKi70dZoYL3lwT50KtwJoLqp0OgQcKKLESwN2mm5YcmQ76qVQmtgtJXWTNrDALu_ZrLU9OSa1cVrTuLIsPDwp-VNY8Y678lwk5HD7w-Wnh-DzircbIiRdPLHd-5-0VTVW/s320/Cover_SERIE%20A_alta.webp')
-    center/cover no-repeat;
-  background-blend-mode: lighten; /* bikin efek lebih terang */
   border-color: #ff4d4d;
-  filter: brightness(1.1); /* tambahkan efek pencerahan */
 }
 
 .btn {
