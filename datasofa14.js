@@ -36,6 +36,8 @@ function loadSofaScore(matchId, boxId) {
             });
             document.getElementById("kickoff" + boxId).innerHTML = `${tanggal} | K.O ${jam}`;
 
+
+
             // Logo nama tim
             document.getElementById("logoHome" + boxId).src =
                 "https://api.sofascore.app/api/v1/team/" + home.id + "/image";
@@ -53,24 +55,23 @@ function loadSofaScore(matchId, boxId) {
 // --- Fungsi Update Live Score & Match Status ---
 function monitorMatchStatus(matchId, boxId) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
-    const statsUrl = `https://api.sofascore.com/api/v1/event/${matchId}/statistics`;
-
     const matchBox = document.getElementById("match" + boxId);
     const liveContainer = document.getElementById("liveContainer" + boxId);
     const countdownEl = document.getElementById("countdown" + boxId);
     const liveScoreEl = document.getElementById("liveScore" + boxId);
     const matchStatusEl = document.getElementById("matchStatus" + boxId);
+    // 🔸 Jika elemen matchStatus belum ada teks, tampilkan "UP COMING"
+if (matchStatusEl && !matchStatusEl.textContent.trim()) {
+    matchStatusEl.innerHTML = "UP COMING";
+    matchStatusEl.style.display = "block";
+}
+    // 🔸 Jika skor belum ada → tampilkan "VS"
+if (liveScoreEl && !liveScoreEl.textContent.trim()) {
+    liveScoreEl.innerHTML = "VS";
+    liveScoreEl.style.display = "block";
+}
 
-    // 🔸 Jika belum ada teks status, tampilkan default
-    if (matchStatusEl && !matchStatusEl.textContent.trim()) {
-        matchStatusEl.innerHTML = "UP COMING";
-        matchStatusEl.style.display = "block";
-    }
-    if (liveScoreEl && !liveScoreEl.textContent.trim()) {
-        liveScoreEl.innerHTML = "VS";
-        liveScoreEl.style.display = "block";
-    }
-
+    // 🔽 Nomor match 1-100 di Event kalo di atasnya di abroad
     const finishedContainer = document.getElementById(
         boxId < 100 ? "finishedMatches1" : "finishedMatches2"
     );
@@ -97,48 +98,48 @@ function monitorMatchStatus(matchId, boxId) {
 
             // --- Skor realtime ---
             let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
+
+            // Tambahkan penalti kalau ada
             if (event.homeScore.penalties !== undefined && event.awayScore.penalties !== undefined) {
                 scoreText += ` <span style="font-size:12px;">(P: ${event.homeScore.penalties} - ${event.awayScore.penalties})</span>`;
             }
+
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
 
-            // --- Status waktu ---
-            let statusText = event.status.description || "LIVE";
+            // --- Status menit & penalti ---
+            let statusText = "";
+            if (event.status.type === "penalties") {
+                statusText = "PENALTIES";
+            } else if (event.time && event.time.currentPeriodStartTimestamp) {
+                const startTs = event.time.currentPeriodStartTimestamp * 1000;
+                const elapsed = Math.floor((Date.now() - startTs) / 60000);
+
+                switch (event.status.description) {
+                    case "1st half":
+                        statusText = elapsed >= 45 ? "45+'" : `${elapsed}'`;
+                        break;
+                    case "2nd half":
+                        let m2 = 45 + elapsed;
+                        statusText = m2 >= 90 ? "90+'" : `${m2}'`;
+                        break;
+                    case "1st extra":
+                        let m3 = 90 + elapsed;
+                        statusText = m3 >= 105 ? "105+'" : `${m3}'`;
+                        break;
+                    case "2nd extra":
+                        let m4 = 105 + elapsed;
+                        statusText = m4 >= 120 ? "120+'" : `${m4}'`;
+                        break;
+                    default:
+                        statusText = event.status.description || "LIVE";
+                }
+            } else {
+                statusText = event.status.description || "LIVE";
+            }
+
             matchStatusEl.innerHTML = statusText;
             matchStatusEl.style.display = "block";
-
-            // --- 🔹 Ambil Statistik Ball Possession ---
-            fetch(statsUrl)
-                .then(res => res.json())
-                .then(statsData => {
-                    if (statsData.statistics && statsData.statistics.length > 0) {
-                        const statsGroups = statsData.statistics;
-                        let possession = null;
-
-                        statsGroups.forEach(group => {
-                            group.groups.forEach(sub => {
-                                sub.statisticsItems.forEach(item => {
-                                    if (item.name === "Ball possession") {
-                                        possession = item;
-                                    }
-                                });
-                            });
-                        });
-
-                        if (possession) {
-                            const statBox = document.getElementById("possession" + boxId);
-                            if (statBox) {
-                                statBox.innerHTML = `
-                                    <div style="font-size:13px;margin-top:4px;color:#fff;">
-                                        ⚽ Ball Possession: 
-                                        <b>${possession.homeValue}%</b> - 
-                                        <b>${possession.awayValue}%</b>
-                                    </div>`;
-                            }
-                        }
-                    }
-                });
         }
 
         if (event.status.type === "finished") {
@@ -158,40 +159,9 @@ function monitorMatchStatus(matchId, boxId) {
 
             liveScoreEl.innerHTML = scoreText;
             liveScoreEl.style.display = "block";
+
             matchStatusEl.innerHTML = "Full Time";
             matchStatusEl.style.display = "block";
-
-            // 🔹 Ambil statistik akhir Ball Possession
-            fetch(statsUrl)
-                .then(res => res.json())
-                .then(statsData => {
-                    if (statsData.statistics && statsData.statistics.length > 0) {
-                        const statsGroups = statsData.statistics;
-                        let possession = null;
-
-                        statsGroups.forEach(group => {
-                            group.groups.forEach(sub => {
-                                sub.statisticsItems.forEach(item => {
-                                    if (item.name === "Ball possession") {
-                                        possession = item;
-                                    }
-                                });
-                            });
-                        });
-
-                        if (possession) {
-                            const statBox = document.getElementById("possession" + boxId);
-                            if (statBox) {
-                                statBox.innerHTML = `
-                                    <div style="font-size:13px;margin-top:4px;color:#fff;">
-                                        ⚽ Ball Possession: 
-                                        <b>${possession.homeValue}%</b> - 
-                                        <b>${possession.awayValue}%</b>
-                                    </div>`;
-                            }
-                        }
-                    }
-                });
 
             if (finishedContainer && matchBox.parentNode !== finishedContainer) {
                 finishedContainer.appendChild(matchBox);
