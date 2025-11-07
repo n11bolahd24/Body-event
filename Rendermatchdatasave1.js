@@ -21,7 +21,7 @@ async function saveMatchToGitHub(matchData) {
 
 // --- Ambil data Sofascore ---
 function loadSofaScore(matchId, matchKey) {
-  const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
+  const eventUrl = `const eventUrl = `https://api.codetabs.com/v1/proxy?quest=https://api.sofascore.com/api/v1/event/${matchId}`;
   console.log("Load SofaScore untuk matchId=" + matchId + " key=" + matchKey);
 
   fetch(eventUrl)
