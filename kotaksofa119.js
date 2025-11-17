@@ -77,7 +77,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
     <div id="kickoff${matchKey}" style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;"></div>
 
     <!-- Countdown TV server -->
-    <div id="tvCountdown${matchKey}" style="font-size:10px; margin-top:3px; margin-bottom:3px; color: yellow; font-weight:bold; font-style:italic;"></div>
+    <div id="tvCountdown${matchKey}" style="font-size:10px; margin-top:3px; margin-bottom:3px; color: yellow; font-style:italic;"></div>
 
    
     <!-- Tombol TV server -->
