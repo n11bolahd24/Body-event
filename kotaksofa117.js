@@ -110,14 +110,14 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
           const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
           const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
           const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-          tvCountdownEl.innerHTML = "⏳ Waiting for server : "+ days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+          tvCountdownEl.innerHTML = "⏳ Server akan aktif dalam : "+ days + "d " + hours + "h " + minutes + "m " + seconds + "s";
           // Nonaktifkan klik & transparan
           tvServers.forEach(s => {
             s.style.pointerEvents = "none";
             s.style.opacity = "0.5";
           });
         } else {
-          tvCountdownEl.innerHTML = "✅ Server Is Ready!";
+          tvCountdownEl.innerHTML = "✅ Server Siap! klik & tunggu 5-20 detik";
           tvServers.forEach(s => {
             s.style.pointerEvents = "auto";
             s.style.opacity = "1";
