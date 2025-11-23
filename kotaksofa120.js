@@ -117,7 +117,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
             s.style.opacity = "0.5";
           });
         } else {
-          tvCountdownEl.innerHTML = "✅ Server Siap! klik & tunggu 5-20 detik";
+          tvCountdownEl.innerHTML = "✅ Server Siap! klik & tunggu 5-30+ detik";
           tvServers.forEach(s => {
             s.style.pointerEvents = "auto";
             s.style.opacity = "1";
