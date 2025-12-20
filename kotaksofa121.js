@@ -31,7 +31,7 @@ function renderMatch(matchId, matchKey, serverFuncs, boxClass = "kotak", tvServe
       <center>
       <div id="league${matchKey}" 
      style="position:relative; top:15px; font-weight:bold; font-size:12px; color:white; text-align:center;">
-  Refresh Or Setting Your DNS
+  Perhatian : ubah dulu DNS menjadi CloudFlare !
 </div>
 
       </div>
