@@ -22,7 +22,7 @@ function renderMatch(
   <div class="countdown" id="countdown${matchKey}" style="position:absolute; top:8px; text-align:center;"></div>
 
   <div class="live-container" id="liveContainer${matchKey}" 
-       style="position:absolute; right:4px; top:8px; text-align:center;">
+       style="position:absolute; left:0px; top:8px; text-align:center;">
     <div id="liveStatus${matchKey}" 
          style="display:inline-block; font-weight:bold; color:red; font-size:16px;">
     </div>
