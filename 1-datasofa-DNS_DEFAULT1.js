@@ -149,31 +149,44 @@ function monitorMatchStatus(matchId, boxId) {
 
             /* ================= FINISHED ================= */
             if (status === "finished") {
-                matchFinished = true; // 🔒 KUNCI
 
-                clearInterval(interval);
-                if (window["countdown_" + boxId])
-                    clearInterval(window["countdown_" + boxId]);
+    // 🔽 TENTUKAN CONTAINER (sesuai logic lama kamu)
+    const matchBox = document.getElementById("match" + boxId);
+    const finishedContainer = document.getElementById(
+        boxId < 100 ? "finishedMatches1" : "finishedMatches2"
+    );
 
-                liveContainer.classList.remove("blink");
-                liveContainer.style.animation = "none";
-                liveContainer.classList.remove("hidden");
+    // 🔽 PINDAHKAN MATCH (SEKALI SAJA)
+    if (finishedContainer && matchBox && matchBox.parentNode !== finishedContainer) {
+        finishedContainer.appendChild(matchBox);
+    }
 
-                liveContainer.innerHTML =
-                    "<strong style='color:white;-webkit-text-stroke:0.2px black;'>⛔ MATCH ENDED ⛔</strong>";
+    // 🔒 LOCK STATE SETELAH PINDAH
+    matchFinished = true;
 
-                let finalScore = `${event.homeScore.current} - ${event.awayScore.current}`;
-                if (
-                    event.homeScore.penalties !== undefined &&
-                    event.awayScore.penalties !== undefined
-                ) {
-                    finalScore +=
-                        ` <span style="font-size:12px;">(P: ${event.homeScore.penalties} - ${event.awayScore.penalties})</span>`;
-                }
+    clearInterval(interval);
+    if (window["countdown_" + boxId])
+        clearInterval(window["countdown_" + boxId]);
 
-                liveScoreEl.innerHTML = finalScore;
-                matchStatusEl.innerHTML = "Full Time";
-            }
+    liveContainer.classList.remove("blink");
+    liveContainer.style.animation = "none";
+    liveContainer.classList.remove("hidden");
+
+    liveContainer.innerHTML =
+        "<strong style='color:white;-webkit-text-stroke:0.2px black;'>⛔ MATCH ENDED ⛔</strong>";
+
+    let finalScore = `${event.homeScore.current} - ${event.awayScore.current}`;
+    if (
+        event.homeScore.penalties !== undefined &&
+        event.awayScore.penalties !== undefined
+    ) {
+        finalScore +=
+            ` <span style="font-size:12px;">(P: ${event.homeScore.penalties} - ${event.awayScore.penalties})</span>`;
+    }
+
+    liveScoreEl.innerHTML = finalScore;
+    matchStatusEl.innerHTML = "Full Time";
+}
         } catch (e) {
             console.warn("monitor error", e);
         }
