@@ -97,7 +97,7 @@ function renderMatch(
   </div>
 
   <!-- Tombol TV -->
-  <div style="font-size: large; margin-top:6px; padding-bottom:8px;">
+  <div style="font-size: large; margin-left:-10px; margin-top:6px; padding-bottom:8px;">
     ${serverFuncs.map((fn, i) => `
       <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();">
         <b><span>SERVER ${i+1}</span></b>
