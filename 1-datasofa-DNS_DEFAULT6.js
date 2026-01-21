@@ -106,7 +106,7 @@ function monitorMatchStatus(matchId, boxId) {
                 liveContainer.classList.add("blink");
 
                 liveContainer.innerHTML =
-                    "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW</strong>";
+                    "<strong style='left:-10px; color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW</strong>";
 
                 // skor
                 let scoreText = `${event.homeScore.current} - ${event.awayScore.current}`;
