@@ -120,7 +120,7 @@ function monitorMatchStatus(matchId, boxId) {
                 liveScoreEl.innerHTML = scoreText;
 
                 // status menit (LIVE SAJA)
-                let statusText = "LIVE";
+                let statusText = "Half Time";
                 if (status === "penalties") {
                     statusText = "PENALTIES";
                 } else if (event.time && event.time.currentPeriodStartTimestamp) {
