@@ -155,7 +155,7 @@ if (status === "penalties") {
 
 matchStatusEl.innerHTML = statusText;
 return;
-
+}
             /* ================= FINISHED ================= */
             if (status === "finished") {
 
