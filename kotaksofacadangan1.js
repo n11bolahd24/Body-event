@@ -1,0 +1,148 @@
+// --- isi asli Matchxsofascore13.js ---
+// (semua fungsi loadSofaScore & utility tetap di datasofa14.js)
+
+function loadSofaScore(matchId, matchKey) {
+  console.log("Load SofaScore untuk matchId=" + matchId + " key=" + matchKey);
+}
+
+// --- fungsi generate box + FALLBACK TEAM ---
+function renderMatch(
+  matchId,
+  matchKey,
+  serverFuncs,
+  boxClass = "kotak",
+  tvServerTime = null,
+  fallbackTeams = null
+) {
+  const html = `
+  <div class="${boxClass}" id="match${matchKey}" 
+     style="position:relative; display:flex; flex-direction:column; align-items:center; text-align:center;">
+
+  <!-- Countdown / Live -->
+  <div class="countdown" id="countdown${matchKey}" style="position:absolute; top:8px; text-align:center;"></div>
+
+  <div class="live-container" id="liveContainer${matchKey}" 
+       style="position:absolute; top:8px; text-align:center;">
+    <div id="liveStatus${matchKey}" 
+         style="display:inline-block; font-weight:bold; color:red; font-size:16px;">
+    </div>
+  </div>
+
+  <div class="club1" style="position: relative; z-index: 1;">
+    <div style="position: absolute; top: 0%; left: 50%; transform: translateX(-50%); z-index: 0; font-size: 29px;">
+      <strong id="formattedTime${matchKey}" style="color: red;"></strong>
+    </div>
+  </div>
+
+  <div class="club">
+    <center>
+      <div id="league${matchKey}" 
+        style="position:relative; top:15px; font-weight:bold; font-size:12px; color:white; text-align:center;">
+        Perhatian : ubah dulu DNS menjadi CloudFlare !
+      </div>
+    </center>
+  </div>
+
+  <!-- Tengah: Tim -->
+  <div style="
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    width:100%;
+    max-width:420px;
+    margin-top:5px;
+    margin-bottom:0px;
+  ">
+
+    <!-- Home -->
+    <div style="flex:1; display:flex; justify-content:flex-end; align-items:center; gap:8px;">
+      <span id="teamshome${matchKey}" 
+        style="font-weight:bold; color:white; font-size:14px; text-align:right; white-space:normal; word-wrap:break-word; max-width:105px; display:inline-block; line-height:1.2;">
+        ${fallbackTeams?.home || ""}
+      </span>
+      <img id="logoHome${matchKey}" 
+           style="height:45px; width:45px; border-radius:5px; margin-right:15px;">
+    </div>
+
+    <!-- Skor -->
+    <div id="liveScore${matchKey}" 
+         style="min-width:30px; text-align:center; font-size:20px; font-weight:bold; color:orange;">
+      VS
+    </div>
+
+    <!-- Away -->
+    <div style="flex:1; display:flex; justify-content:flex-start; align-items:center; gap:8px;">
+      <img id="logoAway${matchKey}" 
+           style="height:45px; width:45px; border-radius:5px; margin-left:15px;">
+      <span id="teamsaway${matchKey}" 
+        style="font-weight:bold; color:white; font-size:14px; text-align:left; white-space:normal; word-wrap:break-word; max-width:105px; display:inline-block; line-height:1.2;">
+        ${fallbackTeams?.away || ""}
+      </span>
+    </div>
+  </div>
+
+  <!-- Info -->
+  <div id="matchStatus${matchKey}" 
+       style="margin-top:-5px; margin-bottom:0px; text-align:center; font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange;">
+    UP COMING
+  </div>
+
+  <div id="kickoff${matchKey}" 
+       style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;">
+  </div>
+
+  <div id="tvCountdown${matchKey}" 
+       style="font-size:10px; margin-top:3px; margin-bottom:3px; color: yellow; font-style:italic;">
+  </div>
+
+  <!-- Tombol TV -->
+  <div style="font-size: large; margin-top:6px; padding-bottom:8px;">
+    ${serverFuncs.map((fn, i) => `
+      <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();">
+        <b><span>SERVER ${i+1}</span></b>
+      </a>
+    `).join(" ")}
+  </div>
+
+  <script>
+    loadSofaScore(${matchId}, "${matchKey}");
+
+    ${tvServerTime ? `
+    (function(){
+      const tvCountdownEl = document.getElementById("tvCountdown${matchKey}");
+      const tvServers = [${serverFuncs.map((_, i) => `"tvServer${matchKey}_${i}"`).join(",")}]
+        .map(id => document.getElementById(id));
+      const targetTime = new Date("${tvServerTime}").getTime();
+
+      function updateTvCountdown() {
+        const now = Date.now();
+        const distance = targetTime - now;
+        if(distance > 0){
+          const h = Math.floor(distance / 3600000);
+          const m = Math.floor((distance % 3600000) / 60000);
+          const s = Math.floor((distance % 60000) / 1000);
+          tvCountdownEl.innerHTML = "⏳ Server aktif dalam : "+h+"h "+m+"m "+s+"s";
+          tvServers.forEach(sv => {
+            sv.style.pointerEvents = "none";
+            sv.style.opacity = "0.5";
+          });
+        } else {
+          tvCountdownEl.innerHTML = "✅ Server Siap!";
+          tvServers.forEach(sv => {
+            sv.style.pointerEvents = "auto";
+            sv.style.opacity = "1";
+          });
+          clearInterval(interval);
+        }
+      }
+
+      const interval = setInterval(updateTvCountdown, 1000);
+      updateTvCountdown();
+    })();
+    ` : ""}
+  <\/script>
+</div>
+  `;
+
+  document.write(html);
+}
