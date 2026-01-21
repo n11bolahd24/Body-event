@@ -37,7 +37,7 @@ function renderMatch(
   <div class="club">
     <center>
       <div id="league${matchKey}" 
-        style="position:relative; left:-7px; top:15px; font-weight:bold; font-size:12px; color:white; text-align:center;">
+        style="position:relative; left:-5px; top:15px; font-weight:bold; font-size:12px; color:white; text-align:center;">
         Perhatian : Data Pertandingan tidak lengkap, Ubah dulu DNS menjadi CloudFlare !
       </div>
     </center>
