@@ -119,43 +119,40 @@ function monitorMatchStatus(matchId, boxId) {
                 }
                 liveScoreEl.innerHTML = scoreText;
 
-// status menit 
-let statusText = "";
-if (status === "penalties") {
-    statusText = "PENALTIES";
-} else if (event.time && event.time.currentPeriodStartTimestamp) {
-    const startTs = event.time.currentPeriodStartTimestamp * 1000;
-    const elapsed = Math.floor((Date.now() - startTs) / 60000);
+// --- Status menit & penalti ---
+            let statusText = "";
+            if (event.status.type === "penalties") {
+                statusText = "PENALTIES";
+            } else if (event.time && event.time.currentPeriodStartTimestamp) {
+                const startTs = event.time.currentPeriodStartTimestamp * 1000;
+                const elapsed = Math.floor((Date.now() - startTs) / 60000);
 
-    switch (event.status.description) {
-        case "1st half":
-            statusText = elapsed >= 45 ? "Half Time" : `${elapsed}'`;
-            break;
+                switch (event.status.description) {
+                    case "1st half":
+                        statusText = elapsed >= 45 ? "45+'" : `${elapsed}'`;
+                        break;
+                    case "2nd half":
+                        let m2 = 45 + elapsed;
+                        statusText = m2 >= 90 ? "90+'" : `${m2}'`;
+                        break;
+                    case "1st extra":
+                        let m3 = 90 + elapsed;
+                        statusText = m3 >= 105 ? "105+'" : `${m3}'`;
+                        break;
+                    case "2nd extra":
+                        let m4 = 105 + elapsed;
+                        statusText = m4 >= 120 ? "120+'" : `${m4}'`;
+                        break;
+                    default:
+                        statusText = event.status.description || "LIVE";
+                }
+            } else {
+                statusText = event.status.description || "LIVE";
+            }
 
-        case "Halftime":
-            statusText = "Half Time";
-            break;
-
-        case "2nd half":
-            statusText = elapsed + 45 >= 90 ? "90+'" : `${elapsed + 45}'`;
-            break;
-
-        case "1st extra":
-            statusText = `${90 + elapsed}'`;
-            break;
-
-        case "2nd extra":
-            statusText = `${105 + elapsed}'`;
-            break;
-
-        default:
-            statusText = "LIVE";
-    }
-}
-
-matchStatusEl.innerHTML = statusText;
-return;
-}
+            matchStatusEl.innerHTML = statusText;
+            matchStatusEl.style.display = "block";
+        } 
             /* ================= FINISHED ================= */
             if (status === "finished") {
 
