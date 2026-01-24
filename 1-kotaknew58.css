@@ -495,6 +495,43 @@ a:hover, a:visited, a:link, a:active
   border-color: #ff4d4d;
 }
 
+.kotakisl {
+  position: relative;
+  width: 97%;
+  margin: 15px auto 0 auto;
+  border: 1px solid #ff0000;
+  border-radius: 7px;
+  overflow: hidden;
+  transition: border-color 0.25s ease-in-out;
+  background: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjwILhfEbYf1csaDn4h-4kndOubSCIkDWCHn4T-Sn8YSHb30Ie_XWO6dsXsTTg5u4wGlCmzn4kPVNxLiyivyDUqYgWkd9WoAswsx2fE3KeZLjk3Yf-Y8kR_SZfFBNAxK_c7mkUV4Lw5gzcm765v9UnxKJkcnhRGqfeR5dThyphenhyphenohtNfGzRlbXkYivL3qi9vRl/s16000/11111%20(1).webp')
+    center/cover no-repeat;
+}
+
+/* overlay dasar — GELAP saat tidak hover */
+.kotakisl::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 5, 5, 0.9); /* gelap */
+  transition: background 0.25s ease-in-out;
+  z-index: 0;
+}
+
+/* isi tetap di atas overlay */
+.kotakisl > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* saat hover — TERANG */
+.kotakisl:hover::before {
+  background: rgba(60, 60, 60, 0.7); /* lebih terang */
+}
+
+.kotakisl:hover {
+  border-color: #ff4d4d;
+}
+
 .kotakepl {
   position: relative;
   width: 97%;
