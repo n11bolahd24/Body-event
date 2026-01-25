@@ -596,7 +596,7 @@ a:hover, a:visited, a:link, a:active
 
   /* Background dasar dengan gambar WebP */
   background: rgba(10, 10, 10, 0.8)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjwILhfEbYf1csaDn4h-4kndOubSCIkDWCHn4T-Sn8YSHb30Ie_XWO6dsXsTTg5u4wGlCmzn4kPVNxLiyivyDUqYgWkd9WoAswsx2fE3KeZLjk3Yf-Y8kR_SZfFBNAxK_c7mkUV4Lw5gzcm765v9UnxKJkcnhRGqfeR5dThyphenhyphenohtNfGzRlbXkYivL3qi9vRl/s16000/11111%20(1).webp')
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgN11In-pUCvDDjwi6EsHShTFP5xmrI45iskUNp9FnSTMQYAOvcDAw4vgC_I8pKfE_nEhViOg09onn0iTZhZFJF65ulQF99s4BnGtMfVFStfPqgkKeQAlavFEEKsOaJ3XKV9ecOvXCYD_vSc3WupSe-wxpYwrqz-BPYAWuufLQNxH3WokjV06BuWe110pBX/s320/texture3.1280x0p50x50.jpg')
     center/cover no-repeat;
   background-blend-mode: overlay;
 }
@@ -604,7 +604,7 @@ a:hover, a:visited, a:link, a:active
 /* Saat hover — terangin background */
 .kotakisl:hover {
   background: rgba(50, 50, 50, 0.4)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgN11In-pUCvDDjwi6EsHShTFP5xmrI45iskUNp9FnSTMQYAOvcDAw4vgC_I8pKfE_nEhViOg09onn0iTZhZFJF65ulQF99s4BnGtMfVFStfPqgkKeQAlavFEEKsOaJ3XKV9ecOvXCYD_vSc3WupSe-wxpYwrqz-BPYAWuufLQNxH3WokjV06BuWe110pBX/s320/texture3.1280x0p50x50.jpg')
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjwILhfEbYf1csaDn4h-4kndOubSCIkDWCHn4T-Sn8YSHb30Ie_XWO6dsXsTTg5u4wGlCmzn4kPVNxLiyivyDUqYgWkd9WoAswsx2fE3KeZLjk3Yf-Y8kR_SZfFBNAxK_c7mkUV4Lw5gzcm765v9UnxKJkcnhRGqfeR5dThyphenhyphenohtNfGzRlbXkYivL3qi9vRl/s16000/11111%20(1).webp')
     center/cover no-repeat;
   background-blend-mode: lighten; /* bikin efek lebih terang */
   border-color: #ff4d4d;
