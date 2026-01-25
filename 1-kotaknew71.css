@@ -579,7 +579,7 @@ a:hover, a:visited, a:link, a:active
 /* Saat hover — terangin background */
 .kotakucl:hover {
   background: rgba(50, 50, 50, 0.4)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhNIgIL4wadm8azQOSDy7z8WjZX3emsrobSaEKQdjpvpL9sbLJhuYJ7HPedBNKWEoxy-qanW6NbcmQvUGutO_PteGSVaHQ1c7Ge6VmR7cawRwa0jzzh0jDySe2gVtw012V8UNFIcMJ7i8iPoEr_YgUv9d0E83g7lkZMlzxy7r4E-ioZp5dDW6tsYmVSM_PB/s320/Champions%20League%202024-2027%20Brand%20Identity%20Released%20-%20Kick%20of%20Light%20(1).webp')
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiEgsEHcYiT8t0BEBCZLUPJMO8or6qeJ95GM6q3W8LqRyj7KDieR9bdLUi1zk8E09wj08nbfbtn2kIV-KY1lm0kJ9kAMCeM1HszzaxhwWgHD3a0ci-JJCFcfTKDDApTgpsYKRRVgT4G_nDk8rm8V4qXBIYEQqTeIWbsbfgjqgbn-JODGGHLgwROs-kecI9N/s1600/Champions%20League%202024-2027%20Brand%20Identity%20Released%20-%20Kick%20of%20Light%20(1).jpg')
     center/cover no-repeat;
   background-blend-mode: lighten; /* bikin efek lebih terang */
   border-color: #ff4d4d;
@@ -608,9 +608,9 @@ a:hover, a:visited, a:link, a:active
   background: rgba(50, 50, 50, 0.4)
     url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgfEVBKSFuSZRhmttuxbl2X8dybLVbKMwaZEJ7HXjqRMLRBxOCYsI17M1lUr2TGGJGDTPrJamQwY_Euxjy3LYItBTmYzTZ7g7IBATAewhTxML8j3DnTLzTaXOZfsNSIyHPmc0v1ZCpXBbWc87V6x-f4NUJyq9oydT__CyfEiwhRV7mvYnJIfGkDmVZSouq/s320/jtv_1754915699.jpg')
     center/cover no-repeat;
-  background-blend-mode: lighting; /* bikin efek lebih terang ganti lighting */
+  background-blend-mode: lighten; /* bikin efek lebih terang ganti lighten */
   border-color: #ff4d4d;
-  filter: brightness(1.0); /* tambahkan efek pencerahan */
+  filter: brightness(1.3); /* tambahkan efek pencerahan */
 }
 
 .btn {
