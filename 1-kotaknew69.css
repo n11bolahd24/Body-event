@@ -606,9 +606,9 @@ a:hover, a:visited, a:link, a:active
 /* Saat hover — terangin background */
 .kotakisl:hover {
   background: rgba(50, 50, 50, 0.4)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhQiDf78s2nEV-4Yfg2fVo3fp95SZWlT0j1r-aOGLLUicX63rwMc6ddx33L_GN3aLFK9ARgTFMdyCCLTuTDJ2rlGzvqOlu6AFrXNz9Bob0pj1cxpalwavZj3hT-QSg1qnEK5fwUsq1sclp_-zZLSxwl0dBbWlx8AKLfLzN5fXk0Ma5Isn1jB_eyoJsRlfwl/s320/jtv_1754915699.jpg')
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhgfEVBKSFuSZRhmttuxbl2X8dybLVbKMwaZEJ7HXjqRMLRBxOCYsI17M1lUr2TGGJGDTPrJamQwY_Euxjy3LYItBTmYzTZ7g7IBATAewhTxML8j3DnTLzTaXOZfsNSIyHPmc0v1ZCpXBbWc87V6x-f4NUJyq9oydT__CyfEiwhRV7mvYnJIfGkDmVZSouq/s320/jtv_1754915699.jpg')
     center/cover no-repeat;
-  background-blend-mode: overlay; /* bikin efek lebih terang ganti lighting */
+  background-blend-mode: lighting; /* bikin efek lebih terang ganti lighting */
   border-color: #ff4d4d;
   filter: brightness(1.0); /* tambahkan efek pencerahan */
 }
