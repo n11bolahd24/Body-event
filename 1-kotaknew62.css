@@ -581,7 +581,7 @@ a:hover, a:visited, a:link, a:active
 
   /* Background dasar dengan gambar WebP */
   background: rgba(10, 10, 10, 0.8)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg4LHRreELUmitBnl_8xDB_RpNW0Dk7pKE3IPUYeXkKclL00S3KA9hc8xp5migGlVy6tDPadSE_3QBtVaMa0q9GVijnwDshlzMXkaZNYOTXa3_ozCKyZS12idiHQ7tpuTV99_eOnikPdoOuXTBPVPMJxDn-avddY6hW8bmPSOqImTRaDDp5IkegTM6YhNzp/s1280/20251107_222636.webp')
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhWVqGYb1hyphenhypheneacccajGh4HNmREcDYWKVpl52m-dX7dlVnsJF3V6MNrv7egRczut64-Jd4rXKE-TT9aZxiCITKtrmMF_SjwOxmUFumNO1xV3A_bO0Jh5rG7ShlNiZfM39JsXB6BAeV65xyY4zPNGau9NRRlv3ZYDNar0a5VSF0pPmamf9RqvKLI8VSxsG1qB/s320/texture2.1280x0p50x50.jpg')
     center/cover no-repeat;
   background-blend-mode: overlay;
 }
