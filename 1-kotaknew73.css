@@ -458,7 +458,7 @@ a:hover, a:visited, a:link, a:active
   border-color: #ff4d4d;
 }
 
-.kotak3 {
+.kotaktimnas {
   position: relative;
   width: 97%;
   margin: 15px auto 0 auto;
@@ -471,7 +471,7 @@ a:hover, a:visited, a:link, a:active
 }
 
 /* overlay dasar — GELAP saat tidak hover */
-.kotak3::before {
+.kotaktimnas::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -481,17 +481,17 @@ a:hover, a:visited, a:link, a:active
 }
 
 /* isi tetap di atas overlay */
-.kotak3 > * {
+.kotaktimnas > * {
   position: relative;
   z-index: 1;
 }
 
 /* saat hover — TERANG */
-.kotak3:hover::before {
+.kotaktimnas:hover::before {
   background: rgba(60, 60, 60, 0.7); /* lebih terang */
 }
 
-.kotak3:hover {
+.kotaktimnas:hover {
   border-color: #ff4d4d;
 }
 
