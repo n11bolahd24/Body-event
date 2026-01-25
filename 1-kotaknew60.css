@@ -581,7 +581,7 @@ a:hover, a:visited, a:link, a:active
 
   /* Background dasar dengan gambar WebP */
   background: rgba(10, 10, 10, 0.8)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiTgT86SkUx9SjDonCgSdZpa7VOeqQYDepG5mvb7dtQTtZHA_2WqJ2TuKB5_P7-8l-K-jpD1fdbETcM7BZYOOLOm4sJMJfdJPP0VwfhFL7j64GnHwZyWfrzFkGdrYfUXeprxgOeESRLREVui-RrpJkqOf5HCdaRYZiv5cFXoqUhItkqws0qB_33uBtZAyOz/s320/serie%20a.png')
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg4LHRreELUmitBnl_8xDB_RpNW0Dk7pKE3IPUYeXkKclL00S3KA9hc8xp5migGlVy6tDPadSE_3QBtVaMa0q9GVijnwDshlzMXkaZNYOTXa3_ozCKyZS12idiHQ7tpuTV99_eOnikPdoOuXTBPVPMJxDn-avddY6hW8bmPSOqImTRaDDp5IkegTM6YhNzp/s1280/20251107_222636.webp')
     center/cover no-repeat;
   background-blend-mode: overlay;
 }
@@ -589,7 +589,7 @@ a:hover, a:visited, a:link, a:active
 /* Saat hover — terangin background */
 .kotakseriea:hover {
   background: rgba(50, 50, 50, 0.4)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg4LHRreELUmitBnl_8xDB_RpNW0Dk7pKE3IPUYeXkKclL00S3KA9hc8xp5migGlVy6tDPadSE_3QBtVaMa0q9GVijnwDshlzMXkaZNYOTXa3_ozCKyZS12idiHQ7tpuTV99_eOnikPdoOuXTBPVPMJxDn-avddY6hW8bmPSOqImTRaDDp5IkegTM6YhNzp/s1280/20251107_222636.webp')
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhEG61ch1_qGpMK2nLF4_t_u3YNEMq3YZIYs6Uqp8nl5dbGRwsl44DTAl3FnRagNhtgx0Pd1ciqBe2gKjsqHmzSiBgMSsjVpY5O3D8nvEPelY5EyAhza39lJA1EhL7iJQwhsE_2fCuwFsDu98kFEy_9ZHoY9r1FPfs3zkPdOQO_W2HMtzDHgacPRNwC0aTO/s1600/2550251107_222636.jpg')
     center/cover no-repeat;
   background-blend-mode: lighten; /* bikin efek lebih terang */
   border-color: #ff4d4d;
