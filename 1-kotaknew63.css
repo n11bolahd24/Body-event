@@ -495,42 +495,7 @@ a:hover, a:visited, a:link, a:active
   border-color: #ff4d4d;
 }
 
-.kotakisl {
-  position: relative;
-  width: 97%;
-  margin: 15px auto 0 auto;
-  border: 1px solid #ff0000;
-  border-radius: 7px;
-  overflow: hidden;
-  transition: border-color 0.25s ease-in-out;
-  background: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjwILhfEbYf1csaDn4h-4kndOubSCIkDWCHn4T-Sn8YSHb30Ie_XWO6dsXsTTg5u4wGlCmzn4kPVNxLiyivyDUqYgWkd9WoAswsx2fE3KeZLjk3Yf-Y8kR_SZfFBNAxK_c7mkUV4Lw5gzcm765v9UnxKJkcnhRGqfeR5dThyphenhyphenohtNfGzRlbXkYivL3qi9vRl/s16000/11111%20(1).webp')
-    center/cover no-repeat;
-}
 
-/* overlay dasar — GELAP saat tidak hover */
-.kotakisl::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(5, 5, 5, 0.9); /* gelap */
-  transition: background 0.25s ease-in-out;
-  z-index: 0;
-}
-
-/* isi tetap di atas overlay */
-.kotakisl > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* saat hover — TERANG */
-.kotakisl:hover::before {
-  background: rgba(60, 60, 60, 0.7); /* lebih terang */
-}
-
-.kotakisl:hover {
-  border-color: #ff4d4d;
-}
 
 .kotakepl {
   position: relative;
@@ -615,6 +580,31 @@ a:hover, a:visited, a:link, a:active
 .kotakucl:hover {
   background: rgba(50, 50, 50, 0.4)
     url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhNIgIL4wadm8azQOSDy7z8WjZX3emsrobSaEKQdjpvpL9sbLJhuYJ7HPedBNKWEoxy-qanW6NbcmQvUGutO_PteGSVaHQ1c7Ge6VmR7cawRwa0jzzh0jDySe2gVtw012V8UNFIcMJ7i8iPoEr_YgUv9d0E83g7lkZMlzxy7r4E-ioZp5dDW6tsYmVSM_PB/s320/Champions%20League%202024-2027%20Brand%20Identity%20Released%20-%20Kick%20of%20Light%20(1).webp')
+    center/cover no-repeat;
+  background-blend-mode: lighten; /* bikin efek lebih terang */
+  border-color: #ff4d4d;
+  filter: brightness(1.3); /* tambahkan efek pencerahan */
+}
+
+.kotakisl {
+  position: relative;
+  width: 97%;
+  margin: 15px auto 0 auto;
+  border: 1px solid #ff0000;
+  border-radius: 7px;
+  transition: 0.25s all ease-in-out;
+
+  /* Background dasar dengan gambar WebP */
+  background: rgba(10, 10, 10, 0.8)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjwILhfEbYf1csaDn4h-4kndOubSCIkDWCHn4T-Sn8YSHb30Ie_XWO6dsXsTTg5u4wGlCmzn4kPVNxLiyivyDUqYgWkd9WoAswsx2fE3KeZLjk3Yf-Y8kR_SZfFBNAxK_c7mkUV4Lw5gzcm765v9UnxKJkcnhRGqfeR5dThyphenhyphenohtNfGzRlbXkYivL3qi9vRl/s16000/11111%20(1).webp')
+    center/cover no-repeat;
+  background-blend-mode: overlay;
+}
+
+/* Saat hover — terangin background */
+.kotakisl:hover {
+  background: rgba(50, 50, 50, 0.4)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjWL5JIBsWAYx8yLVgzqETU2KNT3bV5CAKgjEnEzs4jNfxMAo8_Bg8AUBm37iacMtfDeg5-6OmBAvTDBymroG1IL4SBsofVu_E3WZVFu4ap9A7GSzUvqAwgqiEorFCRr9O4Os8AUX02HIZ2IiTYdmpu8uKdDAjFi54Txidq_-0EfGUA8elxMXe2ht4IovN0/s320/texture3.1280x0p50x50.jpg')
     center/cover no-repeat;
   background-blend-mode: lighten; /* bikin efek lebih terang */
   border-color: #ff4d4d;
