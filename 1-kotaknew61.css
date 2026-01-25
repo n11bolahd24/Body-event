@@ -589,7 +589,7 @@ a:hover, a:visited, a:link, a:active
 /* Saat hover — terangin background */
 .kotakseriea:hover {
   background: rgba(50, 50, 50, 0.4)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhEG61ch1_qGpMK2nLF4_t_u3YNEMq3YZIYs6Uqp8nl5dbGRwsl44DTAl3FnRagNhtgx0Pd1ciqBe2gKjsqHmzSiBgMSsjVpY5O3D8nvEPelY5EyAhza39lJA1EhL7iJQwhsE_2fCuwFsDu98kFEy_9ZHoY9r1FPfs3zkPdOQO_W2HMtzDHgacPRNwC0aTO/s1600/2550251107_222636.jpg')
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjYQ91AazP-Csr277LlUhYNJz-WNhXJl6LqAtYj1qL2vyU9UaPYv7xdAv1i9HY13k2B2Cb7WwN6HvNVFY7lt0YOO1pSqSlpYX_7MFwpyku2X_FgJWiD-0IbUriQP_cbl2JylAKs4_Je-gdPYNZiUFAbJdIlPNeDAxs8eKQ1J2tx34C554A3Ip7-0K70lpom/s320/texture.1280x0p50x50.jpg')
     center/cover no-repeat;
   background-blend-mode: lighten; /* bikin efek lebih terang */
   border-color: #ff4d4d;
