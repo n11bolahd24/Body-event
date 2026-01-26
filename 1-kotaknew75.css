@@ -644,7 +644,7 @@ a:hover, a:visited, a:link, a:active
 /* Saat hover — terangin background */
 .kotakisl:hover {
   background: rgba(50, 50, 50, 0.4)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEif87MCPwpjOJLzb0ZPE9PiOfzSRU3wZlGt2Tyt7ZgJkSIo0Am6flF0gBsNyK3lQ60q4mKZlqBUqAkc_1r4LRh9Rj31Yze7FfhbrIf1XpVcohiyIz3BQ4h9zDfBBAoCDpZc0lE8xGg6b27yjCReib8I-5TuxCfxudkG7xVEMqZfzGgbzp7xkEqwAdtma2iS/s16000/liga1.jpg')
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhZadSPi36FyTFwvTN6wfi_emUWukuGX2Lp5mC3-POmJaAhtyCazGaJYJXryt4zK2UcEa4mDw3pltru8oJHxXCirjG84p0QQMEi_WDkaLuBNRONt-6NGze3zwaUsAXgnGz7NDoRSn-Jl75TFUB4xrmFaljaXVHAmkdJ-jImZNdMRqoqrV6tDWOnjBixTroa/s320/liga1.jpg')
     center/cover no-repeat;
   background-blend-mode: lighten; /* bikin efek lebih terang ganti lighten */
   border-color: #ff4d4d;
