@@ -62,11 +62,7 @@ function renderMatch(
         ${fallbackTeams?.home || ""}
       </span>
       <img id="logoHome${matchKey}" 
-           style="height:45px; width:45px; border-radius:5px; margin-right:15px; text-shadow:
-        0 0 2px #000,
-        0 0 4px #000,
-        0 0 6px #000,
-        0 0 8px #000;">
+           style="height:45px; width:45px; border-radius:5px; margin-right:15px;">
     </div>
 
     <!-- Skor -->
@@ -78,13 +74,13 @@ function renderMatch(
     <!-- Away -->
     <div style="flex:1; display:flex; justify-content:flex-start; align-items:center; gap:8px;">
       <img id="logoAway${matchKey}" 
-           style="height:45px; width:45px; border-radius:5px; margin-left:15px; text-shadow:
+           style="height:45px; width:45px; border-radius:5px; margin-left:15px;">
+      <span id="teamsaway${matchKey}" 
+        style="font-weight:bold; color:white; font-size:14px; text-align:left; white-space:normal; word-wrap:break-word; max-width:105px; display:inline-block; line-height:1.2;  text-shadow:
         0 0 2px #000,
         0 0 4px #000,
         0 0 6px #000,
         0 0 8px #000;">
-      <span id="teamsaway${matchKey}" 
-        style="font-weight:bold; color:white; font-size:14px; text-align:left; white-space:normal; word-wrap:break-word; max-width:105px; display:inline-block; line-height:1.2;">
         ${fallbackTeams?.away || ""}
       </span>
     </div>
