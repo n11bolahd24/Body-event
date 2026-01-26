@@ -287,17 +287,23 @@ a:hover, a:visited, a:link, a:active
   padding:5px 12px;
   margin:0 4px;
   border-radius:8px;
-  box-shadow:0 0 10px rgba(255,0,0,.35); /* 🔴 outer glow */
   transition:all .2s ease;
 }
 
 .doctor-profile-tabs button.active{ 
-	color:#fff!important; border-bottom:3px solid #ff0000; /* opsional */ 
-	font-weight:500; 
-	background:#000000; 
-	border-top:1px solid #222; 
-	border-radius:8px; /* 👈 ikut oval */ 
+  color:#fff!important;
+  background:#000000;
+  font-weight:500;
+
+  border-radius:8px;
+  border-top:1px solid #222;
+
+  /* efek lampu ke bawah */
+  box-shadow:
+    0 8px 14px rgba(255, 0, 0, 0.55),
+    0 14px 28px rgba(255, 0, 0, 0.35);
 }
+
 
 .navbar-expand-lg a{color:#8B008B;}
 .nav-scroller a {color:#ccc;padding: 0.7rem 1rem;}
