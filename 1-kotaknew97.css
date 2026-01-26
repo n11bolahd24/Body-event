@@ -280,31 +280,35 @@ a:hover, a:visited, a:link, a:active
 .embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: scroll; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%!important; height: 100%; } 
   
 .doctor-profile-tabs button{
-  border:1px solid #ffffff;            /* putih awal */
+  border:1px solid #ffffff;
   background-color:#fff;
   color:#000!important;
   font-size:15px;
 
-  padding:5px 8px;
-  margin:0 4px;
-  border-radius:8px;                   /* oval */
+  padding:5px 10px;        /* isi tombol agak lega */
+  margin:0 6px;            /* 👈 jarak kiri–kanan antar tombol */
+  border-radius:8px;
 
   transition:border-color .25s ease,
              background-color .2s ease,
              color .2s ease;
 }
 
-/* hover → merah */
 .doctor-profile-tabs button:hover{
   border-color:#ff0000;
 }
 
-/* active */
 .doctor-profile-tabs button.active{
   color:#fff!important;
   font-weight:500;
   background:#000000ef;
-  border-color:#ff0000;                /* merah */
+  border-color:#ff0000;
+}
+
+.review-profile{width:35px}
+.offcanvas{
+  border-top-left-radius:2rem;
+  border-top-right-radius:2rem;
 }
 
 /* tetap aman */
