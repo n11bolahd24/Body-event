@@ -503,38 +503,24 @@ a:hover, a:visited, a:link, a:active
   margin: 15px auto 0 auto;
   border: 1px solid #ff0000;
   border-radius: 7px;
-  overflow: hidden;
-  transition: border-color 0.25s ease-in-out;
+  transition: 0.25s all ease-in-out;
 
-  /* background diganti ke GIF baru */
-  background: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPfX6IIsJn0NLJk7JPoE7j1gS1ktU45wV2f8e_sZqVlMIuzFhQHHcO1k7h1gOOI6vCuNvtcnI_pDlW1HKg2leq7LWYt0J6Ed_KZqmSvMeIOwvO2mIcKSUbpdBjKhAkGncqwuRORU9hUUO33oe3hV2wej8G-zmOoQpMB-MYKWDgtarFcOd8JFpELb4B6RY7/s1280/96239bf09550b1cc00a38ebfbc2776b1.gif')
+  /* Background pake gambar yang kamu kasih */
+  background: rgba(10, 10, 10, 0.8)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPfX6IIsJn0NLJk7JPoE7j1gS1ktU45wV2f8e_sZqVlMIuzFhQHHcO1k7h1gOOI6vCuNvtcnI_pDlW1HKg2leq7LWYt0J6Ed_KZqmSvMeIOwvO2mIcKSUbpdBjKhAkGncqwuRORU9hUUO33oe3hV2wej8G-zmOoQpMB-MYKWDgtarFcOd8JFpELb4B6RY7/s1280/96239bf09550b1cc00a38ebfbc2776b1.gif')
     center/cover no-repeat;
-}
-
-/* overlay dasar — GELAP saat tidak hover */
-.kotakepl::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(5, 5, 5, 0.9); /* gelap */
-  transition: background 0.25s ease-in-out;
-  z-index: 0;
-}
-
-/* isi tetap di atas overlay */
-.kotakepl > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* saat hover — TERANG */
-.kotakepl:hover::before {
-  background: rgba(60, 60, 60, 0.7); /* lebih terang */
+  background-blend-mode: overlay;
 }
 
 .kotakepl:hover {
+  background: rgba(50, 50, 50, 0.4)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjPfX6IIsJn0NLJk7JPoE7j1gS1ktU45wV2f8e_sZqVlMIuzFhQHHcO1k7h1gOOI6vCuNvtcnI_pDlW1HKg2leq7LWYt0J6Ed_KZqmSvMeIOwvO2mIcKSUbpdBjKhAkGncqwuRORU9hUUO33oe3hV2wej8G-zmOoQpMB-MYKWDgtarFcOd8JFpELb4B6RY7/s1280/96239bf09550b1cc00a38ebfbc2776b1.gif')
+    center/cover no-repeat;
+  background-blend-mode: lighten;
   border-color: #ff4d4d;
+  filter: brightness(1.25);
 }
+
 
 .kotakseriea {
   position: relative;
@@ -554,7 +540,7 @@ a:hover, a:visited, a:link, a:active
 /* Saat hover — terangin background */
 .kotakseriea:hover {
   background: rgba(50, 50, 50, 0.4)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjYQ91AazP-Csr277LlUhYNJz-WNhXJl6LqAtYj1qL2vyU9UaPYv7xdAv1i9HY13k2B2Cb7WwN6HvNVFY7lt0YOO1pSqSlpYX_7MFwpyku2X_FgJWiD-0IbUriQP_cbl2JylAKs4_Je-gdPYNZiUFAbJdIlPNeDAxs8eKQ1J2tx34C554A3Ip7-0K70lpom/s320/texture.1280x0p50x50.jpg')
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhXjdkQIyNNZ28QNXjyL8JXY5KgmQr2z6rRnamljMYYklMCObH5JKQAoIS9sFIt-PELel9_x8evyHenyM2LVlvLYlYoizPawD5qn-N3422iKjt1djzC4PLQvmftaOK0Ha-peS4OP-FH94yvbf5gk6X5kfH0qfwhjuemJsIxfnulqykhyb3HJcjVafJFDewQ/s320/texture2.1280x0p50x50.jpg')
     center/cover no-repeat;
   background-blend-mode: lighten; /* bikin efek lebih terang */
   border-color: #ff4d4d;
@@ -579,7 +565,7 @@ a:hover, a:visited, a:link, a:active
 /* Saat hover — terangin background */
 .kotakucl:hover {
   background: rgba(50, 50, 50, 0.4)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiEgsEHcYiT8t0BEBCZLUPJMO8or6qeJ95GM6q3W8LqRyj7KDieR9bdLUi1zk8E09wj08nbfbtn2kIV-KY1lm0kJ9kAMCeM1HszzaxhwWgHD3a0ci-JJCFcfTKDDApTgpsYKRRVgT4G_nDk8rm8V4qXBIYEQqTeIWbsbfgjqgbn-JODGGHLgwROs-kecI9N/s1600/Champions%20League%202024-2027%20Brand%20Identity%20Released%20-%20Kick%20of%20Light%20(1).jpg')
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiuPieTBj-q41tluAogihHnIina2Z1oIHRMCwNxF0aeR-okERrXPzZjqx74Dxtkla_3O9FWJv67MGP54BxmaRt5-zURxshIqWaSD9D7dJJwlvVN3qfmgOZtaQUTpl-YavEA2reHWRrZK_OCorIpSj9LeN6jeuukoothhVuQ1fmRqh0scfpXWaZ2tpaxVGwK/s320/Champions%20League%202024-2027%20Brand%20Identity%20Released%20-%20Kick%20of%20Light%20(1).jpg')
     center/cover no-repeat;
   background-blend-mode: lighten; /* bikin efek lebih terang */
   border-color: #ff4d4d;
@@ -592,37 +578,23 @@ a:hover, a:visited, a:link, a:active
   margin: 15px auto 0 auto;
   border: 1px solid #ff0000;
   border-radius: 7px;
-  overflow: hidden;
-  transition: border-color 0.25s ease-in-out;
+  transition: 0.25s all ease-in-out;
 
-  /* background diganti ke GIF baru */
-  background: url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhOfNmpXohaOUaIJyaeYKBedBiTG75mKXDnER1wd3A5w2CXnaeFCQjLaLYASC9FT57Z0EYc_KxCGQA6a4SRI5wjp7OiKnC1_xhecGSTBDz-y6nWLCrYAe_1NPWr8dam_sbHcG7ATQOu3S6aplydqA3F6e4oox1YHcJMUl-6mipmCJGPcgPaSMjnHQ6zUXjN/s320/LALIGA-Header-1.gif')
+  /* Background LaLiga */
+  background: rgba(10, 10, 10, 0.8)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhOfNmpXohaOUaIJyaeYKBedBiTG75mKXDnER1wd3A5w2CXnaeFCQjLaLYASC9FT57Z0EYc_KxCGQA6a4SRI5wjp7OiKnC1_xhecGSTBDz-y6nWLCrYAe_1NPWr8dam_sbHcG7ATQOu3S6aplydqA3F6e4oox1YHcJMUl-6mipmCJGPcgPaSMjnHQ6zUXjN/s320/LALIGA-Header-1.gif')
     center/cover no-repeat;
+  background-blend-mode: overlay;
 }
 
-/* overlay dasar — GELAP saat tidak hover */
-.kotaklaliga::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(5, 5, 5, 0.9); /* gelap */
-  transition: background 0.25s ease-in-out;
-  z-index: 0;
-}
-
-/* isi tetap di atas overlay */
-.kotaklaliga > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* saat hover — TERANG */
-.kotaklaliga:hover::before {
-  background: rgba(60, 60, 60, 0.7); /* lebih terang */
-}
-
+/* Hover effect */
 .kotaklaliga:hover {
+  background: rgba(50, 50, 50, 0.4)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhOfNmpXohaOUaIJyaeYKBedBiTG75mKXDnER1wd3A5w2CXnaeFCQjLaLYASC9FT57Z0EYc_KxCGQA6a4SRI5wjp7OiKnC1_xhecGSTBDz-y6nWLCrYAe_1NPWr8dam_sbHcG7ATQOu3S6aplydqA3F6e4oox1YHcJMUl-6mipmCJGPcgPaSMjnHQ6zUXjN/s320/LALIGA-Header-1.gif')
+    center/cover no-repeat;
+  background-blend-mode: lighten;
   border-color: #ff4d4d;
+  filter: brightness(1.25);
 }
 
 
