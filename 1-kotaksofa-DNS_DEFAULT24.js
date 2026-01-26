@@ -82,7 +82,7 @@ function renderMatch(
         ${fallbackTeams?.home || ""}
       </span>
       <img id="logoHome${matchKey}" 
-           style="height:45px; width:45px; border-radius:5px; margin-right:15px; filter: drop-shadow(0 0 4.0px rgba(0,0,0,0.8));
+           style="height:45px; width:45px; border-radius:5px; margin-right:15px; filter: drop-shadow(0 0 5.0px rgba(0,0,0,0.8));
 ">
     </div>
 
@@ -99,7 +99,7 @@ function renderMatch(
     <!-- Away -->
     <div style="flex:1; display:flex; justify-content:flex-start; align-items:center; gap:8px;">
       <img id="logoAway${matchKey}" 
-           style="height:45px; width:45px; border-radius:5px; margin-left:15px; filter: drop-shadow(0 0 4.0px rgba(0,0,0,0.8));
+           style="height:45px; width:45px; border-radius:5px; margin-left:15px; filter: drop-shadow(0 0 5.0px rgba(0,0,0,0.8));
 ">
       <span id="teamsaway${matchKey}" 
         style="font-weight:bold; color:white; font-size:14px; text-align:left; white-space:normal; word-wrap:break-word; max-width:105px; display:inline-block; line-height:1.2;  text-shadow:
@@ -139,11 +139,7 @@ function renderMatch(
   </div>
 
   <!-- Tombol TV -->
-  <div style="font-size: large; margin-top:6px; padding-bottom:8px;  text-shadow:
-        0 0 2px #000,
-        0 0 4px #000,
-        0 0 6px #000,
-        0 0 8px #000;">
+  <div style="font-size: large; margin-top:6px; padding-bottom:8px;">
     ${serverFuncs.map((fn, i) => `
       <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();">
         <b><span>SERVER ${i+1}</span></b>
