@@ -280,7 +280,8 @@ a:hover, a:visited, a:link, a:active
 .embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: scroll; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%!important; height: 100%; } 
   
 .doctor-profile-tabs{
-  padding:0 12px;   /* jarak dari tepi kiri & kanan */
+  display:flex;
+  gap:10px;            /* 👈 INI yang bikin ada spasi antar tombol */
 }
 
 .doctor-profile-tabs button{
@@ -290,7 +291,6 @@ a:hover, a:visited, a:link, a:active
   font-size:15px;
 
   padding:5px 12px;
-  margin:0 8px;     /* jarak antar tombol */
   border-radius:8px;
 
   transition:border-color .25s ease,
@@ -308,6 +308,7 @@ a:hover, a:visited, a:link, a:active
   background:#000000ef;
   border-color:#ff0000;
 }
+
 
 .navbar-expand-lg a{color:#8B008B;}
 .nav-scroller a {color:#ccc;padding: 0.7rem 1rem;}
