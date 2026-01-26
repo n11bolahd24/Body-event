@@ -294,37 +294,13 @@ a:hover, a:visited, a:link, a:active
   overflow:visible;
 }
 
-.doctor-profile-tabs button{
-  position:relative;
-  overflow:hidden; /* penting */
-}
-
-.doctor-profile-tabs button.active{
-  background:#000;
+.doctor-profile-tabs button.active{ 
   color:#fff!important;
-  border-radius:10px;
+  font-weight:500;
+  background:#000;
+  border-top:1px solid #222;
+  border-radius:8px;
 }
-
-/* LAMPU DI DALAM TOMBOL */
-.doctor-profile-tabs button.active::after{
-  content:"";
-  position:absolute;
-  left:-20%;
-  right:-20%;
-  bottom:-60%;
-
-  height:120%;
-  background:radial-gradient(
-    ellipse at center bottom,
-    rgba(255,0,0,.6),
-    rgba(255,0,0,.25) 40%,
-    transparent 70%
-  );
-
-  filter:blur(12px);
-  pointer-events:none;
-}
-
 .navbar-expand-lg a{color:#8B008B;}
 .nav-scroller a {color:#ccc;padding: 0.7rem 1rem;}
 .nav-scroller a.active {color:#fff;font-size:1em;}
