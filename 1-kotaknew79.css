@@ -648,7 +648,7 @@ a:hover, a:visited, a:link, a:active
     center/cover no-repeat;
   background-blend-mode: lighten; /* bikin efek lebih terang ganti lighten */
   border-color: #ff4d4d;
-  filter: brightness(1.3); /* tambahkan efek pencerahan */
+  filter: brightness(1.0); /* tambahkan efek pencerahan */
 }
 
 .btn {
