@@ -49,7 +49,8 @@ function renderMatch(
   <div class="club">
     <center>
       <div id="league${matchKey}" 
-        style="position:relative; left:-4px; top:15px; font-weight:bold; font-size:12px; color:white; text-align:center;  text-shadow:
+        style="position:relative; left:-4px; top:15px; font-weight:bold; font-size:12px; color:white; text-align:center; filter: drop-shadow(0 0 1px rgba(0,0,0,0.9));
+ text-shadow:
         0 0 2px #000,
         0 0 4px #000,
         0 0 6px #000,
