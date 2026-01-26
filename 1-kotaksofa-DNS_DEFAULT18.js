@@ -19,12 +19,24 @@ function renderMatch(
      style="position:relative; display:flex; flex-direction:column; align-items:center; text-align:center;">
 
   <!-- Countdown / Live -->
-  <div class="countdown" id="countdown${matchKey}" style="position:absolute; top:8px; text-align:center;"></div>
+  <div class="countdown" id="countdown${matchKey}" style="position:absolute; top:8px; text-align:center;  text-shadow:
+        0 0 2px #000,
+        0 0 4px #000,
+        0 0 6px #000,
+        0 0 8px #000;"></div>
 
   <div class="live-container" id="liveContainer${matchKey}" 
-       style="position:absolute; left:0px; top:8px; text-align:center;">
+       style="position:absolute; left:0px; top:8px; text-align:center;  text-shadow:
+        0 0 2px #000,
+        0 0 4px #000,
+        0 0 6px #000,
+        0 0 8px #000;">
     <div id="liveStatus${matchKey}" 
-         style="display:inline-block; font-weight:bold; color:red; font-size:16px;">
+         style="display:inline-block; font-weight:bold; color:red; font-size:16px;  text-shadow:
+        0 0 2px #000,
+        0 0 4px #000,
+        0 0 6px #000,
+        0 0 8px #000;">
     </div>
   </div>
 
@@ -37,7 +49,11 @@ function renderMatch(
   <div class="club">
     <center>
       <div id="league${matchKey}" 
-        style="position:relative; left:-4px; top:15px; font-weight:bold; font-size:12px; color:white; text-align:center;">
+        style="position:relative; left:-4px; top:15px; font-weight:bold; font-size:12px; color:white; text-align:center;  text-shadow:
+        0 0 2px #000,
+        0 0 4px #000,
+        0 0 6px #000,
+        0 0 8px #000;">
         Perhatian : Data Pertandingan tidak lengkap,
         Ubah dulu DNS menjadi CloudFlare !
       </div>
@@ -58,7 +74,11 @@ function renderMatch(
     <!-- Home -->
     <div style="flex:1; display:flex; justify-content:flex-end; align-items:center; gap:8px;">
       <span id="teamshome${matchKey}" 
-        style="font-weight:bold; color:white; font-size:14px; text-align:right; white-space:normal; word-wrap:break-word; max-width:105px; display:inline-block; line-height:1.2;">
+        style="font-weight:bold; color:white; font-size:14px; text-align:right; white-space:normal; word-wrap:break-word; max-width:105px; display:inline-block; line-height:1.2;  text-shadow:
+        0 0 2px #000,
+        0 0 4px #000,
+        0 0 6px #000,
+        0 0 8px #000;">
         ${fallbackTeams?.home || ""}
       </span>
       <img id="logoHome${matchKey}" 
@@ -67,7 +87,11 @@ function renderMatch(
 
     <!-- Skor -->
     <div id="liveScore${matchKey}" 
-         style="min-width:30px; text-align:center; font-size:20px; font-weight:bold; color:orange;">
+         style="min-width:30px; text-align:center; font-size:20px; font-weight:bold; color:orange;  text-shadow:
+        0 0 2px #000,
+        0 0 4px #000,
+        0 0 6px #000,
+        0 0 8px #000;">
       VS
     </div>
 
@@ -88,12 +112,20 @@ function renderMatch(
 
   <!-- Info -->
   <div id="matchStatus${matchKey}" 
-       style="margin-top:-5px; margin-bottom:0px; text-align:center; font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange;">
+       style="margin-top:-5px; margin-bottom:0px; text-align:center; font-family:'Courier New', monospace; font-size:10px; font-weight:bold; color:orange;  text-shadow:
+        0 0 2px #000,
+        0 0 4px #000,
+        0 0 6px #000,
+        0 0 8px #000;">
     UP COMING
   </div>
 
   <div id="kickoff${matchKey}" 
-       style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;">
+       style="font-size:12px; color:white; text-align:center; margin:1px 0; font-style:italic;  text-shadow:
+        0 0 2px #000,
+        0 0 4px #000,
+        0 0 6px #000,
+        0 0 8px #000;">
   </div>
 
   <div id="tvCountdown${matchKey}" 
@@ -101,7 +133,11 @@ function renderMatch(
   </div>
 
   <!-- Tombol TV -->
-  <div style="font-size: large; margin-top:6px; padding-bottom:8px;">
+  <div style="font-size: large; margin-top:6px; padding-bottom:8px;  text-shadow:
+        0 0 2px #000,
+        0 0 4px #000,
+        0 0 6px #000,
+        0 0 8px #000;">
     ${serverFuncs.map((fn, i) => `
       <a class="tv" id="tvServer${matchKey}_${i}" href="javascript:${fn}();">
         <b><span>SERVER ${i+1}</span></b>
