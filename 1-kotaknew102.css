@@ -281,8 +281,10 @@ a:hover, a:visited, a:link, a:active
   
 .doctor-profile-tabs{
   display:flex;
-  gap:3px;            /* 👈 INI yang bikin ada spasi antar tombol */
+  gap:8px;              /* jarak antar tombol */
+  padding:10px 12px;    /* 👈 jarak dari tepi container */
 }
+
 
 .doctor-profile-tabs button{
   border:1px solid #ffffff;
