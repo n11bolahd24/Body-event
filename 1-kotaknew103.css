@@ -279,11 +279,6 @@ a:hover, a:visited, a:link, a:active
   
 .embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: scroll; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%!important; height: 100%; } 
   
-.doctor-profile-tabs{
-  display:flex;
-  gap:8px;              /* jarak antar tombol */
-  padding:10px 12px;    /* 👈 jarak dari tepi container */
-}
 
 
 .doctor-profile-tabs button{
