@@ -453,7 +453,7 @@ a:hover, a:visited, a:link, a:active
 
   /* Background dasar dengan gambar WebP */
   background: rgba(10, 10, 10, 0.8)
-    url('https://https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyaPN5tTq0x-UUqhMa0SEHpXJyN9CveJbwMCcb8wROEZsB24cTRMNSNJVQCzdOSDkoklsDwgvaJLj6dzhz80cvtvaN7Ztk_AEob7sfzrPRmSTQ62IYOBihVnJPD71x8euPMfRvh-W2xRg_23cN6EYVF2JUPZokbcptD9iDqnMCbaim3H7H62I-00kzG3Zr/s320/pngtree-fiery-soccer-ball---burning-passion-image_17105065.jpg')
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyaPN5tTq0x-UUqhMa0SEHpXJyN9CveJbwMCcb8wROEZsB24cTRMNSNJVQCzdOSDkoklsDwgvaJLj6dzhz80cvtvaN7Ztk_AEob7sfzrPRmSTQ62IYOBihVnJPD71x8euPMfRvh-W2xRg_23cN6EYVF2JUPZokbcptD9iDqnMCbaim3H7H62I-00kzG3Zr/s320/pngtree-fiery-soccer-ball---burning-passion-image_17105065.jpg')
     center/cover no-repeat;
   background-blend-mode: overlay;
 }
