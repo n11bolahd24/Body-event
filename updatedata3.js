@@ -1,6 +1,6 @@
 // --- Fungsi Utama Load Sofascore + Countdown ---
 function loadSofaScore(matchId, boxId) {
-    const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
+    const eventUrl = `https://geogersr.itilstrem.workers.dev/https://api.sofascore.com/api/v1/event/${matchId}`;
 
     fetch(eventUrl)
         .then(res => {
