@@ -1,6 +1,6 @@
 // --- Fungsi Utama Load Sofascore + Countdown ---
 function loadSofaScore(matchId, boxId) {
-    const eventUrl = `https://geogersr.itilstrem.workers.dev/https://api.sofascore.com/api/v1/event/${matchId}`;
+    const eventUrl = `https://api.sofascore.app/api/v1/event/${matchId}`;
 
     fetch(eventUrl)
         .then(res => {
@@ -62,7 +62,7 @@ function loadSofaScore(matchId, boxId) {
 
 // --- Update Live Score & Status ---
 function monitorMatchStatus(matchId, boxId) {
-    const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
+    const eventUrl = `https://api.sofascore.app/api/v1/event/${matchId}`;
     const liveContainer = document.getElementById("liveContainer" + boxId);
     const countdownEl = document.getElementById("countdown" + boxId);
     const liveScoreEl = document.getElementById("liveScore" + boxId);
@@ -196,7 +196,7 @@ function monitorMatchStatus(matchId, boxId) {
         } catch (e) {
             console.warn("monitor error", e);
         }
-    }, 7000);
+    }, 3000);
 }
 
 // --- Countdown ---
