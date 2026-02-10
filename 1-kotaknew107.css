@@ -507,6 +507,55 @@ a:hover, a:visited, a:link, a:active
   border-color: #ff4d4d;
 }
 
+.kotakacl1 {
+  position: relative;
+  width: 97%;
+  margin: 15px auto 0 auto;
+  border: 1px solid #ff0000;
+  border-radius: 7px;
+  transition: 0.25s all ease-in-out;
+
+  /* Background dasar dengan gambar WebP */
+  background: rgba(10, 10, 10, 0.8)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhcdP82zssTwC6w-mI5_rcuj5gIUyd792IeUQkCYXa1Lx5axdtpfHWa7Thx9dq1JTtrAAiYbfU_bIlLPlaRnD1Mhqi-DQ6uNFbQAmGkWUhEHyloNn7PDh2Z687wXemSoERq7joBzaYoUPvsVmYIqmNTQ6RZ7_Z9cW1Gzk-SjZdYhBOaBPHy7hyphenhyphenAPOUMZceM/s320/ACLE2024-25_trophy-background_1.jpg')
+    center/cover no-repeat;
+  background-blend-mode: overlay;
+}
+
+/* Saat hover — terangin background */
+.kotakacl1:hover {
+  background: rgba(40, 40, 40, 0.4)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhcdP82zssTwC6w-mI5_rcuj5gIUyd792IeUQkCYXa1Lx5axdtpfHWa7Thx9dq1JTtrAAiYbfU_bIlLPlaRnD1Mhqi-DQ6uNFbQAmGkWUhEHyloNn7PDh2Z687wXemSoERq7joBzaYoUPvsVmYIqmNTQ6RZ7_Z9cW1Gzk-SjZdYhBOaBPHy7hyphenhyphenAPOUMZceM/s320/ACLE2024-25_trophy-background_1.jpg')
+    center/cover no-repeat;
+  background-blend-mode: lighten; /* bikin efek lebih terang */
+  border-color: #ff4d4d;
+  filter: brightness(1.1); /* tambahkan efek pencerahan */
+}
+
+.kotakacl2 {
+  position: relative;
+  width: 97%;
+  margin: 15px auto 0 auto;
+  border: 1px solid #ff0000;
+  border-radius: 7px;
+  transition: 0.25s all ease-in-out;
+
+  /* Background dasar dengan gambar WebP */
+  background: rgba(10, 10, 10, 0.8)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhDGOfRPwAyEYWfkMTrXalznppjsaG-iC4-JHmHWXzwqnjuJJnjqZadSCgyDFCqThmkKlJGgbwd8R9WkRoPDIIkwbF1wBYLugsqFk9ipTUmADVdaIMHU8m8rk6aLuO_3bSb2KgX6OvONrEjGWEJ4eeE1_SWUX5yCeyPaPgfGrQ_ZcDfdrLVL8A-eyeWMzRO/s320/ACLTwo2024-25_trophy-background_1.jpg')
+    center/cover no-repeat;
+  background-blend-mode: overlay;
+}
+
+/* Saat hover — terangin background */
+.kotakacl2:hover {
+  background: rgba(40, 40, 40, 0.4)
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhDGOfRPwAyEYWfkMTrXalznppjsaG-iC4-JHmHWXzwqnjuJJnjqZadSCgyDFCqThmkKlJGgbwd8R9WkRoPDIIkwbF1wBYLugsqFk9ipTUmADVdaIMHU8m8rk6aLuO_3bSb2KgX6OvONrEjGWEJ4eeE1_SWUX5yCeyPaPgfGrQ_ZcDfdrLVL8A-eyeWMzRO/s320/ACLTwo2024-25_trophy-background_1.jpg')
+    center/cover no-repeat;
+  background-blend-mode: lighten; /* bikin efek lebih terang */
+  border-color: #ff4d4d;
+  filter: brightness(1.1); /* tambahkan efek pencerahan */
+}
 
 
 .kotakepl {
