@@ -460,12 +460,12 @@ a:hover, a:visited, a:link, a:active
 
 /* Saat hover — terangin background */
 .kotak2:hover {
-  background: rgba(50, 50, 50, 0.4)
+  background: rgba(40, 40, 40, 0.4)
     url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgyaPN5tTq0x-UUqhMa0SEHpXJyN9CveJbwMCcb8wROEZsB24cTRMNSNJVQCzdOSDkoklsDwgvaJLj6dzhz80cvtvaN7Ztk_AEob7sfzrPRmSTQ62IYOBihVnJPD71x8euPMfRvh-W2xRg_23cN6EYVF2JUPZokbcptD9iDqnMCbaim3H7H62I-00kzG3Zr/s320/pngtree-fiery-soccer-ball---burning-passion-image_17105065.jpg')
     center/cover no-repeat;
   background-blend-mode: lighten; /* bikin efek lebih terang */
   border-color: #ff4d4d;
-  filter: brightness(1.3); /* tambahkan efek pencerahan */
+  filter: brightness(1.1); /* tambahkan efek pencerahan */
 }
 
 
