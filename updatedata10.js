@@ -1,4 +1,4 @@
-// --- Fungsi Utama Load Sofascore + Fallback Lengkap ---
+// --- Fungsi Utama Load Sofascore + FALLBACK ---
 function loadSofaScore(matchId, boxId, fallback = {}) {
     const eventUrl = `https://api.sofascore.com/api/v1/event/${matchId}`;
 
@@ -17,61 +17,52 @@ function loadSofaScore(matchId, boxId, fallback = {}) {
             // ===== LEAGUE =====
             const leagueEl = document.getElementById("league" + boxId);
             if (leagueEl) {
-                leagueEl.innerHTML = `
-                <span style="display:inline-flex;align-items:center;">
-                  <img src="https://api.sofascore.app/api/v1/unique-tournament/${event.tournament.uniqueTournament.id}/image/dark"
-                       style="height:18px;width:18px;margin-right:4px;">
-                  <span>${event.tournament.name}</span>
-                </span>`;
+                leagueEl.innerHTML = event.tournament?.name || fallback.league || "";
             }
 
             // ===== KICKOFF =====
             const kickoffDate = new Date(event.startTimestamp * 1000);
-            const tanggal = kickoffDate.toLocaleDateString("id-ID", {
-                day: "2-digit",
-                month: "long",
-                year: "numeric"
-            });
-            const jam = kickoffDate.toLocaleTimeString("id-ID", {
-                hour: "2-digit",
-                minute: "2-digit",
-                hour12: false
-            });
-
             document.getElementById("kickoff" + boxId).innerHTML =
-                `${tanggal} | K.O ${jam}`;
+                kickoffDate.toLocaleDateString("id-ID", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric"
+                }) +
+                " | K.O " +
+                kickoffDate.toLocaleTimeString("id-ID", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false
+                });
 
-            // ===== TEAM + LOGO =====
+            // ===== TEAMS =====
             document.getElementById("teamshome" + boxId).innerText = home.name;
             document.getElementById("teamsaway" + boxId).innerText = away.name;
 
             document.getElementById("logoHome" + boxId).src =
-                `https://api.sofascore.app/api/v1/team/${home.id}/image`;
+                "https://api.sofascore.app/api/v1/team/" + home.id + "/image";
             document.getElementById("logoAway" + boxId).src =
-                `https://api.sofascore.app/api/v1/team/${away.id}/image`;
+                "https://api.sofascore.app/api/v1/team/" + away.id + "/image";
 
-            // ===== COUNTDOWN + LIVE =====
             startCountdown(kickoffDate.getTime(), boxId);
             monitorMatchStatus(matchId, boxId);
         })
-        .catch(err => {
-            console.warn("⚠️ Sofascore gagal → fallback aktif", err);
+        .catch(() => {
+            // ===== FALLBACK TOTAL =====
+            console.warn("⚠️ SofaScore mati → pakai fallback");
 
-            // ===== FALLBACK TEAM =====
             if (fallback.home)
                 document.getElementById("teamshome" + boxId).innerText = fallback.home;
+
             if (fallback.away)
                 document.getElementById("teamsaway" + boxId).innerText = fallback.away;
 
-            // ===== FALLBACK LEAGUE =====
             if (fallback.league)
-                document.getElementById("league" + boxId).innerHTML = fallback.league;
+                document.getElementById("league" + boxId).innerText = fallback.league;
 
-            // ===== FALLBACK KICKOFF =====
             if (fallback.kickoffText)
-                document.getElementById("kickoff" + boxId).innerHTML = fallback.kickoffText;
+                document.getElementById("kickoff" + boxId).innerText = fallback.kickoffText;
 
-            // ===== FALLBACK COUNTDOWN =====
             if (fallback.kickoffTime)
                 startCountdown(fallback.kickoffTime, boxId);
         });
