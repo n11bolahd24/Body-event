@@ -54,8 +54,8 @@ function renderMatch(
         0 0 4px #000,
         0 0 6px #000,
         0 0 8px #000;">
-        Perhatian : Data Pertandingan tidak lengkap,
-        Ubah dulu DNS menjadi CloudFlare !
+        Perhatian : Data Pertandingan Error,
+        Mungkin Perlu Ubah DNS menjadi CloudFlare !
       </div>
     </center>
   </div>
