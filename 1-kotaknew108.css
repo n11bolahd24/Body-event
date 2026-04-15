@@ -507,7 +507,7 @@ a:hover, a:visited, a:link, a:active
   border-color: #ff4d4d;
 }
 
-.kotaktimnas2 {
+.kotak10 {
   position: relative;
   width: 97%;
   margin: 15px auto 0 auto;
@@ -523,7 +523,7 @@ a:hover, a:visited, a:link, a:active
 }
 
 /* Saat hover — terangin background */
-.kotaktimnas2:hover {
+.kotak10:hover {
   background: rgba(60, 60, 60, 0.4)
     url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhn_491Bk_AZrJdHWOkCoL9CGLVYB8NTg2VbqgubCOEofQno0e-aUWNjm_Xj0eN1_fTgrGBUbjBDigaaTPv3HTRbvgVGy7wd8aa5-RJJMkMr1PfuJ2s1oU06NHPaqAVoH5v-vRo8VjPuCQHuSFsfSbwURSE7RPzRSvJ6yLkXVX0n1lLccmuV8yUH8ayz2ey/s320/11111.webp')
     center/cover no-repeat;
