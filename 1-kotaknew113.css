@@ -529,7 +529,6 @@ a:hover, a:visited, a:link, a:active
     center/cover no-repeat;
   background-blend-mode: overlay; /* bikin efek lebih terang */
   border-color: #ff4d4d;
-  filter: brightness(0.5); /* tambahkan efek pencerahan */
 }
 
 
