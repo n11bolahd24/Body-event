@@ -1,5 +1,5 @@
 // ===============================
-// MATCH SYSTEM (RENDER + TIMER)
+// MATCH SYSTEM FINAL
 // ===============================
 
 function createCountdown(targetDate, countdownId, liveContainerId, kickoffId, matchBoxId) {
@@ -19,7 +19,7 @@ function createCountdown(targetDate, countdownId, liveContainerId, kickoffId, ma
 
         var now = new Date().getTime();
         var distance = targetDate - now;
-        var matchEnd = targetDate + (2 * 60 * 60 * 1000); // 2 jam match
+        var matchEnd = targetDate + (2 * 60 * 60 * 1000);
 
         if (distance > 0) {
 
@@ -52,11 +52,7 @@ function createCountdown(targetDate, countdownId, liveContainerId, kickoffId, ma
 
     var d = new Date(targetDate);
     kickoffElement.innerHTML =
-        d.toLocaleDateString("id-ID", {
-            day: "2-digit",
-            month: "long",
-            year: "numeric"
-        }) +
+        d.toLocaleDateString("id-ID") +
         " | K.O " +
         d.toLocaleTimeString("id-ID", {
             hour: "2-digit",
@@ -66,7 +62,7 @@ function createCountdown(targetDate, countdownId, liveContainerId, kickoffId, ma
 
 
 // ===============================
-// RENDER MATCH (MAIN FUNCTION)
+// RENDER MATCH (FIX KOTAK1 DI SINI)
 // ===============================
 
 function renderMatch(
@@ -87,7 +83,7 @@ function renderMatch(
     ).join("");
 
     let html = `
-    <div class="kotak1" id="match${id}">
+    <div class="kotak1 match-box" id="match${id}">
 
         <div class="countdown" id="countdown${id}"></div>
 
