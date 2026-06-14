@@ -17,7 +17,7 @@ function renderMatch({
   `).join("");
 
   let html = `
-  <div class="${boxClass} match-box" id="match${id}">
+  <div class="${boxClass}" id="match${id}">
 
       <div class="countdown" id="countdown${id}"></div>
 
@@ -33,29 +33,27 @@ function renderMatch({
         </center>
       </div>
 
-      <img src="${homeLogo}"
-        style="position:absolute;height:50px;width:50px;top:25%;left:10%;border-radius:5px;">
-
-      <img src="${awayLogo}"
-        style="position:absolute;height:50px;width:50px;top:25%;right:10%;border-radius:5px;">
+      <img src="${homeLogo}" style="position:absolute;height:50px;width:50px;top:25%;left:10%;border-radius:5px;">
+      <img src="${awayLogo}" style="position:absolute;height:50px;width:50px;top:25%;right:10%;border-radius:5px;">
 
       <center>
-        <span style="font-size:large;">
-          ${serverHTML}
-        </span>
+        ${serverHTML}
       </center>
 
       <br>
   </div>
   `;
 
-  document.getElementById("matchContainer").innerHTML += html;
+  document.getElementById("matchContainer")
+    .insertAdjacentHTML("beforeend", html);
 
-  createCountdown(
-    new Date(kickoff).getTime(),
-    `countdown${id}`,
-    `liveContainer${id}`,
-    `kickoff${id}`,
-    `match${id}`
-  );
+  setTimeout(() => {
+    createCountdown(
+      new Date(kickoff).getTime(),
+      `countdown${id}`,
+      `liveContainer${id}`,
+      `kickoff${id}`,
+      `match${id}`
+    );
+  }, 50);
 }
