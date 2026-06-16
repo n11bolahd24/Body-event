@@ -28,7 +28,7 @@ function createCountdown(
   const countdown = setInterval(() => {
     const now = Date.now();
     const distance = targetDate - now;
-    const matchEnd = targetDate + (2 * 60 * 60 * 1000);
+    const matchEnd = targetDate + (2.5 * 60 * 60 * 1000); // 2.5 = 2 JAM 30 MENIT
 
     // ⏳ BEFORE KICKOFF
     if (distance > 0) {
