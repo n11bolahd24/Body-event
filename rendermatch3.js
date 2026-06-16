@@ -12,39 +12,17 @@ function createCountdown(
 
   if (!countdownElement || !liveContainer || !kickoffElement || !matchBox) return;
 
+  // 🔥 ambil semua tombol server di match ini
   const serverButtons = matchBox.querySelectorAll(".tv");
 
-  // STATUS SERVER TEXT
-  const serverStatus = document.createElement("div");
-  serverStatus.style.textAlign = "center";
-  serverStatus.style.marginTop = "6px";
-  serverStatus.style.fontWeight = "bold";
-  serverStatus.style.fontSize = "12px";
-  matchBox.appendChild(serverStatus);
-
-  function setServerState(state) {
+  function setServerState(enabled) {
     serverButtons.forEach(btn => {
-      if (state === "active") {
+      if (enabled) {
         btn.classList.remove("disabled");
       } else {
         btn.classList.add("disabled");
       }
     });
-
-    if (state === "ready") {
-      serverStatus.innerHTML = "⏳ SERVER BELUM SIAP";
-      serverStatus.style.color = "#ffcc00";
-    }
-
-    if (state === "active") {
-      serverStatus.innerHTML = "🔴 SERVER AKTIF";
-      serverStatus.style.color = "#00ff7b";
-    }
-
-    if (state === "ended") {
-      serverStatus.innerHTML = "⛔ SERVER TUTUP";
-      serverStatus.style.color = "#ff4d4d";
-    }
   }
 
   const countdown = setInterval(() => {
@@ -52,10 +30,10 @@ function createCountdown(
     const distance = targetDate - now;
     const matchEnd = targetDate + (2 * 60 * 60 * 1000);
 
-    // ⏳ BEFORE MATCH
+    // ⏳ BEFORE KICKOFF
     if (distance > 0) {
 
-      setServerState("ready");
+      setServerState(false);
 
       const days = Math.floor(distance / (1000 * 60 * 60 * 24));
       const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -64,12 +42,13 @@ function createCountdown(
 
       countdownElement.innerHTML =
         days + "D - " + hours + "H - " + minutes + "M - " + seconds + "S";
+
     }
 
     // 🔴 LIVE
     else if (now < matchEnd) {
 
-      setServerState("active");
+      setServerState(true);
 
       countdownElement.innerHTML = "";
 
@@ -78,12 +57,13 @@ function createCountdown(
 
       liveContainer.innerHTML =
         "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW</strong>";
+
     }
 
-    // ⛔ END
+    // ⛔ FINISHED
     else {
 
-      setServerState("ended");
+      setServerState(false);
 
       clearInterval(countdown);
 
@@ -123,7 +103,7 @@ function createCountdown(
 
 
 // ===============================
-// RENDER MATCH (TIDAK DIUBAH)
+// RENDER MATCH
 // ===============================
 function renderMatch({
   no,
@@ -140,7 +120,8 @@ function renderMatch({
   if (!container) return;
 
   const serverHTML = servers.map((func, i) => `
-    <a class="tv" href="javascript:${func}();">
+    <a class="tv"
+       href="javascript:${func}();">
       <b>
         <span style="border:none;color:white;padding:0 10px 0 6px;">
           SERVER${i + 1}
@@ -154,22 +135,34 @@ function renderMatch({
 
       <div class="countdown" id="countdown${no}"></div>
 
-      <div class="live-container hidden" id="liveContainer${no}"></div>
-
-      <div class="club" style="text-align:center;">
-        <b>${competition}</b><br>
-        <div id="kickoff${no}"></div>
-        <b>${home} vs ${away}</b>
+      <div class="live-container hidden" id="liveContainer${no}">
+        <strong style="color:red;">🔴 LIVE NOW</strong>
       </div>
 
-      <img src="${homeLogo}" style="position:absolute;height:50px;width:50px;top:25%;left:10%;">
-      <img src="${awayLogo}" style="position:absolute;height:50px;width:50px;top:25%;right:10%;">
+      <div class="club1" style="position:relative;z-index:1;">
+        <br>
+      </div>
+
+      <div class="club">
+        <center>
+          <font style="font-weight:bold">${competition}</font>
+          <br>
+          <div id="kickoff${no}"></div>
+          <font style="font-weight:bold">${home} vs ${away}</font>
+        </center>
+      </div>
+
+      <img src="${homeLogo}" style="position:absolute;height:50px;width:50px;top:25%;left:10%;border-radius:5px;">
+      <img src="${awayLogo}" style="position:absolute;height:50px;width:50px;top:25%;right:10%;border-radius:5px;">
 
       <center>
-        ${serverHTML}
+        <span style="font-size:large;">
+          ${serverHTML}
+        </span>
       </center>
 
       <br>
+
     </div>
   `);
 
