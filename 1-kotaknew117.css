@@ -303,7 +303,7 @@ a:hover, a:visited, a:link, a:active
   color:#fff!important;
   font-weight:500;
   background:#000000ef;
-  border-color:#ff0000;
+  border-color:#f7c82d;
 }
 
 
@@ -422,7 +422,7 @@ a:hover, a:visited, a:link, a:active
   position: relative;
   width: 97%;
   margin: 15px auto 0 auto;
-  border: 1px solid #ff0000;
+  border: 1px solid #f7c82d;
   border-radius: 7px;
   transition: 0.25s all ease-in-out;
 
