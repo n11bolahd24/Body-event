@@ -124,7 +124,7 @@ function renderMatch({
        href="javascript:${func}();">
       <b>
         <span style="border:none;color:white;padding:0 10px 0 6px;">
-          SERVER${i + 1}
+          CHANNEL ${i + 1}
         </span>
       </b>
     </a>
