@@ -152,8 +152,8 @@ function renderMatch({
         </center>
       </div>
 
-      <img src="${homeLogo}" class="team-logo" style="position:absolute;height:50px;width:50px;top:25%;left:10%;">
-      <img src="${awayLogo}" class="team-logo" style="position:absolute;height:50px;width:50px;top:25%;right:10%;">
+      <img src="${homeLogo}" style="position:absolute;height:50px;width:50px;top:25%;left:10%;">
+      <img src="${awayLogo}" style="position:absolute;height:50px;width:50px;top:25%;right:10%;">
 
       <center>
         <span style="font-size:large;">
