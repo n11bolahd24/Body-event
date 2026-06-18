@@ -428,7 +428,7 @@ a:hover, a:visited, a:link, a:active
 
   /* Background dasar dengan gambar WebP */
   background: rgba(20, 20, 20, 0.8)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh7MSssV5FOpj36izZZLxYZ2B-vGJODXaVTTuHGZZTJEfLUl-DKRosBHqfmSur040aCSoQQgMMyJnTOc0mXmiWCQWHnsTmFxK5YXs3XQZ6zfxK_BRkHr3YEfZjCSBZa6it9KNWSKLnxffpsRKUUiZK_Jnz9KMWP9vNMIAB8H9997XfIByi_Y_hVfy2lfCr7/s320/Vector-black-abstract-background-free-vector-download-01-scaled.webp')
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEghXtRwrve1908c-M5Q_i65k8geNU7ugYaSqMMlP_npZIpiS0KEUlAebFUuoVMVm4AhQqZuJuFZI0R22U6ot8iVTVwLjAv46h6zhw4Cx5MEd3GwHMqNFWPGtxaCQF-9iiBo_2DYwvBTIPvS6vVJ98Vjc7fKUcGknbpe-72zNIpztQNsEd3bZPpml36d3prR/s320/ChatGPT%20Image%20Jun%2018,%202026,%2003_21_52%20PM.webp')
     center/cover no-repeat;
   background-blend-mode: overlay;
 }
@@ -436,7 +436,7 @@ a:hover, a:visited, a:link, a:active
 /* Saat hover — terangin background */
 .kotak1:hover {
   background: rgba(60, 60, 60, 0.4)
-    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEh7MSssV5FOpj36izZZLxYZ2B-vGJODXaVTTuHGZZTJEfLUl-DKRosBHqfmSur040aCSoQQgMMyJnTOc0mXmiWCQWHnsTmFxK5YXs3XQZ6zfxK_BRkHr3YEfZjCSBZa6it9KNWSKLnxffpsRKUUiZK_Jnz9KMWP9vNMIAB8H9997XfIByi_Y_hVfy2lfCr7/s320/Vector-black-abstract-background-free-vector-download-01-scaled.webp')
+    url('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEghXtRwrve1908c-M5Q_i65k8geNU7ugYaSqMMlP_npZIpiS0KEUlAebFUuoVMVm4AhQqZuJuFZI0R22U6ot8iVTVwLjAv46h6zhw4Cx5MEd3GwHMqNFWPGtxaCQF-9iiBo_2DYwvBTIPvS6vVJ98Vjc7fKUcGknbpe-72zNIpztQNsEd3bZPpml36d3prR/s320/ChatGPT%20Image%20Jun%2018,%202026,%2003_21_52%20PM.webp')
     center/cover no-repeat;
   background-blend-mode: lighten; /* bikin efek lebih terang */
   border-color: #ffffff;
