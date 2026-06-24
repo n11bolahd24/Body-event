@@ -33,7 +33,12 @@ function createCountdown(
     // ⏳ BEFORE KICKOFF
     if (distance > 0) {
 
-      setServerState(false);
+  // Aktifkan server 15 menit sebelum kickoff
+  if (distance <= 15 * 60 * 1000) {
+    setServerState(true);
+  } else {
+    setServerState(false);
+  }
 
       const days = Math.floor(distance / (1000 * 60 * 60 * 24));
       const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
