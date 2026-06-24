@@ -119,16 +119,16 @@ function renderMatch({
   const container = document.getElementById("matchContainer");
   if (!container) return;
 
-  const serverHTML = servers.map((func, i) => `
-    <a class="tv"
-       href="javascript:${func}();">
-      <b>
-        <span style="border:none;color:white;padding:0 10px 0 6px;">
-          LIVE ${i + 1}
-        </span>
-      </b>
-    </a>
-  `).join("");
+  const serverHTML = servers.map((server, i) => `
+  <a class="tv"
+     href="javascript:${server.func}();">
+    <b>
+      <span style="border:none;color:white;padding:0 10px 0 6px;">
+        ${server.name}
+      </span>
+    </b>
+  </a>
+`).join("");
 
   container.insertAdjacentHTML("beforeend", `
     <div class="kotak1" id="match${no}">
