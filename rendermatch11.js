@@ -34,7 +34,7 @@ function createCountdown(
     if (distance > 0) {
 
   // Aktifkan server 15 menit sebelum kickoff
-  if (distance <= 15 * 60 * 1000) {
+  if (distance <= 30 * 60 * 1000) {
     setServerState(true);
   } else {
     setServerState(false);
