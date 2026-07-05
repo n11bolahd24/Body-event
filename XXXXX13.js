@@ -26,7 +26,7 @@ function createCountdown(
   }
 
   // ===============================
-  // REPLAY MODE (NO TIMER)
+  // 🔴 REPLAY MODE (NO TIMER)
   // ===============================
   if (type === "replay") {
     countdownElement.innerHTML = "";
@@ -63,7 +63,7 @@ function createCountdown(
     const matchEnd = targetDate + (3 * 60 * 60 * 1000);
 
     // ===============================
-    // BEFORE KICKOFF
+    // ⏳ BEFORE KICKOFF
     // ===============================
     if (distance > 0) {
 
@@ -80,11 +80,12 @@ function createCountdown(
     }
 
     // ===============================
-    // LIVE
+    // 🔴 LIVE
     // ===============================
     else if (now < matchEnd) {
 
       setServerState(true);
+
       countdownElement.innerHTML = "";
 
       liveContainer.classList.remove("hidden");
@@ -95,18 +96,19 @@ function createCountdown(
     }
 
     // ===============================
-    // FINISHED
+    // ⛔ FINISHED
     // ===============================
     else {
 
       setServerState(false);
+
       clearInterval(countdown);
 
       countdownElement.innerHTML = "";
 
       liveContainer.classList.remove("blink");
-      liveContainer.classList.remove("hidden");
       liveContainer.style.animation = "none";
+      liveContainer.classList.remove("hidden");
 
       liveContainer.innerHTML =
         "<strong style='color:white;-webkit-text-stroke:0.2px black;'>⛔ MATCH ENDED ⛔</strong>";
