@@ -13,15 +13,35 @@ function createCountdown(
 
   if (!countdownElement || !liveContainer || !kickoffElement || !matchBox) return;
 
- if (type === "replay") {
+ // 🔥 MODE REPLAY (tanpa countdown & tanpa batas waktu)
+if (type === "replay") {
   countdownElement.innerHTML = "";
 
   liveContainer.classList.remove("hidden");
+  liveContainer.classList.add("blink");
+
   liveContainer.innerHTML =
     "<strong style='color:white;-webkit-text-stroke:0.2px black;'>▶️ LIVE REPLAY</strong>";
 
   setServerState(true);
-  return; // ⛔ stop semua countdown
+
+  // update tanggal kickoff tetap ditampilkan
+  const kickoffDate = new Date(targetDate);
+
+  kickoffElement.innerHTML =
+    kickoffDate.toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric"
+    }) +
+    " | K.O " +
+    kickoffDate.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false
+    });
+
+  return; // ⛔ stop semua countdown logic
 }
   
   // 🔥 ambil semua tombol server di match ini
