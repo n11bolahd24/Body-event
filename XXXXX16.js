@@ -1,6 +1,3 @@
-// ===============================
-// CREATE COUNTDOWN
-// ===============================
 function createCountdown(
   targetDate,
   countdownId,
@@ -15,6 +12,7 @@ function createCountdown(
 
   if (!countdownElement || !liveContainer || !kickoffElement || !matchBox) return;
 
+  // 🔥 ambil semua tombol server di match ini
   const serverButtons = matchBox.querySelectorAll(".tv");
 
   function setServerState(enabled) {
@@ -30,18 +28,17 @@ function createCountdown(
   const countdown = setInterval(() => {
     const now = Date.now();
     const distance = targetDate - now;
-    const matchEnd = targetDate + (3 * 60 * 60 * 1000);
+    const matchEnd = targetDate + (3 * 60 * 60 * 1000); // 3 = 3 JAM
 
-    // ===============================
-    // BEFORE KICKOFF
-    // ===============================
+    // ⏳ BEFORE KICKOFF
     if (distance > 0) {
 
-      if (distance <= 30 * 60 * 1000) {
-        setServerState(true);
-      } else {
-        setServerState(false);
-      }
+  // Aktifkan server 15 menit sebelum kickoff
+  if (distance <= 30 * 60 * 1000) {
+    setServerState(true);
+  } else {
+    setServerState(false);
+  }
 
       const days = Math.floor(distance / (1000 * 60 * 60 * 24));
       const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -50,11 +47,10 @@ function createCountdown(
 
       countdownElement.innerHTML =
         days + "D - " + hours + "H - " + minutes + "M - " + seconds + "S";
+
     }
 
-    // ===============================
-    // LIVE
-    // ===============================
+    // 🔴 LIVE
     else if (now < matchEnd) {
 
       setServerState(true);
@@ -66,14 +62,13 @@ function createCountdown(
 
       liveContainer.innerHTML =
         "<strong style='color:white;-webkit-text-stroke:0.2px black;'>🔴 LIVE NOW</strong>";
+
     }
 
-    // ===============================
-    // FINISHED
-    // ===============================
+    // ⛔ FINISHED
     else {
 
-      // 🔥 SERVER TETAP AKTIF (sesuai request kamu)
+      // tetap aktifkan server walaupun match selesai
       setServerState(true);
 
       clearInterval(countdown);
@@ -81,12 +76,14 @@ function createCountdown(
       countdownElement.innerHTML = "";
 
       liveContainer.classList.remove("blink");
+      liveContainer.style.animation = "none";
       liveContainer.classList.remove("hidden");
 
       liveContainer.innerHTML =
         "<strong style='color:white;-webkit-text-stroke:0.2px black;'>⛔ MATCH ENDED ⛔</strong>";
 
       const finishedContainer = document.getElementById("finishedMatches");
+
       if (finishedContainer) {
         finishedContainer.appendChild(matchBox);
       }
@@ -128,15 +125,16 @@ function renderMatch({
   const container = document.getElementById("matchContainer");
   if (!container) return;
 
-  const serverHTML = servers.map(server => `
-    <a class="tv" href="javascript:${server.func}();">
-      <b>
-        <span style="border:none;color:white;padding:0 10px 0 6px;">
-          ${server.name}
-        </span>
-      </b>
-    </a>
-  `).join("");
+  const serverHTML = servers.map((server, i) => `
+  <a class="tv"
+     href="javascript:${server.func}();">
+    <b>
+      <span style="border:none;color:white;padding:0 10px 0 6px;">
+        ${server.name}
+      </span>
+    </b>
+  </a>
+`).join("");
 
   container.insertAdjacentHTML("beforeend", `
     <div class="kotak1" id="match${no}">
@@ -145,6 +143,10 @@ function renderMatch({
 
       <div class="live-container hidden" id="liveContainer${no}">
         <strong style="color:red;">🔴 LIVE NOW</strong>
+      </div>
+
+      <div class="club1" style="position:relative;z-index:1;">
+        <br>
       </div>
 
       <div class="club">
