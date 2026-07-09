@@ -255,6 +255,15 @@ document.addEventListener("click", function (e) {
                 color:#ffd700;
              ">
         </div>
+        <div id="previewNotice"
+        style="
+        margin-top:12px;
+        font-size:13px;
+        color:#bdbdbd;
+        font-style:italic;
+     ">
+    Live Streaming will be available 30 minutes before kick-off.
+</div>
 
     </div>
     `;
@@ -271,18 +280,6 @@ document.addEventListener("click", function (e) {
     // Kalau LIVE benar-benar tampil
     if(sourceLive &&
        !sourceLive.classList.contains("hidden")){
-      // Jalankan hanya sekali
-if (!match.dataset.autoPlay) {
-
-    const firstServer = match.querySelector(".tv");
-
-    if (firstServer) {
-
-        firstServer.click();   // otomatis klik LIVE 1
-
-        match.dataset.autoPlay = "1";
-
-    }
 
 }
 
@@ -303,3 +300,12 @@ if (!match.dataset.autoPlay) {
     window.previewInterval = setInterval(syncPreview,1000);
 
 });
+const notice = document.getElementById("previewNotice");
+
+if (sourceLive && !sourceLive.classList.contains("hidden")) {
+    target.innerHTML = sourceLive.innerHTML;
+    if (notice) notice.style.display = "none";
+} else {
+    target.innerHTML = sourceCountdown.innerHTML;
+    if (notice) notice.style.display = "block";
+}
