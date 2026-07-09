@@ -233,13 +233,13 @@ document.addEventListener("click", function (e) {
             margin:15px 0;
         ">
 
-            <img src="${homeLogo}" width="65">
+            <img src="${homeLogo}" style="width:45px;height:45px;object-fit:contain;">
 
-            <div style="font-size:20px;font-weight:bold;">
+            <div style="font-size:16px;font-weight:bold;">
                 VS
             </div>
 
-            <img src="${awayLogo}" width="65">
+            <img src="${awayLogo}" style="width:45px;height:45px;object-fit:contain;">
 
         </div>
 
