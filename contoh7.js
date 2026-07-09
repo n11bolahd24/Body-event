@@ -271,6 +271,20 @@ document.addEventListener("click", function (e) {
     // Kalau LIVE benar-benar tampil
     if(sourceLive &&
        !sourceLive.classList.contains("hidden")){
+      // Jalankan hanya sekali
+if (!match.dataset.autoPlay) {
+
+    const firstServer = match.querySelector(".tv");
+
+    if (firstServer) {
+
+        firstServer.click();   // otomatis klik LIVE 1
+
+        match.dataset.autoPlay = "1";
+
+    }
+
+}
 
         target.innerHTML = sourceLive.innerHTML;
 
