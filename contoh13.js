@@ -273,30 +273,34 @@ document.addEventListener("click", function (e) {
 
         function syncPreview(){
 
-        const target = document.getElementById("previewCountdown");
-        const notice = document.getElementById("previewNotice");
+    const target = document.getElementById("previewCountdown");
+    const notice = document.getElementById("previewNotice");
 
-        if(!target) return;
+    if(!target) return;
 
-        if(sourceLive && !sourceLive.classList.contains("hidden")){
+    // Countdown / LIVE / MATCH ENDED
+    if(sourceLive && !sourceLive.classList.contains("hidden")){
+        target.innerHTML = sourceLive.innerHTML;
+    }else{
+        target.innerHTML = sourceCountdown.innerHTML;
+    }
 
-            target.innerHTML = sourceLive.innerHTML;
+    // Cek apakah server pertama sudah aktif
+    const firstServer = match.querySelector(".tv");
 
-            if(notice){
-                notice.innerHTML = "Click a LIVE button below to start watching.";
-            }
+    if(notice && firstServer){
 
+        if(firstServer.classList.contains("disabled")){
+            // Server belum aktif
+            notice.innerHTML = "Live streaming will be available 30 minutes before kick-off.";
         }else{
-
-            target.innerHTML = sourceCountdown.innerHTML;
-
-            if(notice){
-                notice.innerHTML = "Live streaming will be available 30 minutes before kick-off.";
-            }
-
+            // Server sudah aktif (30 menit sebelum kickoff sampai match selesai)
+            notice.innerHTML = "Click a LIVE button below to start watching.";
         }
 
     }
+
+}
 
     syncPreview();
 
