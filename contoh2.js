@@ -334,8 +334,8 @@ const serverHTML =
 servers.map(server=>`
 
 <a class="tv"
-href="javascript:${server.func}();"
-onclick="event.stopPropagation();">
+onclick="event.stopPropagation();"
+href="javascript:${server.func}();">
 
 <b>
 <span style="border:none;color:white;padding:0 10px 0 6px;">
@@ -355,7 +355,6 @@ container.insertAdjacentHTML("beforeend",`
 
 <div class="kotak1"
 id="match${no}"
-
 onclick="
 showMatchPreview(
 '${home}',
@@ -363,8 +362,7 @@ showMatchPreview(
 '${homeLogo}',
 '${awayLogo}',
 ${new Date(date).getTime()}
-);
-">
+)">
 
 
 <div class="countdown"
