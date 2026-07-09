@@ -274,38 +274,30 @@ document.addEventListener("click", function (e) {
     function syncPreview(){
 
     const target = document.getElementById("previewCountdown");
+    const notice = document.getElementById("previewNotice");
 
     if(!target) return;
 
-    // Kalau LIVE benar-benar tampil
-    if(sourceLive &&
-       !sourceLive.classList.contains("hidden")){
-
-}
+    // LIVE atau MATCH ENDED
+    if(sourceLive && !sourceLive.classList.contains("hidden")){
 
         target.innerHTML = sourceLive.innerHTML;
 
-    }else{
-
-        target.innerHTML = sourceCountdown.innerHTML;
+        if(notice){
+            notice.style.display = "none";
+        }
 
     }
 
-}
+    // Countdown
+    else{
 
-    syncPreview();
+        target.innerHTML = sourceCountdown.innerHTML;
 
-    clearInterval(window.previewInterval);
+        if(notice){
+            notice.style.display = "block";
+        }
 
-    window.previewInterval = setInterval(syncPreview,1000);
+    }
 
-});
-const notice = document.getElementById("previewNotice");
-
-if (sourceLive && !sourceLive.classList.contains("hidden")) {
-    target.innerHTML = sourceLive.innerHTML;
-    if (notice) notice.style.display = "none";
-} else {
-    target.innerHTML = sourceCountdown.innerHTML;
-    if (notice) notice.style.display = "block";
 }
