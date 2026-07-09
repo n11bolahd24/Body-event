@@ -203,7 +203,8 @@ document.addEventListener("click", function (e) {
 
     tv.innerHTML = `
     <div id="previewBox" style="
-        height:100%;
+        min-height:100%;
+        height:auto;
         background:#000;
         color:#fff;
         display:flex;
@@ -211,8 +212,10 @@ document.addEventListener("click", function (e) {
         justify-content:center;
         flex-direction:column;
         text-align:center;
-        padding:15px;
-    ">
+        padding:10px;
+        box-sizing:border-box;
+        overflow:hidden;
+">
 
         <div style="font-weight:bold;font-size:18px;color:#f7c82d;">
             ${competition}
