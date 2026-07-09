@@ -271,39 +271,37 @@ document.addEventListener("click", function (e) {
     const sourceCountdown = match.querySelector('[id^="countdown"]');
     const sourceLive = match.querySelector('[id^="liveContainer"]');
 
-    function syncPreview(){
+        function syncPreview(){
 
-    const target = document.getElementById("previewCountdown");
-    const notice = document.getElementById("previewNotice");
+        const target = document.getElementById("previewCountdown");
+        const notice = document.getElementById("previewNotice");
 
-    if(!target) return;
+        if(!target) return;
 
-    if(sourceLive && !sourceLive.classList.contains("hidden")){
+        if(sourceLive && !sourceLive.classList.contains("hidden")){
 
-    target.innerHTML = sourceLive.innerHTML;
+            target.innerHTML = sourceLive.innerHTML;
 
-    if(notice){
-        notice.innerHTML = "Click a LIVE button below to start watching.";
+            if(notice){
+                notice.innerHTML = "Click a LIVE button below to start watching.";
+            }
+
+        }else{
+
+            target.innerHTML = sourceCountdown.innerHTML;
+
+            if(notice){
+                notice.innerHTML = "Live streaming will be available 30 minutes before kick-off.";
+            }
+
+        }
+
     }
 
-}else{
+    syncPreview();
 
-    target.innerHTML = sourceCountdown.innerHTML;
+    clearInterval(window.previewInterval);
 
-    if(notice){
-        notice.innerHTML = "Live streaming will be available 30 minutes before kick-off.";
-    }
-
-}
-
-    }
-
-}
-
-syncPreview();
-
-clearInterval(window.previewInterval);
-
-window.previewInterval = setInterval(syncPreview, 1000);
+    window.previewInterval = setInterval(syncPreview, 1000);
 
 });
