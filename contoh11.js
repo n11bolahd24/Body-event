@@ -280,19 +280,21 @@ document.addEventListener("click", function (e) {
 
     if(sourceLive && !sourceLive.classList.contains("hidden")){
 
-        target.innerHTML = sourceLive.innerHTML;
+    target.innerHTML = sourceLive.innerHTML;
 
-        if(notice){
-            notice.style.display = "none";
-        }
+    if(notice){
+        notice.innerHTML = "Click a LIVE button below to start watching.";
+    }
 
-    }else{
+}else{
 
-        target.innerHTML = sourceCountdown.innerHTML;
+    target.innerHTML = sourceCountdown.innerHTML;
 
-        if(notice){
-            notice.style.display = "block";
-        }
+    if(notice){
+        notice.innerHTML = "Live streaming will be available 30 minutes before kick-off.";
+    }
+
+}
 
     }
 
