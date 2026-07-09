@@ -68,7 +68,8 @@ function createCountdown(
     // ⛔ FINISHED
     else {
 
-      setServerState(false);
+      // tetap aktifkan server walaupun match selesai
+      setServerState(true);
 
       clearInterval(countdown);
 
@@ -179,3 +180,132 @@ function renderMatch({
     `match${no}`
   );
 }
+
+// ===============================
+// MATCH PREVIEW (Klik kotak pertandingan)
+// Tidak mengubah createCountdown()
+// ===============================
+
+document.addEventListener("click", function (e) {
+
+    const match = e.target.closest(".kotak1");
+    if (!match) return;
+
+    const tv = document.getElementById("tv");
+    if (!tv) return;
+
+    const competition = match.querySelector(".club font:first-child")?.innerHTML || "";
+    const kickoff = match.querySelector('[id^="kickoff"]')?.innerHTML || "";
+    const teams = match.querySelector(".club font:last-child")?.innerHTML || "";
+
+    const homeLogo = match.querySelectorAll("img")[0]?.src || "";
+    const awayLogo = match.querySelectorAll("img")[1]?.src || "";
+
+    tv.innerHTML = `
+    <div id="previewBox" style="
+        height:100%;
+        background:#000;
+        color:#fff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        flex-direction:column;
+        text-align:center;
+        padding:15px;
+    ">
+
+        <div style="font-weight:bold;font-size:18px;color:#f7c82d;">
+            ${competition}
+        </div>
+
+        <div style="margin-top:5px;">
+            ${kickoff}
+        </div>
+
+        <div style="
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:20px;
+            margin:15px 0;
+        ">
+
+            <img src="${homeLogo}" width="65">
+
+            <div style="font-size:20px;font-weight:bold;">
+                VS
+            </div>
+
+            <img src="${awayLogo}" width="65">
+
+        </div>
+
+        <div style="
+            font-size:18px;
+            font-weight:bold;
+            margin-bottom:10px;
+        ">
+            ${teams}
+        </div>
+
+        <div id="previewCountdown"
+             style="
+                font-size:24px;
+                font-weight:bold;
+                color:#ffd700;
+             ">
+        </div>
+        <div id="previewNotice"
+        style="
+        margin-top:12px;
+        font-size:13px;
+        color:#bdbdbd;
+        font-style:italic;
+     ">
+    Live Streaming will be available 30 minutes before kick-off.
+</div>
+
+    </div>
+    `;
+
+    const sourceCountdown = match.querySelector('[id^="countdown"]');
+    const sourceLive = match.querySelector('[id^="liveContainer"]');
+
+        function syncPreview(){
+
+    const target = document.getElementById("previewCountdown");
+    const notice = document.getElementById("previewNotice");
+
+    if(!target) return;
+
+    // Countdown / LIVE / MATCH ENDED
+    if(sourceLive && !sourceLive.classList.contains("hidden")){
+        target.innerHTML = sourceLive.innerHTML;
+    }else{
+        target.innerHTML = sourceCountdown.innerHTML;
+    }
+
+    // Cek apakah server pertama sudah aktif
+    const firstServer = match.querySelector(".tv");
+
+    if(notice && firstServer){
+
+        if(firstServer.classList.contains("disabled")){
+            // Server belum aktif
+            notice.innerHTML = "Live streaming will be available 30 minutes before kick-off.";
+        }else{
+            // Server sudah aktif (30 menit sebelum kickoff sampai match selesai)
+            notice.innerHTML = "Click a LIVE button below to start watching.";
+        }
+
+    }
+
+}
+
+    syncPreview();
+
+    clearInterval(window.previewInterval);
+
+    window.previewInterval = setInterval(syncPreview, 1000);
+
+});
