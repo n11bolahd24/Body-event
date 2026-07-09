@@ -182,103 +182,108 @@ function renderMatch({
 }
 
 // ===============================
-// MATCH REVIEW SYSTEM (ADD ON)
-// TIDAK MENGUBAH SCRIPT ASLI
+// MATCH PREVIEW (Klik kotak pertandingan)
+// Tidak mengubah createCountdown()
 // ===============================
 
-function createMatchReview(matchBox) {
+document.addEventListener("click", function (e) {
 
-  if (!matchBox) return;
+    const match = e.target.closest(".kotak1");
+    if (!match) return;
 
-  const reviewContainer = document.getElementById("matchReview");
+    const tv = document.getElementById("tv");
+    if (!tv) return;
 
-  if (!reviewContainer) return;
+    const competition = match.querySelector(".club font:first-child")?.innerHTML || "";
+    const kickoff = match.querySelector('[id^="kickoff"]')?.innerHTML || "";
+    const teams = match.querySelector(".club font:last-child")?.innerHTML || "";
 
+    const homeLogo = match.querySelectorAll("img")[0]?.src || "";
+    const awayLogo = match.querySelectorAll("img")[1]?.src || "";
 
-  const matchName = matchBox.querySelector(".club font:last-child")?.innerText || "Match";
+    tv.innerHTML = `
+    <div id="previewBox" style="
+        height:100%;
+        background:#000;
+        color:#fff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        flex-direction:column;
+        text-align:center;
+        padding:15px;
+    ">
 
-  const competition = matchBox.querySelector(".club font:first-child")?.innerText || "";
+        <div style="font-weight:bold;font-size:18px;color:#f7c82d;">
+            ${competition}
+        </div>
 
-  const kickoff = matchBox.querySelector(".club div")?.innerText || "";
+        <div style="margin-top:5px;">
+            ${kickoff}
+        </div>
 
+        <div style="
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:20px;
+            margin:15px 0;
+        ">
 
-  const homeLogo = matchBox.querySelectorAll("img")[0]?.src || "";
-  const awayLogo = matchBox.querySelectorAll("img")[1]?.src || "";
+            <img src="${homeLogo}" width="65">
 
+            <div style="font-size:20px;font-weight:bold;">
+                VS
+            </div>
 
-  reviewContainer.insertAdjacentHTML("afterbegin", `
-
-    <div class="review-box">
-
-      <div class="review-title">
-        📝 MATCH REVIEW
-      </div>
-
-
-      <div class="review-content">
-
-        <img src="${homeLogo}" class="review-logo">
-
-
-        <div class="review-info">
-
-          <b>${competition}</b>
-          <br>
-
-          <span>${kickoff}</span>
-
-          <h3>
-            ${matchName}
-          </h3>
-
-          <div class="review-status">
-            ⛔ FULL TIME
-          </div>
-
-
-          <div class="review-score">
-            Review tersedia setelah pertandingan selesai
-          </div>
+            <img src="${awayLogo}" width="65">
 
         </div>
 
+        <div style="
+            font-size:18px;
+            font-weight:bold;
+            margin-bottom:10px;
+        ">
+            ${teams}
+        </div>
 
-        <img src="${awayLogo}" class="review-logo">
-
-
-      </div>
-
+        <div id="previewCountdown"
+             style="
+                font-size:24px;
+                font-weight:bold;
+                color:#ffd700;
+             ">
+        </div>
 
     </div>
+    `;
 
-  `);
+    const sourceCountdown = match.querySelector('[id^="countdown"]');
+    const sourceLive = match.querySelector('[id^="liveContainer"]');
 
-}
+    function syncPreview(){
 
+        const target = document.getElementById("previewCountdown");
 
+        if(!target) return;
 
-// Monitor pertandingan selesai
-const reviewWatcher = setInterval(() => {
+        if(sourceLive && sourceLive.innerHTML.trim() !== ""){
 
-  const finishedContainer = document.getElementById("finishedMatches");
+            target.innerHTML = sourceLive.innerHTML;
 
-  if (!finishedContainer) return;
+        }else{
 
+            target.innerHTML = sourceCountdown.innerHTML;
 
-  const matches = finishedContainer.querySelectorAll(".kotak1");
-
-
-  matches.forEach(match => {
-
-    if (!match.dataset.reviewCreated) {
-
-      createMatchReview(match);
-
-      match.dataset.reviewCreated = "true";
+        }
 
     }
 
-  });
+    syncPreview();
 
+    clearInterval(window.previewInterval);
 
-},2000);
+    window.previewInterval = setInterval(syncPreview,1000);
+
+});
