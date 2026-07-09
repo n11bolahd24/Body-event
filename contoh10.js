@@ -278,7 +278,6 @@ document.addEventListener("click", function (e) {
 
     if(!target) return;
 
-    // LIVE atau MATCH ENDED
     if(sourceLive && !sourceLive.classList.contains("hidden")){
 
         target.innerHTML = sourceLive.innerHTML;
@@ -287,10 +286,7 @@ document.addEventListener("click", function (e) {
             notice.style.display = "none";
         }
 
-    }
-
-    // Countdown
-    else{
+    }else{
 
         target.innerHTML = sourceCountdown.innerHTML;
 
@@ -301,3 +297,11 @@ document.addEventListener("click", function (e) {
     }
 
 }
+
+syncPreview();
+
+clearInterval(window.previewInterval);
+
+window.previewInterval = setInterval(syncPreview, 1000);
+
+});
