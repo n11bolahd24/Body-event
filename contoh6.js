@@ -264,21 +264,23 @@ document.addEventListener("click", function (e) {
 
     function syncPreview(){
 
-        const target = document.getElementById("previewCountdown");
+    const target = document.getElementById("previewCountdown");
 
-        if(!target) return;
+    if(!target) return;
 
-        if(sourceLive && sourceLive.innerHTML.trim() !== ""){
+    // Kalau LIVE benar-benar tampil
+    if(sourceLive &&
+       !sourceLive.classList.contains("hidden")){
 
-            target.innerHTML = sourceLive.innerHTML;
+        target.innerHTML = sourceLive.innerHTML;
 
-        }else{
+    }else{
 
-            target.innerHTML = sourceCountdown.innerHTML;
-
-        }
+        target.innerHTML = sourceCountdown.innerHTML;
 
     }
+
+}
 
     syncPreview();
 
