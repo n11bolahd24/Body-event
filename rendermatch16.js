@@ -195,15 +195,11 @@ const tv = document.getElementById("tv");
 if (!tv) return;
 
 
-// ⛔ Jika pertandingan sudah selesai, matikan preview
+// ⛔ Jika MATCH ENDED, abaikan klik
 const liveStatus = match.querySelector('[id^="liveContainer"]');
 
 if(liveStatus && liveStatus.innerHTML.includes("MATCH ENDED")){
-
-    tv.innerHTML = "";
-
     return;
-
 }
 
     const competition = match.querySelector(".club font:first-child")?.innerHTML || "";
