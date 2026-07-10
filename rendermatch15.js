@@ -189,10 +189,22 @@ function renderMatch({
 document.addEventListener("click", function (e) {
 
     const match = e.target.closest(".kotak1");
-    if (!match) return;
+if (!match) return;
 
-    const tv = document.getElementById("tv");
-    if (!tv) return;
+const tv = document.getElementById("tv");
+if (!tv) return;
+
+
+// ⛔ Jika pertandingan sudah selesai, matikan preview
+const liveStatus = match.querySelector('[id^="liveContainer"]');
+
+if(liveStatus && liveStatus.innerHTML.includes("MATCH ENDED")){
+
+    tv.innerHTML = "";
+
+    return;
+
+}
 
     const competition = match.querySelector(".club font:first-child")?.innerHTML || "";
     const kickoff = match.querySelector('[id^="kickoff"]')?.innerHTML || "";
