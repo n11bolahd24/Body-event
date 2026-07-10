@@ -198,10 +198,12 @@ if (!tv) return;
 // ⛔ Jika MATCH ENDED, abaikan klik
 const liveStatus = match.querySelector('[id^="liveContainer"]');
 
-if(liveStatus && liveStatus.innerHTML.includes("MATCH ENDED")){
+if(
+    liveStatus &&
+    !liveStatus.classList.contains("hidden")
+){
     return;
 }
-
     const competition = match.querySelector(".club font:first-child")?.innerHTML || "";
     const kickoff = match.querySelector('[id^="kickoff"]')?.innerHTML || "";
     const teams = match.querySelector(".club font:last-child")?.innerHTML || "";
