@@ -545,9 +545,12 @@ ${
 class="cola-watch">
 
     onclick="
-    event.stopPropagation();
-    playColaMatch('${match.match_uuid}')
-    ">
+event.stopPropagation();
+playColaAnchor(
+'${match.match_uuid}',
+${index}
+);
+">
 
     ▶ WATCH
 
@@ -570,7 +573,28 @@ class="cola-watch">
 
 
 
+function playColaAnchor(match_uuid,index){
 
+    const match = colaMatches.find(
+        m => m.match_uuid === match_uuid
+    );
+
+    if(!match) return;
+
+    const anchor =
+        match.anchorAppointmentVoList[index];
+
+    if(!anchor) return;
+
+    const url =
+        anchor.playStreamAddress2 ||
+        anchor.playStreamAddress ||
+        anchor.servers?.[0] ||
+        match.videoUrl;
+
+    playColaStream(url);
+
+}
 
 
 
