@@ -830,9 +830,8 @@ async function openColaMatch(match_uuid){
 
 
         let detailURL =
-"https://api.gvapi.cc/api/match/" +
-match.matchId +
-"/detail_live";
+"https://api.gvapi.cc/api/match/detail_live?id=" 
++ match.matchId;
 
 
 
