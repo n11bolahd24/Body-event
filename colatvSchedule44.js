@@ -501,40 +501,41 @@ match.status == "LIVE"
 function getScore(match){
 
 
-    let homeScore =
-    match.score?.home?.score ??
-    match.homeScore ??
-    match.home_score ??
-    0;
+    if(match.score){
 
 
-    let awayScore =
-    match.score?.away?.score ??
-    match.awayScore ??
-    match.away_score ??
-    0;
+        let home =
+        match.score.home?.score;
+
+
+        let away =
+        match.score.away?.score;
 
 
 
-    if(
-        isLiveMatch(match) ||
-        match.match_status == 3
-    ){
+        // pastikan hanya angka
+        if(
+            typeof home === "number" &&
+            typeof away === "number"
+        ){
 
-        return `
-        ${homeScore}
-        -
-        ${awayScore}
-        `;
+            return `
+            ${home}
+            -
+            ${away}
+            `;
+
+        }
+
 
     }
+
 
 
     return "VS";
 
 
 }
-
 
 // ==========================================
 // TIME
