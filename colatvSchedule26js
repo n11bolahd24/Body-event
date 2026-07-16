@@ -933,72 +933,6 @@ async function openColaMatch(match_uuid){
 
 function showColaServers(match){
 
-    const box =
-    document.getElementById(
-        "colaServerList"
-    );
-
-    if(!box) return;
-
-    const anchors =
-    match.anchorAppointmentVoList || [];
-
-    box.innerHTML = "";
-
-    if(anchors.length === 0){
-
-        box.innerHTML =
-        "<button disabled>Server belum tersedia</button>";
-
-        return;
-
-    }
-
-    anchors.forEach((anchor,index)=>{
-
-        const stream =
-
-            anchor.playStreamAddress2 ||
-
-            anchor.playStreamAddress ||
-
-            anchor.servers?.[0] ||
-
-            match.videoUrl ||
-
-            "";
-
-        const btn =
-        document.createElement("button");
-
-        btn.className =
-        "cola-server-btn";
-
-        btn.textContent =
-        anchor.nickName ||
-        `SERVER ${index+1}`;
-
-        btn.onclick = ()=>{
-
-            // hapus active lama
-            document
-            .querySelectorAll(
-                "#colaServerList button"
-            )
-            .forEach(b=>b.classList.remove("active"));
-
-            // active baru
-            btn.classList.add("active");
-
-            playColaStream(stream);
-
-        };
-
-        box.appendChild(btn);
-
-    });
-
-}
 
 
 
@@ -1383,57 +1317,25 @@ closeColaPopup();
 
 function playColaMatch(match_uuid){
 
+
+
     const match =
     colaMatches.find(
         m => m.match_uuid == match_uuid
     );
 
+
+
     if(!match){
 
-        alert("Match tidak ditemukan");
+        alert(
+        "Match tidak ditemukan"
+        );
 
         return;
 
     }
 
-    // tampilkan daftar server
-    showColaServers(match);
-
-    const anchors =
-    match.anchorAppointmentVoList || [];
-
-    // kalau cuma satu server
-    // langsung play otomatis
-    if(anchors.length === 1){
-
-        const stream =
-
-            anchors[0].playStreamAddress2 ||
-
-            anchors[0].playStreamAddress ||
-
-            anchors[0].servers?.[0] ||
-
-            match.videoUrl;
-
-        playColaStream(stream);
-
-        // aktifkan tombol pertama
-        setTimeout(()=>{
-
-            const btn =
-            document.querySelector(
-                "#colaServerList button"
-            );
-
-            if(btn)
-                btn.classList.add("active");
-
-        },100);
-
-    }
-
-}
 
 
     console.log(
