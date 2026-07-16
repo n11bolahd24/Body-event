@@ -491,12 +491,10 @@ function getTime(match){
     if(timestamp){
 
 
-        // kalau timestamp berupa string angka
         timestamp = Number(timestamp);
 
 
 
-        // cek apakah milliseconds
         if(timestamp < 10000000000){
 
             timestamp = timestamp * 1000;
@@ -513,7 +511,7 @@ function getTime(match){
             undefined,
             {
                 day:"2-digit",
-                month:"2-digit",
+                month:"short",
                 year:"numeric",
                 hour:"2-digit",
                 minute:"2-digit",
@@ -526,12 +524,10 @@ function getTime(match){
     }
 
 
-
     return "TBA";
 
 
 }
-
 
 
 
