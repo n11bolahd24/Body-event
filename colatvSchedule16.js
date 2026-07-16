@@ -960,6 +960,14 @@ console.log(
 servers
 );
 
+console.log(
+"SERVER PERTAMA DETAIL:",
+JSON.stringify(
+servers[0],
+null,
+2
+)
+);
 
 
 
