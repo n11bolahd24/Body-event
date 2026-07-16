@@ -299,7 +299,8 @@ function createMatchCard(match){
     return `
 
 
-    <div class="cola-match">
+    <div class="cola-match"
+onclick="openColaMatch('${match.match_uuid || match.uuid || ""}')">
 
 
         <div class="cola-status">
@@ -354,9 +355,16 @@ function createMatchCard(match){
 
         <div class="cola-time">
 
-            ${getTime(match)}
+${getTime(match)}
 
-        </div>
+</div>
+
+
+<button class="cola-watch">
+
+▶ WATCH
+
+</button>
 
 
 
@@ -529,6 +537,224 @@ function getTime(match){
 
 }
 
+
+
+
+// ==========================================
+// OPEN COLATV DETAIL
+// ==========================================
+
+
+async function openColaMatch(id){
+
+
+if(!id){
+
+alert("Match ID tidak ditemukan");
+
+return;
+
+}
+
+
+
+console.log(
+"OPEN MATCH:",
+id
+);
+
+
+
+let url =
+"https://api.colatv88xb.cc/api/match/"
++
+id
++
+"/detail_live";
+
+
+
+try{
+
+
+let res =
+await fetch(url);
+
+
+
+let data =
+await res.json();
+
+
+
+console.log(
+"DETAIL LIVE:",
+data
+);
+
+
+
+showColaServers(data);
+
+
+
+}
+catch(e){
+
+
+console.log(
+"DETAIL ERROR:",
+e
+);
+
+
+}
+
+
+}
+
+
+
+
+
+// ==========================================
+// SHOW SERVER
+// ==========================================
+
+
+function showColaServers(data){
+
+
+let servers =
+data?.data?.anchorAppointmentVoList ||
+data?.anchorAppointmentVoList ||
+[];
+
+
+
+let html = `
+
+
+<div class="cola-popup">
+
+
+<div class="cola-popup-box">
+
+
+<h3>
+⚡ LIVE STREAM
+</h3>
+
+
+
+`;
+
+
+
+if(!servers.length){
+
+
+html += `
+
+<p>
+Server belum tersedia
+</p>
+
+`;
+
+
+
+}
+else{
+
+
+servers.forEach(
+(server,index)=>{
+
+
+html += `
+
+<button onclick="playColaServer('${server.url || server.play_url}')">
+
+SERVER ${index+1}
+
+</button>
+
+`;
+
+
+
+});
+
+
+
+}
+
+
+
+html += `
+
+
+<button onclick="closeColaPopup()">
+
+CLOSE
+
+</button>
+
+
+</div>
+
+</div>
+
+
+`;
+
+
+
+document.body.insertAdjacentHTML(
+"beforeend",
+html
+);
+
+
+}
+
+
+
+
+
+function closeColaPopup(){
+
+
+let pop =
+document.querySelector(
+".cola-popup"
+);
+
+
+if(pop)
+pop.remove();
+
+
+}
+
+
+
+
+
+function playColaServer(url){
+
+
+console.log(
+"PLAY URL:",
+url
+);
+
+
+// nanti sambungkan ke player Anda
+
+
+}
 
 
 // ==========================================
