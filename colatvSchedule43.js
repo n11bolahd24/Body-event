@@ -501,36 +501,39 @@ match.status == "LIVE"
 function getScore(match){
 
 
+    let homeScore =
+    match.score?.home?.score ??
+    match.homeScore ??
+    match.home_score ??
+    0;
+
+
+    let awayScore =
+    match.score?.away?.score ??
+    match.awayScore ??
+    match.away_score ??
+    0;
+
+
 
     if(
-        match.score
+        isLiveMatch(match) ||
+        match.match_status == 3
     ){
 
-
         return `
-
-        ${match.score.home.score}
+        ${homeScore}
         -
-        ${match.score.away.score}
-
+        ${awayScore}
         `;
 
-
     }
-
 
 
     return "VS";
 
 
 }
-
-
-
-
-
-
-
 
 
 // ==========================================
