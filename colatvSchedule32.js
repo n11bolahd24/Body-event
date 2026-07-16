@@ -1326,136 +1326,141 @@ closeColaPopup();
 // PLAY COLATV MATCH
 // ==========================================
 
-
-function playColaMatch(match_uuid){
-
-
+async function playColaMatch(match_uuid){
 
     const match =
     colaMatches.find(
         m => m.match_uuid == match_uuid
     );
 
-
-
     if(!match){
 
-        alert(
-        "Match tidak ditemukan"
-        );
-
+        alert("Match tidak ditemukan");
         return;
 
     }
 
+    console.log("PLAY MATCH:", match);
 
+    try{
 
-    console.log(
-    "PLAY MATCH:",
-    match
-    );
-
-
-
-
-
-    let stream = "";
-
-
-
-    // PRIORITAS STREAM
-
-
-    if(
-        match.videoUrl
-    ){
-
-        stream =
-        match.videoUrl;
-
-    }
-
-
-
-    else if(
-        match.anchorAppointmentVoList &&
-        match.anchorAppointmentVoList.length
-    ){
-
-
-        stream =
-
-        match.anchorAppointmentVoList[0]
-        .playStreamAddress2 ||
-
-        match.anchorAppointmentVoList[0]
-        .playStreamAddress;
-
-
-    }
-
-
-
-
-
-    if(!stream){
-
-
-        alert(
-        "Stream belum tersedia"
+        // Ambil detail terbaru
+        const response = await fetch(
+            "https://api.gvapi.cc/api/match/detail_live?id=" +
+            match.matchId,
+            {cache:"no-store"}
         );
 
+        const json = await response.json();
 
-        return;
+        const detail = json.data || json;
 
+        const anchors =
+        detail.anchorAppointmentVoList || [];
+
+
+
+        // =====================================
+        // JIKA LEBIH DARI 1 PENYIAR
+        // =====================================
+
+        if(anchors.length > 1){
+
+            let html = "";
+
+            anchors.forEach((anchor,index)=>{
+
+                const stream =
+
+                    anchor.playStreamAddress2 ||
+
+                    anchor.playStreamAddress ||
+
+                    anchor.servers?.[0] ||
+
+                    detail.videoUrl ||
+
+                    match.videoUrl;
+
+                html += `
+                    <button
+                        class="cola-server-btn"
+                        onclick="
+                            playColaStream('${stream}');
+                            closeColaPopup();
+                        ">
+                        ${anchor.nickName || `SERVER ${index+1}`}
+                    </button>
+                `;
+
+            });
+
+            document.body.insertAdjacentHTML(
+                "beforeend",
+                `
+                <div class="cola-popup">
+
+                    <div class="cola-popup-box">
+
+                        <h3>⚡ PILIH SIARAN</h3>
+
+                        ${html}
+
+                        <button
+                            class="cola-close-btn"
+                            onclick="closeColaPopup()">
+                            CLOSE
+                        </button>
+
+                    </div>
+
+                </div>
+                `
+            );
+
+            return;
+
+        }
+
+
+
+        // =====================================
+        // JIKA CUMA SATU SERVER
+        // =====================================
+
+        let stream =
+
+            anchors[0]?.playStreamAddress2 ||
+
+            anchors[0]?.playStreamAddress ||
+
+            anchors[0]?.servers?.[0] ||
+
+            detail.videoUrl ||
+
+            match.videoUrl;
+
+
+
+        if(!stream){
+
+            alert("Stream belum tersedia");
+            return;
+
+        }
+
+        playColaStream(stream);
 
     }
 
+    catch(error){
 
-
-    console.log(
-    "STREAM URL:",
-    stream
-    );
-
-
-
-
-    // sambungkan ke player N11BOLAHD
-
-
-    if(
-        typeof loadPlayer === "function"
-    ){
-
-
-        loadPlayer(stream);
-
+        console.log(error);
+        alert("Gagal mengambil server.");
 
     }
-
-    else if(
-        typeof playStream === "function"
-    ){
-
-
-        playStream(stream);
-
-
-    }
-
-    else{
-
-
-    playColaStream(stream);
-
 
 }
-
-
-
-}
-
 // ==========================================
 // SHAKA PLAYER COLATV
 // ==========================================
