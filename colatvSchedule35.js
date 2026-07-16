@@ -1400,45 +1400,6 @@ async function playColaMatch(match_uuid, btn){
 
 
 
-        // =====================================
-        // JIKA CUMA SATU SERVER
-        // =====================================
-
-        let stream =
-
-            anchors[0]?.playStreamAddress2 ||
-
-            anchors[0]?.playStreamAddress ||
-
-            anchors[0]?.servers?.[0] ||
-
-            detail.videoUrl ||
-
-            match.videoUrl;
-
-
-
-        if(!stream){
-
-            alert("Stream belum tersedia");
-            return;
-
-        }
-
-        playColaStream(stream);
-
-    }
-
-    catch(error){
-
-        console.log(error);
-        alert("Gagal mengambil server.");
-
-    }
-
-}
-
-
 // ==========================================
 // SHAKA PLAYER COLATV
 // ==========================================
