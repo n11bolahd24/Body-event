@@ -542,7 +542,7 @@ ${
     `
 
     <button
-    class="cola-watch"
+class="cola-watch">
 
     onclick="
     event.stopPropagation();
