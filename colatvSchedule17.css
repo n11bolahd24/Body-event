@@ -33,31 +33,74 @@
 
 
 .cola-title{
+
     display:flex;
+
     justify-content:space-between;
+
     align-items:center;
-    background:linear-gradient(135deg,#111,#222);
-    color:#fff;
-    padding:14px;
-    border-left:4px solid #f7c82d;
-    border-radius:12px 12px 0 0;
+
 }
 
+.cola-title-btn{
+
+    display:flex;
+
+    gap:8px;
+
+}
+
+.cola-search-btn,
 .cola-refresh{
-    background:#222;
+
+    background:#111;
+
     color:#f7c82d;
+
     border:1px solid #f7c82d;
+
     border-radius:6px;
-    padding:5px 10px;
-    font-size:12px;
+
+    padding:6px 10px;
+
     cursor:pointer;
+
+    font-size:12px;
+
 }
 
+.cola-search-btn:hover,
 .cola-refresh:hover{
+
     background:#f7c82d;
+
     color:#000;
+
 }
 
+.cola-search-box{
+
+    background:#111;
+
+    padding:10px;
+
+}
+
+.cola-search-box input{
+
+    width:100%;
+
+    padding:10px;
+
+    border:1px solid #444;
+
+    border-radius:8px;
+
+    background:#1b1b1b;
+
+    color:#fff;
+
+}
 
 /* ==========================================
    LEAGUE
