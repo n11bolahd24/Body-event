@@ -44,10 +44,17 @@ async function loadColaTVSchedule(){
         const json = await response.json();
 
 
-        console.log(
-            "COLATV RESPONSE:",
-            json
-        );
+console.log("COLATV RESPONSE:", json);
+
+console.log(
+    "ALL KEYS:",
+    Object.keys(json)
+);
+
+console.log(
+    "DATA KEYS:",
+    json.data ? Object.keys(json.data) : "NO DATA"
+);
 
 
         /*
