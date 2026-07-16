@@ -33,24 +33,30 @@
 
 
 .cola-title{
-
-    background:
-    linear-gradient(135deg,#111,#222);
-
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:linear-gradient(135deg,#111,#222);
     color:#fff;
-
-    font-size:18px;
-
-    font-weight:700;
-
     padding:14px;
-
     border-left:4px solid #f7c82d;
-
     border-radius:12px 12px 0 0;
-
 }
 
+.cola-refresh{
+    background:#222;
+    color:#f7c82d;
+    border:1px solid #f7c82d;
+    border-radius:6px;
+    padding:5px 10px;
+    font-size:12px;
+    cursor:pointer;
+}
+
+.cola-refresh:hover{
+    background:#f7c82d;
+    color:#000;
+}
 
 
 /* ==========================================
