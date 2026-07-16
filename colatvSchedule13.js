@@ -583,22 +583,12 @@ function getMatchStatus(match){
 
 function isLiveMatch(match){
 
-
 return (
 
-match.match_status == 2 ||
-match.match_status == 4 ||
-
-match.status == "LIVE" ||
-
-match.status == 2 ||
-
-match.live == true ||
-
-match.is_live == true
+match.matchStatus == 2 ||
+match.matchStatus == 4
 
 );
-
 
 }
 
@@ -656,14 +646,12 @@ function getScore(match){
 
 function getTime(match){
 
-
 let timestamp =
+match.matchTime ||
 match.kickoff_timestamp ||
 match.kickoffTime ||
 match.start_time ||
 match.startTime ||
-match.matchTime ||
-match.match_time ||
 match.timestamp ||
 match.time;
 
@@ -842,12 +830,9 @@ async function openColaMatch(match_uuid){
 
 
         let detailURL =
-
-        "https://api.gvapi.cc/api/match/" +
-
-        match_uuid +
-
-        "/detail_live";
+"https://api.gvapi.cc/api/match/" +
+match.matchId +
+"/detail_live";
 
 
 
