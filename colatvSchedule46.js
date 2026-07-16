@@ -304,70 +304,31 @@ onclick="openColaMatch('${match.match_uuid}')">
 
 
 
+<div class="cola-team">
 
-    <div class="cola-team">
+    <div class="cola-team-box home-team">
 
+        <span>${home}</span>
 
-        <div class="cola-team-box">
-
-
-            <img src="${homeLogo}"
-
-            onerror="
-            this.style.display='none'
-            ">
-
-
-            <span>
-
-            ${home}
-
-            </span>
-
-
-        </div>
-
-
-
-
-
-        <div class="cola-score">
-
-
-            ${getScore(match)}
-
-
-        </div>
-
-
-
-
-
-
-        <div class="cola-team-box">
-
-
-            <img src="${awayLogo}"
-
-            onerror="
-            this.style.display='none'
-            ">
-
-
-
-            <span>
-
-            ${away}
-
-            </span>
-
-
-        </div>
-
-
-
+        <img src="${homeLogo}"
+        onerror="this.style.display='none'">
 
     </div>
+
+    <div class="cola-score">
+        ${getScore(match)}
+    </div>
+
+    <div class="cola-team-box away-team">
+
+        <img src="${awayLogo}"
+        onerror="this.style.display='none'">
+
+        <span>${away}</span>
+
+    </div>
+
+</div>
 
 
 
