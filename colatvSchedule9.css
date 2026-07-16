@@ -298,7 +298,28 @@
 }
 
 
+.home-team{
+    justify-content:flex-end;
+    text-align:right;
+}
 
+.away-team{
+    justify-content:flex-start;
+    text-align:left;
+}
+
+.home-team span{
+    order:1;
+}
+
+.home-team img{
+    order:2;
+    margin-left:8px;
+}
+
+.away-team img{
+    margin-right:8px;
+}
 /* ==========================================
    SCORE
 ========================================== */
