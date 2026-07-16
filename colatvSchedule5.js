@@ -60,10 +60,10 @@ async function loadColaTVSchedule(){
         // data = ARRAY MATCH
 
 
-        colaMatches = 
-            Array.isArray(json.data)
-            ? json.data
-            : [];
+        colaMatches =
+    json.data
+    ? Object.values(json.data)
+    : [];
 
 
 
