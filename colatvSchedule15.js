@@ -939,21 +939,26 @@ function showColaServers(match){
 
     let servers =
 
+match.results ||
+
+match.anchorAppointmentVoList ||
+
+match.streamList ||
+
+match.servers ||
+
+[];
+
+   console.log(
+"TOTAL SERVER:",
+servers.length
+);
 
 
-
-
-    match.anchorAppointmentVoList ||
-
-
-    match.streamList ||
-
-
-    match.servers ||
-
-
-    [];
-
+console.log(
+"SERVER LIST:",
+servers
+);
 
 
 
