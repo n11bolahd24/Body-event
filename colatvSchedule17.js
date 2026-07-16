@@ -960,13 +960,15 @@ console.log(
 servers
 );
 
-console.log(
-"SERVER PERTAMA DETAIL:",
-JSON.stringify(
-servers[0],
-null,
-2
-)
+
+
+   console.log(
+    "FULL DETAIL RESULTS:",
+    JSON.stringify(
+        servers[0],
+        null,
+        2
+    )
 );
 
 
