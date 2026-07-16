@@ -208,33 +208,69 @@ function renderColaTV(){
 
 
 
-    /*
-       LIVE FIRST
-    */
 
 
-    colaMatches.sort((a,b)=>{
 
-    return (
-        Number(a.matchTime||0) -
-        Number(b.matchTime||0)
-    );
+
+
+// Urut berdasarkan kickoff (terlama → terbaru)
+colaMatches.sort((a,b)=>{
+
+    const ta =
+        Number(
+            a.matchTime ||
+            a.kickoff_timestamp ||
+            a.start_time ||
+            0
+        );
+
+    const tb =
+        Number(
+            b.matchTime ||
+            b.kickoff_timestamp ||
+            b.start_time ||
+            0
+        );
+
+    return ta - tb;
 
 });
-
-let html = `
-<div class="cola-title">
-⚡ COLATV LIVE SCHEDULE
-</div>
-`;
 
 colaMatches.forEach(match=>{
 
-    html += createColaCard(match);
+    const league =
+        match.competitionName ||
+        match.leagueName ||
+        "Other";
+
+    html += `
+
+    <div class="cola-league">
+
+        <div class="cola-league-name">
+            🏆 ${league}
+        </div>
+
+        ${createColaCard(match)}
+
+    </div>
+
+    `;
 
 });
 
-box.innerHTML = html;
+
+
+
+
+
+    box.innerHTML =
+    html;
+
+
+
+}
+
 
 
 
@@ -298,9 +334,7 @@ onclick="openColaMatch('${match.match_uuid}')">
 
     </div>
 
-<div class="cola-league-name">
-🏆 ${match.competitionName || match.leagueName || "Other"}
-</div>
+
 
 
 
