@@ -5,26 +5,37 @@
 
 
 #colatvSchedule{
+
     width:100%;
+
     margin-top:20px;
+
     font-family:Arial,Helvetica,sans-serif;
+
     box-sizing:border-box;
+
 }
 
 
 #colatvSchedule *,
 #colatvSchedule *:before,
 #colatvSchedule *:after{
+
     box-sizing:border-box;
+
 }
 
 
 
-/* TITLE */
+/* ==========================================
+   TITLE
+========================================== */
+
 
 .cola-title{
 
-    background:linear-gradient(135deg,#111,#222);
+    background:
+    linear-gradient(135deg,#111,#222);
 
     color:#fff;
 
@@ -42,7 +53,50 @@
 
 
 
-/* MATCH BOX */
+/* ==========================================
+   LEAGUE
+========================================== */
+
+
+.cola-league{
+
+    background:#111;
+
+    border-radius:12px;
+
+    overflow:hidden;
+
+    margin-top:12px;
+
+    box-shadow:
+    0 3px 10px rgba(0,0,0,.35);
+
+}
+
+
+
+.cola-league-name{
+
+    background:#1c1c1c;
+
+    color:#fff;
+
+    padding:12px 14px;
+
+    font-size:14px;
+
+    font-weight:bold;
+
+    border-bottom:1px solid #2b2b2b;
+
+}
+
+
+
+/* ==========================================
+   MATCH CARD
+========================================== */
+
 
 .cola-match{
 
@@ -63,11 +117,13 @@
 }
 
 
+
 .cola-match:hover{
 
     background:#202020;
 
 }
+
 
 
 .cola-match:last-child{
@@ -78,7 +134,10 @@
 
 
 
-/* COMPETITION */
+/* ==========================================
+   COMPETITION
+========================================== */
+
 
 .cola-competition{
 
@@ -90,15 +149,16 @@
 
     text-align:center;
 
-    margin-top:4px;
-
     margin-bottom:8px;
 
 }
 
 
 
-/* STATUS */
+/* ==========================================
+   STATUS
+========================================== */
+
 
 .cola-status{
 
@@ -108,13 +168,14 @@
 
     right:10px;
 
+    color:#fff;
+
     font-size:12px;
 
     font-weight:bold;
 
-    color:#fff;
-
 }
+
 
 
 .cola-live{
@@ -132,6 +193,7 @@
 }
 
 
+
 @keyframes colaPulse{
 
     50%{
@@ -144,7 +206,10 @@
 
 
 
-/* TEAM */
+/* ==========================================
+   TEAM
+========================================== */
+
 
 .cola-team{
 
@@ -161,6 +226,7 @@
 }
 
 
+
 .cola-team-box{
 
     flex:1;
@@ -174,6 +240,7 @@
 }
 
 
+
 .cola-team-box:first-child{
 
     justify-content:flex-end;
@@ -181,6 +248,7 @@
     text-align:right;
 
 }
+
 
 
 .cola-team-box:last-child{
@@ -229,7 +297,10 @@
 
 
 
-/* SCORE */
+/* ==========================================
+   SCORE
+========================================== */
+
 
 .cola-score{
 
@@ -249,13 +320,16 @@
 
 
 
-/* TIME */
+/* ==========================================
+   TIME
+========================================== */
+
 
 .cola-time{
 
     margin-top:10px;
 
-    margin-bottom:12px;
+    margin-bottom:14px;
 
     text-align:center;
 
@@ -267,11 +341,18 @@
 
 
 
-/* WATCH BUTTON */
+/* ==========================================
+   WATCH BUTTON
+========================================== */
+
 
 .cola-watch{
 
-    width:100%;
+    display:block;
+
+    width:auto;
+
+    margin:0 auto;
 
     background:#111;
 
@@ -281,7 +362,7 @@
 
     border-radius:8px;
 
-    padding:8px 10px;
+    padding:8px 20px;
 
     font-size:12px;
 
@@ -294,6 +375,7 @@
 }
 
 
+
 .cola-watch:hover{
 
     background:#f7c82d;
@@ -304,11 +386,16 @@
 
 
 
-/* SERVER LIST */
+/* ==========================================
+   SERVER LIST
+========================================== */
+
 
 .cola-server-list{
 
     display:flex;
+
+    justify-content:center;
 
     flex-wrap:wrap;
 
@@ -319,11 +406,10 @@
 }
 
 
+
 .cola-server-btn{
 
-    flex:1;
-
-    min-width:100px;
+    width:auto;
 
     background:#111;
 
@@ -333,15 +419,18 @@
 
     border-radius:6px;
 
-    padding:8px 12px;
+    padding:8px 14px;
 
     font-size:12px;
+
+    font-weight:600;
 
     cursor:pointer;
 
     transition:.2s;
 
 }
+
 
 
 .cola-server-btn:hover{
@@ -354,42 +443,10 @@
 
 
 
-/* LEAGUE (jika dipakai lagi) */
+/* ==========================================
+   LOADING ERROR EMPTY
+========================================== */
 
-.cola-league{
-
-    background:#111;
-
-    border-radius:12px;
-
-    overflow:hidden;
-
-    margin-top:12px;
-
-    box-shadow:0 3px 10px rgba(0,0,0,.35);
-
-}
-
-
-.cola-league-name{
-
-    background:#1c1c1c;
-
-    color:#fff;
-
-    padding:12px 14px;
-
-    font-size:14px;
-
-    font-weight:bold;
-
-    border-bottom:1px solid #2b2b2b;
-
-}
-
-
-
-/* LOADING */
 
 .cola-loading,
 .cola-error,
@@ -409,7 +466,10 @@
 
 
 
-/* MOBILE */
+/* ==========================================
+   MOBILE
+========================================== */
+
 
 @media(max-width:768px){
 
@@ -446,9 +506,16 @@
     }
 
 
+    .cola-watch{
+
+        padding:8px 18px;
+
+    }
+
+
     .cola-server-btn{
 
-        flex:1 1 calc(50% - 4px);
+        padding:8px 12px;
 
     }
 
