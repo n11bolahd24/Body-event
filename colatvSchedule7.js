@@ -477,43 +477,60 @@ function getScore(match){
 function getTime(match){
 
 
-
-    if(match.matchTime){
-
-        return match.matchTime;
-
-    }
-
-
-
-    if(match.kickoff_timestamp){
-
-
-        let d =
-        new Date(
-            match.kickoff_timestamp * 1000
-        );
+    let timestamp =
+        match.kickoff_timestamp ||
+        match.kickoffTime ||
+        match.start_time ||
+        match.startTime ||
+        match.time ||
+        match.matchTime ||
+        match.timestamp;
 
 
 
-        return d.toLocaleTimeString(
-            "en-GB",
+    if(timestamp){
+
+
+        // kalau timestamp berupa string angka
+        timestamp = Number(timestamp);
+
+
+
+        // cek apakah milliseconds
+        if(timestamp < 10000000000){
+
+            timestamp = timestamp * 1000;
+
+        }
+
+
+
+        let date = new Date(timestamp);
+
+
+
+        return new Intl.DateTimeFormat(
+            undefined,
             {
+                day:"2-digit",
+                month:"2-digit",
+                year:"numeric",
                 hour:"2-digit",
-                minute:"2-digit"
+                minute:"2-digit",
+                hour12:false
             }
-        );
+        ).format(date);
+
 
 
     }
 
 
 
-    return "";
+    return "TBA";
 
 
 }
-
 
 
 
