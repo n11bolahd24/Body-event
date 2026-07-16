@@ -502,65 +502,9 @@ onclick="openColaMatch('${match.match_uuid}')">
 
 
 
-<div class="cola-watch-list">
-
-${
-    (match.anchorAppointmentVoList &&
-     match.anchorAppointmentVoList.length)
-
-    ?
-
-    match.anchorAppointmentVoList.map((anchor,index)=>{
-
-        return `
-
-        <button
-        class="cola-watch"
-
-        onclick="
-        event.stopPropagation();
-        playColaStream(
-            '${
-                anchor.playStreamAddress2 ||
-                anchor.playStreamAddress ||
-                anchor.servers?.[0] ||
-                match.videoUrl
-            }'
-        );
-        ">
-
-        ${anchor.nickName || `SERVER ${index+1}`}
-
-        </button>
-
-        `;
-
-    }).join("")
-
-    :
-
-    `
-
-    <button
-class="cola-watch">
-
-    onclick="
-event.stopPropagation();
-playColaAnchor(
-'${match.match_uuid}',
-${index}
-);
-">
-
-    ▶ WATCH
-
-    </button>
-
-    `
-
-}
-</div>
-
+<button class="cola-watch">
+▶ WATCH
+</button>
 
 
 `;
