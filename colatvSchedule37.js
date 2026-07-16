@@ -213,147 +213,28 @@ function renderColaTV(){
     */
 
 
-    colaMatches.sort(
-        (a,b)=>{
+    colaMatches.sort((a,b)=>{
 
-
-            return (
-                isLiveMatch(b)
-                -
-                isLiveMatch(a)
-            );
-
-
-        }
+    return (
+        Number(a.matchTime||0) -
+        Number(b.matchTime||0)
     );
 
+});
 
+let html = `
+<div class="cola-title">
+⚡ COLATV LIVE SCHEDULE
+</div>
+`;
 
+colaMatches.forEach(match=>{
 
+    html += createColaCard(match);
 
+});
 
-    /*
-       GROUP LEAGUE
-    */
-
-
-    let groups = {};
-
-
-
-
-    colaMatches.forEach(
-        match=>{
-
-
-            let league =
-            match.competitionName ||
-            match.leagueName ||
-            "Other";
-
-
-
-            if(!groups[league]){
-
-                groups[league]=[];
-
-            }
-
-
-
-            groups[league].push(
-                match
-            );
-
-
-
-        }
-    );
-
-
-
-
-
-
-
-    let html = `
-
-
-    <div class="cola-title">
-
-        ⚡ COLATV LIVE SCHEDULE
-
-    </div>
-
-
-    `;
-
-
-
-
-
-
-    Object.keys(groups)
-    .forEach(
-        league=>{
-
-
-            html += `
-
-
-            <div class="cola-league">
-
-
-                <div class="cola-league-name">
-
-                    🏆 ${league}
-
-                </div>
-
-
-            `;
-
-
-
-            groups[league]
-            .forEach(
-                match=>{
-
-
-                    html +=
-                    createColaCard(
-                        match
-                    );
-
-
-                }
-            );
-
-
-
-            html += `
-
-            </div>
-
-            `;
-
-
-
-        }
-    );
-
-
-
-
-
-
-    box.innerHTML =
-    html;
-
-
-
-}
-
+box.innerHTML = html;
 
 
 
@@ -417,7 +298,9 @@ onclick="openColaMatch('${match.match_uuid}')">
 
     </div>
 
-
+<div class="cola-league-name">
+🏆 ${match.competitionName || match.leagueName || "Other"}
+</div>
 
 
 
