@@ -217,8 +217,13 @@ function renderColaTV(){
 
     let html = `
     <div class="cola-title">
-        ⚡ COLATV LIVE SCHEDULE
-    </div>
+    <span>LIVE SCHEDULE</span>
+
+    <button class="cola-refresh"
+        onclick="loadColaTVSchedule()">
+        🔄 Update 
+    </button>
+</div>
     `;
 
     colaMatches.forEach(match=>{
@@ -595,18 +600,7 @@ match.time;
 document.addEventListener(
 "DOMContentLoaded",
 ()=>{
-
-
     loadColaTVSchedule();
-
-
-
-    setInterval(
-loadColaTVSchedule,
-30000
-);
-
-
 });
 
 /* ==========================================
