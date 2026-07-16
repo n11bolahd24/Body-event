@@ -40,7 +40,25 @@ async function loadColaTVSchedule(){
         );
 
 
-        const json = await res.json();
+        const json = await res.jsonconst json = await res.json();
+
+
+         console.log("COLATV DATA:", json);
+
+
+         colaMatches =
+         json.data?.list ||
+         json.data?.records ||
+         json.data ||
+         json.matches ||
+         json.result ||
+         [];
+
+
+         console.log("MATCH LIST:", colaMatches);
+
+
+         renderColaTV();();
 
 
         /*
@@ -48,8 +66,13 @@ async function loadColaTVSchedule(){
         data : array pertandingan
         */
 
-        colaMatches = 
-        json.data || json.matches || [];
+        colaMatches =
+         json.data?.list ||
+         json.data?.records ||
+         json.data ||
+         json.matches ||
+         json.result ||
+         [];
 
 
         renderColaTV();
