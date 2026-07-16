@@ -62,7 +62,14 @@ async function loadColaTVSchedule(){
 
         colaMatches =
     json.data
-    ? Object.values(json.data)
+    ? Object.entries(json.data).map(([key,value])=>{
+
+        return {
+            ...value,
+            match_uuid:key
+        };
+
+    })
     : [];
 
 
@@ -270,6 +277,16 @@ function renderColaTV(){
 
 function createMatchCard(match){
 
+console.log(
+"MATCH ID:",
+match.match_uuid
+);
+
+console.log(
+"MATCH DATA:",
+match
+);
+
 
 
     let home =
@@ -300,7 +317,7 @@ function createMatchCard(match){
 
 
     <div class="cola-match"
-onclick="openColaMatch('${match.match_uuid || match.uuid || ""}')">
+onclick="openColaMatch('${match.match_uuid || ""}')">
 
 
         <div class="cola-status">
