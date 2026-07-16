@@ -504,12 +504,11 @@ onclick="openColaMatch('${match.match_uuid}')">
 
 <button 
 class="cola-watch"
-onclick="event.stopPropagation();openColaMatch('${match.match_uuid}')">
+onclick="event.stopPropagation();playColaMatch('${match.match_uuid}')">
 
 ▶ WATCH
 
 </button>
-
 
 
 
@@ -590,15 +589,19 @@ function getMatchStatus(match){
 
 function isLiveMatch(match){
 
+
 return (
 
 match.matchStatus == 2 ||
-match.matchStatus == 4
+
+match.match_status == "live" ||
+
+match.status == "LIVE"
 
 );
 
-}
 
+}
 
 
 
@@ -1307,7 +1310,142 @@ closeColaPopup();
 
 
 
+// ==========================================
+// PLAY COLATV MATCH
+// ==========================================
 
+
+function playColaMatch(match_uuid){
+
+
+
+    const match =
+    colaMatches.find(
+        m => m.match_uuid == match_uuid
+    );
+
+
+
+    if(!match){
+
+        alert(
+        "Match tidak ditemukan"
+        );
+
+        return;
+
+    }
+
+
+
+    console.log(
+    "PLAY MATCH:",
+    match
+    );
+
+
+
+
+
+    let stream = "";
+
+
+
+    // PRIORITAS STREAM
+
+
+    if(
+        match.videoUrl
+    ){
+
+        stream =
+        match.videoUrl;
+
+    }
+
+
+
+    else if(
+        match.anchorAppointmentVoList &&
+        match.anchorAppointmentVoList.length
+    ){
+
+
+        stream =
+
+        match.anchorAppointmentVoList[0]
+        .playStreamAddress2 ||
+
+        match.anchorAppointmentVoList[0]
+        .playStreamAddress;
+
+
+    }
+
+
+
+
+
+    if(!stream){
+
+
+        alert(
+        "Stream belum tersedia"
+        );
+
+
+        return;
+
+
+    }
+
+
+
+    console.log(
+    "STREAM URL:",
+    stream
+    );
+
+
+
+
+    // sambungkan ke player N11BOLAHD
+
+
+    if(
+        typeof loadPlayer === "function"
+    ){
+
+
+        loadPlayer(stream);
+
+
+    }
+
+    else if(
+        typeof playStream === "function"
+    ){
+
+
+        playStream(stream);
+
+
+    }
+
+    else{
+
+
+        window.open(
+            stream,
+            "_blank"
+        );
+
+
+    }
+
+
+
+}
 
 
 
