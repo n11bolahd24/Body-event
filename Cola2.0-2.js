@@ -280,6 +280,40 @@ function renderColaTV(){
         return;
     }
 
+
+function toggleColaSearch(){
+
+    const box =
+    document.getElementById(
+        "colaSearchBox"
+    );
+
+    box.style.display =
+    box.style.display=="none"
+    ? "block"
+    : "none";
+
+}
+
+function searchColaMatch(keyword){
+
+    keyword =
+    keyword.toLowerCase();
+
+    document
+    .querySelectorAll(".cola-match")
+    .forEach(card=>{
+
+        card.style.display =
+        card.innerText
+        .toLowerCase()
+        .includes(keyword)
+        ? ""
+        : "none";
+
+    });
+
+}   
     // ============================
     // URUTKAN BERDASARKAN KICK OFF
     // ============================
@@ -310,15 +344,46 @@ function renderColaTV(){
     });
 
     let html = `
+    
     <div class="cola-title">
+
     <span>LIVE SCHEDULE</span>
 
-    <button class="cola-refresh"
+    <div class="cola-title-btn">
+
+        <button
+        class="cola-search-btn"
+        onclick="toggleColaSearch()">
+
+            🔎 Search
+
+        </button>
+
+        <button
+        class="cola-refresh"
         onclick="loadColaTVSchedule()">
-        🔄 Update 
-    </button>
+
+            🔄 Update
+
+        </button>
+
+    </div>
+
 </div>
-    `;
+
+<div
+class="cola-search-box"
+id="colaSearchBox"
+style="display:none;">
+
+<input
+type="text"
+id="colaSearchInput"
+placeholder="Cari tim atau liga..."
+onkeyup="searchColaMatch(this.value)">
+
+</div>
+`;
 
     colaMatches.forEach(match=>{
 
