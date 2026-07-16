@@ -5,16 +5,16 @@
 ========================================== */
 
 
-const COLATV_API = 
+const COLATV_API =
 "https://api.gvapi.cc/api/matches?t=" + Date.now();
 
 
 let colaMatches = [];
 
 
-// ===============================
-// LOAD DATA
-// ===============================
+// ==========================================
+// LOAD COLATV DATA
+// ==========================================
 
 async function loadColaTVSchedule(){
 
@@ -30,9 +30,10 @@ async function loadColaTVSchedule(){
     `;
 
 
-    try{
+    try {
 
-        const res = await fetch(
+
+        const response = await fetch(
             COLATV_API,
             {
                 cache:"no-store"
@@ -40,70 +41,87 @@ async function loadColaTVSchedule(){
         );
 
 
-        const json = await res.jsonconst json = await res.json();
+        const json = await response.json();
 
 
-         console.log("COLATV DATA:", json);
-
-
-         colaMatches =
-         json.data?.list ||
-         json.data?.records ||
-         json.data ||
-         json.matches ||
-         json.result ||
-         [];
-
-
-         console.log("MATCH LIST:", colaMatches);
-
-
-         renderColaTV();();
+        console.log(
+            "COLATV RESPONSE:",
+            json
+        );
 
 
         /*
-        API FORMAT
-        data : array pertandingan
+          Flexible API parser
         */
 
+
         colaMatches =
-         json.data?.list ||
-         json.data?.records ||
-         json.data ||
-         json.matches ||
-         json.result ||
-         [];
+            json.data?.list ||
+            json.data?.items ||
+            json.data?.records ||
+            json.data ||
+            json.matches ||
+            json.result ||
+            [];
+
+
+
+        console.log(
+            "COLATV MATCHES:",
+            colaMatches
+        );
+
+
+
+        if(!Array.isArray(colaMatches)){
+
+            colaMatches = [];
+
+        }
+
 
 
         renderColaTV();
 
 
+
     }
-    catch(err){
+    catch(error){
+
 
         console.log(
-            "ColaTV API Error:",
-            err
+            "COLATV ERROR:",
+            error
         );
 
 
         box.innerHTML = `
+
         <div class="cola-error">
-            Schedule unavailable
+
+        Schedule unavailable
+
         </div>
+
         `;
 
+
     }
+
 
 }
 
 
 
-// ===============================
+
+
+// ==========================================
 // RENDER
-// ===============================
+// ==========================================
+
 
 function renderColaTV(){
+
 
 const box =
 document.getElementById(
@@ -111,17 +129,24 @@ document.getElementById(
 );
 
 
+
 if(!box) return;
 
 
 
-if(!colaMatches.length){
 
-box.innerHTML =
-`
+if(
+colaMatches.length === 0
+){
+
+box.innerHTML = `
+
 <div class="cola-empty">
+
 No matches available
+
 </div>
+
 `;
 
 return;
@@ -130,48 +155,57 @@ return;
 
 
 
+
+
 // LIVE FIRST
 
 colaMatches.sort(
 (a,b)=>{
 
-let liveA =
-isLiveMatch(a) ? 0 : 1;
 
-let liveB =
-isLiveMatch(b) ? 0 : 1;
+return isLiveMatch(b) -
+isLiveMatch(a);
 
-
-return liveA-liveB;
 
 });
 
 
 
 
-// GROUP BY COMPETITION
+
+// GROUP LEAGUE
 
 
-let groups={};
+let groups = {};
 
 
-colaMatches.forEach(match=>{
+
+colaMatches.forEach(
+(match)=>{
 
 
 let league =
 match.competitionName ||
 match.leagueName ||
+match.competition ||
 "Other";
 
 
-if(!groups[league])
+
+if(!groups[league]){
+
 groups[league]=[];
+
+}
+
 
 
 groups[league].push(match);
 
 
+
 });
+
 
 
 
@@ -189,13 +223,16 @@ let html = `
 
 
 
+
 Object.keys(groups).forEach(
-league=>{
+(league)=>{
 
 
 html += `
 
+
 <div class="cola-league">
+
 
 <div class="cola-league-name">
 
@@ -207,8 +244,9 @@ html += `
 `;
 
 
+
 groups[league].forEach(
-match=>{
+(match)=>{
 
 
 html += createMatchCard(match);
@@ -217,68 +255,80 @@ html += createMatchCard(match);
 });
 
 
+
 html += `
 
 </div>
 
 `;
 
+
+
 });
 
 
 
-box.innerHTML=html;
+
+
+box.innerHTML = html;
+
 
 
 }
 
 
 
-// ===============================
+
+
+// ==========================================
 // MATCH CARD
-// ===============================
+// ==========================================
 
 
 function createMatchCard(match){
 
 
+
 let home =
 match.homeTeamName ||
-match.home_name ||
-"Home";
+match.home_team_name ||
+match.homeName ||
+"HOME";
+
 
 
 let away =
 match.awayTeamName ||
-match.away_name ||
-"Away";
+match.away_team_name ||
+match.awayName ||
+"AWAY";
 
 
 
 let homeLogo =
 match.homeTeamLogo ||
+match.home_logo ||
 "";
+
 
 
 let awayLogo =
 match.awayTeamLogo ||
+match.away_logo ||
 "";
 
 
 
-let status =
-getMatchStatus(match);
-
-
 
 return `
+
 
 <div class="cola-match">
 
 
 <div class="cola-status">
 
-${status}
+${getMatchStatus(match)}
 
 </div>
 
@@ -292,9 +342,12 @@ ${status}
 <img src="${homeLogo}"
 onerror="this.style.display='none'">
 
-<span>${home}</span>
+<span>
+${home}
+</span>
 
 </div>
+
 
 
 
@@ -306,17 +359,22 @@ ${getScore(match)}
 
 
 
+
 <div>
 
 <img src="${awayLogo}"
 onerror="this.style.display='none'">
 
-<span>${away}</span>
+<span>
+${away}
+</span>
 
 </div>
 
 
+
 </div>
+
 
 
 
@@ -330,34 +388,52 @@ ${getTime(match)}
 
 </div>
 
+
 `;
+
+
 
 }
 
 
 
 
-// ===============================
+
+// ==========================================
 // STATUS
-// ===============================
+// ==========================================
 
 
 function getMatchStatus(match){
 
 
-if(isLiveMatch(match))
+if(
+isLiveMatch(match)
+){
+
 return `
+
 <span class="cola-live">
+
 🔴 LIVE
+
 </span>
+
 `;
+
+}
+
 
 
 if(
-match.match_status==3 ||
-match.status=="finished"
-)
+match.match_status == 3 ||
+match.status == "finished"
+){
+
 return "FT";
+
+}
+
 
 
 return "UPCOMING";
@@ -368,14 +444,17 @@ return "UPCOMING";
 
 
 
+
 function isLiveMatch(match){
 
 
 return (
 
-match.match_status==2 ||
-match.match_status==3 ||
-match.status=="live"
+match.match_status == 2 ||
+
+match.match_status == 4 ||
+
+match.status == "live"
 
 );
 
@@ -384,37 +463,53 @@ match.status=="live"
 
 
 
-// ===============================
+
+
+// ==========================================
 // SCORE
-// ===============================
+// ==========================================
 
 
 function getScore(match){
 
 
+if(match.score){
+
+
+let h =
+match.score.home?.score ??
+match.score.home ??
+0;
+
+
+let a =
+match.score.away?.score ??
+match.score.away ??
+0;
+
+
+
+return h+" - "+a;
+
+
+}
+
+
+
+
 if(
 match.homeScore !== undefined
-)
+){
 
-return `
+return (
 
-${match.homeScore}
--
-${match.awayScore}
+match.homeScore +
+" - " +
+match.awayScore
 
-`;
+);
 
-
-
-if(match.score)
-
-return `
-
-${match.score.home}
--
-${match.score.away}
-
-`;
+}
 
 
 
@@ -425,28 +520,37 @@ return "VS";
 
 
 
-// ===============================
+
+
+// ==========================================
 // TIME
-// ===============================
+// ==========================================
 
 
 function getTime(match){
 
 
-if(match.matchTime)
+
+if(match.matchTime){
+
 return match.matchTime;
+
+}
+
 
 
 
 if(match.kickoff_timestamp){
 
-let d =
+
+let date =
 new Date(
-match.kickoff_timestamp*1000
+match.kickoff_timestamp * 1000
 );
 
 
-return d.toLocaleTimeString(
+
+return date.toLocaleTimeString(
 "en-GB",
 {
 hour:"2-digit",
@@ -458,15 +562,18 @@ minute:"2-digit"
 }
 
 
+
 return "";
 
 }
 
 
 
-// ===============================
-// AUTO START
-// ===============================
+
+
+// ==========================================
+// START
+// ==========================================
 
 
 document.addEventListener(
@@ -477,12 +584,12 @@ document.addEventListener(
 loadColaTVSchedule();
 
 
-// refresh 60 detik
 
 setInterval(
 loadColaTVSchedule,
 60000
 );
+
 
 
 });
