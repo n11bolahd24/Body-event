@@ -170,107 +170,66 @@ null,
 
 function renderColaTV(){
 
-
     const box =
-    document.getElementById(
-        "colatvSchedule"
-    );
-
-
+    document.getElementById("colatvSchedule");
 
     if(!box) return;
 
-
-
-
-    if(
-        colaMatches.length === 0
-    ){
-
+    if(colaMatches.length === 0){
 
         box.innerHTML = `
-
         <div class="cola-empty">
             No matches available
         </div>
-
         `;
 
-
         return;
-
-
     }
 
+    // ============================
+    // URUTKAN BERDASARKAN KICK OFF
+    // ============================
 
+    colaMatches.sort((a,b)=>{
 
+        const getTimestamp = (m)=>{
 
+            let t =
+            m.matchTime ||
+            m.kickoff_timestamp ||
+            m.kickoffTime ||
+            m.start_time ||
+            m.startTime ||
+            m.timestamp ||
+            m.time ||
+            0;
 
+            t = Number(t);
 
+            if(t < 10000000000) t *= 1000;
 
+            return t;
+        };
 
+        return getTimestamp(a) - getTimestamp(b);
 
+    });
 
-
-
-// Urut berdasarkan kickoff (terlama → terbaru)
-colaMatches.sort((a,b)=>{
-
-    const ta =
-        Number(
-            a.matchTime ||
-            a.kickoff_timestamp ||
-            a.start_time ||
-            0
-        );
-
-    const tb =
-        Number(
-            b.matchTime ||
-            b.kickoff_timestamp ||
-            b.start_time ||
-            0
-        );
-
-    return ta - tb;
-
-});
-
-colaMatches.forEach(match=>{
-
-    const league =
-        match.competitionName ||
-        match.leagueName ||
-        "Other";
-
-    html += `
-
-    <div class="cola-league">
-
-        <div class="cola-league-name">
-            🏆 ${league}
-        </div>
-
-        ${createColaCard(match)}
-
+    let html = `
+    <div class="cola-title">
+        ⚡ COLATV LIVE SCHEDULE
     </div>
-
     `;
 
-});
+    colaMatches.forEach(match=>{
 
+        html += createColaCard(match);
 
+    });
 
-
-
-
-    box.innerHTML =
-    html;
-
-
+    box.innerHTML = html;
 
 }
-
 
 
 
