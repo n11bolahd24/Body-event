@@ -281,7 +281,7 @@ function renderColaTV(){
 
     <div class="cola-title">
 
-        ⚡ COLATV LIVE SCHEDULE
+        ⚡ LIVE SCHEDULE
 
     </div>
 
@@ -502,16 +502,60 @@ onclick="openColaMatch('${match.match_uuid}')">
 
 
 
-<button 
-class="cola-watch"
-onclick="event.stopPropagation();playColaMatch('${match.match_uuid}')">
+<div class="cola-watch-list">
 
-▶ WATCH
+${
+    (match.anchorAppointmentVoList &&
+     match.anchorAppointmentVoList.length)
 
-</button>
+    ?
 
+    match.anchorAppointmentVoList.map((anchor,index)=>{
 
+        return `
 
+        <button
+        class="cola-watch"
+
+        onclick="
+        event.stopPropagation();
+        playColaStream(
+            '${
+                anchor.playStreamAddress2 ||
+                anchor.playStreamAddress ||
+                anchor.servers?.[0] ||
+                match.videoUrl
+            }'
+        );
+        ">
+
+        ${anchor.nickName || `SERVER ${index+1}`}
+
+        </button>
+
+        `;
+
+    }).join("")
+
+    :
+
+    `
+
+    <button
+    class="cola-watch"
+
+    onclick="
+    event.stopPropagation();
+    playColaMatch('${match.match_uuid}')
+    ">
+
+    ▶ WATCH
+
+    </button>
+
+    `
+
+}
 </div>
 
 
