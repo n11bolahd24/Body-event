@@ -495,14 +495,13 @@ onclick="openColaMatch('${match.match_uuid}')">
 
 
 
+<button 
+class="cola-watch"
+onclick="event.stopPropagation();openColaMatch('${match.match_uuid}')">
 
-    <button class="cola-watch">
+▶ WATCH
 
-
-        ▶ WATCH
-
-
-    </button>
+</button>
 
 
 
@@ -585,16 +584,23 @@ function getMatchStatus(match){
 function isLiveMatch(match){
 
 
-    return (
+return (
 
-        match.match_status == 2 ||
-        match.match_status == 4
+match.match_status == 2 ||
+match.match_status == 4 ||
 
-    );
+match.status == "LIVE" ||
+
+match.status == 2 ||
+
+match.live == true ||
+
+match.is_live == true
+
+);
 
 
 }
-
 
 
 
@@ -651,16 +657,15 @@ function getScore(match){
 function getTime(match){
 
 
-
-    let timestamp =
-
-        match.kickoff_timestamp ||
-
-        match.start_time ||
-
-        match.timestamp ||
-
-        match.time;
+let timestamp =
+match.kickoff_timestamp ||
+match.kickoffTime ||
+match.start_time ||
+match.startTime ||
+match.matchTime ||
+match.match_time ||
+match.timestamp ||
+match.time;
 
 
 
@@ -755,9 +760,9 @@ document.addEventListener(
 
 
     setInterval(
-        loadColaTVSchedule,
-        60000
-    );
+loadColaTVSchedule,
+30000
+);
 
 
 });
