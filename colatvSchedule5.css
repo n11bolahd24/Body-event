@@ -94,7 +94,7 @@
 
 
 /* ==========================================
-   MATCH CARD
+   MATCH CARD BOX
 ========================================== */
 
 
@@ -102,17 +102,24 @@
 
     position:relative;
 
-    width:100%;
+    width:calc(100% - 20px);
+
+    margin:10px auto;
 
     background:#151515;
 
     padding:14px;
 
-    border-bottom:1px solid #292929;
+    border:1px solid #333;
+
+    border-radius:12px;
 
     cursor:pointer;
 
     transition:.2s;
+
+    box-shadow:
+    0 2px 8px rgba(0,0,0,.35);
 
 }
 
@@ -122,38 +129,17 @@
 
     background:#202020;
 
+    border-color:#f7c82d;
+
 }
 
 
 
 .cola-match:last-child{
 
-    border-bottom:none;
+    border-bottom:1px solid #333;
 
 }
-
-
-
-/* ==========================================
-   COMPETITION
-========================================== */
-
-
-.cola-competition{
-
-    color:#fff;
-
-    font-size:12px;
-
-    font-weight:600;
-
-    text-align:center;
-
-    margin-bottom:8px;
-
-}
-
-
 
 /* ==========================================
    STATUS
