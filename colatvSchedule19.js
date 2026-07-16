@@ -117,7 +117,14 @@ async function loadColaTVSchedule(){
             colaMatches
         );
 
-
+console.log(
+"FIRST MATCH FULL:",
+JSON.stringify(
+colaMatches[0],
+null,
+2
+)
+);
 
         renderColaTV();
 
