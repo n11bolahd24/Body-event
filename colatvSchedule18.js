@@ -962,13 +962,13 @@ servers
 
 
 
-   console.log(
-    "FULL DETAIL RESULTS:",
-    JSON.stringify(
-        servers[0],
-        null,
-        2
-    )
+  console.log(
+"TLIVE:",
+JSON.stringify(
+servers[0].tlive,
+null,
+2
+)
 );
 
 
