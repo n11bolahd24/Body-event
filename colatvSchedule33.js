@@ -281,7 +281,7 @@ function renderColaTV(){
 
     <div class="cola-title">
 
-        ⚡ LIVE SCHEDULE
+        ⚡ COLATV LIVE SCHEDULE
 
     </div>
 
@@ -502,9 +502,18 @@ onclick="openColaMatch('${match.match_uuid}')">
 
 
 
-<button class="cola-watch">
+<button 
+class="cola-watch"
+onclick="event.stopPropagation();playColaMatch('${match.match_uuid}')">
+
 ▶ WATCH
+
 </button>
+
+
+
+</div>
+
 
 
 `;
@@ -517,28 +526,7 @@ onclick="openColaMatch('${match.match_uuid}')">
 
 
 
-function playColaAnchor(match_uuid,index){
 
-    const match = colaMatches.find(
-        m => m.match_uuid === match_uuid
-    );
-
-    if(!match) return;
-
-    const anchor =
-        match.anchorAppointmentVoList[index];
-
-    if(!anchor) return;
-
-    const url =
-        anchor.playStreamAddress2 ||
-        anchor.playStreamAddress ||
-        anchor.servers?.[0] ||
-        match.videoUrl;
-
-    playColaStream(url);
-
-}
 
 
 
@@ -1321,7 +1309,6 @@ closeColaPopup();
 }
 
 
-
 // ==========================================
 // PLAY COLATV MATCH
 // ==========================================
@@ -1461,6 +1448,8 @@ async function playColaMatch(match_uuid){
     }
 
 }
+
+
 // ==========================================
 // SHAKA PLAYER COLATV
 // ==========================================
