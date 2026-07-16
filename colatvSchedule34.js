@@ -502,18 +502,18 @@ onclick="openColaMatch('${match.match_uuid}')">
 
 
 
-<button 
+<button
 class="cola-watch"
-onclick="event.stopPropagation();playColaMatch('${match.match_uuid}')">
+onclick="event.stopPropagation();playColaMatch('${match.match_uuid}', this)">
 
 ▶ WATCH
 
 </button>
 
-
-
+<div
+class="cola-server-list"
+id="server-${match.match_uuid}">
 </div>
-
 
 
 `;
@@ -1313,7 +1313,7 @@ closeColaPopup();
 // PLAY COLATV MATCH
 // ==========================================
 
-async function playColaMatch(match_uuid){
+async function playColaMatch(match_uuid, btn){
 
     const match =
     colaMatches.find(
@@ -1321,93 +1321,82 @@ async function playColaMatch(match_uuid){
     );
 
     if(!match){
-
         alert("Match tidak ditemukan");
         return;
+    }
+
+    const serverBox =
+    document.getElementById(
+        "server-" + match_uuid
+    );
+
+    // kalau sudah tampil, sembunyikan lagi
+    if(serverBox.innerHTML.trim() !== ""){
+        serverBox.innerHTML = "";
+        return;
+    }
+
+    let anchors =
+    match.anchorAppointmentVoList || [];
+
+    // kalau belum ada ambil dari API detail
+    if(anchors.length === 0){
+
+        try{
+
+            const res = await fetch(
+                "https://api.gvapi.cc/api/match/detail_live?id=" +
+                match.matchId
+            );
+
+            const json = await res.json();
+
+            anchors =
+            json.data?.anchorAppointmentVoList || [];
+
+        }catch(e){
+            console.log(e);
+        }
 
     }
 
-    console.log("PLAY MATCH:", match);
+    if(anchors.length === 0){
 
-    try{
+        serverBox.innerHTML =
+        `<button class="cola-server-btn"
+        onclick="playColaStream('${match.videoUrl}')">
+        SERVER
+        </button>`;
 
-        // Ambil detail terbaru
-        const response = await fetch(
-            "https://api.gvapi.cc/api/match/detail_live?id=" +
-            match.matchId,
-            {cache:"no-store"}
-        );
+        return;
+    }
 
-        const json = await response.json();
+    serverBox.innerHTML =
+    anchors.map((anchor,index)=>{
 
-        const detail = json.data || json;
+        const stream =
 
-        const anchors =
-        detail.anchorAppointmentVoList || [];
+        anchor.playStreamAddress2 ||
 
+        anchor.playStreamAddress ||
 
+        anchor.servers?.[0] ||
 
-        // =====================================
-        // JIKA LEBIH DARI 1 PENYIAR
-        // =====================================
+        match.videoUrl;
 
-        if(anchors.length > 1){
+        return `
+        <button
+        class="cola-server-btn"
+        onclick="playColaStream('${stream}')">
 
-            let html = "";
+        ${anchor.nickName || `SERVER ${index+1}`}
 
-            anchors.forEach((anchor,index)=>{
+        </button>
+        `;
 
-                const stream =
+    }).join("");
 
-                    anchor.playStreamAddress2 ||
-
-                    anchor.playStreamAddress ||
-
-                    anchor.servers?.[0] ||
-
-                    detail.videoUrl ||
-
-                    match.videoUrl;
-
-                html += `
-                    <button
-                        class="cola-server-btn"
-                        onclick="
-                            playColaStream('${stream}');
-                            closeColaPopup();
-                        ">
-                        ${anchor.nickName || `SERVER ${index+1}`}
-                    </button>
-                `;
-
-            });
-
-            document.body.insertAdjacentHTML(
-                "beforeend",
-                `
-                <div class="cola-popup">
-
-                    <div class="cola-popup-box">
-
-                        <h3>⚡ PILIH SIARAN</h3>
-
-                        ${html}
-
-                        <button
-                            class="cola-close-btn"
-                            onclick="closeColaPopup()">
-                            CLOSE
-                        </button>
-
-                    </div>
-
-                </div>
-                `
-            );
-
-            return;
-
-        }
+}
 
 
 
