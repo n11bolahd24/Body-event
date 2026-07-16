@@ -397,3 +397,40 @@ margin:auto;
 
 
 }
+/* ==========================================
+   COLATV SERVER LIST
+========================================== */
+
+#colaServerList{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:8px 0 12px;
+}
+
+#colaServerList button{
+    background:#111;
+    color:#f7c82d;
+    border:1px solid #f7c82d;
+    border-radius:6px;
+    padding:8px 14px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.2s;
+}
+
+#colaServerList button:hover,
+#colaServerList button.active{
+    background:#f7c82d;
+    color:#000;
+}
+
+@media(max-width:768px){
+
+    #colaServerList button{
+        flex:1 1 calc(50% - 4px);
+        text-align:center;
+    }
+
+}
