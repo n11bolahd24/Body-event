@@ -1447,7 +1447,128 @@ function playColaMatch(match_uuid){
 
 }
 
+// ==========================================
+// SHAKA PLAYER COLATV
+// ==========================================
 
+
+let shakaPlayer;
+
+
+
+async function playColaStream(url){
+
+
+    const tv =
+    document.getElementById("tv");
+
+
+
+    if(!tv) return;
+
+
+
+    tv.innerHTML = `
+
+    <video id="colaVideo"
+
+    autoplay
+
+    controls
+
+    playsinline
+
+    style="
+    width:100%;
+    height:100%;
+    background:#000;
+    ">
+
+    </video>
+
+    `;
+
+
+
+    const video =
+    document.getElementById(
+        "colaVideo"
+    );
+
+
+
+    shaka.polyfill.installAll();
+
+
+
+    if(
+        shaka.Player.isBrowserSupported()
+    ){
+
+
+
+        shakaPlayer =
+        new shaka.Player(video);
+
+
+
+        shakaPlayer.addEventListener(
+            "error",
+            e=>{
+
+                console.log(
+                "SHAKA ERROR:",
+                e
+                );
+
+            }
+        );
+
+
+
+        try{
+
+
+            await shakaPlayer.load(url);
+
+
+
+            console.log(
+            "SHAKA PLAYING:",
+            url
+            );
+
+
+
+        }
+        catch(error){
+
+
+            console.log(
+            "SHAKA LOAD ERROR:",
+            error
+            );
+
+
+        }
+
+
+
+    }
+
+    else{
+
+
+        alert(
+        "Browser tidak support Shaka Player"
+        );
+
+
+    }
+
+
+
+}
 
 // ==========================================
 // UPDATE LIVE STATUS
