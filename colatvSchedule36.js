@@ -515,7 +515,7 @@ class="cola-server-list"
 id="server-${match.match_uuid}">
 </div>
 
-
+</div>
 `;
 
 
