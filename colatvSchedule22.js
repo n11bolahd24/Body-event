@@ -1435,13 +1435,10 @@ function playColaMatch(match_uuid){
     else{
 
 
-        window.open(
-            stream,
-            "_blank"
-        );
+    playColaStream(stream);
 
 
-    }
+}
 
 
 
