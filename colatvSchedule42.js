@@ -293,6 +293,14 @@ onclick="openColaMatch('${match.match_uuid}')">
 
     </div>
 
+    <div class="cola-competition">
+    🏆 ${
+        match.competitionName ||
+        match.leagueName ||
+        "Other"
+    }
+</div>
+
 
 
 
