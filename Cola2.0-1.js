@@ -1459,26 +1459,15 @@ async function playColaStream(url){
 }
 
 // ==========================================
-// UPDATE LIVE STATUS
+// AUTO UPDATE LIVE
 // ==========================================
 
+setInterval(()=>{
 
-setInterval(
-()=>{
+    if(colaMatches.length){
 
-
-    if(
-        colaMatches.length
-    ){
-
-
-        renderColaTV();
-
+        updateLiveData();
 
     }
 
-
-
-},
-30000
-);                 
+},30000);
