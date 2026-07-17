@@ -280,40 +280,47 @@ function renderColaTV(){
         return;
     }
 
+// ==========================================
+// SEARCH
+// ==========================================
 
 function toggleColaSearch(){
 
     const box =
-    document.getElementById(
-        "colaSearchBox"
-    );
+    document.getElementById("colaSearchBox");
+
+    if(!box) return;
 
     box.style.display =
-    box.style.display=="none"
-    ? "block"
-    : "none";
+    box.style.display === "block"
+    ? "none"
+    : "block";
+
+    if(box.style.display === "block"){
+
+        document
+        .getElementById("colaSearchInput")
+        ?.focus();
+
+    }
 
 }
 
 function searchColaMatch(keyword){
 
-    keyword =
-    keyword.toLowerCase();
+    keyword = keyword.toLowerCase();
 
-    document
-    .querySelectorAll(".cola-match")
+    document.querySelectorAll(".cola-match")
     .forEach(card=>{
 
         card.style.display =
-        card.innerText
-        .toLowerCase()
-        .includes(keyword)
+        card.innerText.toLowerCase().includes(keyword)
         ? ""
         : "none";
 
     });
 
-}   
+}
     // ============================
     // URUTKAN BERDASARKAN KICK OFF
     // ============================
