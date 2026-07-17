@@ -464,7 +464,7 @@
 
 .cola-server-btn:hover{
 
-    background:#f7c82d;
+    background-image: linear-gradient(to right top, #ff0303, #000, #000);
 
     color:#000;
 
