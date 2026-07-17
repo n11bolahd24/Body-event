@@ -449,7 +449,7 @@ id="status-${match.match_uuid}">
 
    <div class="cola-competition">
 🏆 ${
-    translateColaCompetition(match)
+    getCompetitionName(match)
 }
 </div>
 
