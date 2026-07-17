@@ -257,8 +257,17 @@ addColaTranslations({
     "giải vô địch bóng đá thế giới":
     "FIFA World Cup",
 
+    "giải vô địch Bóng đá thế giới":
+    "FIFA World Cup",
+
+    "giải vô địch Bóng Đá Thế Giới":
+    "FIFA World Cup",
+
     "giải vô địch bóng đá thế giới fifa":
     "FIFA World Cup",
+
+    "giải vô địch bóng đá thế giới 2026":
+    "FIFA World Cup 2026",
 
     "giải vô địch châu âu":
     "UEFA European Championship",
