@@ -33,19 +33,23 @@
 
 .cola-title{
 
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    background:linear-gradient(135deg,#111,#222);
+
+    color:#fff;
+
+    padding:14px;
+
+    border-left:4px solid #f7c82d;
+
     position:sticky;
 
     top:0;
 
-    z-index:100;
-
-}
-
-.cola-list{
-
-    max-height:600px;   /* sesuaikan */
-
-    overflow-y:auto;
+    z-index:9999;
 
 }
 
