@@ -328,44 +328,30 @@ function searchColaMatch(keyword){
 
     });
 
-    let html = `
-    
-   <div class="cola-title">
+   let html = `
+
+<div class="cola-title">
 
     <span>LIVE SCHEDULE</span>
 
-    <div class="cola-title-right">
+    <input
+        type="text"
+        id="colaSearch"
+        class="cola-search"
+        placeholder="🔎 Cari jadwal..."
+        oninput="searchColaMatch(this.value)"
+    >
 
-        <input
-            type="search"
-            id="colaSearchInput"
-            class="cola-search-input"
-            placeholder=" Cari jadwal..."
-            oninput="searchColaMatch(this.value)">
+    <button
+        class="cola-refresh"
+        onclick="loadColaTVSchedule()">
 
-        <button
-            class="cola-refresh"
-            onclick="loadColaTVSchedule()">
+        🔄 Update
 
-            🔄 Update
-
-        </button>
-
-    </div>
+    </button>
 
 </div>
-<div
-class="cola-search-box"
-id="colaSearchBox"
-style="display:none;">
 
-<input
-type="text"
-id="colaSearchInput"
-placeholder="Cari tim atau liga..."
-onkeyup="searchColaMatch(this.value)">
-
-</div>
 `;
 
     colaMatches.forEach(match=>{
