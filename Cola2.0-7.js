@@ -311,7 +311,7 @@ function renderColaTV(){
 
     let html = `
     <div class="cola-title">
-    <span>LIVE SCHEDULE</span>
+    <span>LIVE SCORE & SCHEDULE</span>
 
     <button class="cola-refresh"
         onclick="loadColaTVSchedule()">
