@@ -1694,21 +1694,21 @@ console.log(
 /* ==========================================
    colaTranslator.js
    PART 6
-   COLA COMPETITION TRANSLATOR PATCH
 ========================================== */
 
 
 window.translateColaCompetition = function(match){
 
-    if(!match)
-        return "Other";
+    console.log(
+        "COLA COMPETITION ORIGINAL:",
+        match.competitionName
+    );
 
 
     let name =
         match.competitionName ||
         match.competition?.name ||
         match.node_api_data?.competition?.name ||
-        match.node_api_data?.competitionName ||
         "";
 
 
@@ -1716,71 +1716,17 @@ window.translateColaCompetition = function(match){
         return "Other";
 
 
-
-    console.log(
-        "COLA COMPETITION ORIGINAL:",
-        name
-    );
-
-
-
-    /*
-       NORMALIZE
-    */
-
-    let clean =
-        String(name)
-        .trim()
-        .replace(/\s+/g," ")
-        .toLowerCase();
-
-
-
-    /*
-       EXACT DICTIONARY
-    */
-
     let result =
-        translateName(clean);
+    translateName(name);
 
 
-
-    /*
-       SMART TRANSLATE
-       jika belum berubah
-    */
-
-    if(result === clean){
+    if(result === name){
 
         result =
-        smartTranslate(clean);
+        smartTranslate(name);
 
     }
 
-
-
-    /*
-       SPECIAL FIFA PATCH
-    */
-
-    if(
-        clean === 
-        "giải vô địch bóng đá thế giới"
-        ||
-        clean ===
-        "giải vô địch bóng đá thế giới 2026"
-    ){
-
-        result =
-        "FIFA World Cup";
-
-    }
-
-
-
-    /*
-       FORMAT RETURN
-    */
 
     console.log(
         "COLA COMPETITION RESULT:",
@@ -1794,17 +1740,15 @@ window.translateColaCompetition = function(match){
 
 
 
-
-
 console.log(
-    "TEST TRANSLATOR FIFA:",
-    translateColaCompetition({
-        competitionName:
-        "Giải vô địch bóng đá thế giới"
-    })
+"TEST TRANSLATOR FIFA:",
+translateName("Giải vô địch bóng đá thế giới")
 );
 
 
+console.log(
+"COLA Translator Loaded"
+);
 
 console.log(
     "COLA Translator PART 6 Loaded"
