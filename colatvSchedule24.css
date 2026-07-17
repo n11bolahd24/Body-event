@@ -128,7 +128,16 @@
 
     margin:10px auto;
 
-    background:#151515;
+    background:
+    linear-gradient(
+    rgba(0,0,0,.55),
+    rgba(0,0,0,.75)
+    ),
+    url("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEghXtRwrve1908c-M5Q_i65k8geNU7ugYaSqMMlP_npZIpiS0KEUlAebFUuoVMVm4AhQqZuJuFZI0R22U6ot8iVTVwLjAv46h6zhw4Cx5MEd3GwHMqNFWPGtxaCQF-9iiBo_2DYwvBTIPvS6vVJ98Vjc7fKUcGknbpe-72zNIpztQNsEd3bZPpml36d3prR/s320/ChatGPT%20Image%20Jun%2018,%202026,%2003_21_52%20PM.webp");
+
+    background-size:cover;
+
+    background-position:center;
 
     padding:14px;
 
@@ -144,7 +153,6 @@
     0 2px 8px rgba(0,0,0,.35);
 
 }
-
 
 
 .cola-match:hover{
@@ -369,8 +377,106 @@
 }
 
 
+/* ==========================================
+   WATCH BUTTON
+========================================== */
 
-/*/ taruh sini
+
+.cola-watch{
+
+    display:block;
+
+    width:auto;
+
+    margin:0 auto;
+
+    background:#117300;
+
+    color:#fff; 
+
+    border:1px solid #fff;
+
+    border-radius:8px;
+
+    padding:4px 10px;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+
+
+.cola-watch:hover{
+
+    background:#ff0303;
+
+    color:#fff;
+
+}
+
+
+
+/* ==========================================
+   SERVER LIST
+========================================== */
+
+
+.cola-server-list{
+
+    display:flex;
+
+    justify-content:center;
+
+    flex-wrap:wrap;
+
+    gap:8px;
+
+    margin-top:10px;
+
+}
+
+
+
+.cola-server-btn{
+
+    width:auto;
+
+    background:#111;
+
+    color:#f7c82d;
+
+    border:1px solid #f7c82d;
+
+    border-radius:6px;
+
+    padding:4px 7px;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+
+
+.cola-server-btn:hover{
+
+    background-image: linear-gradient(to right top, #ff0303, #000, #000);
+
+    color:#fff;
+
+}
+
 /* ==========================================
    LOADING ERROR EMPTY
 ========================================== */
