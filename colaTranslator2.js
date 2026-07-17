@@ -1936,46 +1936,40 @@ function autoTranslateColaLeague(name, fallback=""){
 ========================================== */
 
 
-/*
-   Override competition display
-*/
-
-
 function translateColaCompetition(match){
-
 
     let main =
     match.competitionName ||
+    match.competition?.name ||
+    match.node_api_data?.competition?.name ||
     "";
 
 
-
-    let fallback =
-    match
-    ?.node_api_data
-    ?.competition
-    ?.name
-    ||
-    match
-    ?.competition
-    ?.name
-    ||
-    "";
+    if(!main){
+        return "Other";
+    }
 
 
+    let exact =
+    translateName(main);
 
-    return autoTranslateColaLeague(
-        main,
-        fallback
-    );
 
+    if(exact !== main){
+
+        return exact;
+
+    }
+
+
+    return smartTranslate(main);
 
 }
 
 
 
-
-
+console.log(
+"COLA Translator PART 6 Loaded - AUTO ENGINE"
+);
 
 
 console.log(
