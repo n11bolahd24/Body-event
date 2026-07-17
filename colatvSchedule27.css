@@ -31,19 +31,26 @@
    TITLE
 ========================================== */
 
-
 .cola-title{
+
     display:flex;
     justify-content:space-between;
     align-items:center;
+
     background:linear-gradient(135deg,#111,#222);
     color:#fff;
+
     padding:14px;
+
     border-left:4px solid #f7c82d;
-    border-radius:12px 12px 0 0;
-    position:sticky;
+
+    position:fixed;
     top:0;
-    z-index:999;
+    left:0;
+    right:0;
+
+    z-index:9999;
+
 }
 
 .cola-refresh{
