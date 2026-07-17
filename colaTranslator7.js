@@ -1694,16 +1694,22 @@ console.log(
 /* ==========================================
    colaTranslator.js
    PART 6
-   AUTO TRANSLATE ENGINE
+   COLA COMPETITION TRANSLATOR PATCH
 ========================================== */
 
 
-/*
-    CLEAN VIETNAMESE COMPETITION NAME
-*/
+window.translateColaCompetition = function(match){
+
+    if(!match)
+        return "Other";
 
 
-function autoTranslateColaLeague(name, fallback=""){
+    let name =
+        match.competitionName ||
+        match.competition?.name ||
+        match.node_api_data?.competition?.name ||
+        match.node_api_data?.competitionName ||
+        "";
 
 
     if(!name)
@@ -1711,283 +1717,95 @@ function autoTranslateColaLeague(name, fallback=""){
 
 
 
-    let original =
-    name.trim();
-
-
-
-    let text =
-    original.toLowerCase();
-
-
-
-
-
-    /*
-       CEK DATABASE TRANSLATION
-    */
-
-
-    if(
-    typeof smartTranslate === "function"
-){
-
-    let result =
-    smartTranslate(original);
-
-
-    if(
-        result &&
-        result !== original
-    ){
-
-        return result;
-
-    }
-
-}
-
-
-
-
-
-
-
-    /*
-       REMOVE VIETNAMESE WORD
-    */
-
-
-    const replaceMap = {
-
-
-        "giải vô địch bóng đá thế giới":
-        "FIFA World Cup",
-
-
-        "giải vô địch bóng đá":
-        "Football Championship",
-
-
-        "giải vô địch":
-        "Championship",
-
-
-        "giải":
-        "League",
-
-
-        "vô địch":
-        "Championship",
-
-
-        "quốc gia":
-        "National",
-
-
-        "bóng đá":
-        "Football",
-
-
-        "thế giới":
-        "World",
-
-
-        "châu âu":
-        "Europe",
-
-
-        "châu á":
-        "Asia",
-
-
-        "anh":
-        "England",
-
-
-        "pháp":
-        "France",
-
-
-        "đức":
-        "Germany",
-
-
-        "tây ban nha":
-        "Spain",
-
-
-        "italia":
-        "Italy",
-
-
-        "nhật bản":
-        "Japan",
-
-
-        "hàn quốc":
-        "South Korea",
-
-
-        "mexico":
-        "Mexico"
-
-    };
-
-
-
-
-
-
-
-
-    Object.keys(replaceMap)
-    .forEach(key=>{
-
-
-        text =
-        text.replace(
-            new RegExp(key,"gi"),
-            replaceMap[key]
-        );
-
-
-    });
-
-
-
-
-
-
-
-
-
-    /*
-       FORMAT TEXT
-    */
-
-
-    text =
-    text
-    .replace(/\s+/g," ")
-    .trim();
-
-
-
-
-
-
-
-    /*
-       CAPITALIZE
-    */
-
-
-    text =
-    text
-    .split(" ")
-    .map(word=>{
-
-        return word
-        .charAt(0)
-        .toUpperCase()
-        +
-        word.slice(1);
-
-    })
-    .join(" ");
-
-
-
-
-
-
-
-
-    /*
-       JIKA HASIL MASIH ANEH
-       AMBIL FALLBACK
-    */
-
-
-    if(
-        text.length < 3 ||
-        text.includes("Giải")
-    ){
-
-        if(fallback){
-
-            return fallback;
-
-        }
-
-    }
-
-
-
-
-
-
-    return text;
-
-
-}
-
-
-
-
-
-
-
-
-/* ==========================================
-   PATCH CREATE CARD
-========================================== */
-
-
-function translateColaCompetition(match){
-
-    let main =
-    match.competitionName ||
-    match.competition?.name ||
-    match.node_api_data?.competition?.name ||
-    "";
-
-
-    if(!main){
-        return "Other";
-    }
-
-
-    let exact =
-    translateName(main);
-
-
     console.log(
-        "TRANSLATE COMP:",
-        main,
-        "RESULT:",
-        exact
+        "COLA COMPETITION ORIGINAL:",
+        name
     );
 
 
-    if(exact !== main){
 
-        return exact;
+    /*
+       NORMALIZE
+    */
+
+    let clean =
+        String(name)
+        .trim()
+        .replace(/\s+/g," ")
+        .toLowerCase();
+
+
+
+    /*
+       EXACT DICTIONARY
+    */
+
+    let result =
+        translateName(clean);
+
+
+
+    /*
+       SMART TRANSLATE
+       jika belum berubah
+    */
+
+    if(result === clean){
+
+        result =
+        smartTranslate(clean);
 
     }
 
 
-    return smartTranslate(main);
 
-}
+    /*
+       SPECIAL FIFA PATCH
+    */
+
+    if(
+        clean === 
+        "giải vô địch bóng đá thế giới"
+        ||
+        clean ===
+        "giải vô địch bóng đá thế giới 2026"
+    ){
+
+        result =
+        "FIFA World Cup";
+
+    }
+
+
+
+    /*
+       FORMAT RETURN
+    */
+
+    console.log(
+        "COLA COMPETITION RESULT:",
+        result
+    );
+
+
+    return result;
+
+};
+
+
+
 
 
 console.log(
-"TEST TRANSLATOR FIFA:",
-translateName("Giải vô địch bóng đá thế giới")
+    "TEST TRANSLATOR FIFA:",
+    translateColaCompetition({
+        competitionName:
+        "Giải vô địch bóng đá thế giới"
+    })
 );
-"COLA Translator PART 6 Loaded - AUTO ENGINE"
-);  
 
-})(window);
+
+
+console.log(
+    "COLA Translator PART 6 Loaded"
+);
