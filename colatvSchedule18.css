@@ -79,29 +79,15 @@
 }
 
 .cola-search-box{
-
-    background:#111;
-
-    padding:10px;
-
+    position:relative;
+    z-index:9999;
 }
 
 .cola-search-box input{
-
-    width:100%;
-
-    padding:10px;
-
-    border:1px solid #444;
-
-    border-radius:8px;
-
-    background:#1b1b1b;
-
-    color:#fff;
-
+    position:relative;
+    z-index:9999;
+    pointer-events:auto;
 }
-
 /* ==========================================
    LEAGUE
 ========================================== */
