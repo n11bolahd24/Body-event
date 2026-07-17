@@ -333,7 +333,60 @@ function renderColaTV(){
 
 
 
+// ==========================================
+// COMPETITION NAME TRANSLATE
+// ==========================================
 
+function getCompetitionName(match){
+
+    let league =
+        match.competitionName ||
+        match.leagueName ||
+        match.competition?.name ||
+        "Other";
+
+    const translate = {
+
+        // UEFA
+        "UEFA EL": "UEFA Europa League",
+        "Cúp C1 Châu Âu": "UEFA Champions League",
+        "Cúp C2 Châu Âu": "UEFA Europa League",
+        "Cúp C3 Châu Âu": "UEFA Conference League",
+
+        // England
+        "Giải VĐQG Anh": "Premier League",
+        "Cúp FA": "FA Cup",
+        "Cúp Liên đoàn Anh": "EFL Cup",
+
+        // Spain
+        "Giải VĐQG Tây Ban Nha": "La Liga",
+        "Cúp Nhà Vua Tây Ban Nha": "Copa del Rey",
+
+        // Italy
+        "Giải VĐQG Ý": "Serie A",
+        "Cúp Quốc gia Ý": "Coppa Italia",
+
+        // Germany
+        "Giải VĐQG Đức": "Bundesliga",
+        "Cúp Quốc gia Đức": "DFB Pokal",
+
+        // France
+        "Giải VĐQG Pháp": "Ligue 1",
+
+        // Netherlands
+        "Giải VĐQG Hà Lan": "Eredivisie",
+
+        // Portugal
+        "Giải VĐQG Bồ Đào Nha": "Liga Portugal",
+
+        // Saudi
+        "Giải VĐQG Ả Rập Xê Út": "Saudi Pro League"
+
+    };
+
+    return translate[league] || league;
+
+}
 
 
 
@@ -395,11 +448,7 @@ id="status-${match.match_uuid}">
 </div>
 
     <div class="cola-competition">
-    🏆 ${
-        match.competitionName ||
-        match.leagueName ||
-        "Other"
-    }
+🏆 ${getCompetitionName(match)}
 </div>
 
 
