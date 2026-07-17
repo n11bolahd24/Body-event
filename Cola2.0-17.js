@@ -310,25 +310,23 @@ function renderColaTV(){
     });
 
     let html = `
-    <div class="cola-title">
+<div class="cola-title">
     <span>LIVE SCORE & SCHEDULE</span>
 
     <button class="cola-refresh"
         onclick="loadColaTVSchedule()">
-        🔄 Update 
+        🔄 Update
     </button>
 </div>
-    `;
 
-    colaMatches.forEach(match=>{
+<div class="cola-list">
+`;
 
-        html += createColaCard(match);
+colaMatches.forEach(match=>{
+    html += createColaCard(match);
+});
 
-    });
-
-    box.innerHTML = html;
-
-}
+html += `</div>`;
 
 
 
