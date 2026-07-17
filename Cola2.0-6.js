@@ -280,26 +280,7 @@ function renderColaTV(){
         return;
     }
 
-// ==========================================
-// SEARCH
-// ==========================================
-
-function searchColaMatch(keyword){
-
-    keyword = keyword.toLowerCase().trim();
-
-    document.querySelectorAll(".cola-match").forEach(card=>{
-
-        const text = card.innerText.toLowerCase();
-
-        card.style.display =
-        text.includes(keyword)
-        ? ""
-        : "none";
-
-    });
-
-}    // ============================
+    // ============================
     // URUTKAN BERDASARKAN KICK OFF
     // ============================
 
@@ -328,31 +309,16 @@ function searchColaMatch(keyword){
 
     });
 
-   let html = `
-
-<div class="cola-title">
-
+    let html = `
+    <div class="cola-title">
     <span>LIVE SCHEDULE</span>
 
-    <input
-        type="text"
-        id="colaSearch"
-        class="cola-search"
-        placeholder="🔎 Cari jadwal..."
-        oninput="searchColaMatch(this.value)"
-    >
-
-    <button
-        class="cola-refresh"
+    <button class="cola-refresh"
         onclick="loadColaTVSchedule()">
-
-        🔄 Update
-
+        🔄 Update 
     </button>
-
 </div>
-
-`;
+    `;
 
     colaMatches.forEach(match=>{
 
