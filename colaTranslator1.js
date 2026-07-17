@@ -1720,23 +1720,23 @@ function autoTranslateColaLeague(name, fallback=""){
 
 
     if(
-        typeof colaTranslate === "function"
+    typeof smartTranslate === "function"
+){
+
+    let result =
+    smartTranslate(original);
+
+
+    if(
+        result &&
+        result !== original
     ){
 
-        let result =
-        colaTranslate(original);
-
-
-        if(
-            result &&
-            result !== original
-        ){
-
-            return result;
-
-        }
+        return result;
 
     }
+
+}
 
 
 
