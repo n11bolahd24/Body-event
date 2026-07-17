@@ -40,18 +40,63 @@
 
     align-items:center;
 
+    gap:10px;
+
+    flex-wrap:wrap;
+
 }
 
-.cola-title-btn{
+.cola-title-right{
 
     display:flex;
+
+    align-items:center;
 
     gap:8px;
 
 }
 
-.cola-search-btn,
+.cola-search-input{
+
+    width:170px;
+
+    height:34px;
+
+    padding:0 12px;
+
+    background:#111;
+
+    color:#fff;
+
+    border:1px solid #f7c82d;
+
+    border-radius:8px;
+
+    font-size:12px;
+
+    outline:none;
+
+}
+
+.cola-search-input::placeholder{
+
+    color:#aaa;
+
+}
+
+.cola-search-input:focus{
+
+    border-color:#ffd84d;
+
+    box-shadow:0 0 6px rgba(247,200,45,.35);
+
+}
+
 .cola-refresh{
+
+    height:34px;
+
+    padding:0 12px;
 
     background:#111;
 
@@ -59,17 +104,16 @@
 
     border:1px solid #f7c82d;
 
-    border-radius:6px;
-
-    padding:6px 10px;
+    border-radius:8px;
 
     cursor:pointer;
 
     font-size:12px;
 
+    font-weight:600;
+
 }
 
-.cola-search-btn:hover,
 .cola-refresh:hover{
 
     background:#f7c82d;
@@ -78,16 +122,6 @@
 
 }
 
-.cola-search-box{
-    position:relative;
-    z-index:9999;
-}
-
-.cola-search-box input{
-    position:relative;
-    z-index:9999;
-    pointer-events:auto;
-}
 /* ==========================================
    LEAGUE
 ========================================== */
