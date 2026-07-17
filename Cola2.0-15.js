@@ -61,15 +61,30 @@ async function loadColaTVSchedule(){
 
 
 
-        const json =
-        await response.json();
-
-
-
         console.log(
-            "COLATV RESPONSE:",
-            json
-        );
+    "API STATUS:",
+    response.status
+);
+
+
+const raw =
+await response.text();
+
+
+console.log(
+    "API RAW:",
+    raw
+);
+
+
+const json =
+JSON.parse(raw);
+
+
+console.log(
+    "COLATV RESPONSE:",
+    json
+);
 
 
 
