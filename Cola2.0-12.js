@@ -340,10 +340,11 @@ function renderColaTV(){
 function getCompetitionName(match){
 
     let league =
-        match.competitionName ||
-        match.leagueName ||
-        match.competition?.name ||
-        "Other";
+    match.node_api_data?.competition?.name ||
+    match.competition?.name ||
+    match.competitionName ||
+    match.leagueName ||
+    "Other";
 
     const translate = {
 
