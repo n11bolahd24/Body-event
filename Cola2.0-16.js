@@ -61,30 +61,15 @@ async function loadColaTVSchedule(){
 
 
 
+        const json =
+        await response.json();
+
+
+
         console.log(
-    "API STATUS:",
-    response.status
-);
-
-
-const raw =
-await response.text();
-
-
-console.log(
-    "API RAW:",
-    raw
-);
-
-
-const json =
-JSON.parse(raw);
-
-
-console.log(
-    "COLATV RESPONSE:",
-    json
-);
+            "COLATV RESPONSE:",
+            json
+        );
 
 
 
@@ -464,7 +449,13 @@ id="status-${match.match_uuid}">
 </div>
 
    <div class="cola-competition">
-🏆 ${translateColaCompetition(match)}
+🏆 ${
+    typeof translateColaCompetition === "function"
+    ?
+    translateColaCompetition(match)
+    :
+    getCompetitionName(match)
+}
 </div>
 
 
