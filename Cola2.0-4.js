@@ -284,44 +284,22 @@ function renderColaTV(){
 // SEARCH
 // ==========================================
 
-function toggleColaSearch(){
-
-    const box =
-    document.getElementById("colaSearchBox");
-
-    if(!box) return;
-
-    box.style.display =
-    box.style.display === "block"
-    ? "none"
-    : "block";
-
-    if(box.style.display === "block"){
-
-        document
-        .getElementById("colaSearchInput")
-        ?.focus();
-
-    }
-
-}
-
 function searchColaMatch(keyword){
 
-    keyword = keyword.toLowerCase();
+    keyword = keyword.toLowerCase().trim();
 
-    document.querySelectorAll(".cola-match")
-    .forEach(card=>{
+    document.querySelectorAll(".cola-match").forEach(card=>{
+
+        const text = card.innerText.toLowerCase();
 
         card.style.display =
-        card.innerText.toLowerCase().includes(keyword)
+        text.includes(keyword)
         ? ""
         : "none";
 
     });
 
-}
-    // ============================
+}    // ============================
     // URUTKAN BERDASARKAN KICK OFF
     // ============================
 
@@ -352,23 +330,22 @@ function searchColaMatch(keyword){
 
     let html = `
     
-    <div class="cola-title">
+   <div class="cola-title">
 
     <span>LIVE SCHEDULE</span>
 
-    <div class="cola-title-btn">
+    <div class="cola-title-right">
+
+        <input
+            type="search"
+            id="colaSearchInput"
+            class="cola-search-input"
+            placeholder=" Cari jadwal..."
+            oninput="searchColaMatch(this.value)">
 
         <button
-        class="cola-search-btn"
-        onclick="toggleColaSearch()">
-
-            🔎 Search
-
-        </button>
-
-        <button
-        class="cola-refresh"
-        onclick="loadColaTVSchedule()">
+            class="cola-refresh"
+            onclick="loadColaTVSchedule()">
 
             🔄 Update
 
@@ -377,7 +354,6 @@ function searchColaMatch(keyword){
     </div>
 
 </div>
-
 <div
 class="cola-search-box"
 id="colaSearchBox"
