@@ -1963,6 +1963,14 @@ function translateColaCompetition(match){
     translateName(main);
 
 
+    console.log(
+        "TRANSLATE COMP:",
+        main,
+        "RESULT:",
+        exact
+    );
+
+
     if(exact !== main){
 
         return exact;
@@ -1973,7 +1981,6 @@ function translateColaCompetition(match){
     return smartTranslate(main);
 
 }
-
 
 
 console.log(
