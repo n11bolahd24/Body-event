@@ -41,6 +41,9 @@
     padding:14px;
     border-left:4px solid #f7c82d;
     border-radius:12px 12px 0 0;
+    position:sticky;
+    top:0;
+    z-index:999;
 }
 
 .cola-refresh{
