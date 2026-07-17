@@ -447,13 +447,9 @@ id="status-${match.match_uuid}">
 
 </div>
 
-    <div class="cola-competition">
+   <div class="cola-competition">
 🏆 ${
-    match.node_api_data?.competition?.name ||
-    match.competition?.name ||
-    match.competitionName ||
-    match.leagueName ||
-    "Other"
+    translateColaCompetition(match)
 }
 </div>
 
