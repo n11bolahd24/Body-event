@@ -44,7 +44,7 @@
 
     border-left:4px solid #f7c82d;
 
-    position:fixed;
+    position:sticky;
     top:0;
     left:0;
     right:0;
