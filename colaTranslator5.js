@@ -1984,11 +1984,9 @@ function translateColaCompetition(match){
 
 
 console.log(
-"COLA Translator PART 6 Loaded - AUTO ENGINE"
+"TEST TRANSLATOR FIFA:",
+translateName("Giải vô địch bóng đá thế giới")
 );
-
-
-console.log(
 "COLA Translator PART 6 Loaded - AUTO ENGINE"
 );  
 
