@@ -856,9 +856,10 @@ async function openColaMatch(match_uuid){
 
         await response.json();
 
-
-
-
+       console.log(
+    "DETAIL:",
+    JSON.stringify(json, null, 2)
+);
 
 
 
