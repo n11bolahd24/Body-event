@@ -1414,24 +1414,27 @@ async function playColaStream(url){
 
     <div class="shaka-video-container"
     style="
+    position:relative;
     width:100%;
     height:100%;
+    overflow:hidden;
     background:#000;
     ">
 
-    <video id="colaVideo"
+        <video id="colaVideo"
 
-    autoplay
+        autoplay
 
-    playsinline
+        playsinline
 
-    style="
-    width:100%;
-    height:100%;
-    background:#000;
-    ">
+        style="
+        width:100%;
+        height:100%;
+        object-fit:contain;
+        background:#000;
+        ">
 
-    </video>
+        </video>
 
     </div>
 
@@ -1440,9 +1443,7 @@ async function playColaStream(url){
 
 
     const video =
-    document.getElementById(
-        "colaVideo"
-    );
+    document.getElementById("colaVideo");
 
 
 
@@ -1471,12 +1472,33 @@ async function playColaStream(url){
         );
 
 
+
         shakaUI =
         new shaka.ui.Overlay(
             shakaPlayer,
             container,
             video
         );
+
+
+
+        shakaUI.configure({
+
+            controlPanelElements:[
+
+                "play_pause",
+
+                "time_and_duration",
+
+                "spacer",
+
+                "mute",
+
+                "fullscreen"
+
+            ]
+
+        });
 
 
 
@@ -1509,6 +1531,7 @@ async function playColaStream(url){
 
 
         }
+
         catch(error){
 
 
@@ -1537,7 +1560,6 @@ async function playColaStream(url){
 
 
 }
-
 // ==========================================
 // AUTO UPDATE LIVE
 // ==========================================
