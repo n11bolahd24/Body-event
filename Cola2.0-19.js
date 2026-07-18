@@ -1394,6 +1394,7 @@ async function playColaMatch(match_uuid, btn){
 
 
 let shakaPlayer;
+let shakaUI;
 
 
 
@@ -1411,11 +1412,16 @@ async function playColaStream(url){
 
     tv.innerHTML = `
 
+    <div class="shaka-video-container"
+    style="
+    width:100%;
+    height:100%;
+    background:#000;
+    ">
+
     <video id="colaVideo"
 
     autoplay
-
-    controls
 
     playsinline
 
@@ -1426,6 +1432,8 @@ async function playColaStream(url){
     ">
 
     </video>
+
+    </div>
 
     `;
 
@@ -1450,6 +1458,25 @@ async function playColaStream(url){
 
         shakaPlayer =
         new shaka.Player(video);
+
+
+
+        // ===============================
+        // SHAKA UI CONTROL
+        // ===============================
+
+        const container =
+        document.querySelector(
+            ".shaka-video-container"
+        );
+
+
+        shakaUI =
+        new shaka.ui.Overlay(
+            shakaPlayer,
+            container,
+            video
+        );
 
 
 
