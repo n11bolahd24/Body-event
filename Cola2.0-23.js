@@ -861,7 +861,19 @@ async function openColaMatch(match_uuid){
     JSON.stringify(json, null, 2)
 );
 
+console.log(
+"ANCHOR:",
+json.data?.anchorAppointmentVoList
+);
 
+       console.log(
+"TLIVE:",
+JSON.stringify(
+servers[0].tlive,
+null,
+2
+)
+);
 
         console.log(
             "DETAIL LIVE:",
@@ -959,16 +971,6 @@ console.log(
 servers
 );
 
-
-
-  console.log(
-"TLIVE:",
-JSON.stringify(
-servers[0].tlive,
-null,
-2
-)
-);
 
 
 
