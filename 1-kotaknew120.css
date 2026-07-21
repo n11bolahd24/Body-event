@@ -287,7 +287,7 @@ a:hover, a:visited, a:link, a:active
   color:#000!important;
   font-size:15px;
 
-  padding:5px 12px;
+  padding:1px 1px;
   border-radius:8px;
 
   transition:border-color .25s ease,
