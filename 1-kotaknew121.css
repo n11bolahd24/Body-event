@@ -302,7 +302,7 @@ a:hover, a:visited, a:link, a:active
 .doctor-profile-tabs button.active{
   color:#fff!important;
   font-weight:500;
-  background:#000000ef;
+  background:#ff0000ef;
   border-color:#f7c82d;
 }
 
