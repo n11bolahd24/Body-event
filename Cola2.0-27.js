@@ -1413,7 +1413,6 @@ height:100%;
 <video id="colaVideo"
 autoplay
 playsinline
-controls
 style="
 width:100%;
 height:100%;
