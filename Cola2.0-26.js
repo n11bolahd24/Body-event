@@ -1402,29 +1402,29 @@ async function playColaStream(url){
 
     tv.innerHTML = `
 
-    <div id="shakaContainer" 
-    class="shaka-video-container"
-    style="
-    width:100%;
-    height:100%;
-    background:#000;
-    ">
+<div id="shakaContainer"
+class="shaka-video-container"
+style="
+position:relative;
+width:100%;
+height:100%;
+">
 
-        <video id="colaVideo"
-        autoplay
-        playsinline
-        muted
-        style="
-        width:100%;
-        height:100%;
-        object-fit:contain;
-        background:#000;
-        ">
-        </video>
+<video id="colaVideo"
+autoplay
+playsinline
+controls
+style="
+width:100%;
+height:100%;
+object-fit:contain;
+background:#000;
+">
+</video>
 
-    </div>
+</div>
 
-    `;
+`;
 
 
     const video =
