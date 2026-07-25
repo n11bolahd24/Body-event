@@ -1507,11 +1507,22 @@ background:#000;
 
     // aktifkan UI Shaka
     shakaUI =
-    new shaka.ui.Overlay(
-        shakaPlayer,
-        container,
-        video
-    );
+new shaka.ui.Overlay(
+    shakaPlayer,
+    container,
+    video
+);
+
+
+const controls =
+shakaUI.getControls();
+
+
+controls.getConfig().overflowMenuButtons = [
+    'quality',
+    'picture_in_picture',
+    'cast'
+];
 
 
 
