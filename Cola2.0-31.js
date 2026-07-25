@@ -1415,6 +1415,8 @@ bottom:0;
 <video id="colaVideo"
 autoplay
 playsinline
+muted
+controls
 style="
 width:100%;
 height:100%;
