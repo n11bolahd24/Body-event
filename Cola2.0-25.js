@@ -1386,52 +1386,53 @@ async function playColaMatch(match_uuid, btn){
 
 
 // ==========================================
-// SHAKA PLAYER COLATV
+// SHAKA PLAYER COLATV + UI + QUALITY
 // ==========================================
 
-
 let shakaPlayer;
-
+let shakaUI;
 
 
 async function playColaStream(url){
 
-
-    const tv =
-    document.getElementById("tv");
-
-
+    const tv = document.getElementById("tv");
 
     if(!tv) return;
 
 
-
     tv.innerHTML = `
 
-    <video id="colaVideo"
-
-    autoplay
-
-    controls
-
-    playsinline
-
+    <div id="shakaContainer" 
+    class="shaka-video-container"
     style="
     width:100%;
     height:100%;
     background:#000;
     ">
 
-    </video>
+        <video id="colaVideo"
+        autoplay
+        playsinline
+        muted
+        style="
+        width:100%;
+        height:100%;
+        object-fit:contain;
+        background:#000;
+        ">
+        </video>
+
+    </div>
 
     `;
 
 
-
     const video =
-    document.getElementById(
-        "colaVideo"
-    );
+    document.getElementById("colaVideo");
+
+
+    const container =
+    document.getElementById("shakaContainer");
 
 
 
@@ -1439,74 +1440,118 @@ async function playColaStream(url){
 
 
 
-    if(
-        shaka.Player.isBrowserSupported()
-    ){
-
-
-
-        shakaPlayer =
-        new shaka.Player(video);
-
-
-
-        shakaPlayer.addEventListener(
-            "error",
-            e=>{
-
-                console.log(
-                "SHAKA ERROR:",
-                e
-                );
-
-            }
-        );
-
-
-
-        try{
-
-
-            await shakaPlayer.load(url);
-
-
-
-            console.log(
-            "SHAKA PLAYING:",
-            url
-            );
-
-
-
-        }
-        catch(error){
-
-
-            console.log(
-            "SHAKA LOAD ERROR:",
-            error
-            );
-
-
-        }
-
-
-
-    }
-
-    else{
-
+    if(!shaka.Player.isBrowserSupported()){
 
         alert(
         "Browser tidak support Shaka Player"
         );
 
+        return;
+    }
+
+
+
+    // hapus player lama
+    if(shakaPlayer){
+
+        shakaPlayer.destroy();
 
     }
 
 
 
-}// ==========================================
+    shakaPlayer =
+    new shaka.Player(video);
+
+
+
+    shakaPlayer.configure({
+
+        streaming:{
+
+            rebufferingGoal:2,
+
+            bufferingGoal:30,
+
+            retryParameters:{
+                maxAttempts:8,
+                baseDelay:1000
+            }
+
+        },
+
+
+        abr:{
+
+            enabled:true,
+
+            defaultBandwidthEstimate:1000000
+
+        }
+
+    });
+
+
+
+    shakaPlayer.addEventListener(
+    "error",
+    e=>{
+
+        console.log(
+        "SHAKA ERROR:",
+        e.detail
+        );
+
+    });
+
+
+
+    // aktifkan UI Shaka
+    shakaUI =
+    new shaka.ui.Overlay(
+        shakaPlayer,
+        container,
+        video
+    );
+
+
+
+    try{
+
+
+        await shakaPlayer.load(url);
+
+
+
+        console.log(
+        "SHAKA PLAYING:",
+        url
+        );
+
+
+
+        // autoplay
+        video.play()
+        .catch(()=>{});
+
+
+
+    }
+    catch(error){
+
+
+        console.log(
+        "SHAKA LOAD ERROR:",
+        error
+        );
+
+
+    }
+
+
+
+}
+// ==========================================
 // AUTO UPDATE LIVE
 // ==========================================
 
