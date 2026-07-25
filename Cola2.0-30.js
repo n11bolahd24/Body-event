@@ -1520,11 +1520,22 @@ const controls =
 shakaUI.getControls();
 
 
-controls.getConfig().overflowMenuButtons = [
-    'quality',
-    'picture_in_picture',
-    'cast'
-];
+controls.configure({
+
+    controlPanelElements:[
+
+        'play_pause',
+        'time_and_duration',
+        'progress',
+        'spacer',
+        'mute',
+        'volume',
+        'quality',
+        'fullscreen'
+
+    ]
+
+});
 
 
 
