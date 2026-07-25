@@ -1415,8 +1415,6 @@ bottom:0;
 <video id="colaVideo"
 autoplay
 playsinline
-muted
-controls
 style="
 width:100%;
 height:100%;
@@ -1522,22 +1520,11 @@ const controls =
 shakaUI.getControls();
 
 
-controls.configure({
-
-    controlPanelElements:[
-
-        'play_pause',
-        'time_and_duration',
-        'progress',
-        'spacer',
-        'mute',
-        'volume',
-        'quality',
-        'fullscreen'
-
-    ]
-
-});
+controls.getConfig().overflowMenuButtons = [
+    'quality',
+    'picture_in_picture',
+    'cast'
+];
 
 
 
