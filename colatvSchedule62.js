@@ -1918,7 +1918,14 @@ jwplayer("jwContainer")
 
 .setup({
 
+sources:[
+
+{
 file:url,
+type:"hls"
+}
+
+],
 
 width:"100%",
 
@@ -1930,14 +1937,9 @@ controls:true,
 
 primary:"html5",
 
-hlshtml:true,
-
-stretching:"uniform",
-
-preload:"auto"
+stretching:"uniform"
 
 });
-
 
 
 
