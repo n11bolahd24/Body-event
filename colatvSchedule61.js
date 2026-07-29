@@ -1930,7 +1930,11 @@ controls:true,
 
 primary:"html5",
 
-stretching:"uniform"
+hlshtml:true,
+
+stretching:"uniform",
+
+preload:"auto"
 
 });
 
