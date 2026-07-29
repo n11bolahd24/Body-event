@@ -1435,24 +1435,36 @@ colaPlayerType = type;
 
 
 console.log(
-"PLAYER CHANGE:",
+"PLAYER DIPILIH:",
 type
 );
 
 
-// reload stream terakhir
+console.log(
+"STREAM SEKARANG:",
+window.currentColaStream
+);
+
+
+
 if(window.currentColaStream){
 
 playColaStream(
 window.currentColaStream
 );
 
-}
+}else{
+
+
+console.log(
+"BELUM ADA STREAM"
+);
 
 
 }
 
 
+}
 
 
 
