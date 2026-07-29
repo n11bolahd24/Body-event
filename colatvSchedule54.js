@@ -1455,24 +1455,102 @@ function playColaServerWithPlayer(url, selectID){
 }
 
 // ==========================================
-// SHAKA PLAYER COLATV + UI + QUALITY
+// COLATV PLAYER
+// SHAKA PLAYER + JW PLAYER
 // ==========================================
+
 
 let shakaPlayer;
 let shakaUI;
 
+let jwPlayerInstance;
 
-async function playColaStream(url){
 
-    const tv = document.getElementById("tv");
+
+// ==========================================
+// MAIN PLAYER
+// ==========================================
+
+
+async function playColaStream(url,type="shaka"){
+
+
+
+console.log(
+"PLAYER SELECT:",
+type
+);
+
+
+
+// pilih JW
+
+if(type==="jw"){
+
+
+playJW(url);
+
+
+return;
+
+
+}
+
+
+
+// default SHAKA
+
+playShaka(url);
+
+
+
+}
+
+
+
+
+
+
+
+// ==========================================
+// SHAKA PLAYER COLATV
+// ==========================================
+
+
+async function playShaka(url){
+
+
+    const tv =
+    document.getElementById("tv");
+
 
     if(!tv) return;
 
 
+
+    // hapus JW lama
+
+    if(jwPlayerInstance){
+
+        try{
+
+        jwPlayerInstance.remove();
+
+        }catch(e){}
+
+
+        jwPlayerInstance=null;
+
+    }
+
+
+
     tv.innerHTML = `
+
 
 <div id="shakaContainer"
 class="shaka-video-container"
+
 style="
 position:absolute;
 top:0;
@@ -1481,24 +1559,33 @@ right:0;
 bottom:0;
 ">
 
+
 <video id="colaVideo"
+
 autoplay
 playsinline
+
 style="
 width:100%;
 height:100%;
 object-fit:contain;
 background:#000;
 ">
+
 </video>
 
+
 </div>
+
 
 `;
 
 
+
+
     const video =
     document.getElementById("colaVideo");
+
 
 
     const container =
@@ -1506,27 +1593,43 @@ background:#000;
 
 
 
+
+
     shaka.polyfill.installAll();
+
+
 
 
 
     if(!shaka.Player.isBrowserSupported()){
 
+
         alert(
         "Browser tidak support Shaka Player"
         );
 
+
         return;
+
+
     }
 
 
 
-    // hapus player lama
+
+
+
+
     if(shakaPlayer){
 
-        shakaPlayer.destroy();
+
+        await shakaPlayer.destroy();
+
 
     }
+
+
+
 
 
 
@@ -1535,65 +1638,133 @@ background:#000;
 
 
 
+
+
+
+
     shakaPlayer.configure({
+
 
         streaming:{
 
+
             rebufferingGoal:2,
+
 
             bufferingGoal:30,
 
+
             retryParameters:{
+
+
                 maxAttempts:8,
+
+
                 baseDelay:1000
+
+
             }
+
 
         },
 
 
+
         abr:{
+
 
             enabled:true,
 
+
             defaultBandwidthEstimate:1000000
+
 
         }
 
+
     });
+
+
+
+
+
 
 
 
     shakaPlayer.addEventListener(
+
     "error",
+
     e=>{
 
+
         console.log(
+
         "SHAKA ERROR:",
+
         e.detail
+
         );
 
-    });
+
+    }
+
+    );
 
 
 
-    // aktifkan UI Shaka
+
+
+
+
+
+
     shakaUI =
-new shaka.ui.Overlay(
-    shakaPlayer,
-    container,
-    video
-);
+
+    new shaka.ui.Overlay(
+
+        shakaPlayer,
+
+        container,
+
+        video
+
+    );
 
 
-const controls =
-shakaUI.getControls();
 
 
-controls.getConfig().overflowMenuButtons = [
-    'quality',
-    'picture_in_picture',
-    'cast'
-];
+
+
+
+
+    const controls =
+
+    shakaUI.getControls();
+
+
+
+
+
+
+    controls.getConfig()
+    .overflowMenuButtons = [
+
+
+        'quality',
+
+
+        'picture_in_picture',
+
+
+        'cast'
+
+
+    ];
+
+
+
+
 
 
 
@@ -1605,29 +1776,229 @@ controls.getConfig().overflowMenuButtons = [
 
 
         console.log(
+
         "SHAKA PLAYING:",
+
         url
+
         );
 
 
 
-        // autoplay
         video.play()
+
         .catch(()=>{});
 
 
 
     }
+
+
     catch(error){
 
 
+
         console.log(
+
         "SHAKA LOAD ERROR:",
+
         error
+
         );
 
 
+
     }
+
+
+
+
+
+}
+
+
+
+
+
+
+
+// ==========================================
+// JW PLAYER COLATV
+// ==========================================
+
+
+function playJW(url){
+
+
+
+const tv =
+document.getElementById("tv");
+
+
+
+if(!tv) return;
+
+
+
+
+
+// hapus Shaka
+
+if(shakaPlayer){
+
+
+try{
+
+
+shakaPlayer.destroy();
+
+
+}catch(e){}
+
+
+
+shakaPlayer=null;
+
+
+}
+
+
+
+
+
+
+
+tv.innerHTML = `
+
+
+
+<div id="jwContainer"
+
+style="
+width:100%;
+height:100%;
+background:#000;
+">
+
+</div>
+
+
+
+`;
+
+
+
+
+
+
+
+
+if(jwPlayerInstance){
+
+
+try{
+
+
+jwPlayerInstance.remove();
+
+
+}catch(e){}
+
+
+
+}
+
+
+
+
+
+
+
+jwPlayerInstance =
+
+jwplayer("jwContainer")
+
+.setup({
+
+
+
+file:url,
+
+
+
+width:"100%",
+
+
+
+height:"100%",
+
+
+
+autostart:true,
+
+
+
+controls:true,
+
+
+
+stretching:"uniform"
+
+
+
+});
+
+
+
+
+
+
+
+jwPlayerInstance.on(
+
+"ready",
+
+()=>{
+
+
+console.log(
+
+"JW PLAYING:",
+
+url
+
+);
+
+
+}
+
+);
+
+
+
+
+
+
+jwPlayerInstance.on(
+
+"error",
+
+e=>{
+
+
+console.log(
+
+"JW ERROR:",
+
+e
+
+);
+
+
+}
+
+);
+
 
 
 
