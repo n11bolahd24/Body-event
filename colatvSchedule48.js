@@ -158,7 +158,101 @@ null,
 
 
 
+// ==========================================
+// UPDATE MATCH DATA (NO RE-RENDER)
+// ==========================================
 
+async function updateLiveData(){
+
+    try{
+
+        const response = await fetch(
+            COLATV_API + Date.now(),
+            {
+                cache:"no-store"
+            }
+        );
+
+        const json = await response.json();
+
+        if(!json.data) return;
+
+        const latestMatches = Object.entries(json.data).map(
+            ([key,value])=>{
+
+                return{
+
+                    ...value,
+
+                    match_uuid:key
+
+                };
+
+            }
+        );
+
+        latestMatches.forEach(newMatch=>{
+
+            const oldMatch = colaMatches.find(
+                m=>m.match_uuid===newMatch.match_uuid
+            );
+
+            if(!oldMatch) return;
+
+            // simpan data terbaru
+            Object.assign(oldMatch,newMatch);
+
+            // update status
+            const status =
+            document.getElementById(
+                "status-"+newMatch.match_uuid
+            );
+
+            if(status){
+
+                status.innerHTML =
+                getMatchStatus(newMatch);
+
+            }
+
+            // update score
+            const score =
+            document.getElementById(
+                "score-"+newMatch.match_uuid
+            );
+
+            if(score){
+
+                score.innerHTML =
+                getScore(newMatch);
+
+            }
+
+            // update waktu
+            const time =
+            document.getElementById(
+                "time-"+newMatch.match_uuid
+            );
+
+            if(time){
+
+                time.innerHTML =
+                getTime(newMatch);
+
+            }
+
+        });
+
+        console.log("LIVE DATA UPDATED");
+
+    }
+    catch(err){
+
+        console.log("UPDATE ERROR",err);
+
+    }
+
+}
 
 
 
@@ -217,7 +311,7 @@ function renderColaTV(){
 
     let html = `
     <div class="cola-title">
-    <span>LIVE SCHEDULE</span>
+    <span>LIVE SCORE & SCHEDULE</span>
 
     <button class="cola-refresh"
         onclick="loadColaTVSchedule()">
@@ -237,9 +331,61 @@ function renderColaTV(){
 }
 
 
+// ==========================================
+// COMPETITION NAME TRANSLATE
+// ==========================================
 
+function getCompetitionName(match){
 
+    let league =
+    match.node_api_data?.competition?.name ||
+    match.competition?.name ||
+    match.competitionName ||
+    match.leagueName ||
+    "Other";
 
+    const translate = {
+
+        // UEFA
+        "UEFA EL": "UEFA Europa League",
+        "Cúp C1 Châu Âu": "UEFA Champions League",
+        "Cúp C2 Châu Âu": "UEFA Europa League",
+        "Cúp C3 Châu Âu": "UEFA Conference League",
+
+        // England
+        "Giải VĐQG Anh": "Premier League",
+        "Cúp FA": "FA Cup",
+        "Cúp Liên đoàn Anh": "EFL Cup",
+
+        // Spain
+        "Giải VĐQG Tây Ban Nha": "La Liga",
+        "Cúp Nhà Vua Tây Ban Nha": "Copa del Rey",
+
+        // Italy
+        "Giải VĐQG Ý": "Serie A",
+        "Cúp Quốc gia Ý": "Coppa Italia",
+
+        // Germany
+        "Giải VĐQG Đức": "Bundesliga",
+        "Cúp Quốc gia Đức": "DFB Pokal",
+
+        // France
+        "Giải VĐQG Pháp": "Ligue 1",
+
+        // Netherlands
+        "Giải VĐQG Hà Lan": "Eredivisie",
+
+        // Portugal
+        "Giải VĐQG Bồ Đào Nha": "Liga Portugal",
+
+        // Saudi
+        "Giải VĐQG Ả Rập Xê Út": "Saudi Pro League"
+
+    };
+
+    return translate[league] || league;
+
+}
 
 
 
@@ -285,27 +431,30 @@ function createColaCard(match){
 return `
 
 
-
-<div class="cola-match"
-
+<div
+class="cola-match"
+id="match-${match.match_uuid}"
 onclick="openColaMatch('${match.match_uuid}')">
 
 
 
-    <div class="cola-status">
+   <div
+class="cola-status"
+id="status-${match.match_uuid}">
 
-        ${getMatchStatus(match)}
+    ${getMatchStatus(match)}
 
-    </div>
-
-    <div class="cola-competition">
-    🏆 ${
-        match.competitionName ||
-        match.leagueName ||
-        "Other"
-    }
 </div>
 
+   <div class="cola-competition">
+🏆 ${
+    typeof translateColaCompetition === "function"
+    ?
+    translateColaCompetition(match)
+    :
+    getCompetitionName(match)
+}
+</div>
 
 
 
@@ -320,9 +469,11 @@ onclick="openColaMatch('${match.match_uuid}')">
 
     </div>
 
-    <div class="cola-score">
-        ${getScore(match)}
-    </div>
+    <div
+class="cola-score"
+id="score-${match.match_uuid}">
+    ${getScore(match)}
+</div>
 
     <div class="cola-team-box away-team">
 
@@ -340,14 +491,13 @@ onclick="openColaMatch('${match.match_uuid}')">
 
 
 
+<div
+class="cola-time"
+id="time-${match.match_uuid}">
 
-    <div class="cola-time">
+    ${getTime(match)}
 
-
-        ${getTime(match)}
-
-
-    </div>
+</div>
 
 
 
@@ -706,11 +856,18 @@ async function openColaMatch(match_uuid){
 
         await response.json();
 
-
-
-
-
-
+       console.log(
+    "DETAIL:",
+    JSON.stringify(json, null, 2)
+);
+       
+console.log(
+    JSON.stringify(
+        json,
+        null,
+        2
+    )
+);
 
         console.log(
             "DETAIL LIVE:",
@@ -808,16 +965,6 @@ console.log(
 servers
 );
 
-
-
-  console.log(
-"TLIVE:",
-JSON.stringify(
-servers[0].tlive,
-null,
-2
-)
-);
 
 
 
@@ -1239,149 +1386,553 @@ async function playColaMatch(match_uuid, btn){
 
 
 // ==========================================
-// SHAKA PLAYER COLATV
+// COLATV MULTI PLAYER
+// SHAKA PLAYER + JW PLAYER
 // ==========================================
 
 
 let shakaPlayer;
+let shakaUI;
 
+let jwPlayerInstance;
+
+
+// default player
+let colaPlayerType = "shaka";
+
+
+// ==========================================
+// PLAYER SWITCH BUTTON
+// ==========================================
+
+function createPlayerSelector(){
+
+return `
+
+<div class="cola-player-select">
+
+<button onclick="setColaPlayer('shaka')">
+⚡ Shaka
+</button>
+
+<button onclick="setColaPlayer('jw')">
+▶ JW
+</button>
+
+</div>
+
+`;
+
+}
+
+
+
+
+function setColaPlayer(type){
+
+
+colaPlayerType = type;
+
+
+console.log(
+"PLAYER CHANGE:",
+type
+);
+
+
+// reload stream terakhir
+if(window.currentColaStream){
+
+playColaStream(
+window.currentColaStream
+);
+
+}
+
+
+}
+
+
+
+
+
+// ==========================================
+// MAIN PLAYER FUNCTION
+// ==========================================
 
 
 async function playColaStream(url){
 
 
-    const tv =
-    document.getElementById("tv");
+if(!url){
+
+return;
+
+}
 
 
 
-    if(!tv) return;
+window.currentColaStream = url;
 
 
 
-    tv.innerHTML = `
-
-    <video id="colaVideo"
-
-    autoplay
-
-    controls
-
-    playsinline
-
-    style="
-    width:100%;
-    height:100%;
-    background:#000;
-    ">
-
-    </video>
-
-    `;
+if(
+colaPlayerType === "jw"
+){
 
 
+playJW(url);
 
-    const video =
-    document.getElementById(
-        "colaVideo"
-    );
+
+}
+else{
+
+
+playShaka(url);
+
+
+}
+
+
+}
 
 
 
-    shaka.polyfill.installAll();
+
+
+// ==========================================
+// SHAKA PLAYER
+// ==========================================
+
+
+async function playShaka(url){
+
+
+const tv =
+document.getElementById("tv");
+
+
+if(!tv) return;
 
 
 
-    if(
-        shaka.Player.isBrowserSupported()
-    ){
+if(jwPlayerInstance){
+
+try{
+
+jwPlayerInstance.remove();
+
+}catch(e){}
+
+
+jwPlayerInstance=null;
+
+}
 
 
 
-        shakaPlayer =
-        new shaka.Player(video);
+tv.innerHTML = `
+
+
+${createPlayerSelector()}
+
+
+<div id="shakaContainer"
+class="shaka-video-container"
+
+style="
+position:absolute;
+top:0;
+left:0;
+right:0;
+bottom:0;
+">
+
+
+<video id="colaVideo"
+
+autoplay
+playsinline
+
+style="
+width:100%;
+height:100%;
+object-fit:contain;
+background:#000;
+">
+
+</video>
+
+
+</div>
+
+
+`;
 
 
 
-        shakaPlayer.addEventListener(
-            "error",
-            e=>{
 
-                console.log(
-                "SHAKA ERROR:",
-                e
-                );
 
-            }
-        );
+const video =
+document.getElementById(
+"colaVideo"
+);
 
 
 
-        try{
-
-
-            await shakaPlayer.load(url);
-
-
-
-            console.log(
-            "SHAKA PLAYING:",
-            url
-            );
+const container =
+document.getElementById(
+"shakaContainer"
+);
 
 
 
-        }
-        catch(error){
 
 
-            console.log(
-            "SHAKA LOAD ERROR:",
-            error
-            );
-
-
-        }
+shaka.polyfill.installAll();
 
 
 
-    }
-
-    else{
 
 
-        alert(
-        "Browser tidak support Shaka Player"
-        );
+if(
+!shaka.Player.isBrowserSupported()
+){
 
 
-    }
+alert(
+"Browser tidak support Shaka Player"
+);
+
+
+return;
+
+
+}
+
+
+
+
+
+if(shakaPlayer){
+
+
+await shakaPlayer.destroy();
+
+
+}
+
+
+
+
+
+shakaPlayer =
+new shaka.Player(video);
+
+
+
+
+
+shakaPlayer.configure({
+
+
+streaming:{
+
+
+rebufferingGoal:2,
+
+
+bufferingGoal:30,
+
+
+retryParameters:{
+
+
+maxAttempts:8,
+
+
+baseDelay:1000
+
+
+}
+
+
+},
+
+
+
+abr:{
+
+
+enabled:true,
+
+
+defaultBandwidthEstimate:1000000
+
+
+}
+
+
+});
+
+
+
+
+
+
+shakaPlayer.addEventListener(
+
+"error",
+
+e=>{
+
+
+console.log(
+"SHAKA ERROR:",
+e.detail
+);
+
+
+}
+
+);
+
+
+
+
+
+
+shakaUI =
+new shaka.ui.Overlay(
+
+shakaPlayer,
+
+container,
+
+video
+
+);
+
+
+
+
+
+const controls =
+shakaUI.getControls();
+
+
+
+
+controls.getConfig()
+.overflowMenuButtons=[
+
+"quality",
+
+"picture_in_picture",
+
+"cast"
+
+];
+
+
+
+
+
+
+
+try{
+
+
+await shakaPlayer.load(url);
+
+
+
+console.log(
+
+"SHAKA PLAYING:",
+
+url
+
+);
+
+
+
+video.play()
+.catch(()=>{});
 
 
 
 }
 
+catch(error){
+
+
+console.log(
+
+"SHAKA LOAD ERROR",
+
+error
+
+);
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
 // ==========================================
-// UPDATE LIVE STATUS
+// JW PLAYER
 // ==========================================
 
 
-setInterval(
+function playJW(url){
+
+
+
+const tv =
+document.getElementById("tv");
+
+
+
+if(!tv) return;
+
+
+
+
+
+if(shakaPlayer){
+
+
+shakaPlayer.destroy();
+
+shakaPlayer=null;
+
+
+}
+
+
+
+
+
+tv.innerHTML = `
+
+
+
+${createPlayerSelector()}
+
+
+
+<div id="jwContainer"
+
+style="
+width:100%;
+height:100%;
+">
+
+</div>
+
+
+
+`;
+
+
+
+
+
+if(jwPlayerInstance){
+
+
+try{
+
+jwPlayerInstance.remove();
+
+
+}catch(e){}
+
+
+}
+
+
+
+
+
+
+jwPlayerInstance =
+
+jwplayer("jwContainer")
+.setup({
+
+
+file:url,
+
+
+width:"100%",
+
+
+height:"100%",
+
+
+autostart:true,
+
+
+controls:true,
+
+
+stretching:"uniform"
+
+
+});
+
+
+
+
+
+
+
+jwPlayerInstance.on(
+
+"ready",
+
 ()=>{
 
 
-    if(
-        colaMatches.length
-    ){
+console.log(
+
+"JW PLAYING:",
+
+url
+
+);
 
 
-        renderColaTV();
+}
 
+);
+
+
+
+
+
+}
+// ==========================================
+// AUTO UPDATE LIVE
+// ==========================================
+
+setInterval(()=>{
+
+    if(colaMatches.length){
+
+        updateLiveData();
 
     }
 
-
-
-},
-30000
-);                 
+},30000);
