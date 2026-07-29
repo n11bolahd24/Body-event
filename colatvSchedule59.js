@@ -1833,6 +1833,23 @@ background:#000;
 function playJW(url){
 
 
+console.log("MASUK JW");
+console.log("URL JW:",url);
+
+
+
+if(typeof jwplayer !== "function"){
+
+console.log("JW LIBRARY TIDAK ADA");
+
+alert("JW Player belum dimuat");
+
+return;
+
+}
+
+
+
 const tv =
 document.getElementById("tv");
 
