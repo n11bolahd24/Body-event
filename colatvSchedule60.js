@@ -1928,6 +1928,8 @@ autostart:true,
 
 controls:true,
 
+primary:"html5",
+
 stretching:"uniform"
 
 });
