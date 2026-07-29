@@ -1846,8 +1846,29 @@ shakaPlayer=null;
 tv.innerHTML = `
 
 
+<div id="colaPlayerMenu"
+style="
+position:absolute;
+top:10px;
+left:10px;
+z-index:9999;
+background:#111;
+padding:5px;
+border-radius:8px;
+">
 
-${createPlayerSelector()}
+
+<button onclick="setColaPlayer('shaka')">
+⚡ Shaka
+</button>
+
+
+<button onclick="setColaPlayer('jw')">
+▶ JW
+</button>
+
+
+</div>
 
 
 
