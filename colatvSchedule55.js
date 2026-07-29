@@ -1870,11 +1870,12 @@ shakaPlayer=null;
 
 tv.innerHTML = `
 
-
-
 <div id="jwContainer"
 
 style="
+position:absolute;
+top:0;
+left:0;
 width:100%;
 height:100%;
 background:#000;
@@ -1882,10 +1883,7 @@ background:#000;
 
 </div>
 
-
-
 `;
-
 
 
 
@@ -1920,34 +1918,21 @@ jwplayer("jwContainer")
 
 .setup({
 
-
-
 file:url,
-
-
 
 width:"100%",
 
-
-
 height:"100%",
-
-
 
 autostart:true,
 
-
-
 controls:true,
 
-
+primary:"html5",
 
 stretching:"uniform"
 
-
-
 });
-
 
 
 
@@ -1980,11 +1965,15 @@ url
 
 
 jwPlayerInstance.on(
-
 "error",
-
 e=>{
 
+console.log(
+"JW ERROR DETAIL:",
+e
+);
+
+});
 
 console.log(
 
