@@ -1827,43 +1827,35 @@ background:#000;
 // ==========================================
 
 
-function playJW(url){
+let jwPlayerInstance;
 
+
+
+function playJW(url){
 
 
 const tv =
 document.getElementById("tv");
 
 
-
 if(!tv) return;
 
 
 
-
-
-// hapus Shaka
+// hapus shaka
 
 if(shakaPlayer){
 
-
 try{
 
-
 shakaPlayer.destroy();
-
 
 }catch(e){}
 
 
-
 shakaPlayer=null;
 
-
 }
-
-
-
 
 
 
@@ -1889,24 +1881,16 @@ background:#000;
 
 
 
-
-
 if(jwPlayerInstance){
-
 
 try{
 
-
 jwPlayerInstance.remove();
-
 
 }catch(e){}
 
 
-
 }
-
-
 
 
 
@@ -1928,12 +1912,9 @@ autostart:true,
 
 controls:true,
 
-primary:"html5",
-
 stretching:"uniform"
 
 });
-
 
 
 
@@ -1947,47 +1928,33 @@ jwPlayerInstance.on(
 
 
 console.log(
-
 "JW PLAYING:",
-
 url
-
 );
 
 
 }
 
 );
-
-
-
 
 
 
 jwPlayerInstance.on(
+
 "error",
+
 e=>{
 
-console.log(
-"JW ERROR DETAIL:",
-e
-);
-
-});
 
 console.log(
-
 "JW ERROR:",
-
 e
-
 );
 
 
 }
 
 );
-
 
 
 
