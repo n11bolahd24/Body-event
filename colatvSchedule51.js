@@ -502,6 +502,9 @@ id="time-${match.match_uuid}">
 
 
 
+<div class="cola-watch-row">
+
+
 <button
 class="cola-watch"
 onclick="event.stopPropagation();playColaMatch('${match.match_uuid}', this)">
@@ -509,6 +512,29 @@ onclick="event.stopPropagation();playColaMatch('${match.match_uuid}', this)">
 ▶ WATCH
 
 </button>
+
+
+
+<select
+class="cola-player-select"
+onclick="event.stopPropagation()"
+onchange="colaPlayerType=this.value">
+
+
+<option value="shaka">
+⚡ Shaka
+</option>
+
+
+<option value="jw">
+▶ JW
+</option>
+
+
+</select>
+
+
+</div>
 
 <div
 class="cola-server-list"
@@ -1386,192 +1412,24 @@ async function playColaMatch(match_uuid, btn){
 
 
 // ==========================================
-// COLATV MULTI PLAYER
-// SHAKA PLAYER + JW PLAYER
+// SHAKA PLAYER COLATV + UI + QUALITY
 // ==========================================
-
 
 let shakaPlayer;
 let shakaUI;
-
-let jwPlayerInstance;
-
-
-// default player
 let colaPlayerType = "shaka";
-
-
-// ==========================================
-// PLAYER SWITCH BUTTON
-// ==========================================
-
-function createPlayerSelector(){
-
-return `
-
-<div class="cola-player-select">
-
-<button onclick="setColaPlayer('shaka')">
-⚡ Shaka
-</button>
-
-<button onclick="setColaPlayer('jw')">
-▶ JW
-</button>
-
-</div>
-
-`;
-
-}
-
-
-
-
-function setColaPlayer(type){
-
-
-colaPlayerType = type;
-
-
-console.log(
-"PLAYER DIPILIH:",
-type
-);
-
-
-console.log(
-"STREAM SEKARANG:",
-window.currentColaStream
-);
-
-
-
-if(window.currentColaStream){
-
-playColaStream(
-window.currentColaStream
-);
-
-}else{
-
-
-console.log(
-"BELUM ADA STREAM"
-);
-
-
-}
-
-
-}
-
-
-
-// ==========================================
-// MAIN PLAYER FUNCTION
-// ==========================================
-
 
 async function playColaStream(url){
 
+    const tv = document.getElementById("tv");
 
-if(!url){
-
-return;
-
-}
+    if(!tv) return;
 
 
-
-window.currentColaStream = url;
-
-
-
-if(
-colaPlayerType === "jw"
-){
-
-
-playJW(url);
-
-
-}
-else{
-
-
-playShaka(url);
-
-
-}
-
-
-}
-
-
-
-
-
-// ==========================================
-// SHAKA PLAYER
-// ==========================================
-
-
-async function playShaka(url){
-
-
-const tv =
-document.getElementById("tv");
-
-
-if(!tv) return;
-
-
-
-if(jwPlayerInstance){
-
-try{
-
-jwPlayerInstance.remove();
-
-}catch(e){}
-
-
-jwPlayerInstance=null;
-
-}
-
-
-
-tv.innerHTML = `
-
-<div id="colaPlayerMenu"
-style="
-position:absolute;
-top:10px;
-left:10px;
-z-index:9999;
-background:#111;
-padding:5px;
-border-radius:8px;
-">
-
-<button onclick="setColaPlayer('shaka')">
-⚡ Shaka
-</button>
-
-
-<button onclick="setColaPlayer('jw')">
-▶ JW
-</button>
-
-
-</div>
-
+    tv.innerHTML = `
 
 <div id="shakaContainer"
 class="shaka-video-container"
-
 style="
 position:absolute;
 top:0;
@@ -1580,398 +1438,153 @@ right:0;
 bottom:0;
 ">
 
-
 <video id="colaVideo"
-
 autoplay
 playsinline
-
 style="
 width:100%;
 height:100%;
 object-fit:contain;
 background:#000;
 ">
-
 </video>
 
-
 </div>
-
 
 `;
 
 
+    const video =
+    document.getElementById("colaVideo");
 
 
+    const container =
+    document.getElementById("shakaContainer");
 
-const video =
-document.getElementById(
-"colaVideo"
-);
 
 
+    shaka.polyfill.installAll();
 
-const container =
-document.getElementById(
-"shakaContainer"
-);
 
 
+    if(!shaka.Player.isBrowserSupported()){
 
+        alert(
+        "Browser tidak support Shaka Player"
+        );
 
+        return;
+    }
 
-shaka.polyfill.installAll();
 
 
+    // hapus player lama
+    if(shakaPlayer){
 
+        shakaPlayer.destroy();
 
+    }
 
-if(
-!shaka.Player.isBrowserSupported()
-){
 
 
-alert(
-"Browser tidak support Shaka Player"
-);
+    shakaPlayer =
+    new shaka.Player(video);
 
 
-return;
 
+    shakaPlayer.configure({
 
-}
+        streaming:{
 
+            rebufferingGoal:2,
 
+            bufferingGoal:30,
 
+            retryParameters:{
+                maxAttempts:8,
+                baseDelay:1000
+            }
 
+        },
 
-if(shakaPlayer){
 
+        abr:{
 
-await shakaPlayer.destroy();
+            enabled:true,
 
+            defaultBandwidthEstimate:1000000
 
-}
+        }
 
+    });
 
 
 
+    shakaPlayer.addEventListener(
+    "error",
+    e=>{
 
-shakaPlayer =
-new shaka.Player(video);
+        console.log(
+        "SHAKA ERROR:",
+        e.detail
+        );
 
+    });
 
 
 
-
-shakaPlayer.configure({
-
-
-streaming:{
-
-
-rebufferingGoal:2,
-
-
-bufferingGoal:30,
-
-
-retryParameters:{
-
-
-maxAttempts:8,
-
-
-baseDelay:1000
-
-
-}
-
-
-},
-
-
-
-abr:{
-
-
-enabled:true,
-
-
-defaultBandwidthEstimate:1000000
-
-
-}
-
-
-});
-
-
-
-
-
-
-shakaPlayer.addEventListener(
-
-"error",
-
-e=>{
-
-
-console.log(
-"SHAKA ERROR:",
-e.detail
-);
-
-
-}
-
-);
-
-
-
-
-
-
-shakaUI =
+    // aktifkan UI Shaka
+    shakaUI =
 new shaka.ui.Overlay(
-
-shakaPlayer,
-
-container,
-
-video
-
+    shakaPlayer,
+    container,
+    video
 );
-
-
-
 
 
 const controls =
 shakaUI.getControls();
 
 
-
-
-controls.getConfig()
-.overflowMenuButtons=[
-
-"quality",
-
-"picture_in_picture",
-
-"cast"
-
+controls.getConfig().overflowMenuButtons = [
+    'quality',
+    'picture_in_picture',
+    'cast'
 ];
 
 
 
+    try{
 
 
+        await shakaPlayer.load(url);
 
 
-try{
 
+        console.log(
+        "SHAKA PLAYING:",
+        url
+        );
 
-await shakaPlayer.load(url);
 
 
+        // autoplay
+        video.play()
+        .catch(()=>{});
 
-console.log(
 
-"SHAKA PLAYING:",
 
-url
+    }
+    catch(error){
 
-);
 
+        console.log(
+        "SHAKA LOAD ERROR:",
+        error
+        );
 
 
-video.play()
-.catch(()=>{});
-
-
-
-}
-
-catch(error){
-
-
-console.log(
-
-"SHAKA LOAD ERROR",
-
-error
-
-);
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-// ==========================================
-// JW PLAYER
-// ==========================================
-
-
-function playJW(url){
-
-
-
-const tv =
-document.getElementById("tv");
-
-
-
-if(!tv) return;
-
-
-
-
-
-if(shakaPlayer){
-
-
-shakaPlayer.destroy();
-
-shakaPlayer=null;
-
-
-}
-
-
-
-
-
-tv.innerHTML = `
-
-
-<div id="colaPlayerMenu"
-style="
-position:absolute;
-top:10px;
-left:10px;
-z-index:9999;
-background:#111;
-padding:5px;
-border-radius:8px;
-">
-
-
-<button onclick="setColaPlayer('shaka')">
-⚡ Shaka
-</button>
-
-
-<button onclick="setColaPlayer('jw')">
-▶ JW
-</button>
-
-
-</div>
-
-
-
-<div id="jwContainer"
-
-style="
-width:100%;
-height:100%;
-">
-
-</div>
-
-
-
-`;
-
-
-
-
-
-if(jwPlayerInstance){
-
-
-try{
-
-jwPlayerInstance.remove();
-
-
-}catch(e){}
-
-
-}
-
-
-
-
-
-
-jwPlayerInstance =
-
-jwplayer("jwContainer")
-.setup({
-
-
-file:url,
-
-
-width:"100%",
-
-
-height:"100%",
-
-
-autostart:true,
-
-
-controls:true,
-
-
-stretching:"uniform"
-
-
-});
-
-
-
-
-
-
-
-jwPlayerInstance.on(
-
-"ready",
-
-()=>{
-
-
-console.log(
-
-"JW PLAYING:",
-
-url
-
-);
-
-
-}
-
-);
-
-
+    }
 
 
 
