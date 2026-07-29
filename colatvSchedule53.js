@@ -502,9 +502,6 @@ id="time-${match.match_uuid}">
 
 
 
-<div class="cola-watch-row">
-
-
 <button
 class="cola-watch"
 onclick="event.stopPropagation();playColaMatch('${match.match_uuid}', this)">
@@ -512,29 +509,6 @@ onclick="event.stopPropagation();playColaMatch('${match.match_uuid}', this)">
 ▶ WATCH
 
 </button>
-
-
-
-<select
-class="cola-player-select"
-onclick="event.stopPropagation()"
-onchange="colaPlayerType=this.value">
-
-
-<option value="shaka">
-⚡ Shaka
-</option>
-
-
-<option value="jw">
-▶ JW
-</option>
-
-
-</select>
-
-
-</div>
 
 <div
 class="cola-server-list"
@@ -1382,34 +1356,103 @@ async function playColaMatch(match_uuid, btn){
         return;
     }
 
-    serverBox.innerHTML =
-    anchors.map((anchor,index)=>{
+    serverBox.innerHTML = `
 
-        const stream =
+<div class="cola-server-control">
 
-        anchor.playStreamAddress2 ||
 
-        anchor.playStreamAddress ||
+<select
+class="cola-player-select"
+id="player-${match_uuid}"
+onclick="event.stopPropagation()">
 
-        anchor.servers?.[0] ||
 
-        match.videoUrl;
+<option value="shaka">
+⚡ Shaka
+</option>
 
-        return `
-        <button
-        class="cola-server-btn"
-        onclick="playColaStream('${stream}')">
 
-        ${anchor.nickName || `SERVER ${index+1}`}
+<option value="jw">
+▶ JW
+</option>
 
-        </button>
-        `;
 
-    }).join("");
+</select>
 
+
+
+<div class="cola-server-buttons">
+
+${anchors.map((anchor,index)=>{
+
+
+const stream =
+
+anchor.playStreamAddress2 ||
+
+anchor.playStreamAddress ||
+
+anchor.servers?.[0] ||
+
+match.videoUrl;
+
+
+
+return `
+
+<button
+class="cola-server-btn"
+
+onclick="
+playColaServerWithPlayer(
+'${stream}',
+'player-${match_uuid}'
+)
+">
+
+${anchor.nickName || `SERVER ${index+1}`}
+
+</button>
+
+
+`;
+
+
+}).join("")}
+
+</div>
+
+
+</div>
+
+`;
 }
 
+// ==========================================
+// PLAYER SELECT + SERVER
+// ==========================================
 
+function playColaServerWithPlayer(url, selectID){
+
+
+    const player =
+    document.getElementById(selectID);
+
+
+
+    let type =
+    player ? player.value : "shaka";
+
+
+
+    colaPlayerType = type;
+
+
+
+    playColaStream(url,type);
+
+
+}
 
 // ==========================================
 // SHAKA PLAYER COLATV + UI + QUALITY
@@ -1417,7 +1460,7 @@ async function playColaMatch(match_uuid, btn){
 
 let shakaPlayer;
 let shakaUI;
-let colaPlayerType = "shaka";
+
 
 async function playColaStream(url){
 
