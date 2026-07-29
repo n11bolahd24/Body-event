@@ -1465,6 +1465,8 @@ let shakaUI;
 
 let jwPlayerInstance;
 
+let colaPlayerType = "shaka";
+
 
 
 // ==========================================
@@ -1825,9 +1827,6 @@ background:#000;
 // ==========================================
 // JW PLAYER COLATV
 // ==========================================
-
-
-let jwPlayerInstance;
 
 
 
