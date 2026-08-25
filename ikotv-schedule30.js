@@ -44,6 +44,39 @@
   let currentVideos = [];
   let loadingSchedule = false;
 
+/* =========================================================
+     fungsi ini hanya sementara,
+  ========================================================= */
+  async function testMatchInfo(matchId) {
+
+  console.log(
+    "[IKOTV TEST] MATCH INFO ID:",
+    matchId
+  );
+
+  try {
+
+    const result =
+      await fetchMatchInfo(matchId);
+
+    console.log(
+      "[IKOTV TEST] MATCH INFO RESULT:",
+      result
+    );
+
+    return result;
+
+  } catch (error) {
+
+    console.error(
+      "[IKOTV TEST] MATCH INFO ERROR:",
+      error
+    );
+
+    return null;
+
+  }
+  }
   /* =========================================================
      UTILITIES
   ========================================================= */
@@ -2363,6 +2396,8 @@ async function openIKOMatch(matchId) {
     "[IKOTV] Mengambil server untuk match:",
     id
   );
+
+  await testMatchInfo(id);
 
   try {
 
