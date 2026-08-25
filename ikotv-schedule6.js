@@ -946,10 +946,6 @@
     font-size: 8px;
   }
 }
-    `;
-
-    document.head.appendChild(style);
-  }
 
 
 /* =========================================================
@@ -1100,6 +1096,14 @@
     font-size: 8px !important;
   }
 }
+
+
+    `;
+
+    document.head.appendChild(style);
+  }
+
+
   
   /* =========================================================
      LOAD EXTERNAL LIBRARIES
