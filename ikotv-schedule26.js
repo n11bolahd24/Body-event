@@ -2653,64 +2653,100 @@ async function openIKOMatch(matchId) {
      REFRESH / COUNTDOWN
   ========================================================= */
 
-  function updateCountdowns() {
-    if (!matches.length) return;
+function updateCountdowns() {
+  if (!matches.length) return;
 
-    const countdownElements =
-      document.querySelectorAll(
-        ".iko-countdown"
+  let needRender = false;
+
+  const cards = document.querySelectorAll(".iko-card");
+
+  cards.forEach(card => {
+
+    const matchId =
+      card.dataset.ikotvMatch;
+
+    if (!matchId) return;
+
+    const match =
+      matches.find(
+        item =>
+          String(item.id) === String(matchId)
       );
 
-    countdownElements.forEach(element => {
+    if (!match) return;
 
-      const card =
-        element.closest(".iko-card");
-
-      if (!card) return;
-
-      const matchIndex =
-        [...document.querySelectorAll(".iko-card")]
-          .indexOf(card);
-
-      if (matchIndex < 0) return;
-
-      /*
-       * The schedule can contain cards grouped by date,
-       * so find the match from its displayed time instead
-       * of relying only on the global index.
-       */
-
-      const timeElement =
-        card.querySelector(".iko-time");
-
-      if (!timeElement) return;
-
-      const displayedTime =
-        timeElement.textContent.trim();
-
-      const match =
-        matches.find(item =>
-          formatTime(item.time) === displayedTime &&
-          getStatus(item) === "upcoming"
-        );
-
-      if (!match) return;
-
-      const value =
-        countdown(match.time);
-
-      if (value) {
-        element.textContent = value;
-      }
-    });
+    const currentStatus =
+      getStatus(match);
 
     /*
-     * Re-render when a match changes state.
-     * This makes UPCOMING -> LIVE -> ENDED
-     * happen automatically.
+     * Ambil status yang sedang tampil
      */
+    const statusElement =
+      card.querySelector(".iko-status");
+
+    if (!statusElement) return;
+
+    const displayedStatus =
+      statusElement.classList.contains("live")
+        ? "live"
+        : statusElement.classList.contains("ended")
+          ? "ended"
+          : "upcoming";
+
+    /*
+     * HANYA render ulang kalau status
+     * pertandingan benar-benar berubah.
+     *
+     * Jangan render setiap detik karena
+     * itu akan menghapus server panel.
+     */
+    if (
+      currentStatus !== displayedStatus
+    ) {
+
+      needRender = true;
+
+      return;
+    }
+
+    /*
+     * Update countdown saja
+     */
+    if (
+      currentStatus === "upcoming"
+    ) {
+
+      const countdownElement =
+        card.querySelector(
+          ".iko-countdown"
+        );
+
+      if (countdownElement) {
+
+        const value =
+          countdown(match.time);
+
+        if (value) {
+          countdownElement.textContent =
+            value;
+        }
+
+      }
+
+    }
+
+  });
+
+  /*
+   * Render ulang HANYA ketika status
+   * UPCOMING -> LIVE
+   * atau
+   * LIVE -> ENDED
+   */
+  if (needRender) {
     renderSchedule();
   }
+}
 
   /* =========================================================
      LOAD SCHEDULE
