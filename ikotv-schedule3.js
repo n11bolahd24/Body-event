@@ -72,20 +72,27 @@
   }
 
   function getArray(result) {
-    const candidates = [
-      result?.data?.matches,
-      result?.data?.list,
-      result?.matches,
-      result?.list,
-      result?.data
-    ];
 
-    for (const item of candidates) {
-      if (Array.isArray(item)) return item;
+  const candidates = [
+    result?.data?.matchs,      // IKOTV API
+    result?.data?.matches,
+    result?.data?.list,
+    result?.matchs,
+    result?.matches,
+    result?.list,
+    result?.data
+  ];
+
+  for (const item of candidates) {
+
+    if (Array.isArray(item)) {
+      return item;
     }
 
-    return [];
   }
+
+  return [];
+}
 
   function formatTime(timestamp) {
     return new Intl.DateTimeFormat(undefined, {
@@ -133,40 +140,104 @@
   }
 
   function getStatus(match) {
-    const now = Math.floor(Date.now() / 1000);
-    const start = Number(match.time || 0);
-    const end = start + CONFIG.matchDurationHours * 3600;
 
-    if (now < start) return "upcoming";
-    if (now <= end) return "live";
-    return "ended";
-  }
+  const now = Math.floor(Date.now() / 1000);
+
+  const start = Number(match.time || 0);
+
+  const end =
+    start +
+    CONFIG.matchDurationHours * 3600;
+
+  if (now < start) return "upcoming";
+
+  if (now <= end) return "live";
+
+  return "ended";
+}
 
   function normalizeMatch(match) {
-    const home = match?.hometeam || {};
-    const away = match?.awayteam || {};
-    const comp = match?.matchevent || {};
 
-    return {
-      id: String(match?.id ?? ""),
-      time: Number(match?.time ?? 0),
-      statusRaw: Number(match?.status ?? 0),
+  const home =
+    match?.hometeam ||
+    match?.home_team ||
+    match?.home ||
+    {};
 
-      home: home.name_en || home.short_name_en || "Home",
-      away: away.name_en || away.short_name_en || "Away",
+  const away =
+    match?.awayteam ||
+    match?.away_team ||
+    match?.away ||
+    {};
 
-      homeLogo: safeURL(home.logo_rt || home.logo || ""),
-      awayLogo: safeURL(away.logo_rt || away.logo || ""),
+  const comp =
+    match?.matchevent ||
+    match?.competition ||
+    {};
 
-      competition:
-        comp.name_en ||
-        comp.short_name_en ||
-        "Football",
+  return {
 
-      competitionLogo:
-        safeURL(comp.logo_rt || comp.logo || "")
-    };
-  }
+    id: String(
+      match?.id ??
+      match?.match_id ??
+      match?.matchId ??
+      ""
+    ),
+
+    time: Number(
+      match?.time ??
+      match?.match_time ??
+      match?.matchTime ??
+      0
+    ),
+
+    statusRaw: Number(
+      match?.status ??
+      match?.match_status ??
+      0
+    ),
+
+    home:
+      home.name_en ||
+      home.short_name_en ||
+      home.name ||
+      home.name_zh ||
+      "Home",
+
+    away:
+      away.name_en ||
+      away.short_name_en ||
+      away.name ||
+      away.name_zh ||
+      "Away",
+
+    homeLogo: safeURL(
+      home.logo_rt ||
+      home.logo ||
+      ""
+    ),
+
+    awayLogo: safeURL(
+      away.logo_rt ||
+      away.logo ||
+      ""
+    ),
+
+    competition:
+      comp.name_en ||
+      comp.short_name_en ||
+      comp.name ||
+      comp.name_zh ||
+      "Football",
+
+    competitionLogo: safeURL(
+      comp.logo_rt ||
+      comp.logo ||
+      ""
+    )
+
+  };
+}
 
   /* =========================================================
      DOM
@@ -716,13 +787,13 @@
             statusText = "ENDED";
 
             button = `
-              <button
-                class="iko-watch disabled"
-                disabled
-              >
-                MATCH ENDED
-              </button>
-            `;
+  <button
+    class="iko-watch disabled"
+    disabled
+  >
+    WAITING FOR KICKOFF
+  </button>
+`;
           } else {
             const cd = countdown(match.time);
 
