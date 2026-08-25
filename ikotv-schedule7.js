@@ -269,8 +269,8 @@
     const style = document.createElement("style");
     style.id = "ikotvStyles";
 
-    style.textContent = `
-      #ikotvSchedule,
+style.textContent = `
+#ikotvSchedule,
 #ikotvPlayer {
   width: 100%;
   max-width: 1000px;
@@ -317,16 +317,10 @@
   margin: 25px 0 12px;
   padding: 12px 16px;
 
-  background:
-    linear-gradient(
-      90deg,
-      #111,
-      #171717
-    );
+  background: linear-gradient(90deg,#111,#171717);
 
   border: 1px solid rgba(255,255,255,.07);
   border-left: 4px solid #00d979;
-
   border-radius: 8px;
 
   color: #fff;
@@ -350,19 +344,17 @@
   margin: 10px 0;
   padding: 14px 16px;
 
-  background:
-    linear-gradient(
-      135deg,
-      #0d0d0d 0%,
-      #151515 50%,
-      #101010 100%
-    );
+  background: linear-gradient(
+    135deg,
+    #0d0d0d 0%,
+    #151515 50%,
+    #101010 100%
+  );
 
   border: 1px solid rgba(255,255,255,.07);
   border-radius: 12px;
 
   color: #fff;
-
   box-sizing: border-box;
 
   transition:
@@ -403,13 +395,13 @@
 }
 
 .iko-comp img {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
 
-  margin-right: 8px;
+  margin-right: 7px;
 
   object-fit: contain;
-  flex: 0 0 22px;
+  flex: 0 0 20px;
 }
 
 /* =========================================================
@@ -421,14 +413,15 @@
 
   grid-template-columns:
     minmax(0, 1fr)
-    90px
+    76px
     minmax(0, 1fr);
 
   align-items: center;
 
-  gap: 12px;
+  gap: 8px;
 
   width: 100%;
+  box-sizing: border-box;
 }
 
 /* =========================================================
@@ -441,9 +434,9 @@
 
   min-width: 0;
 
-  gap: 10px;
+  gap: 8px;
 
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
 
   line-height: 1.25;
@@ -460,24 +453,27 @@
 }
 
 .iko-team span {
+  min-width: 0;
   overflow-wrap: anywhere;
+  word-break: normal;
 }
 
+/* LOGO DIPERKECIL */
 .iko-team img {
-  width: 44px;
-  height: 44px;
+  width: 32px;
+  height: 32px;
 
-  padding: 3px;
+  padding: 2px;
 
   object-fit: contain;
 
   background: rgba(255,255,255,.03);
 
-  border-radius: 8px;
+  border-radius: 6px;
 
   box-sizing: border-box;
 
-  flex: 0 0 44px;
+  flex: 0 0 32px;
 }
 
 /* =========================================================
@@ -496,12 +492,10 @@
   min-width: 0;
 }
 
-/* KICKOFF TIME */
-
 .iko-time {
   color: #fff;
 
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 900;
 
   line-height: 1;
@@ -511,14 +505,12 @@
   letter-spacing: .3px;
 }
 
-/* VS */
-
 .iko-vs {
-  margin-top: 5px;
+  margin-top: 4px;
 
   color: #555;
 
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 700;
 
   letter-spacing: 1px;
@@ -533,10 +525,10 @@
   align-items: center;
   justify-content: center;
 
-  min-width: 60px;
+  min-width: 58px;
 
-  margin-top: 7px;
-  padding: 4px 8px;
+  margin-top: 6px;
+  padding: 4px 7px;
 
   border-radius: 5px;
 
@@ -571,7 +563,7 @@
 ========================================================= */
 
 .iko-countdown {
-  margin-top: 7px;
+  margin-top: 6px;
 
   color: #00d979;
 
@@ -579,7 +571,7 @@
     "Courier New",
     monospace;
 
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
 
   letter-spacing: .5px;
@@ -593,8 +585,7 @@
 
 .iko-action {
   width: 100%;
-
-  margin-top: 14px;
+  margin-top: 13px;
 }
 
 .iko-watch {
@@ -801,72 +792,65 @@
 
   .iko-date {
     margin: 18px 0 9px;
-
     padding: 10px 12px;
-
     font-size: 11px;
   }
 
   .iko-card {
     margin: 8px 0;
     padding: 12px 10px;
-
     border-radius: 10px;
   }
 
   .iko-comp {
     margin-bottom: 11px;
-
     padding-bottom: 8px;
-
     font-size: 9px;
   }
 
   .iko-comp img {
-    width: 19px;
-    height: 19px;
-
-    flex-basis: 19px;
+    width: 18px;
+    height: 18px;
+    flex-basis: 18px;
   }
 
   .iko-match {
     grid-template-columns:
       minmax(0, 1fr)
-      62px
+      58px
       minmax(0, 1fr);
 
-    gap: 5px;
+    gap: 4px;
   }
 
   .iko-team {
-    gap: 6px;
-
-    font-size: 11px;
+    gap: 5px;
+    font-size: 10px;
   }
 
+  /* LOGO MOBILE DIPERKECIL */
   .iko-team img {
-    width: 34px;
-    height: 34px;
+    width: 27px;
+    height: 27px;
 
-    flex-basis: 34px;
+    flex-basis: 27px;
 
     padding: 2px;
 
-    border-radius: 6px;
+    border-radius: 5px;
   }
 
   .iko-time {
-    font-size: 16px;
+    font-size: 15px;
   }
 
   .iko-vs {
     margin-top: 4px;
-
     font-size: 8px;
   }
 
   .iko-status {
-    min-width: 52px;
+    min-width: 50px;
 
     margin-top: 5px;
     padding: 3px 5px;
@@ -876,7 +860,6 @@
 
   .iko-countdown {
     margin-top: 5px;
-
     font-size: 9px;
   }
 
@@ -886,19 +869,16 @@
 
   .iko-watch {
     padding: 9px 10px;
-
     font-size: 9px;
   }
 
   .iko-player-title {
     padding: 9px 10px;
-
     font-size: 10px;
   }
 
   .iko-server {
     padding: 6px 9px;
-
     font-size: 9px;
   }
 
@@ -917,28 +897,30 @@
   .iko-match {
     grid-template-columns:
       minmax(0, 1fr)
-      54px
+      52px
       minmax(0, 1fr);
+
+    gap: 3px;
   }
 
   .iko-team {
-    font-size: 10px;
+    gap: 4px;
+    font-size: 9px;
   }
 
   .iko-team img {
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
 
-    flex-basis: 30px;
+    flex-basis: 25px;
   }
 
   .iko-time {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .iko-status {
-    min-width: 48px;
-
+    min-width: 46px;
     font-size: 6.5px;
   }
 
@@ -946,165 +928,10 @@
     font-size: 8px;
   }
 }
+`;
 
-
-/* =========================================================
-   IKOTV COMPACT OVERRIDE perbaikan
-========================================================= */
-
-.iko-card {
-  padding: 10px 12px !important;
-  margin: 7px 0 !important;
-  border-radius: 9px !important;
-}
-
-.iko-comp {
-  margin-bottom: 8px !important;
-  padding-bottom: 6px !important;
-  font-size: 9px !important;
-}
-
-.iko-comp img {
-  width: 16px !important;
-  height: 16px !important;
-  flex: 0 0 16px !important;
-  margin-right: 5px !important;
-}
-
-/* MATCH GRID */
-.iko-match {
-  grid-template-columns: minmax(0, 1fr) 58px minmax(0, 1fr) !important;
-  gap: 6px !important;
-}
-
-/* TEAM */
-.iko-team {
-  gap: 6px !important;
-  font-size: 11px !important;
-  line-height: 1.15 !important;
-}
-
-/* LOGO KLUB — KECIL */
-.iko-team img {
-  width: 30px !important;
-  height: 30px !important;
-  flex: 0 0 30px !important;
-
-  padding: 2px !important;
-
-  border-radius: 5px !important;
-
-  background: transparent !important;
-}
-
-/* TIME */
-.iko-time {
-  font-size: 15px !important;
-  line-height: 1 !important;
-}
-
-/* VS */
-.iko-vs {
-  margin-top: 3px !important;
-  font-size: 7px !important;
-}
-
-/* STATUS */
-.iko-status {
-  min-width: 48px !important;
-
-  margin-top: 4px !important;
-  padding: 3px 5px !important;
-
-  font-size: 7px !important;
-}
-
-/* COUNTDOWN */
-.iko-countdown {
-  margin-top: 4px !important;
-  font-size: 9px !important;
-}
-
-/* BUTTON */
-.iko-action {
-  margin-top: 9px !important;
-}
-
-.iko-watch {
-  padding: 8px 10px !important;
-  border-radius: 6px !important;
-  font-size: 9px !important;
-}
-
-/* DATE */
-.iko-date {
-  margin: 15px 0 7px !important;
-  padding: 8px 11px !important;
-
-  font-size: 10px !important;
-
-  border-left-width: 3px !important;
-}
-
-/* MOBILE */
-@media (max-width: 600px) {
-
-  .iko-card {
-    padding: 9px 8px !important;
-  }
-
-  .iko-match {
-    grid-template-columns:
-      minmax(0, 1fr)
-      52px
-      minmax(0, 1fr) !important;
-
-    gap: 4px !important;
-  }
-
-  .iko-team {
-    gap: 4px !important;
-    font-size: 10px !important;
-  }
-
-  .iko-team img {
-    width: 26px !important;
-    height: 26px !important;
-    flex: 0 0 26px !important;
-  }
-
-  .iko-time {
-    font-size: 13px !important;
-  }
-
-  .iko-vs {
-    font-size: 6px !important;
-  }
-
-  .iko-status {
-    min-width: 44px !important;
-    font-size: 6px !important;
-    padding: 2px 4px !important;
-  }
-
-  .iko-countdown {
-    font-size: 8px !important;
-  }
-
-  .iko-watch {
-    padding: 7px 8px !important;
-    font-size: 8px !important;
-  }
-}
-
-
-    `;
-
-    document.head.appendChild(style);
-  }
-
-
-  
+document.head.appendChild(style);
+    
   /* =========================================================
      LOAD EXTERNAL LIBRARIES
   ========================================================= */
