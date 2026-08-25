@@ -2843,15 +2843,23 @@ renderSchedule();
      INIT
   ========================================================= */
 
- async function init() {
+async function init() {
 
   try {
 
+    console.log("[IKOTV TEST] INIT MULAI");
+
     injectCSS();
+
+    console.log("[IKOTV TEST] injectCSS OK");
 
     ensureDOM();
 
+    console.log("[IKOTV TEST] ensureDOM OK");
+
     await loadSchedule();
+
+    console.log("[IKOTV TEST] loadSchedule SELESAI");
 
     startAutoRefresh();
 
@@ -2883,8 +2891,7 @@ renderSchedule();
       </div>
     `;
   }
-}
-  /* =========================================================
+}  /* =========================================================
      PUBLIC API
   ========================================================= */
 
