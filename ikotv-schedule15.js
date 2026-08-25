@@ -1549,10 +1549,11 @@
   ========================================================= */
 
   function showPlayer(match, videos) {
+
   const tv = document.getElementById("tv");
 
   if (!tv) {
-    console.error("[IKOTV] Element #tv tidak ditemukan.");
+    console.error("[IKOTV] Element #tv tidak ditemukan");
     return;
   }
 
@@ -1562,47 +1563,78 @@
 
   currentVideos = validVideos;
 
-  if (!validVideos.length) {
-    tv.innerHTML = `
-      <div class="iko-error">
-        URL stream tidak tersedia.
-      </div>
-    `;
-    return;
-  }
+  const title =
+    `${match.home} vs ${match.away}`;
 
   /*
-   * Hapus player sebelumnya
-   */
-  if (art) {
-    try {
-      art.destroy(false);
-    } catch (_) {}
-
-    art = null;
-  }
-
-  /*
-   * #tv adalah TV utama.
-   * IKOTV hanya mengganti isi TV.
+   * IKOTV MENGGUNAKAN TV UTAMA
    */
   tv.innerHTML = `
-    <div id="ikotvArt"
-         style="
-           position:relative;
-           width:100%;
-           height:100%;
-           min-height:220px;
-           background:#000;
-         ">
+    <div class="iko-tv-wrapper">
+
+      <div class="iko-player-title">
+
+        <span>
+          ${escapeHTML(title)}
+        </span>
+
+        <button
+          class="iko-close"
+          id="ikoClosePlayer"
+        >
+          CLOSE
+        </button>
+
+      </div>
+
+      <div id="ikotvArt"></div>
+
+      <div
+        class="iko-servers"
+        id="ikoServers"
+      ></div>
+
+      <div class="iko-note">
+        IKOTV • ArtPlayer • HLS
+      </div>
+
     </div>
   `;
 
+  const closeButton =
+    document.getElementById("ikoClosePlayer");
+
+  if (closeButton) {
+
+    closeButton.onclick = () => {
+
+      if (art) {
+
+        try {
+          art.destroy(false);
+        } catch (_) {}
+
+        art = null;
+      }
+
+      currentMatchId = null;
+      currentVideos = [];
+
+      /*
+       * Kosongkan TV
+       */
+      tv.innerHTML = "";
+    };
+
+  }
+
+  renderServers();
+
   /*
-   * Mainkan server pertama
+   * MAIN TV
    */
   playVideo(
-    validVideos[0].url,
+    validVideos[0]?.url || "",
     validVideos[0]
   );
 }
