@@ -2843,50 +2843,47 @@ renderSchedule();
      INIT
   ========================================================= */
 
-  async function init() {
+ async function init() {
 
-    try {
+  try {
 
-      injectCSS();
+    injectCSS();
 
+    ensureDOM();
+
+    await loadSchedule();
+
+    startAutoRefresh();
+
+    startCountdownTimer();
+
+    console.log(
+      "[IKOTV] Initialized successfully."
+    );
+
+  } catch (error) {
+
+    console.error(
+      "[IKOTV] Initialization error:",
+      error
+    );
+
+    const { schedule } =
       ensureDOM();
 
-      await loadLibraries();
-
-      await loadSchedule();
-
-      startAutoRefresh();
-
-      startCountdownTimer();
-
-      console.log(
-        "[IKOTV] Initialized successfully."
-      );
-
-    } catch (error) {
-
-      console.error(
-        "[IKOTV] Initialization error:",
-        error
-      );
-
-      const { schedule } =
-        ensureDOM();
-
-      schedule.innerHTML = `
-        <div class="iko-error">
-          IKOTV gagal diinisialisasi.
-          <br>
-          <small>
-            ${escapeHTML(
-              error?.message || ""
-            )}
-          </small>
-        </div>
-      `;
-    }
+    schedule.innerHTML = `
+      <div class="iko-error">
+        IKOTV gagal diinisialisasi.
+        <br>
+        <small>
+          ${escapeHTML(
+            error?.message || ""
+          )}
+        </small>
+      </div>
+    `;
   }
-
+}
   /* =========================================================
      PUBLIC API
   ========================================================= */
