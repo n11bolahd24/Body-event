@@ -531,20 +531,65 @@
   ========================================================= */
 
   async function postJSON(url, body) {
+  console.log("[IKOTV] REQUEST:", url);
+  console.log("[IKOTV] BODY:", body);
+
+  try {
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Accept": "application/json"
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      mode: "cors"
     });
 
+    console.log(
+      "[IKOTV] RESPONSE STATUS:",
+      response.status
+    );
+
+    console.log(
+      "[IKOTV] RESPONSE TYPE:",
+      response.type
+    );
+
+    const text = await response.text();
+
+    console.log(
+      "[IKOTV] RESPONSE TEXT:",
+      text
+    );
+
     if (!response.ok) {
-      throw new Error("HTTP " + response.status);
+      throw new Error(
+        "HTTP " +
+        response.status +
+        " - " +
+        text
+      );
     }
 
-    return response.json();
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      throw new Error(
+        "Response bukan JSON: " +
+        text.substring(0, 300)
+      );
+    }
+
+  } catch (error) {
+
+    console.error(
+      "[IKOTV] FETCH ERROR:",
+      error
+    );
+
+    throw error;
   }
+}
 
   async function fetchMatches() {
     const result = await postJSON(
