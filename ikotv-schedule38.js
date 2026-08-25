@@ -1810,7 +1810,7 @@ async function playIKOTVStream(url) {
     shaka.polyfill.installAll();
 
     if (
-      !shaka.Player.isBro-wserSupported()
+      !shaka.Player.isBrowserSupported()
     ) {
 
       throw new Error(
