@@ -2195,10 +2195,29 @@
         </div>
       `;
 
-      matches =
-        await fetchMatches();
+      const newMatches = await fetchMatches();
 
-      renderSchedule();
+/*
+ * Jangan langsung membuang pertandingan lama.
+ * Pertahankan match yang sebelumnya sudah ada.
+ */
+
+const merged = new Map();
+
+/* Data lama */
+matches.forEach(match => {
+  merged.set(String(match.id), match);
+});
+
+/* Data terbaru menimpa data lama */
+newMatches.forEach(match => {
+  merged.set(String(match.id), match);
+});
+
+matches = Array.from(merged.values())
+  .sort((a, b) => a.time - b.time);
+
+renderSchedule();
 
       console.log(
         "[IKOTV] Schedule loaded:",
