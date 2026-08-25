@@ -271,260 +271,681 @@
 
     style.textContent = `
       #ikotvSchedule,
-      #ikotvPlayer {
-        width: 100%;
-        max-width: 900px;
-        margin: 16px auto;
-        font-family: Arial, Helvetica, sans-serif;
-      }
+#ikotvPlayer {
+  width: 100%;
+  max-width: 1000px;
+  margin: 20px auto;
+  font-family: Arial, Helvetica, sans-serif;
+  box-sizing: border-box;
+}
 
-      #ikotvPlayer {
-        display: none;
-        background: #000;
-        border-radius: 12px;
-        overflow: hidden;
-      }
+/* =========================================================
+   PLAYER
+========================================================= */
 
-      #ikotvArt {
-        width: 100%;
-        height: min(56.25vw, 506px);
-        min-height: 220px;
-        background: #000;
-      }
-            .iko-box {
-        box-sizing: border-box;
-        width: 100%;
-      }
+#ikotvPlayer {
+  display: none;
+  background: #050505;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 35px rgba(0,0,0,.35);
+}
 
-      .iko-loading,
-      .iko-error,
-      .iko-empty {
-        padding: 24px;
-        text-align: center;
-        color: #fff;
-        background: #111;
-        border-radius: 12px;
-      }
+#ikotvArt {
+  width: 100%;
+  height: min(56.25vw, 562px);
+  min-height: 220px;
+  background: #000;
+}
 
-      .iko-date {
-        margin: 18px 0 10px;
-        padding: 10px 14px;
-        border-left: 4px solid #00d979;
-        background: #111;
-        color: #fff;
-        font-size: 14px;
-        font-weight: 700;
-        text-transform: uppercase;
-      }
+/* =========================================================
+   GENERAL
+========================================================= */
 
-      .iko-card {
-        margin: 10px 0;
-        padding: 14px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #101010, #1b1b1b);
-        border: 1px solid rgba(255,255,255,.08);
-        color: #fff;
-      }
+.iko-box {
+  width: 100%;
+  box-sizing: border-box;
+}
 
-      .iko-comp {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 12px;
-        color: #aaa;
-        font-size: 12px;
-      }
+/* =========================================================
+   DATE HEADER
+========================================================= */
 
-      .iko-comp img {
-        width: 20px;
-        height: 20px;
-        object-fit: contain;
-      }
+.iko-date {
+  position: relative;
+  margin: 25px 0 12px;
+  padding: 12px 16px;
 
-      .iko-match {
-        display: grid;
-        grid-template-columns: 1fr 70px 1fr;
-        align-items: center;
-        gap: 10px;
-      }
+  background:
+    linear-gradient(
+      90deg,
+      #111,
+      #171717
+    );
 
-      .iko-team {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 14px;
-        font-weight: 700;
-      }
+  border: 1px solid rgba(255,255,255,.07);
+  border-left: 4px solid #00d979;
 
-      .iko-team.home {
-        justify-content: flex-end;
-        text-align: right;
-      }
+  border-radius: 8px;
 
-      .iko-team.away {
-        justify-content: flex-start;
-        text-align: left;
-      }
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
 
-      .iko-team img {
-        width: 42px;
-        height: 42px;
-        object-fit: contain;
-        flex: 0 0 42px;
-      }
+  letter-spacing: .5px;
+  text-transform: uppercase;
 
-      .iko-center {
-        text-align: center;
-      }
+  box-sizing: border-box;
+}
 
-      .iko-time {
-        font-size: 18px;
-        font-weight: 800;
-      }
+/* =========================================================
+   MATCH CARD
+========================================================= */
 
-      .iko-vs {
-        margin-top: 2px;
-        color: #777;
-        font-size: 10px;
-      }
+.iko-card {
+  position: relative;
 
-      .iko-status {
-        display: inline-block;
-        margin-top: 5px;
-        padding: 3px 7px;
-        border-radius: 5px;
-        font-size: 9px;
-        font-weight: 800;
-        text-transform: uppercase;
-      }
+  width: 100%;
+  margin: 10px 0;
+  padding: 14px 16px;
 
-      .iko-status.upcoming {
-        background: #333;
-        color: #fff;
-      }
+  background:
+    linear-gradient(
+      135deg,
+      #0d0d0d 0%,
+      #151515 50%,
+      #101010 100%
+    );
 
-      .iko-status.live {
-        background: #00c878;
-        color: #000;
-      }
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 12px;
 
-      .iko-status.ended {
-        background: #222;
-        color: #777;
-      }
+  color: #fff;
 
-      .iko-countdown {
-        margin-top: 5px;
-        color: #00d979;
-        font-family: monospace;
-        font-size: 11px;
-        font-weight: 700;
-      }
+  box-sizing: border-box;
 
-      .iko-action {
-        margin-top: 14px;
-        text-align: center;
-      }
+  transition:
+    transform .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease;
+}
 
-      .iko-watch {
-        width: 100%;
-        padding: 10px 15px;
-        border: 0;
-        border-radius: 8px;
-        background: #00c878;
-        color: #000;
-        cursor: pointer;
-        font-size: 13px;
-        font-weight: 800;
-      }
+.iko-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(0,217,121,.35);
+  box-shadow: 0 8px 25px rgba(0,0,0,.25);
+}
 
-      .iko-watch:hover {
-        opacity: .85;
-      }
+/* =========================================================
+   COMPETITION
+========================================================= */
 
-      .iko-watch.disabled {
-        background: #252525;
-        color: #777;
-        cursor: not-allowed;
-      }
+.iko-comp {
+  display: flex;
+  align-items: center;
 
-      .iko-player-title {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        padding: 10px 12px;
-        background: #111;
-        color: #fff;
-        font-size: 13px;
-        font-weight: 700;
-      }
+  width: 100%;
 
-      .iko-close {
-        padding: 6px 10px;
-        border: 0;
-        border-radius: 5px;
-        background: #252525;
-        color: #fff;
-        cursor: pointer;
-        font-size: 10px;
-      }
+  margin-bottom: 14px;
+  padding-bottom: 9px;
 
-      .iko-servers {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        padding: 10px;
-        background: #111;
-      }
+  border-bottom: 1px solid rgba(255,255,255,.06);
 
-      .iko-server {
-        border: 0;
-        border-radius: 5px;
-        background: #252525;
-        padding: 8px 12px;
-        color: #fff;
-        cursor: pointer;
-        font-size: 11px;
-        font-weight: 700;
-      }
+  color: #999;
 
-      .iko-server.active {
-        background: #00c878;
-        color: #000;
-      }
+  font-size: 11px;
+  font-weight: 700;
 
-      .iko-note {
-        padding: 8px 12px;
-        color: #aaa;
-        background: #111;
-        font-size: 11px;
-      }
+  text-transform: uppercase;
 
-      @media (max-width: 600px) {
-        #ikotvArt {
-          height: 56.25vw;
-          min-height: 190px;
-        }
+  box-sizing: border-box;
+}
 
-        .iko-match {
-          grid-template-columns: 1fr 58px 1fr;
-        }
+.iko-comp img {
+  width: 22px;
+  height: 22px;
 
-        .iko-team {
-          font-size: 12px;
-        }
+  margin-right: 8px;
 
-        .iko-team img {
-          width: 32px;
-          height: 32px;
-          flex-basis: 32px;
-        }
+  object-fit: contain;
+  flex: 0 0 22px;
+}
 
-        .iko-time {
-          font-size: 15px;
-        }
-      }
+/* =========================================================
+   MATCH AREA
+========================================================= */
+
+.iko-match {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    90px
+    minmax(0, 1fr);
+
+  align-items: center;
+
+  gap: 12px;
+
+  width: 100%;
+}
+
+/* =========================================================
+   TEAMS
+========================================================= */
+
+.iko-team {
+  display: flex;
+  align-items: center;
+
+  min-width: 0;
+
+  gap: 10px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  line-height: 1.25;
+}
+
+.iko-team.home {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.iko-team.away {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.iko-team span {
+  overflow-wrap: anywhere;
+}
+
+.iko-team img {
+  width: 44px;
+  height: 44px;
+
+  padding: 3px;
+
+  object-fit: contain;
+
+  background: rgba(255,255,255,.03);
+
+  border-radius: 8px;
+
+  box-sizing: border-box;
+
+  flex: 0 0 44px;
+}
+
+/* =========================================================
+   CENTER
+========================================================= */
+
+.iko-center {
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  min-width: 0;
+}
+
+/* KICKOFF TIME */
+
+.iko-time {
+  color: #fff;
+
+  font-size: 20px;
+  font-weight: 900;
+
+  line-height: 1;
+
+  white-space: nowrap;
+
+  letter-spacing: .3px;
+}
+
+/* VS */
+
+.iko-vs {
+  margin-top: 5px;
+
+  color: #555;
+
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 1px;
+}
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.iko-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 60px;
+
+  margin-top: 7px;
+  padding: 4px 8px;
+
+  border-radius: 5px;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  letter-spacing: .5px;
+
+  box-sizing: border-box;
+}
+
+.iko-status.upcoming {
+  background: #292929;
+  color: #aaa;
+}
+
+.iko-status.live {
+  background: #00d979;
+  color: #001b0f;
+
+  box-shadow:
+    0 0 12px rgba(0,217,121,.25);
+}
+
+.iko-status.ended {
+  background: #1d1d1d;
+  color: #555;
+}
+
+/* =========================================================
+   COUNTDOWN
+========================================================= */
+
+.iko-countdown {
+  margin-top: 7px;
+
+  color: #00d979;
+
+  font-family:
+    "Courier New",
+    monospace;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  letter-spacing: .5px;
+
+  white-space: nowrap;
+}
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.iko-action {
+  width: 100%;
+
+  margin-top: 14px;
+}
+
+.iko-watch {
+  display: block;
+
+  width: 100%;
+
+  padding: 10px 14px;
+
+  border: 0;
+  border-radius: 7px;
+
+  background: #00d979;
+  color: #001b0f;
+
+  cursor: pointer;
+
+  font-size: 11px;
+  font-weight: 900;
+
+  letter-spacing: .3px;
+
+  transition:
+    opacity .2s ease,
+    transform .15s ease;
+}
+
+.iko-watch:hover {
+  opacity: .88;
+}
+
+.iko-watch:active {
+  transform: scale(.99);
+}
+
+.iko-watch.disabled {
+  background: #202020;
+  color: #555;
+
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   PLAYER TITLE
+========================================================= */
+
+.iko-player-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  padding: 11px 13px;
+
+  background: #101010;
+
+  border-bottom: 1px solid rgba(255,255,255,.06);
+
+  color: #fff;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  box-sizing: border-box;
+}
+
+.iko-close {
+  padding: 6px 10px;
+
+  border: 0;
+  border-radius: 5px;
+
+  background: #242424;
+  color: #aaa;
+
+  cursor: pointer;
+
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.iko-close:hover {
+  background: #333;
+  color: #fff;
+}
+
+/* =========================================================
+   SERVER BUTTONS
+========================================================= */
+
+.iko-servers {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 6px;
+
+  padding: 9px 10px;
+
+  background: #101010;
+
+  box-sizing: border-box;
+}
+
+.iko-server {
+  padding: 7px 11px;
+
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 5px;
+
+  background: #202020;
+  color: #aaa;
+
+  cursor: pointer;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  transition:
+    background .2s ease,
+    color .2s ease;
+}
+
+.iko-server:hover {
+  background: #2c2c2c;
+  color: #fff;
+}
+
+.iko-server.active {
+  background: #00d979;
+  border-color: #00d979;
+
+  color: #001b0f;
+}
+
+/* =========================================================
+   NOTE
+========================================================= */
+
+.iko-note {
+  padding: 7px 11px;
+
+  background: #0c0c0c;
+
+  color: #555;
+
+  font-size: 9px;
+
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   LOADING / ERROR / EMPTY
+========================================================= */
+
+.iko-loading,
+.iko-error,
+.iko-empty {
+  width: 100%;
+
+  padding: 25px 15px;
+
+  background: #111;
+
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 10px;
+
+  color: #aaa;
+
+  text-align: center;
+
+  font-size: 12px;
+
+  box-sizing: border-box;
+}
+
+.iko-error {
+  color: #ff7777;
+}
+
+/* =========================================================
+   LIVE CARD
+========================================================= */
+
+.iko-card.live {
+  border-color: rgba(0,217,121,.18);
+}
+
+.iko-card.live .iko-comp {
+  color: #aaa;
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+  #ikotvSchedule,
+  #ikotvPlayer {
+    width: 100%;
+    margin: 12px auto;
+  }
+
+  .iko-date {
+    margin: 18px 0 9px;
+
+    padding: 10px 12px;
+
+    font-size: 11px;
+  }
+
+  .iko-card {
+    margin: 8px 0;
+    padding: 12px 10px;
+
+    border-radius: 10px;
+  }
+
+  .iko-comp {
+    margin-bottom: 11px;
+
+    padding-bottom: 8px;
+
+    font-size: 9px;
+  }
+
+  .iko-comp img {
+    width: 19px;
+    height: 19px;
+
+    flex-basis: 19px;
+  }
+
+  .iko-match {
+    grid-template-columns:
+      minmax(0, 1fr)
+      62px
+      minmax(0, 1fr);
+
+    gap: 5px;
+  }
+
+  .iko-team {
+    gap: 6px;
+
+    font-size: 11px;
+  }
+
+  .iko-team img {
+    width: 34px;
+    height: 34px;
+
+    flex-basis: 34px;
+
+    padding: 2px;
+
+    border-radius: 6px;
+  }
+
+  .iko-time {
+    font-size: 16px;
+  }
+
+  .iko-vs {
+    margin-top: 4px;
+
+    font-size: 8px;
+  }
+
+  .iko-status {
+    min-width: 52px;
+
+    margin-top: 5px;
+    padding: 3px 5px;
+
+    font-size: 7px;
+  }
+
+  .iko-countdown {
+    margin-top: 5px;
+
+    font-size: 9px;
+  }
+
+  .iko-action {
+    margin-top: 11px;
+  }
+
+  .iko-watch {
+    padding: 9px 10px;
+
+    font-size: 9px;
+  }
+
+  .iko-player-title {
+    padding: 9px 10px;
+
+    font-size: 10px;
+  }
+
+  .iko-server {
+    padding: 6px 9px;
+
+    font-size: 9px;
+  }
+
+  #ikotvArt {
+    height: 56.25vw;
+    min-height: 190px;
+  }
+}
+
+/* =========================================================
+   VERY SMALL SCREEN
+========================================================= */
+
+@media (max-width: 380px) {
+
+  .iko-match {
+    grid-template-columns:
+      minmax(0, 1fr)
+      54px
+      minmax(0, 1fr);
+  }
+
+  .iko-team {
+    font-size: 10px;
+  }
+
+  .iko-team img {
+    width: 30px;
+    height: 30px;
+
+    flex-basis: 30px;
+  }
+
+  .iko-time {
+    font-size: 14px;
+  }
+
+  .iko-status {
+    min-width: 48px;
+
+    font-size: 6.5px;
+  }
+
+  .iko-countdown {
+    font-size: 8px;
+  }
+}
     `;
 
     document.head.appendChild(style);
