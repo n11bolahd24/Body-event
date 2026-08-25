@@ -1641,12 +1641,15 @@
     return result;
   }
 
-  /* =========================================================
-   IKOTV SHAKA PLAYER → #tv
+/* =========================================================
+   IKOTV PLAYER
+   M3U8  → SHAKA CORE / PLAYER LAMA
+   MPD   → SHAKA UI + CLEARKEY
 ========================================================= */
 
 let ikotvShakaPlayer = null;
 let ikotvVideo = null;
+let ikotvShakaUI = null;
 
 async function playIKOTVStream(url) {
 
@@ -1664,11 +1667,16 @@ async function playIKOTVStream(url) {
 
   console.log("[IKOTV] RAW STREAM URL:", url);
 
-  /* ==========================================
-     HAPUS PLAYER IKOTV SEBELUMNYA
-  ========================================== */
+  /* =====================================================
+     HAPUS PLAYER SEBELUMNYA
+  ===================================================== */
 
   try {
+
+    if (ikotvShakaUI) {
+      ikotvShakaUI.destroy();
+      ikotvShakaUI = null;
+    }
 
     if (ikotvShakaPlayer) {
       await ikotvShakaPlayer.destroy();
@@ -1678,37 +1686,113 @@ async function playIKOTVStream(url) {
   } catch (error) {
 
     console.warn(
-      "[IKOTV] Gagal destroy Shaka:",
+      "[IKOTV] Gagal destroy player:",
       error
     );
 
   }
 
-  /* ==========================================
-     BUAT VIDEO
-  ========================================== */
+  ikotvVideo = null;
 
-  tv.innerHTML = `
-    <video
-      id="ikotvVideo"
-      controls
-      autoplay
-      playsinline
-      style="
-        width:100%;
-        height:100%;
-        display:block;
-        background:#000;
-      "
-    ></video>
-  `;
+  /* =====================================================
+     PARSE STREAM
+  ===================================================== */
 
-  ikotvVideo =
-    document.getElementById("ikotvVideo");
+  let streamURL = null;
+  let keyId = null;
+  let key = null;
+  let isMPD = false;
 
-  /* ==========================================
+  try {
+
+    const parsedURL =
+      new URL(url, window.location.href);
+
+    /*
+     * FORMAT:
+     * player.html?mpd=...&keyId=...&key=...
+     */
+
+    const mpd =
+      parsedURL.searchParams.get("mpd");
+
+    const parsedKeyId =
+      parsedURL.searchParams.get("keyId");
+
+    const parsedKey =
+      parsedURL.searchParams.get("key");
+
+    if (mpd) {
+
+      isMPD = true;
+
+      streamURL =
+        decodeURIComponent(mpd);
+
+      keyId =
+        parsedKeyId;
+
+      key =
+        parsedKey;
+
+      console.log(
+        "[IKOTV] TYPE: DASH / MPD"
+      );
+
+      console.log(
+        "[IKOTV] MPD:",
+        streamURL
+      );
+
+      console.log(
+        "[IKOTV] KEY ID:",
+        keyId
+      );
+
+      console.log(
+        "[IKOTV] KEY:",
+        key ? "TERSEDIA" : "TIDAK ADA"
+      );
+
+    } else {
+
+      /*
+       * M3U8 biasa
+       */
+
+      streamURL =
+        safeURL(url);
+
+      console.log(
+        "[IKOTV] TYPE: M3U8 / NORMAL"
+      );
+
+    }
+
+  } catch (error) {
+
+    console.warn(
+      "[IKOTV] URL parsing error:",
+      error
+    );
+
+    streamURL =
+      safeURL(url);
+
+  }
+
+  if (!streamURL) {
+
+    console.error(
+      "[IKOTV] URL stream tidak valid"
+    );
+
+    return;
+  }
+
+  /* =====================================================
      CEK SHAKA
-  ========================================== */
+  ===================================================== */
 
   if (
     typeof window.shaka === "undefined"
@@ -1735,135 +1819,231 @@ async function playIKOTVStream(url) {
 
     }
 
-    /* ==========================================
-       PARSE URL
-    ========================================== */
+    /* ===================================================
+       MPD → SHAKA UI
+    =================================================== */
 
-    let streamURL = safeURL(url);
+    if (isMPD) {
 
-    let keyId = null;
-    let key = null;
-
-    try {
-
-      const parsedURL =
-        new URL(url, window.location.href);
-
-      const mpd =
-        parsedURL.searchParams.get("mpd");
-
-      const parsedKeyId =
-        parsedURL.searchParams.get("keyId");
-
-      const parsedKey =
-        parsedURL.searchParams.get("key");
+      console.log(
+        "[IKOTV] Membuat SHAKA UI..."
+      );
 
       /*
-       * Kalau URL mengandung ?mpd=
-       * berarti ini DASH + ClearKey
+       * JANGAN tambahkan CSS di sini.
+       * #tv tetap menggunakan CSS milik website.
        */
 
-      if (mpd) {
+      tv.innerHTML = `
+        <div
+          id="ikotvShakaContainer"
+          data-shaka-player-container
+          shaka-controls="true"
+          style="
+            width:100%;
+            height:100%;
+          "
+        >
 
-        streamURL = decodeURIComponent(mpd);
+          <video
+            id="ikotvVideo"
+            data-shaka-player
+            autoplay
+            playsinline
+          ></video>
 
-        keyId =
-          parsedKeyId;
+        </div>
+      `;
 
-        key =
-          parsedKey;
-
-        console.log(
-          "[IKOTV] DASH MPD:",
-          streamURL
+      ikotvVideo =
+        document.getElementById(
+          "ikotvVideo"
         );
 
-        console.log(
-          "[IKOTV] ClearKey ID:",
-          keyId
-        );
+      /*
+       * Pastikan Shaka UI sudah tersedia
+       */
 
-        console.log(
-          "[IKOTV] ClearKey tersedia:",
-          !!key
+      if (
+        typeof shaka.ui === "undefined"
+      ) {
+
+        throw new Error(
+          "Shaka UI belum dimuat"
         );
 
       }
 
-    } catch (parseError) {
+      /*
+       * Ambil UI dari video
+       */
 
-      console.warn(
-        "[IKOTV] Gagal parsing URL:",
-        parseError
+      const ui =
+        ikotvVideo.ui;
+
+      if (!ui) {
+
+        throw new Error(
+          "Shaka UI belum terinisialisasi"
+        );
+
+      }
+
+      ikotvShakaUI = ui;
+
+      const controls =
+        ui.getControls();
+
+      ikotvShakaPlayer =
+        controls.getPlayer();
+
+      console.log(
+        "[IKOTV] Shaka UI berhasil dibuat"
       );
 
-    }
+      /* ===============================================
+         CLEARKEY
+      =============================================== */
 
-    if (!streamURL) {
+      if (keyId && key) {
 
-      throw new Error(
-        "URL stream tidak valid"
+        console.log(
+          "[IKOTV] Configure ClearKey..."
+        );
+
+        ikotvShakaPlayer.configure({
+
+          drm: {
+
+            clearKeys: {
+
+              [keyId]: key
+
+            }
+
+          }
+
+        });
+
+      } else {
+
+        console.warn(
+          "[IKOTV] MPD tidak memiliki ClearKey"
+        );
+
+      }
+
+      /* ===============================================
+         ERROR EVENT
+      =============================================== */
+
+      ikotvShakaPlayer.addEventListener(
+        "error",
+        event => {
+
+          console.error(
+            "[IKOTV] SHAKA ERROR:",
+            event.detail
+          );
+
+        }
       );
 
+      controls.addEventListener(
+        "error",
+        event => {
+
+          console.error(
+            "[IKOTV] SHAKA UI ERROR:",
+            event.detail
+          );
+
+        }
+      );
+
+      /* ===============================================
+         LOAD MPD
+      =============================================== */
+
+      console.log(
+        "[IKOTV] LOAD MPD:",
+        streamURL
+      );
+
+      await ikotvShakaPlayer.load(
+        streamURL
+      );
+
+      console.log(
+        "[IKOTV] MPD BERHASIL DIMUAT"
+      );
+
+      /* ===============================================
+         AUTOPLAY
+      =============================================== */
+
+      ikotvVideo
+        .play()
+        .catch(error => {
+
+          console.warn(
+            "[IKOTV] Autoplay diblokir:",
+            error
+          );
+
+        });
+
+      return;
     }
 
-    /* ==========================================
-       BUAT SHAKA
-    ========================================== */
+    /* ===================================================
+       M3U8 → SHAKA CORE
+       TETAP SEPERTI PLAYER LAMA
+    =================================================== */
+
+    console.log(
+      "[IKOTV] Membuat player M3U8..."
+    );
+
+    tv.innerHTML = `
+      <video
+        id="ikotvVideo"
+        controls
+        autoplay
+        playsinline
+        style="
+          width:100%;
+          height:100%;
+          display:block;
+          background:#000;
+        "
+      ></video>
+    `;
+
+    ikotvVideo =
+      document.getElementById(
+        "ikotvVideo"
+      );
 
     ikotvShakaPlayer =
       new shaka.Player(
         ikotvVideo
       );
 
-    /* ==========================================
-       CLEARKEY DRM
-    ========================================== */
-
-    if (keyId && key) {
-
-      console.log(
-        "[IKOTV] Menggunakan ClearKey DRM"
-      );
-
-      ikotvShakaPlayer.configure({
-
-        drm: {
-
-          clearKeys: {
-
-            [keyId]: key
-
-          }
-
-        }
-
-      });
-
-    }
-
-    /* ==========================================
-       SHAKA ERROR
-    ========================================== */
-
     ikotvShakaPlayer.addEventListener(
       "error",
       event => {
 
         console.error(
-          "[IKOTV] SHAKA ERROR:",
+          "[IKOTV] M3U8 SHAKA ERROR:",
           event.detail
         );
 
       }
     );
 
-    /* ==========================================
-       LOAD STREAM
-    ========================================== */
-
     console.log(
-      "[IKOTV] LOAD:",
+      "[IKOTV] LOAD M3U8:",
       streamURL
     );
 
@@ -1872,13 +2052,8 @@ async function playIKOTVStream(url) {
     );
 
     console.log(
-      "[IKOTV] SHAKA PLAYING:",
-      streamURL
+      "[IKOTV] M3U8 BERHASIL DIMUAT"
     );
-
-    /* ==========================================
-       AUTOPLAY
-    ========================================== */
 
     ikotvVideo
       .play()
@@ -1894,7 +2069,7 @@ async function playIKOTVStream(url) {
   } catch (error) {
 
     console.error(
-      "[IKOTV] SHAKA LOAD ERROR:",
+      "[IKOTV] PLAYER LOAD ERROR:",
       error
     );
 
@@ -1908,29 +2083,34 @@ async function playIKOTVStream(url) {
       error?.message
     );
 
+    /*
+     * Jangan kasih CSS posisi baru.
+     * Hanya isi pesan di dalam #tv.
+     */
+
     tv.innerHTML = `
-      <div style="
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        width:100%;
-        height:100%;
-        min-height:250px;
-        background:#000;
-        color:#ff7777;
-        font-family:Arial;
-        font-size:13px;
-        text-align:center;
-        padding:20px;
-        box-sizing:border-box;
-      ">
+      <div
+        style="
+          width:100%;
+          height:100%;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          background:#000;
+          color:#ff7777;
+          text-align:center;
+          box-sizing:border-box;
+        "
+      >
         Gagal memuat stream IKOTV.
       </div>
     `;
 
   }
+
 }
-  /* =========================================================
+  
+/* =========================================================
      SCHEDULE RENDER
   ========================================================= */
 
