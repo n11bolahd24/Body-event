@@ -1333,29 +1333,164 @@
 }
 
   async function fetchMatches() {
-    const result = await postJSON(
-      CONFIG.api.matches,
-      {
-        date: null,
-        filter: "all",
-        sport: "football"
-      }
-    );
 
-    console.log("[IKOTV] matches:", result);
+  console.log("[IKOTV] Mengambil ALL + LIVE...");
 
-    return getArray(result)
+  const [allResult, liveResult] =
+    await Promise.all([
+
+      // ==========================
+      // SEMUA JADWAL
+      // ==========================
+      postJSON(
+        CONFIG.api.matches,
+        {
+          date: null,
+          filter: "all",
+          sport: "football"
+        }
+      ),
+
+      // ==========================
+      // MATCH YANG SEDANG LIVE
+      // ==========================
+      postJSON(
+        CONFIG.api.matches,
+        {
+          date: null,
+          filter: "live",
+          sport: "football"
+        }
+      )
+
+    ]);
+
+  console.log(
+    "[IKOTV] ALL:",
+    allResult
+  );
+
+  console.log(
+    "[IKOTV] LIVE:",
+    liveResult
+  );
+
+  // ==========================
+  // PARSE ALL
+  // ==========================
+
+  const allMatches =
+    getArray(allResult)
       .map(normalizeMatch)
       .filter(
         match =>
           match.id &&
           match.time > 0
-      )
-      .sort(
-        (a, b) =>
-          a.time - b.time
       );
-  }
+
+  // ==========================
+  // PARSE LIVE
+  // ==========================
+
+  const liveMatches =
+    getArray(liveResult)
+      .map(normalizeMatch)
+      .filter(
+        match =>
+          match.id &&
+          match.time > 0
+      );
+
+  console.log(
+    "[IKOTV] ALL COUNT:",
+    allMatches.length
+  );
+
+  console.log(
+    "[IKOTV] LIVE COUNT:",
+    liveMatches.length
+  );
+
+  // ==========================
+  // GABUNG ALL + LIVE
+  // ==========================
+
+  const merged =
+    new Map();
+
+  // Masukkan semua jadwal
+  allMatches.forEach(match => {
+
+    merged.set(
+      String(match.id),
+      match
+    );
+
+  });
+
+  // Masukkan LIVE
+  // Kalau pertandingan sudah hilang
+  // dari ALL tetapi muncul di LIVE,
+  // pertandingan tersebut tetap masuk.
+  liveMatches.forEach(match => {
+
+    const id =
+      String(match.id);
+
+    if (merged.has(id)) {
+
+      // Pertahankan data jadwal
+      // tetapi gunakan informasi terbaru
+      // dari LIVE jika tersedia.
+
+      const old =
+        merged.get(id);
+
+      merged.set(id, {
+        ...old,
+        ...match
+      });
+
+    } else {
+
+      // Match hanya ada di LIVE
+      // tetap masukkan ke jadwal.
+
+      merged.set(
+        id,
+        match
+      );
+
+    }
+
+  });
+
+  const result =
+    Array.from(
+      merged.values()
+    )
+    .filter(
+      match =>
+        match.id &&
+        match.time > 0
+    )
+    .sort(
+      (a, b) =>
+        a.time - b.time
+    );
+
+  console.log(
+    "[IKOTV] MERGED COUNT:",
+    result.length
+  );
+
+  console.log(
+    "[IKOTV] MERGED MATCHES:",
+    result
+  );
+
+  return result;
+}
 
   async function fetchMatchInfo(matchId) {
     const result = await postJSON(
@@ -2394,27 +2529,10 @@
         </div>
       `;
 
-      const newMatches = await fetchMatches();
+      const newMatches =
+  await fetchMatches();
 
-/*
- * Jangan langsung membuang pertandingan lama.
- * Pertahankan match yang sebelumnya sudah ada.
- */
-
-const merged = new Map();
-
-/* Data lama */
-matches.forEach(match => {
-  merged.set(String(match.id), match);
-});
-
-/* Data terbaru menimpa data lama */
-newMatches.forEach(match => {
-  merged.set(String(match.id), match);
-});
-
-matches = Array.from(merged.values())
-  .sort((a, b) => a.time - b.time);
+matches = newMatches;
 
 renderSchedule();
 
