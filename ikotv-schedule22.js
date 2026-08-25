@@ -1321,57 +1321,54 @@
   console.log("[IKOTV] REQUEST:", url);
   console.log("[IKOTV] BODY:", body);
 
-  const controller = new AbortController();
+  const response = await fetch(url, {
+    method: "POST",
 
-  // Jangan biarkan HP stuck "Loading..." selamanya
-  const timeout = setTimeout(() => {
-    controller.abort();
-  }, 30000);
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+
+    body: JSON.stringify(body),
+
+    mode: "cors"
+  });
+
+  console.log(
+    "[IKOTV] STATUS:",
+    response.status
+  );
+
+  const text =
+    await response.text();
+
+  console.log(
+    "[IKOTV] RAW:",
+    text
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "HTTP " +
+      response.status +
+      " - " +
+      text
+    );
+  }
 
   try {
 
-    const response = await fetch(
-      url + (url.includes("?") ? "&" : "?") + "_=" + Date.now(),
-      {
-        method: "POST",
+    return JSON.parse(text);
 
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
+  } catch (error) {
 
-        body: JSON.stringify(body),
-
-        mode: "cors",
-
-        cache: "no-store",
-
-        signal: controller.signal
-      }
+    throw new Error(
+      "Response bukan JSON: " +
+      text.substring(0, 500)
     );
 
-    console.log(
-      "[IKOTV] STATUS:",
-      response.status
-    );
-
-    const text = await response.text();
-
-    console.log(
-      "[IKOTV] RESPONSE:",
-      text
-    );
-
-    if (!response.ok) {
-
-      throw new Error(
-        "HTTP " +
-        response.status +
-        " - " +
-        text.substring(0, 200)
-      );
-
-    }
+  }
+}
 
     if (!text) {
       throw new Error("Response API kosong");
@@ -2376,18 +2373,21 @@ async function openIKOMatch(matchId) {
   try {
 
     const result =
-      await fetchStreamURL(id);
+  await fetchStreamURL(id);
 
-    console.log(
-      "[IKOTV] Stream result:",
-      result
-    );
+console.log("================================");
+console.log("[IKOTV] STREAM RAW RESPONSE:");
+console.log(result);
+console.log("================================");
 
-    const videos =
-      extractVideos(result);
+const videos =
+  extractVideos(result);
 
-    if (!videos.length) {
+console.log("[IKOTV] EXTRACTED VIDEOS:");
+console.log(videos);
 
+if (!videos.length) {
+  
       panel.innerHTML = `
         <div class="iko-server-error">
           Server stream tidak tersedia.
@@ -2477,10 +2477,29 @@ async function openIKOMatch(matchId) {
 
   } catch (error) {
 
-    console.error(
-      "[IKOTV] Server error:",
-      error
-    );
+  console.error(
+    "================================"
+  );
+
+  console.error(
+    "[IKOTV] OPEN MATCH ERROR:"
+  );
+
+  console.error(error);
+
+  console.error(
+    "MESSAGE:",
+    error?.message
+  );
+
+  console.error(
+    "STACK:",
+    error?.stack
+  );
+
+  console.error(
+    "================================"
+  );
 
     panel.innerHTML = `
       <div class="iko-server-error">
