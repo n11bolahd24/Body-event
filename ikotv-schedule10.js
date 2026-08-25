@@ -21,7 +21,6 @@
 
     // Change these only if you want another placement.
     scheduleSelector: "#ikotvSchedule",
-    playerSelector: "#ikotvPlayer",
 
     refreshMs: 60000,
     countdownMs: 1000,
@@ -244,24 +243,25 @@
   ========================================================= */
 
   function ensureDOM() {
-    let schedule = $(CONFIG.scheduleSelector);
+  let schedule = $(CONFIG.scheduleSelector);
 
-    if (!schedule) {
-      schedule = document.createElement("div");
-      schedule.id = "ikotvSchedule";
-      document.body.appendChild(schedule);
-    }
-
-    let player = $(CONFIG.playerSelector);
-
-    if (!player) {
-      player = document.createElement("div");
-      player.id = "ikotvPlayer";
-      document.body.appendChild(player);
-    }
-
-    return { schedule, player };
+  if (!schedule) {
+    schedule = document.createElement("div");
+    schedule.id = "ikotvSchedule";
+    document.body.appendChild(schedule);
   }
+
+  const tv = document.getElementById("tv");
+
+  if (!tv) {
+    console.error("[IKOTV] Element #tv tidak ditemukan.");
+  }
+
+  return {
+    schedule,
+    player: tv
+  };
+}
 
   function injectCSS() {
     if (document.getElementById("ikotvStyles")) return;
@@ -269,8 +269,8 @@
     const style = document.createElement("style");
     style.id = "ikotvStyles";
 
-style.textContent = `
-#ikotvSchedule,
+    style.textContent = `
+      #ikotvSchedule,
 #ikotvPlayer {
   width: 100%;
   max-width: 1000px;
@@ -278,6 +278,10 @@ style.textContent = `
   font-family: Arial, Helvetica, sans-serif;
   box-sizing: border-box;
 }
+
+/* =========================================================
+   PLAYER
+========================================================= */
 
 #ikotvPlayer {
   display: none;
@@ -295,42 +299,72 @@ style.textContent = `
   background: #000;
 }
 
+/* =========================================================
+   GENERAL
+========================================================= */
+
 .iko-box {
   width: 100%;
   box-sizing: border-box;
 }
 
+/* =========================================================
+   DATE HEADER
+========================================================= */
+
 .iko-date {
   position: relative;
   margin: 25px 0 12px;
   padding: 12px 16px;
-  background: linear-gradient(90deg,#111,#171717);
+
+  background:
+    linear-gradient(
+      90deg,
+      #111,
+      #171717
+    );
+
   border: 1px solid rgba(255,255,255,.07);
   border-left: 4px solid #00d979;
+
   border-radius: 8px;
+
   color: #fff;
   font-size: 13px;
   font-weight: 800;
+
   letter-spacing: .5px;
   text-transform: uppercase;
+
   box-sizing: border-box;
 }
 
+/* =========================================================
+   MATCH CARD
+========================================================= */
+
 .iko-card {
   position: relative;
+
   width: 100%;
   margin: 10px 0;
   padding: 14px 16px;
-  background: linear-gradient(
-    135deg,
-    #0d0d0d 0%,
-    #151515 50%,
-    #101010 100%
-  );
+
+  background:
+    linear-gradient(
+      135deg,
+      #0d0d0d 0%,
+      #151515 50%,
+      #101010 100%
+    );
+
   border: 1px solid rgba(255,255,255,.07);
   border-radius: 12px;
+
   color: #fff;
+
   box-sizing: border-box;
+
   transition:
     transform .2s ease,
     border-color .2s ease,
@@ -343,47 +377,75 @@ style.textContent = `
   box-shadow: 0 8px 25px rgba(0,0,0,.25);
 }
 
+/* =========================================================
+   COMPETITION
+========================================================= */
+
 .iko-comp {
   display: flex;
   align-items: center;
+
   width: 100%;
+
   margin-bottom: 14px;
   padding-bottom: 9px;
+
   border-bottom: 1px solid rgba(255,255,255,.06);
+
   color: #999;
+
   font-size: 11px;
   font-weight: 700;
+
   text-transform: uppercase;
+
   box-sizing: border-box;
 }
 
 .iko-comp img {
-  width: 20px;
-  height: 20px;
-  margin-right: 7px;
+  width: 22px;
+  height: 22px;
+
+  margin-right: 8px;
+
   object-fit: contain;
-  flex: 0 0 20px;
+  flex: 0 0 22px;
 }
+
+/* =========================================================
+   MATCH AREA
+========================================================= */
 
 .iko-match {
   display: grid;
+
   grid-template-columns:
     minmax(0, 1fr)
-    76px
+    90px
     minmax(0, 1fr);
+
   align-items: center;
-  gap: 8px;
+
+  gap: 12px;
+
   width: 100%;
-  box-sizing: border-box;
 }
+
+/* =========================================================
+   TEAMS
+========================================================= */
 
 .iko-team {
   display: flex;
   align-items: center;
+
   min-width: 0;
-  gap: 8px;
-  font-size: 13px;
+
+  gap: 10px;
+
+  font-size: 14px;
   font-weight: 700;
+
   line-height: 1.25;
 }
 
@@ -398,58 +460,91 @@ style.textContent = `
 }
 
 .iko-team span {
-  min-width: 0;
   overflow-wrap: anywhere;
 }
 
 .iko-team img {
-  width: 32px;
-  height: 32px;
-  padding: 2px;
+  width: 44px;
+  height: 44px;
+
+  padding: 3px;
+
   object-fit: contain;
+
   background: rgba(255,255,255,.03);
-  border-radius: 6px;
+
+  border-radius: 8px;
+
   box-sizing: border-box;
-  flex: 0 0 32px;
+
+  flex: 0 0 44px;
 }
+
+/* =========================================================
+   CENTER
+========================================================= */
 
 .iko-center {
   display: flex;
   flex-direction: column;
+
   align-items: center;
   justify-content: center;
+
   text-align: center;
+
   min-width: 0;
 }
 
+/* KICKOFF TIME */
+
 .iko-time {
   color: #fff;
-  font-size: 18px;
+
+  font-size: 20px;
   font-weight: 900;
+
   line-height: 1;
+
   white-space: nowrap;
+
   letter-spacing: .3px;
 }
 
+/* VS */
+
 .iko-vs {
-  margin-top: 4px;
+  margin-top: 5px;
+
   color: #555;
-  font-size: 8px;
+
+  font-size: 9px;
   font-weight: 700;
+
   letter-spacing: 1px;
 }
+
+/* =========================================================
+   STATUS
+========================================================= */
 
 .iko-status {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 58px;
-  margin-top: 6px;
-  padding: 4px 7px;
+
+  min-width: 60px;
+
+  margin-top: 7px;
+  padding: 4px 8px;
+
   border-radius: 5px;
+
   font-size: 8px;
   font-weight: 900;
+
   letter-spacing: .5px;
+
   box-sizing: border-box;
 }
 
@@ -461,7 +556,9 @@ style.textContent = `
 .iko-status.live {
   background: #00d979;
   color: #001b0f;
-  box-shadow: 0 0 12px rgba(0,217,121,.25);
+
+  box-shadow:
+    0 0 12px rgba(0,217,121,.25);
 }
 
 .iko-status.ended {
@@ -469,34 +566,60 @@ style.textContent = `
   color: #555;
 }
 
+/* =========================================================
+   COUNTDOWN
+========================================================= */
+
 .iko-countdown {
-  margin-top: 6px;
+  margin-top: 7px;
+
   color: #00d979;
-  font-family: "Courier New", monospace;
-  font-size: 10px;
+
+  font-family:
+    "Courier New",
+    monospace;
+
+  font-size: 11px;
   font-weight: 800;
+
   letter-spacing: .5px;
+
   white-space: nowrap;
 }
 
+/* =========================================================
+   BUTTON
+========================================================= */
+
 .iko-action {
   width: 100%;
-  margin-top: 13px;
+
+  margin-top: 14px;
 }
 
 .iko-watch {
   display: block;
+
   width: 100%;
+
   padding: 10px 14px;
+
   border: 0;
   border-radius: 7px;
+
   background: #00d979;
   color: #001b0f;
+
   cursor: pointer;
+
   font-size: 11px;
   font-weight: 900;
+
   letter-spacing: .3px;
-  transition: opacity .2s ease, transform .15s ease;
+
+  transition:
+    opacity .2s ease,
+    transform .15s ease;
 }
 
 .iko-watch:hover {
@@ -510,30 +633,46 @@ style.textContent = `
 .iko-watch.disabled {
   background: #202020;
   color: #555;
+
   cursor: not-allowed;
 }
+
+/* =========================================================
+   PLAYER TITLE
+========================================================= */
 
 .iko-player-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   gap: 10px;
+
   padding: 11px 13px;
+
   background: #101010;
+
   border-bottom: 1px solid rgba(255,255,255,.06);
+
   color: #fff;
+
   font-size: 12px;
   font-weight: 800;
+
   box-sizing: border-box;
 }
 
 .iko-close {
   padding: 6px 10px;
+
   border: 0;
   border-radius: 5px;
+
   background: #242424;
   color: #aaa;
+
   cursor: pointer;
+
   font-size: 9px;
   font-weight: 800;
 }
@@ -543,25 +682,40 @@ style.textContent = `
   color: #fff;
 }
 
+/* =========================================================
+   SERVER BUTTONS
+========================================================= */
+
 .iko-servers {
   display: flex;
   flex-wrap: wrap;
+
   gap: 6px;
+
   padding: 9px 10px;
+
   background: #101010;
+
   box-sizing: border-box;
 }
 
 .iko-server {
   padding: 7px 11px;
+
   border: 1px solid rgba(255,255,255,.08);
   border-radius: 5px;
+
   background: #202020;
   color: #aaa;
+
   cursor: pointer;
+
   font-size: 10px;
   font-weight: 800;
-  transition: background .2s ease, color .2s ease;
+
+  transition:
+    background .2s ease,
+    color .2s ease;
 }
 
 .iko-server:hover {
@@ -572,34 +726,58 @@ style.textContent = `
 .iko-server.active {
   background: #00d979;
   border-color: #00d979;
+
   color: #001b0f;
 }
 
+/* =========================================================
+   NOTE
+========================================================= */
+
 .iko-note {
   padding: 7px 11px;
+
   background: #0c0c0c;
+
   color: #555;
+
   font-size: 9px;
+
   box-sizing: border-box;
 }
+
+/* =========================================================
+   LOADING / ERROR / EMPTY
+========================================================= */
 
 .iko-loading,
 .iko-error,
 .iko-empty {
   width: 100%;
+
   padding: 25px 15px;
+
   background: #111;
+
   border: 1px solid rgba(255,255,255,.07);
   border-radius: 10px;
+
   color: #aaa;
+
   text-align: center;
+
   font-size: 12px;
+
   box-sizing: border-box;
 }
 
 .iko-error {
   color: #ff7777;
 }
+
+/* =========================================================
+   LIVE CARD
+========================================================= */
 
 .iko-card.live {
   border-color: rgba(0,217,121,.18);
@@ -608,6 +786,10 @@ style.textContent = `
 .iko-card.live .iko-comp {
   color: #aaa;
 }
+
+/* =========================================================
+   MOBILE
+========================================================= */
 
 @media (max-width: 600px) {
 
@@ -619,67 +801,82 @@ style.textContent = `
 
   .iko-date {
     margin: 18px 0 9px;
+
     padding: 10px 12px;
+
     font-size: 11px;
   }
 
   .iko-card {
     margin: 8px 0;
     padding: 12px 10px;
+
     border-radius: 10px;
   }
 
   .iko-comp {
     margin-bottom: 11px;
+
     padding-bottom: 8px;
+
     font-size: 9px;
   }
 
   .iko-comp img {
-    width: 18px;
-    height: 18px;
-    flex-basis: 18px;
+    width: 19px;
+    height: 19px;
+
+    flex-basis: 19px;
   }
 
   .iko-match {
     grid-template-columns:
       minmax(0, 1fr)
-      58px
+      62px
       minmax(0, 1fr);
-    gap: 4px;
+
+    gap: 5px;
   }
 
   .iko-team {
-    gap: 5px;
-    font-size: 10px;
+    gap: 6px;
+
+    font-size: 11px;
   }
 
   .iko-team img {
-    width: 27px;
-    height: 27px;
-    flex-basis: 27px;
+    width: 34px;
+    height: 34px;
+
+    flex-basis: 34px;
+
     padding: 2px;
-    border-radius: 5px;
+
+    border-radius: 6px;
   }
 
   .iko-time {
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .iko-vs {
     margin-top: 4px;
+
     font-size: 8px;
   }
 
   .iko-status {
-    min-width: 50px;
+    min-width: 52px;
+
     margin-top: 5px;
     padding: 3px 5px;
+
     font-size: 7px;
   }
 
   .iko-countdown {
     margin-top: 5px;
+
     font-size: 9px;
   }
 
@@ -689,16 +886,19 @@ style.textContent = `
 
   .iko-watch {
     padding: 9px 10px;
+
     font-size: 9px;
   }
 
   .iko-player-title {
     padding: 9px 10px;
+
     font-size: 10px;
   }
 
   .iko-server {
     padding: 6px 9px;
+
     font-size: 9px;
   }
 
@@ -708,33 +908,37 @@ style.textContent = `
   }
 }
 
+/* =========================================================
+   VERY SMALL SCREEN
+========================================================= */
+
 @media (max-width: 380px) {
 
   .iko-match {
     grid-template-columns:
       minmax(0, 1fr)
-      52px
+      54px
       minmax(0, 1fr);
-    gap: 3px;
   }
 
   .iko-team {
-    gap: 4px;
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .iko-team img {
-    width: 25px;
-    height: 25px;
-    flex-basis: 25px;
+    width: 30px;
+    height: 30px;
+
+    flex-basis: 30px;
   }
 
   .iko-time {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .iko-status {
-    min-width: 46px;
+    min-width: 48px;
+
     font-size: 6.5px;
   }
 
@@ -742,9 +946,165 @@ style.textContent = `
     font-size: 8px;
   }
 }
-`;
 
-document.head.appendChild(style);    
+
+/* =========================================================
+   IKOTV COMPACT OVERRIDE perbaikan
+========================================================= */
+
+.iko-card {
+  padding: 10px 12px !important;
+  margin: 7px 0 !important;
+  border-radius: 9px !important;
+}
+
+.iko-comp {
+  margin-bottom: 8px !important;
+  padding-bottom: 6px !important;
+  font-size: 9px !important;
+}
+
+.iko-comp img {
+  width: 16px !important;
+  height: 16px !important;
+  flex: 0 0 16px !important;
+  margin-right: 5px !important;
+}
+
+/* MATCH GRID */
+.iko-match {
+  grid-template-columns: minmax(0, 1fr) 58px minmax(0, 1fr) !important;
+  gap: 6px !important;
+}
+
+/* TEAM */
+.iko-team {
+  gap: 6px !important;
+  font-size: 11px !important;
+  line-height: 1.15 !important;
+}
+
+/* LOGO KLUB — KECIL */
+.iko-team img {
+  width: 30px !important;
+  height: 30px !important;
+  flex: 0 0 30px !important;
+
+  padding: 2px !important;
+
+  border-radius: 5px !important;
+
+  background: transparent !important;
+}
+
+/* TIME */
+.iko-time {
+  font-size: 15px !important;
+  line-height: 1 !important;
+}
+
+/* VS */
+.iko-vs {
+  margin-top: 3px !important;
+  font-size: 7px !important;
+}
+
+/* STATUS */
+.iko-status {
+  min-width: 48px !important;
+
+  margin-top: 4px !important;
+  padding: 3px 5px !important;
+
+  font-size: 7px !important;
+}
+
+/* COUNTDOWN */
+.iko-countdown {
+  margin-top: 4px !important;
+  font-size: 9px !important;
+}
+
+/* BUTTON */
+.iko-action {
+  margin-top: 9px !important;
+}
+
+.iko-watch {
+  padding: 8px 10px !important;
+  border-radius: 6px !important;
+  font-size: 9px !important;
+}
+
+/* DATE */
+.iko-date {
+  margin: 15px 0 7px !important;
+  padding: 8px 11px !important;
+
+  font-size: 10px !important;
+
+  border-left-width: 3px !important;
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+
+  .iko-card {
+    padding: 9px 8px !important;
+  }
+
+  .iko-match {
+    grid-template-columns:
+      minmax(0, 1fr)
+      52px
+      minmax(0, 1fr) !important;
+
+    gap: 4px !important;
+  }
+
+  .iko-team {
+    gap: 4px !important;
+    font-size: 10px !important;
+  }
+
+  .iko-team img {
+    width: 26px !important;
+    height: 26px !important;
+    flex: 0 0 26px !important;
+  }
+
+  .iko-time {
+    font-size: 13px !important;
+  }
+
+  .iko-vs {
+    font-size: 6px !important;
+  }
+
+  .iko-status {
+    min-width: 44px !important;
+    font-size: 6px !important;
+    padding: 2px 4px !important;
+  }
+
+  .iko-countdown {
+    font-size: 8px !important;
+  }
+
+  .iko-watch {
+    padding: 7px 8px !important;
+    font-size: 8px !important;
+  }
+}
+
+
+    `;
+
+    document.head.appendChild(style);
+  }
+
+
+  
   /* =========================================================
      LOAD EXTERNAL LIBRARIES
   ========================================================= */
@@ -795,49 +1155,24 @@ document.head.appendChild(style);
   }
 
   async function loadLibraries() {
-
-  try {
     await loadScript(
       CONFIG.artplayer,
       () => typeof window.Artplayer !== "undefined"
     );
-  } catch (error) {
-    console.warn(
-      "[IKOTV] ArtPlayer gagal dimuat:",
-      error
-    );
-  }
 
-  try {
     await loadScript(
       CONFIG.hls,
       () => typeof window.Hls !== "undefined"
     );
-  } catch (error) {
-    console.warn(
-      "[IKOTV] HLS.js gagal dimuat:",
-      error
-    );
-  }
 
-  /*
-   * HLS Quality plugin bersifat OPTIONAL.
-   * Jangan sampai gagal plugin membuat jadwal
-   * IKOTV tidak muncul.
-   */
-  try {
     await loadScript(
       CONFIG.hlsQuality,
       () =>
         typeof window.artplayerPluginHlsQuality !== "undefined"
     );
-  } catch (error) {
-    console.warn(
-      "[IKOTV] HLS Quality plugin tidak dimuat. Diabaikan."
-    );
   }
-}
-/* =========================================================
+
+  /* =========================================================
      API
   ========================================================= */
 
@@ -1035,18 +1370,20 @@ document.head.appendChild(style);
   </button>
 `;
           } else {
+            const cd = countdown(match.time);
 
-  statusText = "UPCOMING";
+            statusText = "UPCOMING";
 
-  button = `
-    <button
-      class="iko-watch disabled"
-      disabled
-    >
-      WAITING FOR KICKOFF
-    </button>
-  `;
-}
+            button = `
+              <button
+                class="iko-watch disabled"
+                disabled
+              >
+                SERVER WILL BE ACTIVE
+                30 MINUTES BEFORE KICKOFF
+              </button>
+            `;
+          }
 
           const cd =
             status === "upcoming"
@@ -1177,76 +1514,63 @@ document.head.appendChild(style);
   ========================================================= */
 
   function showPlayer(match, videos) {
-    const { player } = ensureDOM();
+  const tv = document.getElementById("tv");
 
-    player.style.display = "block";
+  if (!tv) {
+    console.error("[IKOTV] Element #tv tidak ditemukan.");
+    return;
+  }
 
-    const validVideos =
-      videos.filter(
-        v => safeURL(v.url)
-      );
+  const validVideos = videos.filter(
+    v => safeURL(v.url)
+  );
 
-    currentVideos = validVideos;
+  currentVideos = validVideos;
 
-    const title =
-      `${match.home} vs ${match.away}`;
-
-    player.innerHTML = `
-      <div class="iko-player-title">
-
-        <span>
-          ${escapeHTML(title)}
-        </span>
-
-        <button
-          class="iko-close"
-          id="ikoClosePlayer"
-        >
-          CLOSE
-        </button>
-
-      </div>
-
-      <div id="ikotvArt"></div>
-
-      <div
-        class="iko-servers"
-        id="ikoServers"
-      ></div>
-
-      <div class="iko-note">
-        IKOTV • ArtPlayer • HLS
+  if (!validVideos.length) {
+    tv.innerHTML = `
+      <div class="iko-error">
+        URL stream tidak tersedia.
       </div>
     `;
-
-    $("#ikoClosePlayer").onclick = () => {
-
-      if (art) {
-        try {
-          art.destroy(false);
-        } catch (_) {}
-
-        art = null;
-      }
-
-      player.style.display = "none";
-
-      currentMatchId = null;
-      currentVideos = [];
-    };
-
-    renderServers();
-
-    player.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-
-    playVideo(
-      validVideos[0]?.url || "",
-      validVideos[0]
-    );
+    return;
   }
+
+  /*
+   * Hapus player sebelumnya
+   */
+  if (art) {
+    try {
+      art.destroy(false);
+    } catch (_) {}
+
+    art = null;
+  }
+
+  /*
+   * #tv adalah TV utama.
+   * IKOTV hanya mengganti isi TV.
+   */
+  tv.innerHTML = `
+    <div id="ikotvArt"
+         style="
+           position:relative;
+           width:100%;
+           height:100%;
+           min-height:220px;
+           background:#000;
+         ">
+    </div>
+  `;
+
+  /*
+   * Mainkan server pertama
+   */
+  playVideo(
+    validVideos[0].url,
+    validVideos[0]
+  );
+}
 
   function renderServers(activeIndex = 0) {
     const box = $("#ikoServers");
@@ -1906,54 +2230,47 @@ document.head.appendChild(style);
 
   async function init() {
 
-  const { schedule } = ensureDOM();
+    try {
 
-  try {
+      injectCSS();
 
-    injectCSS();
+      ensureDOM();
 
-    /*
-     * JADWAL DIMUAT TERLEBIH DAHULU.
-     * Jadi kalau library player bermasalah,
-     * jadwal tetap tampil.
-     */
+      await loadLibraries();
 
-    await loadSchedule();
+      await loadSchedule();
 
-    /*
-     * Library player dimuat setelah jadwal.
-     */
+      startAutoRefresh();
 
-    await loadLibraries();
+      startCountdownTimer();
 
-    startAutoRefresh();
+      console.log(
+        "[IKOTV] Initialized successfully."
+      );
 
-    startCountdownTimer();
+    } catch (error) {
 
-    console.log(
-      "[IKOTV] Initialized successfully."
-    );
+      console.error(
+        "[IKOTV] Initialization error:",
+        error
+      );
 
-  } catch (error) {
+      const { schedule } =
+        ensureDOM();
 
-    console.error(
-      "[IKOTV] Initialization error:",
-      error
-    );
-
-    schedule.innerHTML = `
-      <div class="iko-error">
-        Gagal memuat jadwal IKOTV.
-        <br>
-        <small>
-          ${escapeHTML(
-            error?.message || ""
-          )}
-        </small>
-      </div>
-    `;
+      schedule.innerHTML = `
+        <div class="iko-error">
+          IKOTV gagal diinisialisasi.
+          <br>
+          <small>
+            ${escapeHTML(
+              error?.message || ""
+            )}
+          </small>
+        </div>
+      `;
+    }
   }
-}
 
   /* =========================================================
      PUBLIC API
