@@ -1415,8 +1415,7 @@
                 class="iko-watch disabled"
                 disabled
               >
-                SERVER WILL BE ACTIVE
-                30 MINUTES BEFORE KICKOFF
+                 WAITING FOR KICKOFF
               </button>
             `;
           }
