@@ -304,7 +304,44 @@
 
     style.textContent = `
       #ikotvSchedule,
+/* =========================================================
+   SHAKA MPD PLAYER
+========================================================= */
 
+#tv #ikotvShakaContainer {
+  position: relative !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 250px !important;
+  background: #000 !important;
+  overflow: hidden !important;
+}
+
+#tv #ikotvShakaContainer video {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  display: block !important;
+
+  background: #000 !important;
+
+  object-fit: contain !important;
+}
+
+#tv #ikotvShakaContainer .shaka-controls-container {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+}
+
+#tv #ikotvShakaContainer .shaka-bottom-controls {
+  width: 100% !important;
+}
 /* =========================================================
    IKOTV SERVER PANEL
 ========================================================= */
@@ -1827,50 +1864,89 @@ if (isMPD) {
 
   console.log("[IKOTV] TYPE: DASH / MPD");
 
-  tv.innerHTML = `
-    <div
-      id="ikotvShakaContainer"
-      class="shaka-video-container"
-      style="
-        width:100%;
-        height:100%;
-      "
-    >
-      <video
-        id="ikotvVideo"
-        autoplay
-        playsinline
-        style="
-          width:100%;
-          height:100%;
-          display:block;
-          background:#000;
-        "
-      ></video>
-    </div>
+  /*
+   * RESET TV
+   */
+  tv.innerHTML = "";
+
+  /*
+   * CONTAINER SHAKA
+   */
+  const container =
+    document.createElement("div");
+
+  container.id =
+    "ikotvShakaContainer";
+
+  container.className =
+    "shaka-video-container";
+
+  container.setAttribute(
+    "data-shaka-player-container",
+    ""
+  );
+
+  container.style.cssText = `
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 250px;
+    background: #000;
+    overflow: hidden;
   `;
 
-  ikotvVideo =
-    document.getElementById("ikotvVideo");
+  /*
+   * VIDEO
+   */
+  const video =
+    document.createElement("video");
 
-  const container =
-    document.getElementById(
-      "ikotvShakaContainer"
-    );
+  video.id =
+    "ikotvVideo";
 
-  /* ===============================================
-     BUAT SHAKA CORE
-  =============================================== */
+  video.setAttribute(
+    "data-shaka-player",
+    ""
+  );
 
+  video.setAttribute(
+    "playsinline",
+    ""
+  );
+
+  video.setAttribute(
+    "autoplay",
+    ""
+  );
+
+  video.style.cssText = `
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    background: #000;
+  `;
+
+  container.appendChild(video);
+
+  tv.appendChild(container);
+
+  ikotvVideo = video;
+
+  /*
+   * SHAKA CORE
+   */
   ikotvShakaPlayer =
     new shaka.Player(
       ikotvVideo
     );
 
-  /* ===============================================
-     CLEARKEY
-  =============================================== */
-
+  /*
+   * CLEARKEY
+   */
   if (keyId && key) {
 
     console.log(
@@ -1905,10 +1981,9 @@ if (isMPD) {
 
   }
 
-  /* ===============================================
-     SHAKA ERROR
-  =============================================== */
-
+  /*
+   * SHAKA ERROR
+   */
   ikotvShakaPlayer.addEventListener(
     "error",
     event => {
@@ -1921,10 +1996,9 @@ if (isMPD) {
     }
   );
 
-  /* ===============================================
-     BUAT SHAKA UI MANUAL
-  =============================================== */
-
+  /*
+   * SHAKA UI
+   */
   if (
     typeof shaka.ui === "undefined"
   ) {
@@ -1946,10 +2020,9 @@ if (isMPD) {
       ikotvVideo
     );
 
-  /* ===============================================
-     UI CONFIG
-  =============================================== */
-
+  /*
+   * CONTROL
+   */
   ikotvShakaUI.configure({
 
     controlPanelElements: [
@@ -1965,10 +2038,9 @@ if (isMPD) {
 
   });
 
-  /* ===============================================
-     LOAD MPD
-  =============================================== */
-
+  /*
+   * LOAD MPD
+   */
   console.log(
     "[IKOTV] LOAD MPD:",
     streamURL
@@ -1982,24 +2054,34 @@ if (isMPD) {
     "[IKOTV] MPD BERHASIL DIMUAT"
   );
 
-  /* ===============================================
-     PLAY
-  =============================================== */
+  /*
+   * PAKSA VIDEO DIMENSI
+   */
+  video.style.width = "100%";
+  video.style.height = "100%";
 
-  ikotvVideo
-    .play()
-    .catch(error => {
+  /*
+   * PLAY
+   */
+  try {
 
-      console.warn(
-        "[IKOTV] Autoplay diblokir:",
-        error
-      );
+    await video.play();
 
-    });
+    console.log(
+      "[IKOTV] MPD VIDEO PLAYING"
+    );
+
+  } catch (error) {
+
+    console.warn(
+      "[IKOTV] Autoplay diblokir:",
+      error
+    );
+
+  }
 
   return;
 }
-
     /* ===================================================
        M3U8 → SHAKA CORE
        TETAP SEPERTI PLAYER LAMA
