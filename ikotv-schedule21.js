@@ -20,6 +20,7 @@
 
     // Change these only if you want another placement.
     scheduleSelector: "#ikotvSchedule",
+    playerSelector: "#tv",
 
     refreshMs: 60000,
     countdownMs: 1000,
