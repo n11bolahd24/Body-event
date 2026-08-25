@@ -26,7 +26,7 @@
 
     // IKOTV match timestamps are treated as Unix seconds.
     // This only controls when a match is considered ended.
-    matchDurationHours: 3,
+    matchDurationHours: 2,
 
     // CDN libraries
     artplayer:
@@ -1244,7 +1244,7 @@
   // Jangan biarkan HP stuck "Loading..." selamanya
   const timeout = setTimeout(() => {
     controller.abort();
-  }, 15000);
+  }, 30000);
 
   try {
 
@@ -1313,7 +1313,7 @@
     if (error.name === "AbortError") {
 
       throw new Error(
-        "Request IKOTV timeout 15 detik"
+        "Request timeout 30 detik"
       );
 
     }
@@ -2525,7 +2525,7 @@
 
       schedule.innerHTML = `
         <div class="iko-loading">
-          Loading IKOTV schedule...
+          Loading schedule...
         </div>
       `;
 
@@ -2550,7 +2550,7 @@ renderSchedule();
 
   schedule.innerHTML = `
     <div class="iko-error">
-      Gagal memuat jadwal IKOTV.
+      Gagal memuat jadwal.
       <br>
       <small>
         ${escapeHTML(
