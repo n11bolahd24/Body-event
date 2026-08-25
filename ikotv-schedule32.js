@@ -1662,15 +1662,7 @@ async function playIKOTVStream(url) {
     return;
   }
 
-  const streamURL = safeURL(url);
-
-  if (!streamURL) {
-    console.error(
-      "[IKOTV] URL stream tidak valid:",
-      url
-    );
-    return;
-  }
+  console.log("[IKOTV] RAW STREAM URL:", url);
 
   /* ==========================================
      HAPUS PLAYER IKOTV SEBELUMNYA
@@ -1715,7 +1707,7 @@ async function playIKOTVStream(url) {
     document.getElementById("ikotvVideo");
 
   /* ==========================================
-     LOAD SHAKA
+     CEK SHAKA
   ========================================== */
 
   if (
@@ -1725,22 +1717,6 @@ async function playIKOTVStream(url) {
     console.error(
       "[IKOTV] Shaka Player belum tersedia"
     );
-
-    tv.innerHTML = `
-      <div style="
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        width:100%;
-        height:100%;
-        background:#000;
-        color:#aaa;
-        font-family:Arial;
-        font-size:13px;
-      ">
-        Shaka Player belum dimuat.
-      </div>
-    `;
 
     return;
   }
@@ -1759,10 +1735,116 @@ async function playIKOTVStream(url) {
 
     }
 
+    /* ==========================================
+       PARSE URL
+    ========================================== */
+
+    let streamURL = safeURL(url);
+
+    let keyId = null;
+    let key = null;
+
+    try {
+
+      const parsedURL =
+        new URL(url, window.location.href);
+
+      const mpd =
+        parsedURL.searchParams.get("mpd");
+
+      const parsedKeyId =
+        parsedURL.searchParams.get("keyId");
+
+      const parsedKey =
+        parsedURL.searchParams.get("key");
+
+      /*
+       * Kalau URL mengandung ?mpd=
+       * berarti ini DASH + ClearKey
+       */
+
+      if (mpd) {
+
+        streamURL = decodeURIComponent(mpd);
+
+        keyId =
+          parsedKeyId;
+
+        key =
+          parsedKey;
+
+        console.log(
+          "[IKOTV] DASH MPD:",
+          streamURL
+        );
+
+        console.log(
+          "[IKOTV] ClearKey ID:",
+          keyId
+        );
+
+        console.log(
+          "[IKOTV] ClearKey tersedia:",
+          !!key
+        );
+
+      }
+
+    } catch (parseError) {
+
+      console.warn(
+        "[IKOTV] Gagal parsing URL:",
+        parseError
+      );
+
+    }
+
+    if (!streamURL) {
+
+      throw new Error(
+        "URL stream tidak valid"
+      );
+
+    }
+
+    /* ==========================================
+       BUAT SHAKA
+    ========================================== */
+
     ikotvShakaPlayer =
       new shaka.Player(
         ikotvVideo
       );
+
+    /* ==========================================
+       CLEARKEY DRM
+    ========================================== */
+
+    if (keyId && key) {
+
+      console.log(
+        "[IKOTV] Menggunakan ClearKey DRM"
+      );
+
+      ikotvShakaPlayer.configure({
+
+        drm: {
+
+          clearKeys: {
+
+            [keyId]: key
+
+          }
+
+        }
+
+      });
+
+    }
+
+    /* ==========================================
+       SHAKA ERROR
+    ========================================== */
 
     ikotvShakaPlayer.addEventListener(
       "error",
@@ -1779,6 +1861,11 @@ async function playIKOTVStream(url) {
     /* ==========================================
        LOAD STREAM
     ========================================== */
+
+    console.log(
+      "[IKOTV] LOAD:",
+      streamURL
+    );
 
     await ikotvShakaPlayer.load(
       streamURL
@@ -1804,18 +1891,21 @@ async function playIKOTVStream(url) {
 
       });
 
-    /*
-     * JANGAN scrollIntoView()
-     *
-     * TV dibiarkan pada posisi/layout
-     * yang sudah ditentukan oleh website.
-     */
-
   } catch (error) {
 
     console.error(
       "[IKOTV] SHAKA LOAD ERROR:",
       error
+    );
+
+    console.error(
+      "[IKOTV] ERROR NAME:",
+      error?.name
+    );
+
+    console.error(
+      "[IKOTV] ERROR MESSAGE:",
+      error?.message
     );
 
     tv.innerHTML = `
@@ -1825,6 +1915,7 @@ async function playIKOTVStream(url) {
         justify-content:center;
         width:100%;
         height:100%;
+        min-height:250px;
         background:#000;
         color:#ff7777;
         font-family:Arial;
