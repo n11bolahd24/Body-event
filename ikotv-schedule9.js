@@ -795,24 +795,49 @@ document.head.appendChild(style);
   }
 
   async function loadLibraries() {
+
+  try {
     await loadScript(
       CONFIG.artplayer,
       () => typeof window.Artplayer !== "undefined"
     );
+  } catch (error) {
+    console.warn(
+      "[IKOTV] ArtPlayer gagal dimuat:",
+      error
+    );
+  }
 
+  try {
     await loadScript(
       CONFIG.hls,
       () => typeof window.Hls !== "undefined"
     );
+  } catch (error) {
+    console.warn(
+      "[IKOTV] HLS.js gagal dimuat:",
+      error
+    );
+  }
 
+  /*
+   * HLS Quality plugin bersifat OPTIONAL.
+   * Jangan sampai gagal plugin membuat jadwal
+   * IKOTV tidak muncul.
+   */
+  try {
     await loadScript(
       CONFIG.hlsQuality,
       () =>
         typeof window.artplayerPluginHlsQuality !== "undefined"
     );
+  } catch (error) {
+    console.warn(
+      "[IKOTV] HLS Quality plugin tidak dimuat. Diabaikan."
+    );
   }
-
-  /* =========================================================
+}
+/* =========================================================
      API
   ========================================================= */
 
@@ -1010,20 +1035,18 @@ document.head.appendChild(style);
   </button>
 `;
           } else {
-            const cd = countdown(match.time);
 
-            statusText = "UPCOMING";
+  statusText = "UPCOMING";
 
-            button = `
-              <button
-                class="iko-watch disabled"
-                disabled
-              >
-                SERVER WILL BE ACTIVE
-                30 MINUTES BEFORE KICKOFF
-              </button>
-            `;
-          }
+  button = `
+    <button
+      class="iko-watch disabled"
+      disabled
+    >
+      WAITING FOR KICKOFF
+    </button>
+  `;
+}
 
           const cd =
             status === "upcoming"
@@ -1883,47 +1906,54 @@ document.head.appendChild(style);
 
   async function init() {
 
-    try {
+  const { schedule } = ensureDOM();
 
-      injectCSS();
+  try {
 
-      ensureDOM();
+    injectCSS();
 
-      await loadLibraries();
+    /*
+     * JADWAL DIMUAT TERLEBIH DAHULU.
+     * Jadi kalau library player bermasalah,
+     * jadwal tetap tampil.
+     */
 
-      await loadSchedule();
+    await loadSchedule();
 
-      startAutoRefresh();
+    /*
+     * Library player dimuat setelah jadwal.
+     */
 
-      startCountdownTimer();
+    await loadLibraries();
 
-      console.log(
-        "[IKOTV] Initialized successfully."
-      );
+    startAutoRefresh();
 
-    } catch (error) {
+    startCountdownTimer();
 
-      console.error(
-        "[IKOTV] Initialization error:",
-        error
-      );
+    console.log(
+      "[IKOTV] Initialized successfully."
+    );
 
-      const { schedule } =
-        ensureDOM();
+  } catch (error) {
 
-      schedule.innerHTML = `
-        <div class="iko-error">
-          IKOTV gagal diinisialisasi.
-          <br>
-          <small>
-            ${escapeHTML(
-              error?.message || ""
-            )}
-          </small>
-        </div>
-      `;
-    }
+    console.error(
+      "[IKOTV] Initialization error:",
+      error
+    );
+
+    schedule.innerHTML = `
+      <div class="iko-error">
+        Gagal memuat jadwal IKOTV.
+        <br>
+        <small>
+          ${escapeHTML(
+            error?.message || ""
+          )}
+        </small>
+      </div>
+    `;
   }
+}
 
   /* =========================================================
      PUBLIC API
