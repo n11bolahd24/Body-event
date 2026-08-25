@@ -1665,7 +1665,10 @@ async function playIKOTVStream(url) {
   const streamURL = safeURL(url);
 
   if (!streamURL) {
-    console.error("[IKOTV] URL stream tidak valid:", url);
+    console.error(
+      "[IKOTV] URL stream tidak valid:",
+      url
+    );
     return;
   }
 
@@ -1688,6 +1691,10 @@ async function playIKOTVStream(url) {
     );
 
   }
+
+  /* ==========================================
+     BUAT VIDEO
+  ========================================== */
 
   tv.innerHTML = `
     <video
@@ -1725,7 +1732,7 @@ async function playIKOTVStream(url) {
         align-items:center;
         justify-content:center;
         width:100%;
-        min-height:250px;
+        height:100%;
         background:#000;
         color:#aaa;
         font-family:Arial;
@@ -1778,7 +1785,7 @@ async function playIKOTVStream(url) {
     );
 
     console.log(
-      "IKOTV SHAKA PLAYING:",
+      "[IKOTV] SHAKA PLAYING:",
       streamURL
     );
 
@@ -1797,14 +1804,12 @@ async function playIKOTVStream(url) {
 
       });
 
-    /* ==========================================
-       SCROLL KE TV
-    ========================================== */
-
-    tv.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
+    /*
+     * JANGAN scrollIntoView()
+     *
+     * TV dibiarkan pada posisi/layout
+     * yang sudah ditentukan oleh website.
+     */
 
   } catch (error) {
 
@@ -1819,7 +1824,7 @@ async function playIKOTVStream(url) {
         align-items:center;
         justify-content:center;
         width:100%;
-        min-height:250px;
+        height:100%;
         background:#000;
         color:#ff7777;
         font-family:Arial;
