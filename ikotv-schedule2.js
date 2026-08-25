@@ -14,7 +14,7 @@
 
   const CONFIG = {
     api: {
-      matches: "https://ikotv.cc/api/matches",
+      matches: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/",
       matchInfo: "https://ikotv.cc/api/match-info",
       streamUrl: "https://ikotv.cc/api/stream-url"
     },
