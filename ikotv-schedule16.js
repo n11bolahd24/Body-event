@@ -1827,31 +1827,62 @@
   ========================================================= */
 
   async function openIKOMatch(matchId) {
-    const id = String(matchId || "");
 
-    if (!id) return;
+  const id = String(matchId || "");
 
-    const match =
-      matches.find(
-        item =>
-          String(item.id) === id
-      );
+  if (!id) return;
 
-    if (!match) {
-      console.warn(
-        "[IKOTV] Match not found:",
-        id
-      );
-      return;
-    }
+  const match =
+    matches.find(
+      item =>
+        String(item.id) === id
+    );
 
-    currentMatchId = id;
+  if (!match) {
 
-    const { player } = ensureDOM();
+    console.warn(
+      "[IKOTV] Match not found:",
+      id
+    );
 
-    player.style.display = "block";
+    return;
+  }
 
-    player.innerHTML = `
+  currentMatchId = id;
+
+  /*
+   * GUNAKAN TV UTAMA
+   */
+  const tv =
+    document.getElementById("tv");
+
+  if (!tv) {
+
+    console.error(
+      "[IKOTV] #tv tidak ditemukan"
+    );
+
+    return;
+  }
+
+  /*
+   * Bersihkan player lama
+   */
+  if (art) {
+
+    try {
+      art.destroy(false);
+    } catch (_) {}
+
+    art = null;
+  }
+
+  /*
+   * Loading di TV
+   */
+  tv.innerHTML = `
+    <div class="iko-tv-wrapper">
+
       <div class="iko-player-title">
 
         <span>
@@ -1875,11 +1906,21 @@
       >
         Loading server...
       </div>
-    `;
 
-    $("#ikoClosePlayer").onclick = () => {
+    </div>
+  `;
+
+  const closeButton =
+    document.getElementById(
+      "ikoClosePlayer"
+    );
+
+  if (closeButton) {
+
+    closeButton.onclick = () => {
 
       if (art) {
+
         try {
           art.destroy(false);
         } catch (_) {}
@@ -1887,27 +1928,50 @@
         art = null;
       }
 
-      player.style.display = "none";
       currentMatchId = null;
       currentVideos = [];
+
+      tv.innerHTML = "";
     };
 
-    player.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
+  }
 
-    try {
+  /*
+   * Scroll ke TV utama
+   */
+  tv.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
 
-      const result =
-        await fetchStreamURL(id);
+  try {
 
-      const videos =
-        extractVideos(result);
+    console.log(
+      "[IKOTV] Fetch stream:",
+      id
+    );
 
-      if (!videos.length) {
+    const result =
+      await fetchStreamURL(id);
 
-        player.innerHTML = `
+    console.log(
+      "[IKOTV] Stream response:",
+      result
+    );
+
+    const videos =
+      extractVideos(result);
+
+    console.log(
+      "[IKOTV] Videos:",
+      videos
+    );
+
+    if (!videos.length) {
+
+      tv.innerHTML = `
+        <div class="iko-tv-wrapper">
+
           <div class="iko-player-title">
 
             <span>
@@ -1928,30 +1992,50 @@
           <div class="iko-error">
             Server stream tidak tersedia.
           </div>
-        `;
 
-        $("#ikoClosePlayer").onclick = () => {
-          player.style.display = "none";
+        </div>
+      `;
+
+      const close =
+        document.getElementById(
+          "ikoClosePlayer"
+        );
+
+      if (close) {
+
+        close.onclick = () => {
+
+          tv.innerHTML = "";
+
           currentMatchId = null;
           currentVideos = [];
+
         };
 
-        return;
       }
 
-      showPlayer(
-        match,
-        videos
-      );
+      return;
+    }
 
-    } catch (error) {
+    /*
+     * Tampilkan player IKOTV
+     * di #tv
+     */
+    showPlayer(
+      match,
+      videos
+    );
 
-      console.error(
-        "[IKOTV] open match error:",
-        error
-      );
+  } catch (error) {
 
-      player.innerHTML = `
+    console.error(
+      "[IKOTV] open match error:",
+      error
+    );
+
+    tv.innerHTML = `
+      <div class="iko-tv-wrapper">
+
         <div class="iko-player-title">
 
           <span>
@@ -1970,18 +2054,42 @@
         </div>
 
         <div class="iko-error">
-          Gagal mengambil server IKOTV.
-        </div>
-      `;
 
-      $("#ikoClosePlayer").onclick = () => {
-        player.style.display = "none";
+          Gagal mengambil server IKOTV.
+
+          <br>
+
+          <small>
+            ${escapeHTML(
+              error?.message || ""
+            )}
+          </small>
+
+        </div>
+
+      </div>
+    `;
+
+    const close =
+      document.getElementById(
+        "ikoClosePlayer"
+      );
+
+    if (close) {
+
+      close.onclick = () => {
+
+        tv.innerHTML = "";
+
         currentMatchId = null;
         currentVideos = [];
-      };
-    }
-  }
 
+      };
+
+    }
+
+  }
+}
   /* =========================================================
      STREAM RESPONSE PARSER
   ========================================================= */
