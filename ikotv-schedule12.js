@@ -1,7 +1,6 @@
 /*!
  * IKOTV Auto Schedule + ArtPlayer
  * N11BOLAHD
- * Separate module from ColaTV
  *
  * Requires:
  * - https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.min.js
@@ -2209,24 +2208,43 @@
 
     } catch (error) {
 
-      console.error(
-        "[IKOTV] Schedule error:",
-        error
-      );
+  console.error(
+    "[IKOTV] Schedule error:",
+    error
+  );
 
-      schedule.innerHTML = `
-        <div class="iko-error">
-          Gagal memuat jadwal IKOTV.
-          <br>
-          <small>
-            ${escapeHTML(
-              error?.message || ""
-            )}
-          </small>
-        </div>
-      `;
+  schedule.innerHTML = `
+    <div class="iko-error">
+      Gagal memuat jadwal IKOTV.
+      <br>
+      <small>
+        ${escapeHTML(
+          error?.message || "Unknown error"
+        )}
+      </small>
 
-    } finally {
+      <br><br>
+
+      <button
+        type="button"
+        onclick="window.IKOTV && window.IKOTV.reload()"
+        style="
+          padding:8px 14px;
+          border:0;
+          border-radius:6px;
+          background:#00d979;
+          color:#001b0f;
+          font-weight:800;
+          cursor:pointer;
+        "
+      >
+        RETRY
+      </button>
+    </div>
+  `;
+
+}
+    finally {
 
       loadingSchedule = false;
 
