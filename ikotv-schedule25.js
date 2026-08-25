@@ -1321,54 +1321,57 @@
   console.log("[IKOTV] REQUEST:", url);
   console.log("[IKOTV] BODY:", body);
 
-  const response = await fetch(url, {
-    method: "POST",
+  const controller = new AbortController();
 
-    headers: {
-      "Content-Type": "application/json",
-      "Accept": "application/json"
-    },
-
-    body: JSON.stringify(body),
-
-    mode: "cors"
-  });
-
-  console.log(
-    "[IKOTV] STATUS:",
-    response.status
-  );
-
-  const text =
-    await response.text();
-
-  console.log(
-    "[IKOTV] RAW:",
-    text
-  );
-
-  if (!response.ok) {
-    throw new Error(
-      "HTTP " +
-      response.status +
-      " - " +
-      text
-    );
-  }
+  // Jangan biarkan HP stuck "Loading..." selamanya
+  const timeout = setTimeout(() => {
+    controller.abort();
+  }, 30000);
 
   try {
 
-    return JSON.parse(text);
+    const response = await fetch(
+      url + (url.includes("?") ? "&" : "?") + "_=" + Date.now(),
+      {
+        method: "POST",
 
-  } catch (error) {
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
 
-    throw new Error(
-      "Response bukan JSON: " +
-      text.substring(0, 500)
+        body: JSON.stringify(body),
+
+        mode: "cors",
+
+        cache: "no-store",
+
+        signal: controller.signal
+      }
     );
 
-  }
-}
+    console.log(
+      "[IKOTV] STATUS:",
+      response.status
+    );
+
+    const text = await response.text();
+
+    console.log(
+      "[IKOTV] RESPONSE:",
+      text
+    );
+
+    if (!response.ok) {
+
+      throw new Error(
+        "HTTP " +
+        response.status +
+        " - " +
+        text.substring(0, 200)
+      );
+
+    }
 
     if (!text) {
       throw new Error("Response API kosong");
@@ -2373,21 +2376,18 @@ async function openIKOMatch(matchId) {
   try {
 
     const result =
-  await fetchStreamURL(id);
+      await fetchStreamURL(id);
 
-console.log("================================");
-console.log("[IKOTV] STREAM RAW RESPONSE:");
-console.log(result);
-console.log("================================");
+    console.log(
+      "[IKOTV] Stream result:",
+      result
+    );
 
-const videos =
-  extractVideos(result);
+    const videos =
+      extractVideos(result);
 
-console.log("[IKOTV] EXTRACTED VIDEOS:");
-console.log(videos);
+    if (!videos.length) {
 
-if (!videos.length) {
-  
       panel.innerHTML = `
         <div class="iko-server-error">
           Server stream tidak tersedia.
@@ -2477,29 +2477,10 @@ if (!videos.length) {
 
   } catch (error) {
 
-  console.error(
-    "================================"
-  );
-
-  console.error(
-    "[IKOTV] OPEN MATCH ERROR:"
-  );
-
-  console.error(error);
-
-  console.error(
-    "MESSAGE:",
-    error?.message
-  );
-
-  console.error(
-    "STACK:",
-    error?.stack
-  );
-
-  console.error(
-    "================================"
-  );
+    console.error(
+      "[IKOTV] Server error:",
+      error
+    );
 
     panel.innerHTML = `
       <div class="iko-server-error">
@@ -2843,55 +2824,51 @@ renderSchedule();
      INIT
   ========================================================= */
 
-async function init() {
+  async function init() {
 
-  try {
+    try {
 
-    console.log("[IKOTV TEST] INIT MULAI");
+      injectCSS();
 
-    injectCSS();
-
-    console.log("[IKOTV TEST] injectCSS OK");
-
-    ensureDOM();
-
-    console.log("[IKOTV TEST] ensureDOM OK");
-
-    await loadSchedule();
-
-    console.log("[IKOTV TEST] loadSchedule SELESAI");
-
-    startAutoRefresh();
-
-    startCountdownTimer();
-
-    console.log(
-      "[IKOTV] Initialized successfully."
-    );
-
-  } catch (error) {
-
-    console.error(
-      "[IKOTV] Initialization error:",
-      error
-    );
-
-    const { schedule } =
       ensureDOM();
 
-    schedule.innerHTML = `
-      <div class="iko-error">
-        IKOTV gagal diinisialisasi.
-        <br>
-        <small>
-          ${escapeHTML(
-            error?.message || ""
-          )}
-        </small>
-      </div>
-    `;
+      await loadLibraries();
+
+      await loadSchedule();
+
+      startAutoRefresh();
+
+      startCountdownTimer();
+
+      console.log(
+        "[IKOTV] Initialized successfully."
+      );
+
+    } catch (error) {
+
+      console.error(
+        "[IKOTV] Initialization error:",
+        error
+      );
+
+      const { schedule } =
+        ensureDOM();
+
+      schedule.innerHTML = `
+        <div class="iko-error">
+          IKOTV gagal diinisialisasi.
+          <br>
+          <small>
+            ${escapeHTML(
+              error?.message || ""
+            )}
+          </small>
+        </div>
+      `;
+    }
   }
-}  /* =========================================================
+
+  /* =========================================================
      PUBLIC API
   ========================================================= */
 
