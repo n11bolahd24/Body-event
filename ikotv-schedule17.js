@@ -270,32 +270,91 @@
 
     style.textContent = `
       #ikotvSchedule,
-#ikotvPlayer {
+/* =========================================================
+   IKOTV PLAYER — USE MAIN #tv
+========================================================= */
+
+#tv .iko-tv-wrapper {
   width: 100%;
-  max-width: 1000px;
-  margin: 20px auto;
-  font-family: Arial, Helvetica, sans-serif;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+
+  background: #050505;
+  overflow: hidden;
+}
+
+/* PLAYER TITLE */
+
+#tv .iko-player-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  padding: 11px 13px;
+
+  background: #101010;
+
+  border-bottom: 1px solid rgba(255,255,255,.06);
+
+  color: #fff;
+
+  font-size: 12px;
+  font-weight: 800;
+
   box-sizing: border-box;
 }
 
-/* =========================================================
-   PLAYER
-========================================================= */
+/* ARTPLAYER */
 
-#ikotvPlayer {
-  display: none;
-  background: #050505;
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 14px;
+#tv #ikotvArt {
+  position: relative;
+
+  width: 100%;
+
+  aspect-ratio: 16 / 9;
+
+  min-height: 0;
+
+  background: #000;
+
   overflow: hidden;
-  box-shadow: 0 10px 35px rgba(0,0,0,.35);
 }
 
-#ikotvArt {
+/* SERVER */
+
+#tv .iko-servers {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 6px;
+
   width: 100%;
-  height: min(56.25vw, 562px);
-  min-height: 220px;
-  background: #000;
+
+  padding: 9px 10px;
+
+  background: #101010;
+
+  box-sizing: border-box;
+}
+
+/* NOTE */
+
+#tv .iko-note {
+  width: 100%;
+
+  padding: 7px 11px;
+
+  background: #0c0c0c;
+
+  color: #555;
+
+  font-size: 9px;
+
+  box-sizing: border-box;
 }
 
 /* =========================================================
