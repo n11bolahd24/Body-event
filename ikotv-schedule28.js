@@ -2302,56 +2302,44 @@ async function playIKOTVStream(url) {
 
 async function openIKOMatch(matchId) {
 
-  const id =
-    String(matchId || "");
+  const id = String(matchId || "");
 
   if (!id) return;
 
-  const match =
-    matches.find(
-      item =>
-        String(item.id) === id
-    );
+  const match = matches.find(
+    item => String(item.id) === id
+  );
 
   if (!match) {
-
     console.warn(
       "[IKOTV] Match tidak ditemukan:",
       id
     );
-
     return;
   }
 
-  const card =
-    document.querySelector(
-      `[data-ikotv-match="${CSS.escape(id)}"]`
-    );
+  const card = document.querySelector(
+    `[data-ikotv-match="${CSS.escape(id)}"]`
+  );
 
   if (!card) {
-
     console.warn(
       "[IKOTV] Card match tidak ditemukan:",
       id
     );
-
     return;
   }
 
   /* ==========================================
-     JIKA SERVER SUDAH TERBUKA
-     → TUTUP
+     JIKA SERVER SUDAH TERBUKA → TUTUP
   ========================================== */
 
-  const existing =
-    card.querySelector(
-      ".iko-server-panel"
-    );
+  const existing = card.querySelector(
+    ".iko-server-panel"
+  );
 
   if (existing) {
-
     existing.remove();
-
     return;
   }
 
@@ -2359,11 +2347,9 @@ async function openIKOMatch(matchId) {
      LOADING SERVER
   ========================================== */
 
-  const panel =
-    document.createElement("div");
+  const panel = document.createElement("div");
 
-  panel.className =
-    "iko-server-panel";
+  panel.className = "iko-server-panel";
 
   panel.innerHTML = `
     <div class="iko-server-loading">
@@ -2373,18 +2359,38 @@ async function openIKOMatch(matchId) {
 
   card.appendChild(panel);
 
+  console.log(
+    "[IKOTV] Mengambil server untuk match:",
+    id
+  );
+
   try {
 
-    const result =
-      await fetchStreamURL(id);
+    /* ==========================================
+       REQUEST STREAM URL
+    ========================================== */
+
+    const result = await fetchStreamURL(id);
 
     console.log(
-      "[IKOTV] Stream result:",
+      "[IKOTV] STREAM-URL RESULT:",
       result
     );
 
-    const videos =
-      extractVideos(result);
+    /* ==========================================
+       PARSE SERVER
+    ========================================== */
+
+    const videos = extractVideos(result);
+
+    console.log(
+      "[IKOTV] EXTRACTED VIDEOS:",
+      videos
+    );
+
+    /* ==========================================
+       SERVER TIDAK DITEMUKAN
+    ========================================== */
 
     if (!videos.length) {
 
@@ -2394,11 +2400,16 @@ async function openIKOMatch(matchId) {
         </div>
       `;
 
+      console.warn(
+        "[IKOTV] Tidak ada server ditemukan.",
+        result
+      );
+
       return;
     }
 
     /* ==========================================
-       SERVER BUTTON
+       RENDER SERVER
     ========================================== */
 
     panel.innerHTML = `
@@ -2407,34 +2418,36 @@ async function openIKOMatch(matchId) {
       </div>
 
       <div class="iko-server-list">
-        ${videos.map(
-          (video, index) => {
 
-            const label =
-              video.display_name ||
-              video.name ||
-              video.type_name ||
-              `LIVE ${index + 1}`;
+        ${videos.map((video, index) => {
 
-            return `
-              <button
-                type="button"
-                class="iko-live-server"
-                data-iko-stream="${index}"
-              >
-                ${escapeHTML(label)}
-              </button>
-            `;
+          const label =
+            video.display_name ||
+            video.name ||
+            video.type_name ||
+            `LIVE ${index + 1}`;
 
-          }
-        ).join("")}
+          return `
+            <button
+              type="button"
+              class="iko-live-server"
+              data-iko-stream="${index}"
+            >
+              ${escapeHTML(label)}
+            </button>
+          `;
+
+        }).join("")}
+
       </div>
     `;
 
+    /* ==========================================
+       SERVER BUTTON EVENT
+    ========================================== */
+
     panel
-      .querySelectorAll(
-        "[data-iko-stream]"
-      )
+      .querySelectorAll("[data-iko-stream]")
       .forEach(button => {
 
         button.addEventListener(
@@ -2449,21 +2462,27 @@ async function openIKOMatch(matchId) {
             const video =
               videos[index];
 
-            if (!video) return;
+            if (!video) {
+              console.warn(
+                "[IKOTV] Video server tidak ditemukan:",
+                index
+              );
+              return;
+            }
 
             panel
               .querySelectorAll(
                 ".iko-live-server"
               )
-              .forEach(
-                btn =>
-                  btn.classList.remove(
-                    "active"
-                  )
-              );
+              .forEach(btn => {
+                btn.classList.remove("active");
+              });
 
-            button.classList.add(
-              "active"
+            button.classList.add("active");
+
+            console.log(
+              "[IKOTV] Memutar server:",
+              video
             );
 
             playIKOTVStream(
@@ -2477,29 +2496,47 @@ async function openIKOMatch(matchId) {
 
   } catch (error) {
 
-    console.error("[IKOTV] SERVER ERROR:", error);
-    console.error("[IKOTV] ERROR NAME:", error?.name);
-    console.error("[IKOTV] ERROR MESSAGE:", error?.message);
-    console.error("[IKOTV] MATCH ID:", id);
+    /*
+     * JANGAN RENDER ULANG JADWAL DI SINI.
+     * Hanya ubah isi panel server.
+     */
 
-    panel.innerHTML = `
-      <div class="iko-server-error">
-        Gagal mengambil server IKOTV.
-        <br><br>
-        <small style="
-          display:block;
-          color:#ff9999;
-          word-break:break-word;
-          line-height:1.5;
-        ">
-          ${escapeHTML(
-            error?.message || "Unknown error"
-          )}
-        </small>
-      </div>
-    `;
+    console.error(
+      "[IKOTV] SERVER REQUEST ERROR:",
+      error
+    );
 
-} 
+    console.error(
+      "[IKOTV] ERROR NAME:",
+      error?.name
+    );
+
+    console.error(
+      "[IKOTV] ERROR MESSAGE:",
+      error?.message
+    );
+
+    console.error(
+      "[IKOTV] MATCH ID:",
+      id
+    );
+
+    /*
+     * Pastikan panel masih ada.
+     */
+    if (panel && panel.isConnected) {
+
+      panel.innerHTML = `
+        <div class="iko-server-error">
+          Gagal mengambil server IKOTV.
+        </div>
+      `;
+
+    }
+
+  }
+
+}
   /* =========================================================
      STREAM RESPONSE PARSER
   ========================================================= */
