@@ -270,6 +270,87 @@
 
     style.textContent = `
       #ikotvSchedule,
+
+/* =========================================================
+   IKOTV SERVER PANEL
+========================================================= */
+
+.iko-server-panel {
+  width: 100%;
+  margin-top: 9px;
+  padding: 8px;
+
+  background: #0b0b0b;
+
+  border: 1px solid rgba(0,217,121,.12);
+  border-radius: 7px;
+
+  box-sizing: border-box;
+}
+
+.iko-server-title {
+  margin-bottom: 7px;
+
+  color: #777;
+
+  font-size: 8px;
+  font-weight: 900;
+
+  letter-spacing: .7px;
+}
+
+.iko-server-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.iko-live-server {
+  padding: 7px 10px;
+
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 5px;
+
+  background: #202020;
+  color: #aaa;
+
+  cursor: pointer;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  transition:
+    background .15s ease,
+    color .15s ease,
+    border-color .15s ease;
+}
+
+.iko-live-server:hover {
+  background: #2c2c2c;
+  color: #fff;
+}
+
+.iko-live-server.active {
+  background: #00d979;
+  border-color: #00d979;
+
+  color: #001b0f;
+}
+
+.iko-server-loading,
+.iko-server-error {
+  padding: 8px;
+
+  color: #777;
+
+  font-size: 9px;
+  text-align: center;
+}
+
+.iko-server-error {
+  color: #ff7777;
+}
+      
 /* =========================================================
    IKOTV PLAYER — USE MAIN #tv
 ========================================================= */
@@ -1525,7 +1606,201 @@
 
     return result;
   }
-    /* =========================================================
+
+  /* =========================================================
+   IKOTV SHAKA PLAYER → #tv
+========================================================= */
+
+let ikotvShakaPlayer = null;
+let ikotvVideo = null;
+
+async function playIKOTVStream(url) {
+
+  if (!url) {
+    console.warn("[IKOTV] URL kosong");
+    return;
+  }
+
+  const tv = document.getElementById("tv");
+
+  if (!tv) {
+    console.error("[IKOTV] #tv tidak ditemukan");
+    return;
+  }
+
+  const streamURL = safeURL(url);
+
+  if (!streamURL) {
+    console.error("[IKOTV] URL stream tidak valid:", url);
+    return;
+  }
+
+  /* ==========================================
+     HAPUS PLAYER IKOTV SEBELUMNYA
+  ========================================== */
+
+  try {
+
+    if (ikotvShakaPlayer) {
+      await ikotvShakaPlayer.destroy();
+      ikotvShakaPlayer = null;
+    }
+
+  } catch (error) {
+
+    console.warn(
+      "[IKOTV] Gagal destroy Shaka:",
+      error
+    );
+
+  }
+
+  tv.innerHTML = `
+    <video
+      id="ikotvVideo"
+      controls
+      autoplay
+      playsinline
+      style="
+        width:100%;
+        height:100%;
+        display:block;
+        background:#000;
+      "
+    ></video>
+  `;
+
+  ikotvVideo =
+    document.getElementById("ikotvVideo");
+
+  /* ==========================================
+     LOAD SHAKA
+  ========================================== */
+
+  if (
+    typeof window.shaka === "undefined"
+  ) {
+
+    console.error(
+      "[IKOTV] Shaka Player belum tersedia"
+    );
+
+    tv.innerHTML = `
+      <div style="
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        width:100%;
+        min-height:250px;
+        background:#000;
+        color:#aaa;
+        font-family:Arial;
+        font-size:13px;
+      ">
+        Shaka Player belum dimuat.
+      </div>
+    `;
+
+    return;
+  }
+
+  try {
+
+    shaka.polyfill.installAll();
+
+    if (
+      !shaka.Player.isBrowserSupported()
+    ) {
+
+      throw new Error(
+        "Browser tidak mendukung Shaka Player"
+      );
+
+    }
+
+    ikotvShakaPlayer =
+      new shaka.Player(
+        ikotvVideo
+      );
+
+    ikotvShakaPlayer.addEventListener(
+      "error",
+      event => {
+
+        console.error(
+          "[IKOTV] SHAKA ERROR:",
+          event.detail
+        );
+
+      }
+    );
+
+    /* ==========================================
+       LOAD STREAM
+    ========================================== */
+
+    await ikotvShakaPlayer.load(
+      streamURL
+    );
+
+    console.log(
+      "IKOTV SHAKA PLAYING:",
+      streamURL
+    );
+
+    /* ==========================================
+       AUTOPLAY
+    ========================================== */
+
+    ikotvVideo
+      .play()
+      .catch(error => {
+
+        console.warn(
+          "[IKOTV] Autoplay diblokir:",
+          error
+        );
+
+      });
+
+    /* ==========================================
+       SCROLL KE TV
+    ========================================== */
+
+    tv.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+  } catch (error) {
+
+    console.error(
+      "[IKOTV] SHAKA LOAD ERROR:",
+      error
+    );
+
+    tv.innerHTML = `
+      <div style="
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        width:100%;
+        min-height:250px;
+        background:#000;
+        color:#ff7777;
+        font-family:Arial;
+        font-size:13px;
+        text-align:center;
+        padding:20px;
+        box-sizing:border-box;
+      ">
+        Gagal memuat stream IKOTV.
+      </div>
+    `;
+
+  }
+}
+  /* =========================================================
      SCHEDULE RENDER
   ========================================================= */
 
@@ -1653,7 +1928,10 @@
               : "";
 
           html += `
-            <div class="iko-card ${liveClass}">
+            <div
+  class="iko-card ${liveClass}"
+  data-ikotv-match="${escapeHTML(match.id)}"
+>
 
               <div class="iko-comp">
                 ${compLogo}
@@ -2016,13 +2294,15 @@
     }
   }
 
-  /* =========================================================
-     MATCH OPEN
-  ========================================================= */
+/* =========================================================
+   OPEN IKOTV MATCH
+   SERVER LIST DI BAWAH MATCH
+========================================================= */
 
-  async function openIKOMatch(matchId) {
+async function openIKOMatch(matchId) {
 
-  const id = String(matchId || "");
+  const id =
+    String(matchId || "");
 
   if (!id) return;
 
@@ -2035,252 +2315,177 @@
   if (!match) {
 
     console.warn(
-      "[IKOTV] Match not found:",
+      "[IKOTV] Match tidak ditemukan:",
       id
     );
 
     return;
   }
 
-  currentMatchId = id;
+  const card =
+    document.querySelector(
+      `[data-ikotv-match="${CSS.escape(id)}"]`
+    );
 
-  /*
-   * GUNAKAN TV UTAMA
-   */
-  const tv =
-    document.getElementById("tv");
+  if (!card) {
 
-  if (!tv) {
-
-    console.error(
-      "[IKOTV] #tv tidak ditemukan"
+    console.warn(
+      "[IKOTV] Card match tidak ditemukan:",
+      id
     );
 
     return;
   }
 
-  /*
-   * Bersihkan player lama
-   */
-  if (art) {
+  /* ==========================================
+     JIKA SERVER SUDAH TERBUKA
+     → TUTUP
+  ========================================== */
 
-    try {
-      art.destroy(false);
-    } catch (_) {}
+  const existing =
+    card.querySelector(
+      ".iko-server-panel"
+    );
 
-    art = null;
+  if (existing) {
+
+    existing.remove();
+
+    return;
   }
 
-  /*
-   * Loading di TV
-   */
-  tv.innerHTML = `
-    <div class="iko-tv-wrapper">
+  /* ==========================================
+     LOADING SERVER
+  ========================================== */
 
-      <div class="iko-player-title">
+  const panel =
+    document.createElement("div");
 
-        <span>
-          ${escapeHTML(
-            `${match.home} vs ${match.away}`
-          )}
-        </span>
+  panel.className =
+    "iko-server-panel";
 
-        <button
-          class="iko-close"
-          id="ikoClosePlayer"
-        >
-          CLOSE
-        </button>
-
-      </div>
-
-      <div
-        class="iko-loading"
-        id="ikoLoading"
-      >
-        Loading server...
-      </div>
-
+  panel.innerHTML = `
+    <div class="iko-server-loading">
+      Loading server...
     </div>
   `;
 
-  const closeButton =
-    document.getElementById(
-      "ikoClosePlayer"
-    );
-
-  if (closeButton) {
-
-    closeButton.onclick = () => {
-
-      if (art) {
-
-        try {
-          art.destroy(false);
-        } catch (_) {}
-
-        art = null;
-      }
-
-      currentMatchId = null;
-      currentVideos = [];
-
-      tv.innerHTML = "";
-    };
-
-  }
-
-  /*
-   * Scroll ke TV utama
-   */
-  tv.scrollIntoView({
-    behavior: "smooth",
-    block: "start"
-  });
+  card.appendChild(panel);
 
   try {
-
-    console.log(
-      "[IKOTV] Fetch stream:",
-      id
-    );
 
     const result =
       await fetchStreamURL(id);
 
     console.log(
-      "[IKOTV] Stream response:",
+      "[IKOTV] Stream result:",
       result
     );
 
     const videos =
       extractVideos(result);
 
-    console.log(
-      "[IKOTV] Videos:",
-      videos
-    );
-
     if (!videos.length) {
 
-      tv.innerHTML = `
-        <div class="iko-tv-wrapper">
-
-          <div class="iko-player-title">
-
-            <span>
-              ${escapeHTML(
-                `${match.home} vs ${match.away}`
-              )}
-            </span>
-
-            <button
-              class="iko-close"
-              id="ikoClosePlayer"
-            >
-              CLOSE
-            </button>
-
-          </div>
-
-          <div class="iko-error">
-            Server stream tidak tersedia.
-          </div>
-
+      panel.innerHTML = `
+        <div class="iko-server-error">
+          Server stream tidak tersedia.
         </div>
       `;
-
-      const close =
-        document.getElementById(
-          "ikoClosePlayer"
-        );
-
-      if (close) {
-
-        close.onclick = () => {
-
-          tv.innerHTML = "";
-
-          currentMatchId = null;
-          currentVideos = [];
-
-        };
-
-      }
 
       return;
     }
 
-    /*
-     * Tampilkan player IKOTV
-     * di #tv
-     */
-    showPlayer(
-      match,
-      videos
-    );
+    /* ==========================================
+       SERVER BUTTON
+    ========================================== */
+
+    panel.innerHTML = `
+      <div class="iko-server-title">
+        LIVE SERVER
+      </div>
+
+      <div class="iko-server-list">
+        ${videos.map(
+          (video, index) => {
+
+            const label =
+              video.display_name ||
+              video.name ||
+              video.type_name ||
+              `LIVE ${index + 1}`;
+
+            return `
+              <button
+                type="button"
+                class="iko-live-server"
+                data-iko-stream="${index}"
+              >
+                ${escapeHTML(label)}
+              </button>
+            `;
+
+          }
+        ).join("")}
+      </div>
+    `;
+
+    panel
+      .querySelectorAll(
+        "[data-iko-stream]"
+      )
+      .forEach(button => {
+
+        button.addEventListener(
+          "click",
+          () => {
+
+            const index =
+              Number(
+                button.dataset.ikoStream
+              );
+
+            const video =
+              videos[index];
+
+            if (!video) return;
+
+            panel
+              .querySelectorAll(
+                ".iko-live-server"
+              )
+              .forEach(
+                btn =>
+                  btn.classList.remove(
+                    "active"
+                  )
+              );
+
+            button.classList.add(
+              "active"
+            );
+
+            playIKOTVStream(
+              video.url
+            );
+
+          }
+        );
+
+      });
 
   } catch (error) {
 
     console.error(
-      "[IKOTV] open match error:",
+      "[IKOTV] Server error:",
       error
     );
 
-    tv.innerHTML = `
-      <div class="iko-tv-wrapper">
-
-        <div class="iko-player-title">
-
-          <span>
-            ${escapeHTML(
-              `${match.home} vs ${match.away}`
-            )}
-          </span>
-
-          <button
-            class="iko-close"
-            id="ikoClosePlayer"
-          >
-            CLOSE
-          </button>
-
-        </div>
-
-        <div class="iko-error">
-
-          Gagal mengambil server IKOTV.
-
-          <br>
-
-          <small>
-            ${escapeHTML(
-              error?.message || ""
-            )}
-          </small>
-
-        </div>
-
+    panel.innerHTML = `
+      <div class="iko-server-error">
+        Gagal mengambil server IKOTV.
       </div>
     `;
-
-    const close =
-      document.getElementById(
-        "ikoClosePlayer"
-      );
-
-    if (close) {
-
-      close.onclick = () => {
-
-        tv.innerHTML = "";
-
-        currentMatchId = null;
-        currentVideos = [];
-
-      };
-
-    }
 
   }
 }
