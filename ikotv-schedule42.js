@@ -306,215 +306,6 @@
       #ikotvSchedule,
 
 /* =========================================================
-   IKOTV MPD / AUTO HD CUSTOM LIVE CONTROL
-========================================================= */
-
-.iko-mpd-player {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  min-height: 190px;
-  background: #000;
-  overflow: hidden;
-}
-
-.iko-mpd-player video {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: contain;
-  background: #000;
-}
-
-.iko-mpd-overlay {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 32px 10px 8px;
-  background: linear-gradient(
-    transparent,
-    rgba(0,0,0,.88)
-  );
-  z-index: 20;
-  box-sizing: border-box;
-}
-
-.iko-mpd-live {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 5px;
-
-  color: #fff;
-  font-size: 9px;
-  font-weight: 900;
-}
-
-.iko-mpd-live-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #ff3030;
-
-  box-shadow:
-    0 0 8px rgba(255,48,48,.8);
-
-  animation: ikoLivePulse 1.2s infinite;
-}
-
-@keyframes ikoLivePulse {
-  0%,100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: .35;
-  }
-}
-
-.iko-mpd-progress {
-  position: relative;
-  width: 100%;
-  height: 4px;
-
-  margin-bottom: 7px;
-
-  background: rgba(255,255,255,.18);
-  border-radius: 10px;
-
-  overflow: hidden;
-}
-
-.iko-mpd-progress-buffer {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-
-  width: 0%;
-
-  background: rgba(255,255,255,.32);
-}
-
-.iko-mpd-progress-live {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-
-  width: 100%;
-
-  background: #00d979;
-}
-
-.iko-mpd-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  color: #fff;
-}
-
-.iko-mpd-btn {
-  border: 0;
-  background: transparent;
-  color: #fff;
-
-  padding: 3px 4px;
-
-  cursor: pointer;
-
-  font-size: 14px;
-  line-height: 1;
-}
-
-.iko-mpd-btn:hover {
-  color: #00d979;
-}
-
-.iko-mpd-time {
-  flex: 1;
-
-  color: #ddd;
-
-  font-family: monospace;
-  font-size: 10px;
-  font-weight: 700;
-
-  white-space: nowrap;
-}
-
-.iko-mpd-quality {
-  padding: 4px 7px;
-
-  border: 1px solid rgba(255,255,255,.2);
-  border-radius: 4px;
-
-  background: rgba(0,0,0,.65);
-  color: #fff;
-
-  font-size: 9px;
-  font-weight: 800;
-
-  cursor: pointer;
-}
-
-.iko-mpd-quality:hover {
-  border-color: #00d979;
-  color: #00d979;
-}
-
-.iko-mpd-buffering {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-
-  transform: translate(-50%, -50%);
-
-  display: none;
-
-  color: #fff;
-
-  font-size: 10px;
-  font-weight: 800;
-
-  background: rgba(0,0,0,.65);
-
-  padding: 7px 10px;
-  border-radius: 5px;
-}
-
-.iko-mpd-player.buffering .iko-mpd-buffering {
-  display: block;
-}
-
-@media (max-width:600px) {
-
-  .iko-mpd-overlay {
-    padding: 28px 7px 6px;
-  }
-
-  .iko-mpd-controls {
-    gap: 4px;
-  }
-
-  .iko-mpd-btn {
-    font-size: 12px;
-  }
-
-  .iko-mpd-time {
-    font-size: 8px;
-  }
-
-  .iko-mpd-quality {
-    font-size: 8px;
-    padding: 3px 5px;
-  }
-
-}
-
-/* =========================================================
    IKOTV SERVER PANEL
 ========================================================= */
 
@@ -1850,27 +1641,6 @@
     return result;
   }
 
-function isAutoHDMPD(videoData = {}, url = "") {
-
-  const text = [
-    videoData?.name,
-    videoData?.display_name,
-    videoData?.type_name,
-    url
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-
-  return (
-    text.includes("auto hd") ||
-    text.includes("auto-hd") ||
-    text.includes("mpd") ||
-    text.includes(".mpd") ||
-    text.includes("?mpd=")
-  );
-}
-  
   /* =========================================================
    IKOTV SHAKA PLAYER → #tv
 ========================================================= */
@@ -1878,7 +1648,7 @@ function isAutoHDMPD(videoData = {}, url = "") {
 let ikotvShakaPlayer = null;
 let ikotvVideo = null;
 
-async function playIKOTVStream(url, videoData = {}) {
+async function playIKOTVStream(url) {
 
   if (!url) {
     console.warn("[IKOTV] URL kosong");
@@ -1893,10 +1663,9 @@ async function playIKOTVStream(url, videoData = {}) {
   }
 
   console.log("[IKOTV] RAW STREAM URL:", url);
-  console.log("[IKOTV] VIDEO DATA:", videoData);
 
   /* ==========================================
-     HAPUS PLAYER SEBELUMNYA
+     HAPUS PLAYER IKOTV SEBELUMNYA
   ========================================== */
 
   try {
@@ -1915,226 +1684,27 @@ async function playIKOTVStream(url, videoData = {}) {
 
   }
 
-  const isMPD =
-    isAutoHDMPD(videoData, url);
-
-  console.log(
-    "[IKOTV] AUTO HD / MPD:",
-    isMPD
-  );
-
   /* ==========================================
-     BUAT PLAYER KHUSUS MPD
+     BUAT VIDEO
   ========================================== */
 
   tv.innerHTML = `
-    <div class="iko-mpd-player" id="ikoMpdPlayer">
-
-      <video
-        id="ikotvVideo"
-        autoplay
-        playsinline
-        preload="auto"
-      ></video>
-
-      <div class="iko-mpd-buffering">
-        BUFFERING...
-      </div>
-
-      <div class="iko-mpd-overlay">
-
-        <div class="iko-mpd-live">
-          <span class="iko-mpd-live-dot"></span>
-          <span>LIVE</span>
-        </div>
-
-        <div class="iko-mpd-progress">
-
-          <div
-            class="iko-mpd-progress-buffer"
-            id="ikoMpdBuffer"
-          ></div>
-
-          <div
-            class="iko-mpd-progress-live"
-            id="ikoMpdProgress"
-          ></div>
-
-        </div>
-
-        <div class="iko-mpd-controls">
-
-          <button
-            type="button"
-            class="iko-mpd-btn"
-            id="ikoMpdPlay"
-          >
-            ▶
-          </button>
-
-          <button
-            type="button"
-            class="iko-mpd-btn"
-            id="ikoMpdMute"
-          >
-            🔊
-          </button>
-
-          <div
-            class="iko-mpd-time"
-            id="ikoMpdTime"
-          >
-            LIVE 00:00:00
-          </div>
-
-          <button
-            type="button"
-            class="iko-mpd-quality"
-            id="ikoMpdQuality"
-          >
-            AUTO HD
-          </button>
-
-          <button
-            type="button"
-            class="iko-mpd-btn"
-            id="ikoMpdFullscreen"
-          >
-            ⛶
-          </button>
-
-        </div>
-
-      </div>
-
-    </div>
+    <video
+      id="ikotvVideo"
+      controls
+      autoplay
+      playsinline
+      style="
+        width:100%;
+        height:100%;
+        display:block;
+        background:#000;
+      "
+    ></video>
   `;
 
   ikotvVideo =
     document.getElementById("ikotvVideo");
-
-  const mpdPlayer =
-    document.getElementById("ikoMpdPlayer");
-
-  const playButton =
-    document.getElementById("ikoMpdPlay");
-
-  const muteButton =
-    document.getElementById("ikoMpdMute");
-
-  const fullscreenButton =
-    document.getElementById("ikoMpdFullscreen");
-
-  const timeElement =
-    document.getElementById("ikoMpdTime");
-
-  const qualityElement =
-    document.getElementById("ikoMpdQuality");
-
-  const bufferElement =
-    document.getElementById("ikoMpdBuffer");
-
-  /* ==========================================
-     PLAYER CONTROLS
-  ========================================== */
-
-  playButton.onclick = () => {
-
-    if (ikotvVideo.paused) {
-
-      ikotvVideo.play()
-        .catch(() => {});
-
-    } else {
-
-      ikotvVideo.pause();
-
-    }
-
-  };
-
-  ikotvVideo.addEventListener(
-    "play",
-    () => {
-
-      playButton.textContent = "❚❚";
-
-    }
-  );
-
-  ikotvVideo.addEventListener(
-    "pause",
-    () => {
-
-      playButton.textContent = "▶";
-
-    }
-  );
-
-  muteButton.onclick = () => {
-
-    ikotvVideo.muted =
-      !ikotvVideo.muted;
-
-    muteButton.textContent =
-      ikotvVideo.muted
-        ? "🔇"
-        : "🔊";
-
-  };
-
-  fullscreenButton.onclick = () => {
-
-    if (document.fullscreenElement) {
-
-      document.exitFullscreen()
-        .catch(() => {});
-
-    } else {
-
-      mpdPlayer.requestFullscreen()
-        .catch(() => {});
-
-    }
-
-  };
-
-  /* ==========================================
-     BUFFERING
-  ========================================== */
-
-  ikotvVideo.addEventListener(
-    "waiting",
-    () => {
-
-      mpdPlayer.classList.add(
-        "buffering"
-      );
-
-    }
-  );
-
-  ikotvVideo.addEventListener(
-    "playing",
-    () => {
-
-      mpdPlayer.classList.remove(
-        "buffering"
-      );
-
-    }
-  );
-
-  ikotvVideo.addEventListener(
-    "canplay",
-    () => {
-
-      mpdPlayer.classList.remove(
-        "buffering"
-      );
-
-    }
-  );
 
   /* ==========================================
      CEK SHAKA
@@ -2169,8 +1739,7 @@ async function playIKOTVStream(url, videoData = {}) {
        PARSE URL
     ========================================== */
 
-    let streamURL =
-      safeURL(url);
+    let streamURL = safeURL(url);
 
     let keyId = null;
     let key = null;
@@ -2178,30 +1747,25 @@ async function playIKOTVStream(url, videoData = {}) {
     try {
 
       const parsedURL =
-        new URL(
-          url,
-          window.location.href
-        );
+        new URL(url, window.location.href);
 
       const mpd =
-        parsedURL.searchParams.get(
-          "mpd"
-        );
+        parsedURL.searchParams.get("mpd");
 
       const parsedKeyId =
-        parsedURL.searchParams.get(
-          "keyId"
-        );
+        parsedURL.searchParams.get("keyId");
 
       const parsedKey =
-        parsedURL.searchParams.get(
-          "key"
-        );
+        parsedURL.searchParams.get("key");
+
+      /*
+       * Kalau URL mengandung ?mpd=
+       * berarti ini DASH + ClearKey
+       */
 
       if (mpd) {
 
-        streamURL =
-          decodeURIComponent(mpd);
+        streamURL = decodeURIComponent(mpd);
 
         keyId =
           parsedKeyId;
@@ -2212,6 +1776,16 @@ async function playIKOTVStream(url, videoData = {}) {
         console.log(
           "[IKOTV] DASH MPD:",
           streamURL
+        );
+
+        console.log(
+          "[IKOTV] ClearKey ID:",
+          keyId
+        );
+
+        console.log(
+          "[IKOTV] ClearKey tersedia:",
+          !!key
         );
 
       }
@@ -2243,10 +1817,14 @@ async function playIKOTVStream(url, videoData = {}) {
       );
 
     /* ==========================================
-       CLEARKEY
+       CLEARKEY DRM
     ========================================== */
 
     if (keyId && key) {
+
+      console.log(
+        "[IKOTV] Menggunakan ClearKey DRM"
+      );
 
       ikotvShakaPlayer.configure({
 
@@ -2281,8 +1859,13 @@ async function playIKOTVStream(url, videoData = {}) {
     );
 
     /* ==========================================
-       LOAD
+       LOAD STREAM
     ========================================== */
+
+    console.log(
+      "[IKOTV] LOAD:",
+      streamURL
+    );
 
     await ikotvShakaPlayer.load(
       streamURL
@@ -2291,224 +1874,6 @@ async function playIKOTVStream(url, videoData = {}) {
     console.log(
       "[IKOTV] SHAKA PLAYING:",
       streamURL
-    );
-
-    /* ==========================================
-       RESOLUTION
-    ========================================== */
-
-    try {
-
-      const tracks =
-        ikotvShakaPlayer.getVariantTracks();
-
-      const activeTrack =
-        tracks.find(
-          track =>
-            track.active
-        );
-
-      if (activeTrack?.height) {
-
-        qualityElement.textContent =
-          `${activeTrack.height}p`;
-
-      } else {
-
-        qualityElement.textContent =
-          "AUTO HD";
-
-      }
-
-    } catch (_) {
-
-      qualityElement.textContent =
-        "AUTO HD";
-
-    }
-
-    /* ==========================================
-       LIVE TIMER
-    ========================================== */
-
-    let liveStart = null;
-
-    function formatLiveTime(seconds) {
-
-      seconds =
-        Math.max(
-          0,
-          Math.floor(seconds || 0)
-        );
-
-      const h =
-        Math.floor(
-          seconds / 3600
-        );
-
-      const m =
-        Math.floor(
-          (seconds % 3600) / 60
-        );
-
-      const s =
-        seconds % 60;
-
-      return [
-        String(h).padStart(2, "0"),
-        String(m).padStart(2, "0"),
-        String(s).padStart(2, "0")
-      ].join(":");
-
-    }
-
-    function updateLiveUI() {
-
-      if (!ikotvVideo)
-        return;
-
-      /*
-       * Jangan gunakan duration sebagai
-       * timer LIVE.
-       *
-       * duration MPD bisa sangat besar
-       * sehingga muncul seperti 34435:54.
-       */
-
-      const current =
-        Number(
-          ikotvVideo.currentTime
-        );
-
-      if (
-        liveStart === null &&
-        Number.isFinite(current)
-      ) {
-
-        liveStart = current;
-
-      }
-
-      const elapsed =
-        Number.isFinite(current) &&
-        liveStart !== null
-          ? current - liveStart
-          : 0;
-
-      timeElement.textContent =
-        "LIVE " +
-        formatLiveTime(elapsed);
-
-      /*
-       * Live stream tidak punya
-       * progress menuju END.
-       *
-       * Jadi progress dibuat penuh.
-       */
-
-      const seekable =
-        ikotvVideo.seekable;
-
-      if (
-        seekable &&
-        seekable.length
-      ) {
-
-        const end =
-          seekable.end(
-            seekable.length - 1
-          );
-
-        const start =
-          seekable.start(0);
-
-        const range =
-          end - start;
-
-        if (
-          range > 0 &&
-          Number.isFinite(
-            current
-          )
-        ) {
-
-          const percent =
-            Math.max(
-              0,
-              Math.min(
-                100,
-                (
-                  (current - start) /
-                  range
-                ) * 100
-              )
-            );
-
-          document
-            .getElementById(
-              "ikoMpdProgress"
-            )
-            .style.width =
-            percent + "%";
-
-        }
-
-      }
-
-      requestAnimationFrame(
-        updateLiveUI
-      );
-
-    }
-
-    updateLiveUI();
-
-    /* ==========================================
-       BUFFER BAR
-    ========================================== */
-
-    ikotvVideo.addEventListener(
-      "progress",
-      () => {
-
-        try {
-
-          if (
-            !ikotvVideo.buffered.length
-          )
-            return;
-
-          const bufferedEnd =
-            ikotvVideo.buffered.end(
-              ikotvVideo.buffered.length - 1
-            );
-
-          const current =
-            ikotvVideo.currentTime;
-
-          const buffered =
-            bufferedEnd - current;
-
-          /*
-           * Maksimal visual buffer
-           * 30 detik.
-           */
-
-          const percent =
-            Math.max(
-              0,
-              Math.min(
-                100,
-                (buffered / 30) * 100
-              )
-            );
-
-          bufferElement.style.width =
-            percent + "%";
-
-        } catch (_) {}
-
-      }
     );
 
     /* ==========================================
@@ -2564,10 +1929,7 @@ async function playIKOTVStream(url, videoData = {}) {
     `;
 
   }
-
 }
-  
-  
   /* =========================================================
      SCHEDULE RENDER
   ========================================================= */
@@ -3255,9 +2617,8 @@ async function openIKOMatch(matchId) {
             );
 
             playIKOTVStream(
-              video.url,
-              video
-             );
+              video.url
+            );
 
           }
         );
