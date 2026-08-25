@@ -2477,19 +2477,29 @@ async function openIKOMatch(matchId) {
 
   } catch (error) {
 
-    console.error(
-      "[IKOTV] Server error:",
-      error
-    );
+    console.error("[IKOTV] SERVER ERROR:", error);
+    console.error("[IKOTV] ERROR NAME:", error?.name);
+    console.error("[IKOTV] ERROR MESSAGE:", error?.message);
+    console.error("[IKOTV] MATCH ID:", id);
 
     panel.innerHTML = `
       <div class="iko-server-error">
         Gagal mengambil server IKOTV.
+        <br><br>
+        <small style="
+          display:block;
+          color:#ff9999;
+          word-break:break-word;
+          line-height:1.5;
+        ">
+          ${escapeHTML(
+            error?.message || "Unknown error"
+          )}
+        </small>
       </div>
     `;
 
-  }
-}
+} 
   /* =========================================================
      STREAM RESPONSE PARSER
   ========================================================= */
