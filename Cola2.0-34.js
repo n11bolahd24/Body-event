@@ -313,7 +313,7 @@ function renderColaTV(){
 <div class="cola-title">
 
     <span class="cola-date-title">
-        ${new Intl.DateTimeFormat("id-ID", {
+        ${new Intl.DateTimeFormat("undefined", {
             weekday: "long",
             day: "2-digit",
             month: "long",
@@ -721,7 +721,7 @@ match.time;
 
 
     return new Intl.DateTimeFormat(
-        "id-ID",
+        "undefined",
         {
 
         day:"2-digit",
