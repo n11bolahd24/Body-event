@@ -2369,20 +2369,7 @@ function setupUpdateButtons() {
   tv.innerHTML = `
     <div class="iko-tv-wrapper">
 
-      <div class="iko-player-title">
-
-        <span>
-          ${escapeHTML(title)}
-        </span>
-
-        <button
-          class="iko-close"
-          id="ikoClosePlayer"
-        >
-          CLOSE
-        </button>
-
-      </div>
+      
 
       <div id="ikotvArt"></div>
 
