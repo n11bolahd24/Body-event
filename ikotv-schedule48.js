@@ -389,55 +389,7 @@
    IKOTV PLAYER — USE MAIN #tv
 ========================================================= */
 
-#tv .iko-tv-wrapper {
-  width: 100%;
-  max-width: 100%;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
 
-  background: #050505;
-  overflow: hidden;
-}
-
-/* PLAYER TITLE */
-
-#tv .iko-player-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 10px;
-
-  padding: 11px 13px;
-
-  background: #101010;
-
-  border-bottom: 1px solid rgba(255,255,255,.06);
-
-  color: #fff;
-
-  font-size: 12px;
-  font-weight: 800;
-
-  box-sizing: border-box;
-}
-
-/* ARTPLAYER */
-
-#tv #ikotvArt {
-  position: relative;
-
-  width: 100%;
-
-  aspect-ratio: 16 / 9;
-
-  min-height: 0;
-
-  background: #000;
-
-  overflow: hidden;
-}
 
 /* SERVER */
 
@@ -1165,10 +1117,6 @@
     font-size: 9px;
   }
 
-  #ikotvArt {
-    height: 56.25vw;
-    min-height: 190px;
-  }
   
   .iko-date {
   top: 0;
