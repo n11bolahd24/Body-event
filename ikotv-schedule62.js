@@ -1229,13 +1229,34 @@
   font-size: 13px !important;
 }
 
-/* UPCOMING / LIVE — PC/LAPTOP NORMAL */
+/* =========================================================
+   STATUS UPCOMING PC/LAPTOP — NORMAL & 1 BARIS
+========================================================= */
+
 .iko-status {
-  min-width: 55px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 72px !important;
+  min-width: 72px !important;
+  height: 22px !important;
+
   margin-top: 4px !important;
-  padding: 4px 7px !important;
+  padding: 0 !important;
+
+  box-sizing: border-box !important;
+
+  border-radius: 5px !important;
+
   font-size: 9px !important;
+  font-weight: 900 !important;
+
   line-height: 1 !important;
+  letter-spacing: .3px !important;
+
+  white-space: nowrap !important;
+  overflow: hidden !important;
 }
 
 /* COUNTDOWN */
