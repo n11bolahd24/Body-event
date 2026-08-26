@@ -2385,32 +2385,7 @@ function setupUpdateButtons() {
     </div>
   `;
 
-  const closeButton =
-    document.getElementById("ikoClosePlayer");
-
-  if (closeButton) {
-
-    closeButton.onclick = () => {
-
-      if (art) {
-
-        try {
-          art.destroy(false);
-        } catch (_) {}
-
-        art = null;
-      }
-
-      currentMatchId = null;
-      currentVideos = [];
-
-      /*
-       * Kosongkan TV
-       */
-      tv.innerHTML = "";
-    };
-
-  }
+  
 
   renderServers();
 
