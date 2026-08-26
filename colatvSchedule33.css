@@ -29,6 +29,7 @@
 
 /* ==========================================
    COLATV DATE + UPDATE
+   IKOTV STYLE
 ========================================== */
 
 .cola-title {
@@ -72,15 +73,17 @@
 
 
 /* ==========================================
-   JUDUL / TANGGAL
+   TANGGAL
 ========================================== */
 
-.cola-title span {
+.cola-date-title {
     font-size: 10px;
 
     font-weight: 700;
 
     line-height: 1.2;
+
+    color: #fff;
 }
 
 
@@ -116,8 +119,6 @@
 
     font-weight: 900;
 
-    line-height: 1;
-
     cursor: pointer;
 
     box-sizing: border-box;
@@ -129,6 +130,25 @@
 }
 
 
+/* ICON */
+.cola-update-icon {
+    font-size: 14px;
+
+    line-height: 1;
+}
+
+
+/* TEXT */
+.cola-update-text {
+    font-size: 8px;
+
+    font-weight: 900;
+
+    line-height: 1;
+}
+
+
+/* HOVER */
 .cola-refresh:hover {
     background: #f7c82d;
 
@@ -136,9 +156,11 @@
 }
 
 
+/* CLICK */
 .cola-refresh:active {
     transform: scale(.96);
 }
+
 
 /* ==========================================
    LEAGUE
