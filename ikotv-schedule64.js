@@ -1429,6 +1429,31 @@
 
 }
 
+@media (max-width: 600px) {
+
+  .iko-match {
+    grid-template-columns:
+      minmax(0, 1fr)
+      58px
+      minmax(0, 1fr) !important;
+
+    gap: 8px !important;
+  }
+
+  .iko-status {
+    width: 50px !important;
+    min-width: 50px !important;
+
+    height: 18px !important;
+    padding: 0 !important;
+
+    font-size: 7px !important;
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+  }
+
+}
 
     `;
 
