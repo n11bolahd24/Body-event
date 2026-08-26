@@ -1048,46 +1048,34 @@
   }
 
   .iko-team {
-    gap: 6px;
-
-    font-size: 11px;
+    gap: 4px !important;
+    font-size: 13px !important;
   }
 
   .iko-team img {
-    width: 34px;
-    height: 34px;
-
-    flex-basis: 34px;
-
-    padding: 2px;
-
-    border-radius: 6px;
+    width: 32px !important;
+    height: 32px !important;
+    flex: 0 0 32px !important;
   }
 
   .iko-time {
-    font-size: 16px;
+    font-size: 17px !important;
   }
 
   .iko-vs {
-    margin-top: 4px;
-
-    font-size: 8px;
+    font-size: 10px !important;
   }
 
   .iko-status {
-    min-width: 52px;
-
-    margin-top: 5px;
-    padding: 3px 5px;
-
-    font-size: 7px;
+    min-width: 50px !important;
+    font-size: 9px !important;
+    padding: 3px 5px !important;
   }
 
   .iko-countdown {
-    margin-top: 5px;
-
-    font-size: 9px;
+    font-size: 10px !important;
   }
+
 
   .iko-action {
     margin-top: 11px;
