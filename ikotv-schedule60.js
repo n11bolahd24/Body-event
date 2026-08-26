@@ -1385,36 +1385,7 @@
 }
 
 
-@media (max-width: 600px) {
-  #tv.ratio {
-    position: relative !important;
-    width: 100% !important;
-    height: auto !important;
-    padding-top: 56.25% !important;
-    margin-top: 10px !important;
-    margin-bottom: 5px !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-  }
 
-  #tv.ratio::before {
-    display: none !important;
-  }
-
-  #tv > * {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
-
-  #tv video {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
-  }
-}
 
     `;
 
