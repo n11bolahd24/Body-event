@@ -309,16 +309,29 @@ function renderColaTV(){
 
     });
 
-    let html = `
-    <div class="cola-title">
-    <span>LIVE SCORE & SCHEDULE</span>
+   let html = `
+<div class="cola-title">
 
-    <button class="cola-refresh"
-        onclick="loadColaTVSchedule()">
-        🔄 Update 
+    <span class="cola-date-title">
+        ${new Intl.DateTimeFormat("id-ID", {
+            weekday: "long",
+            day: "2-digit",
+            month: "long",
+            year: "numeric"
+        }).format(new Date())}
+    </span>
+
+    <button
+        type="button"
+        class="cola-refresh"
+        onclick="loadColaTVSchedule()"
+    >
+        <span class="cola-update-icon">↻</span>
+        <span class="cola-update-text">UPDATE</span>
     </button>
+
 </div>
-    `;
+`;
 
     colaMatches.forEach(match=>{
 
