@@ -29,7 +29,7 @@
 
 /* ==========================================
    COLATV DATE + UPDATE
-   IKOTV STYLE
+   ALIGN EXACTLY WITH MATCH CARD
 ========================================== */
 
 .cola-title {
@@ -46,10 +46,15 @@
     min-height: 0;
     height: auto;
 
-    /* SAMA PERSIS DENGAN .cola-match */
+    /* SAMA DENGAN POSISI .cola-match */
     width: calc(100% - 20px);
 
-    margin: 10px auto 7px;
+    margin-top: 10px;
+    margin-bottom: 7px;
+
+    /* INI YANG MEMBUAT TENGAH */
+    margin-left: 10px;
+    margin-right: 10px;
 
     padding: 6px 10px;
 
@@ -73,7 +78,6 @@
     box-shadow:
         0 5px 18px rgba(0,0,0,.25);
 }
-
 /* ==========================================
    TANGGAL
 ========================================== */
