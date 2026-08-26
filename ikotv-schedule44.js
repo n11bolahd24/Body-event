@@ -3200,7 +3200,22 @@ renderSchedule();
 
     }
   }
+/* =========================================================
+   COUNTDOWN TIMER
+========================================================= */
 
+function startCountdownTimer() {
+
+  setInterval(
+    () => {
+
+      updateCountdowns();
+
+    },
+    CONFIG.countdownMs
+  );
+
+}
  
   /* =========================================================
      INIT
