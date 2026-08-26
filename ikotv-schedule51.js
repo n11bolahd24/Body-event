@@ -658,53 +658,85 @@
   width: 100%;
 }
 
-/* =========================================================
+/* ==========================================
    TEAM
-========================================================= */
+========================================== */
 
-.iko-team {
-  display: flex;
-  align-items: center;
-
-  min-width: 0;
-
-  gap: 6px;
-
-  font-size: 11px;
-  font-weight: 700;
-
-  line-height: 1.15;
+.ikotov-team {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:6px;
+    margin-top:18px;
 }
 
-.iko-team.home {
-  justify-content: flex-end;
-  text-align: right;
+.ikotov-team-box {
+    flex:1;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    min-width:0;
 }
 
-.iko-team.away {
-  justify-content: flex-start;
-  text-align: left;
+/* LOGO TEAM */
+.ikotov-team img {
+    width:28px !important;
+    height:28px !important;
+    max-width:28px !important;
+    max-height:28px !important;
+    border-radius:50%;
+    background:#222;
+    padding:3px;
+    object-fit:contain;
+    flex-shrink:0;
 }
 
-.iko-team span {
-  overflow-wrap: anywhere;
+/* NAMA TEAM */
+.ikotov-team span {
+    color:#fff;
+    font-size:11px !important;
+    font-weight:600;
+    line-height:1.3;
+    word-break:break-word;
 }
 
-.iko-team img {
-  width: 30px;
-  height: 30px;
+/* HOME */
+.ikotov-home-team {
+    justify-content:flex-end;
+    text-align:right;
+}
 
-  flex: 0 0 30px;
+.ikotov-home-team span {
+    order:1;
+}
 
-  padding: 2px;
+.ikotov-home-team img {
+    order:2;
+    margin-left:6px;
+}
 
-  object-fit: contain;
+/* AWAY */
+.ikotov-away-team {
+    justify-content:flex-start;
+    text-align:left;
+}
 
-  background: transparent;
+.ikotov-away-team img {
+    margin-right:6px;
+}
 
-  border-radius: 5px;
 
-  box-sizing: border-box;
+/* ==========================================
+   SCORE
+========================================== */
+
+.ikotov-score {
+    width:48px;
+    text-align:center;
+    font-size:16px;
+    font-weight:bold;
+    color:#fff;
+    flex-shrink:0;
 }
 
 /* =========================================================
