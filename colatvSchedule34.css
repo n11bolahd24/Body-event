@@ -46,6 +46,10 @@
     min-height: 0;
     height: auto;
 
+    /* JANGAN melebar keluar dari container */
+    width: 100%;
+    max-width: 100%;
+
     margin: 10px 0 7px;
 
     padding: 6px 10px;
@@ -84,6 +88,8 @@
     line-height: 1.2;
 
     color: #fff;
+
+    white-space: nowrap;
 }
 
 
@@ -123,6 +129,8 @@
 
     box-sizing: border-box;
 
+    white-space: nowrap;
+
     transition:
         background .2s ease,
         color .2s ease,
@@ -130,7 +138,10 @@
 }
 
 
-/* ICON */
+/* ==========================================
+   ICON
+========================================== */
+
 .cola-update-icon {
     font-size: 14px;
 
@@ -138,7 +149,10 @@
 }
 
 
-/* TEXT */
+/* ==========================================
+   TEXT
+========================================== */
+
 .cola-update-text {
     font-size: 8px;
 
@@ -148,7 +162,10 @@
 }
 
 
-/* HOVER */
+/* ==========================================
+   HOVER
+========================================== */
+
 .cola-refresh:hover {
     background: #f7c82d;
 
@@ -156,11 +173,45 @@
 }
 
 
-/* CLICK */
+/* ==========================================
+   CLICK
+========================================== */
+
 .cola-refresh:active {
     transform: scale(.96);
 }
 
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 600px) {
+
+    .cola-title {
+        width: 100%;
+        max-width: 100%;
+
+        margin: 8px 0 6px;
+
+        padding: 6px 8px;
+    }
+
+    .cola-refresh {
+        min-width: 68px;
+
+        height: 27px;
+
+        padding: 0 7px;
+
+        font-size: 8px;
+    }
+
+    .cola-date-title {
+        font-size: 10px;
+    }
+
+}
 
 /* ==========================================
    LEAGUE
