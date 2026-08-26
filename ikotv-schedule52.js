@@ -1055,6 +1055,17 @@
 
 }
 
+
+.cola-team img {
+    width:28px !important;
+    height:28px !important;
+    max-width:28px !important;
+    max-height:28px !important;
+}
+
+.cola-team span {
+    font-size:11px !important;
+}
     `;
 
     document.head.appendChild(style);
