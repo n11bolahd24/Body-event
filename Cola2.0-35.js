@@ -313,13 +313,13 @@ function renderColaTV(){
 <div class="cola-title">
 
     <span class="cola-date-title">
-        ${new Intl.DateTimeFormat("id-ID", {
-            weekday: "long",
-            day: "2-digit",
-            month: "long",
-            year: "numeric"
-        }).format(new Date())}
-    </span>
+    ${new Intl.DateTimeFormat(undefined, {
+        weekday: "long",
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+    }).format(new Date())}
+</span>
 
     <button
         type="button"
@@ -719,27 +719,25 @@ match.time;
 
 
 
+return new Intl.DateTimeFormat(
+    undefined,
+    {
 
-    return new Intl.DateTimeFormat(
-        "id-ID",
-        {
+    day:"2-digit",
 
-        day:"2-digit",
+    month:"short",
 
-        month:"short",
+    year:"numeric",
 
-        year:"numeric",
+    hour:"2-digit",
 
-        hour:"2-digit",
+    minute:"2-digit",
 
-        minute:"2-digit",
+    hour12:false
 
-        hour12:false
-
-        }
-
-    )
-    .format(date);
+    }
+)
+.format(date);
 
 
 
