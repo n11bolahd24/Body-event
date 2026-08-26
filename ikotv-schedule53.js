@@ -806,9 +806,11 @@
 .iko-watch {
   display: block;
 
-  width: 100%;
+  width: auto;
+  min-width: 110px;
+  margin: 0 auto;
 
-  padding: 10px 14px;
+  padding: 8px 14px;
 
   border: 0;
   border-radius: 7px;
