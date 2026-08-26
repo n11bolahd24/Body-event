@@ -1316,7 +1316,32 @@
     font-size: 8px !important;
   }
 }
+/* =========================================================
+   IKOTV LIVE — RED BLINK
+========================================================= */
 
+.iko-status.live {
+  background: #e50914 !important;
+  color: #fff !important;
+
+  animation: ikoLivePulse 1s infinite !important;
+
+  box-shadow: none !important;
+}
+
+@keyframes ikoLivePulse {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: .5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
 
     `;
 
