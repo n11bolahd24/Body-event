@@ -303,18 +303,10 @@
     style.id = "ikotvStyles";
 
     style.textContent = `
-/* =========================================================
-   IKOTV AUTO SCHEDULE
-   N11BOLAHD
-========================================================= */
-
-#ikotvSchedule {
-  width: 100%;
-  box-sizing: border-box;
-}
+      #ikotvSchedule,
 
 /* =========================================================
-   SERVER PANEL
+   IKOTV SERVER PANEL
 ========================================================= */
 
 .iko-server-panel {
@@ -323,6 +315,7 @@
   padding: 8px;
 
   background: #0b0b0b;
+
   border: 1px solid rgba(0,217,121,.12);
   border-radius: 7px;
 
@@ -333,8 +326,10 @@
   margin-bottom: 7px;
 
   color: #777;
+
   font-size: 8px;
   font-weight: 900;
+
   letter-spacing: .7px;
 }
 
@@ -372,6 +367,7 @@
 .iko-live-server.active {
   background: #00d979;
   border-color: #00d979;
+
   color: #001b0f;
 }
 
@@ -380,6 +376,7 @@
   padding: 8px;
 
   color: #777;
+
   font-size: 9px;
   text-align: center;
 }
@@ -387,28 +384,19 @@
 .iko-server-error {
   color: #ff7777;
 }
-
+      
 /* =========================================================
-   IKOTV INTERNAL PLAYER
-   Tidak mengatur #tv
+   IKOTV PLAYER — USE MAIN #tv
 ========================================================= */
 
-.iko-tv-wrapper {
-  width: 100%;
-  max-width: 100%;
 
-  margin: 0;
-  padding: 0;
 
-  background: #050505;
-  overflow: hidden;
+/* SERVER */
 
-  box-sizing: border-box;
-}
-
-.iko-servers {
+#tv .iko-servers {
   display: flex;
   flex-wrap: wrap;
+
   gap: 6px;
 
   width: 100%;
@@ -420,7 +408,9 @@
   box-sizing: border-box;
 }
 
-.iko-note {
+/* NOTE */
+
+#tv .iko-note {
   width: 100%;
 
   padding: 7px 11px;
@@ -444,24 +434,22 @@
 }
 
 /* =========================================================
-   DATE HEADER
+   STICKY DATE + UPDATE
 ========================================================= */
 
 .iko-date {
   position: sticky;
-
   top: 0;
-
-  z-index: 9999;
+  z-index: 100;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
 
-  min-height: 58px;
+  min-height: 64px;
 
-  margin: 8px 0 7px;
-  padding: 8px 11px;
+  margin: 25px 0 12px;
+  padding: 10px 16px;
 
   background:
     linear-gradient(
@@ -471,7 +459,7 @@
     );
 
   border: 1px solid rgba(255,255,255,.07);
-  border-left: 3px solid #00d979;
+  border-left: 4px solid #00d979;
 
   border-radius: 8px;
 
@@ -480,7 +468,7 @@
   box-sizing: border-box;
 
   box-shadow:
-    0 3px 12px rgba(0,0,0,.25);
+    0 5px 18px rgba(0,0,0,.35);
 }
 
 /* =========================================================
@@ -495,10 +483,10 @@
 
   gap: 5px;
 
-  min-width: 82px;
-  height: 34px;
+  min-width: 92px;
+  height: 38px;
 
-  padding: 0 9px;
+  padding: 0 12px;
 
   border: 1px solid #00d979;
   border-radius: 7px;
@@ -507,7 +495,7 @@
 
   color: #00d979;
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 900;
 
   cursor: pointer;
@@ -533,17 +521,21 @@
 }
 
 .iko-update-icon {
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1;
 }
 
+.iko-update-text {
+  line-height: 1;
+}
+
+/* spinner ketika update */
 .iko-update-btn.loading
 .iko-update-icon {
   animation: ikoUpdateSpin .8s linear infinite;
 }
 
 @keyframes ikoUpdateSpin {
-
   from {
     transform: rotate(0deg);
   }
@@ -551,7 +543,6 @@
   to {
     transform: rotate(360deg);
   }
-
 }
 
 /* =========================================================
@@ -562,9 +553,8 @@
   position: relative;
 
   width: 100%;
-
-  margin: 7px 0;
-  padding: 10px 12px;
+  margin: 10px 0;
+  padding: 14px 16px;
 
   background:
     linear-gradient(
@@ -575,7 +565,7 @@
     );
 
   border: 1px solid rgba(255,255,255,.07);
-  border-radius: 9px;
+  border-radius: 12px;
 
   color: #fff;
 
@@ -589,17 +579,8 @@
 
 .iko-card:hover {
   transform: translateY(-1px);
-
-  border-color:
-    rgba(0,217,121,.35);
-
-  box-shadow:
-    0 8px 25px rgba(0,0,0,.25);
-}
-
-.iko-card.live {
-  border-color:
-    rgba(0,217,121,.18);
+  border-color: rgba(0,217,121,.35);
+  box-shadow: 0 8px 25px rgba(0,0,0,.25);
 }
 
 /* =========================================================
@@ -612,15 +593,14 @@
 
   width: 100%;
 
-  margin-bottom: 8px;
-  padding-bottom: 6px;
+  margin-bottom: 14px;
+  padding-bottom: 9px;
 
-  border-bottom:
-    1px solid rgba(255,255,255,.06);
+  border-bottom: 1px solid rgba(255,255,255,.06);
 
   color: #999;
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
 
   text-transform: uppercase;
@@ -629,18 +609,17 @@
 }
 
 .iko-comp img {
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
 
-  margin-right: 5px;
+  margin-right: 8px;
 
   object-fit: contain;
-
-  flex: 0 0 16px;
+  flex: 0 0 22px;
 }
 
 /* =========================================================
-   MATCH
+   MATCH AREA
 ========================================================= */
 
 .iko-match {
@@ -648,95 +627,63 @@
 
   grid-template-columns:
     minmax(0, 1fr)
-    58px
+    90px
     minmax(0, 1fr);
 
   align-items: center;
 
-  gap: 6px;
+  gap: 12px;
 
   width: 100%;
 }
 
-/* ==========================================
-   TEAM
-========================================== */
+/* =========================================================
+   TEAMS
+========================================================= */
 
-.ikotov-team {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:6px;
-    margin-top:18px;
+.iko-team {
+  display: flex;
+  align-items: center;
+
+  min-width: 0;
+
+  gap: 10px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  line-height: 1.25;
 }
 
-.ikotov-team-box {
-    flex:1;
-    display:flex;
-    align-items:center;
-    gap:6px;
-    min-width:0;
+.iko-team.home {
+  justify-content: flex-end;
+  text-align: right;
 }
 
-/* LOGO TEAM */
-.ikotov-team img {
-    width:28px !important;
-    height:28px !important;
-    max-width:28px !important;
-    max-height:28px !important;
-    border-radius:50%;
-    background:#222;
-    padding:3px;
-    object-fit:contain;
-    flex-shrink:0;
+.iko-team.away {
+  justify-content: flex-start;
+  text-align: left;
 }
 
-/* NAMA TEAM */
-.ikotov-team span {
-    color:#fff;
-    font-size:11px !important;
-    font-weight:600;
-    line-height:1.3;
-    word-break:break-word;
+.iko-team span {
+  overflow-wrap: anywhere;
 }
 
-/* HOME */
-.ikotov-home-team {
-    justify-content:flex-end;
-    text-align:right;
-}
+.iko-team img {
+  width: 44px;
+  height: 44px;
 
-.ikotov-home-team span {
-    order:1;
-}
+  padding: 3px;
 
-.ikotov-home-team img {
-    order:2;
-    margin-left:6px;
-}
+  object-fit: contain;
 
-/* AWAY */
-.ikotov-away-team {
-    justify-content:flex-start;
-    text-align:left;
-}
+  background: rgba(255,255,255,.03);
 
-.ikotov-away-team img {
-    margin-right:6px;
-}
+  border-radius: 8px;
 
+  box-sizing: border-box;
 
-/* ==========================================
-   SCORE
-========================================== */
-
-.ikotov-score {
-    width:48px;
-    text-align:center;
-    font-size:16px;
-    font-weight:bold;
-    color:#fff;
-    flex-shrink:0;
+  flex: 0 0 44px;
 }
 
 /* =========================================================
@@ -745,21 +692,22 @@
 
 .iko-center {
   display: flex;
-
   flex-direction: column;
 
   align-items: center;
   justify-content: center;
 
-  min-width: 0;
-
   text-align: center;
+
+  min-width: 0;
 }
+
+/* KICKOFF TIME */
 
 .iko-time {
   color: #fff;
 
-  font-size: 15px;
+  font-size: 20px;
   font-weight: 900;
 
   line-height: 1;
@@ -769,12 +717,14 @@
   letter-spacing: .3px;
 }
 
+/* VS */
+
 .iko-vs {
-  margin-top: 3px;
+  margin-top: 5px;
 
   color: #555;
 
-  font-size: 7px;
+  font-size: 9px;
   font-weight: 700;
 
   letter-spacing: 1px;
@@ -786,18 +736,17 @@
 
 .iko-status {
   display: inline-flex;
-
   align-items: center;
   justify-content: center;
 
-  min-width: 48px;
+  min-width: 60px;
 
-  margin-top: 4px;
-  padding: 3px 5px;
+  margin-top: 7px;
+  padding: 4px 8px;
 
   border-radius: 5px;
 
-  font-size: 7px;
+  font-size: 8px;
   font-weight: 900;
 
   letter-spacing: .5px;
@@ -828,7 +777,7 @@
 ========================================================= */
 
 .iko-countdown {
-  margin-top: 4px;
+  margin-top: 7px;
 
   color: #00d979;
 
@@ -836,7 +785,7 @@
     "Courier New",
     monospace;
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
 
   letter-spacing: .5px;
@@ -845,38 +794,31 @@
 }
 
 /* =========================================================
-   WATCH BUTTON
+   BUTTON
 ========================================================= */
 
 .iko-action {
-  display: flex;
-
-  justify-content: center;
-
   width: 100%;
 
-  margin-top: 9px;
+  margin-top: 14px;
 }
 
 .iko-watch {
-  display: inline-block;
+  display: block;
 
-  width: auto;
-  min-width: 0;
+  width: 100%;
 
-  margin: 0 auto;
-
-  padding: 7px 14px;
+  padding: 10px 14px;
 
   border: 0;
-  border-radius: 6px;
+  border-radius: 7px;
 
   background: #00d979;
   color: #001b0f;
 
   cursor: pointer;
 
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 900;
 
   letter-spacing: .3px;
@@ -891,7 +833,7 @@
 }
 
 .iko-watch:active {
-  transform: scale(.97);
+  transform: scale(.99);
 }
 
 .iko-watch.disabled {
@@ -899,6 +841,115 @@
   color: #555;
 
   cursor: not-allowed;
+}
+
+/* =========================================================
+   PLAYER TITLE
+========================================================= */
+
+.iko-player-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  padding: 11px 13px;
+
+  background: #101010;
+
+  border-bottom: 1px solid rgba(255,255,255,.06);
+
+  color: #fff;
+
+  font-size: 12px;
+  font-weight: 800;
+
+  box-sizing: border-box;
+}
+
+.iko-close {
+  padding: 6px 10px;
+
+  border: 0;
+  border-radius: 5px;
+
+  background: #242424;
+  color: #aaa;
+
+  cursor: pointer;
+
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.iko-close:hover {
+  background: #333;
+  color: #fff;
+}
+
+/* =========================================================
+   SERVER BUTTONS
+========================================================= */
+
+.iko-servers {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 6px;
+
+  padding: 9px 10px;
+
+  background: #101010;
+
+  box-sizing: border-box;
+}
+
+.iko-server {
+  padding: 7px 11px;
+
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 5px;
+
+  background: #202020;
+  color: #aaa;
+
+  cursor: pointer;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  transition:
+    background .2s ease,
+    color .2s ease;
+}
+
+.iko-server:hover {
+  background: #2c2c2c;
+  color: #fff;
+}
+
+.iko-server.active {
+  background: #00d979;
+  border-color: #00d979;
+
+  color: #001b0f;
+}
+
+/* =========================================================
+   NOTE
+========================================================= */
+
+.iko-note {
+  padding: 7px 11px;
+
+  background: #0c0c0c;
+
+  color: #555;
+
+  font-size: 9px;
+
+  box-sizing: border-box;
 }
 
 /* =========================================================
@@ -931,89 +982,156 @@
 }
 
 /* =========================================================
+   LIVE CARD
+========================================================= */
+
+.iko-card.live {
+  border-color: rgba(0,217,121,.18);
+}
+
+.iko-card.live .iko-comp {
+  color: #aaa;
+}
+
+ 
+/* =========================================================
    MOBILE
 ========================================================= */
 
 @media (max-width: 600px) {
 
+  #ikotvSchedule,
+  #ikotvPlayer {
+    width: 100%;
+    margin: 12px auto;
+  }
+
   .iko-date {
-    top: 0;
+    margin: 18px 0 9px;
 
-    min-height: 52px;
+    padding: 10px 12px;
 
-    margin: 7px 0;
-
-    padding: 7px 10px;
+    font-size: 11px;
   }
 
   .iko-card {
-    padding: 9px 8px;
+    margin: 8px 0;
+    padding: 12px 10px;
+
+    border-radius: 10px;
+  }
+
+  .iko-comp {
+    margin-bottom: 11px;
+
+    padding-bottom: 8px;
+
+    font-size: 9px;
+  }
+
+  .iko-comp img {
+    width: 19px;
+    height: 19px;
+
+    flex-basis: 19px;
   }
 
   .iko-match {
     grid-template-columns:
       minmax(0, 1fr)
-      52px
+      62px
       minmax(0, 1fr);
 
-    gap: 4px;
+    gap: 5px;
   }
 
   .iko-team {
-    gap: 4px;
-    font-size: 10px;
+    gap: 6px;
+
+    font-size: 11px;
   }
 
   .iko-team img {
-    width: 26px;
-    height: 26px;
+    width: 34px;
+    height: 34px;
 
-    flex: 0 0 26px;
+    flex-basis: 34px;
+
+    padding: 2px;
+
+    border-radius: 6px;
   }
 
   .iko-time {
-    font-size: 13px;
+    font-size: 16px;
   }
 
   .iko-vs {
-    font-size: 6px;
+    margin-top: 4px;
+
+    font-size: 8px;
   }
 
   .iko-status {
-    min-width: 44px;
+    min-width: 52px;
 
-    font-size: 6px;
+    margin-top: 5px;
+    padding: 3px 5px;
 
-    padding: 2px 4px;
+    font-size: 7px;
   }
 
   .iko-countdown {
-    font-size: 8px;
-  }
-
-  .iko-watch {
-    padding: 7px 13px;
-    font-size: 8px;
-  }
-
-  .iko-update-btn {
-    min-width: 82px;
-    height: 34px;
-
-    padding: 0 9px;
+    margin-top: 5px;
 
     font-size: 9px;
   }
 
-  .iko-update-icon {
-    font-size: 16px;
+  .iko-action {
+    margin-top: 11px;
+  }
+
+  .iko-watch {
+    padding: 9px 10px;
+
+    font-size: 9px;
+  }
+
+  .iko-player-title {
+    padding: 9px 10px;
+
+    font-size: 10px;
   }
 
   .iko-server {
     padding: 6px 9px;
+
     font-size: 9px;
   }
 
+  
+  .iko-date {
+  top: 0;
+
+  min-height: 58px;
+
+  margin: 15px 0 8px;
+
+  padding: 8px 10px;
+}
+
+.iko-update-btn {
+  min-width: 82px;
+  height: 34px;
+
+  padding: 0 9px;
+
+  font-size: 9px;
+}
+
+.iko-update-icon {
+  font-size: 16px;
+}
 }
 
 /* =========================================================
@@ -1025,47 +1143,187 @@
   .iko-match {
     grid-template-columns:
       minmax(0, 1fr)
-      48px
+      54px
       minmax(0, 1fr);
   }
 
   .iko-team {
-    font-size: 9px;
+    font-size: 10px;
   }
 
   .iko-team img {
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
 
-    flex-basis: 24px;
+    flex-basis: 30px;
   }
 
   .iko-time {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .iko-status {
-    min-width: 42px;
-    font-size: 6px;
+    min-width: 48px;
+
+    font-size: 6.5px;
   }
 
   .iko-countdown {
-    font-size: 7px;
+    font-size: 8px;
+  }
+}
+
+
+/* =========================================================
+   IKOTV COMPACT OVERRIDE perbaikan
+========================================================= */
+
+.iko-card {
+  padding: 10px 12px !important;
+  margin: 7px 0 !important;
+  border-radius: 9px !important;
+}
+
+.iko-comp {
+  margin-bottom: 8px !important;
+  padding-bottom: 6px !important;
+  font-size: 9px !important;
+}
+
+.iko-comp img {
+  width: 16px !important;
+  height: 16px !important;
+  flex: 0 0 16px !important;
+  margin-right: 5px !important;
+}
+
+/* MATCH GRID */
+.iko-match {
+  grid-template-columns: minmax(0, 1fr) 58px minmax(0, 1fr) !important;
+  gap: 6px !important;
+}
+
+/* TEAM */
+.iko-team {
+  gap: 6px !important;
+  font-size: 11px !important;
+  line-height: 1.15 !important;
+}
+
+/* LOGO KLUB — KECIL */
+.iko-team img {
+  width: 30px !important;
+  height: 30px !important;
+  flex: 0 0 30px !important;
+
+  padding: 2px !important;
+
+  border-radius: 5px !important;
+
+  background: transparent !important;
+}
+
+/* TIME */
+.iko-time {
+  font-size: 15px !important;
+  line-height: 1 !important;
+}
+
+/* VS */
+.iko-vs {
+  margin-top: 3px !important;
+  font-size: 7px !important;
+}
+
+/* STATUS */
+.iko-status {
+  min-width: 48px !important;
+
+  margin-top: 4px !important;
+  padding: 3px 5px !important;
+
+  font-size: 7px !important;
+}
+
+/* COUNTDOWN */
+.iko-countdown {
+  margin-top: 4px !important;
+  font-size: 9px !important;
+}
+
+/* BUTTON */
+.iko-action {
+  margin-top: 9px !important;
+}
+
+.iko-watch {
+  padding: 8px 10px !important;
+  border-radius: 6px !important;
+  font-size: 9px !important;
+}
+
+/* DATE */
+.iko-date {
+  margin: 15px 0 7px !important;
+  padding: 8px 11px !important;
+
+  font-size: 10px !important;
+
+  border-left-width: 3px !important;
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+
+  .iko-card {
+    padding: 9px 8px !important;
   }
 
+  .iko-match {
+    grid-template-columns:
+      minmax(0, 1fr)
+      52px
+      minmax(0, 1fr) !important;
+
+    gap: 4px !important;
+  }
+
+  .iko-team {
+    gap: 4px !important;
+    font-size: 10px !important;
+  }
+
+  .iko-team img {
+    width: 26px !important;
+    height: 26px !important;
+    flex: 0 0 26px !important;
+  }
+
+  .iko-time {
+    font-size: 13px !important;
+  }
+
+  .iko-vs {
+    font-size: 6px !important;
+  }
+
+  .iko-status {
+    min-width: 44px !important;
+    font-size: 6px !important;
+    padding: 2px 4px !important;
+  }
+
+  .iko-countdown {
+    font-size: 8px !important;
+  }
+
+  .iko-watch {
+    padding: 7px 8px !important;
+    font-size: 8px !important;
+  }
 }
 
 
-.cola-team img {
-    width:28px !important;
-    height:28px !important;
-    max-width:28px !important;
-    max-height:28px !important;
-}
-
-.cola-team span {
-    font-size:11px !important;
-}
     `;
 
     document.head.appendChild(style);
