@@ -1212,39 +1212,41 @@
   line-height: 1.15 !important;
 }
 
-/* LOGO KLUB — KECIL */
+/* =========================================================
+   IKOTV SIZE +3
+========================================================= */
+
+/* LOGO KLUB */
 .iko-team img {
-  width: 30px !important;
-  height: 30px !important;
-  flex: 0 0 30px !important;
-
-  padding: 2px !important;
-
-  border-radius: 5px !important;
-
-  background: transparent !important;
+  width: 33px !important;
+  height: 33px !important;
+  flex: 0 0 33px !important;
 }
 
-/* TIME */
+/* NAMA TIM */
+.iko-team {
+  font-size: 14px !important;
+  line-height: 1.15 !important;
+}
+
+/* KICKOFF TIME */
 .iko-time {
-  font-size: 15px !important;
+  font-size: 18px !important;
   line-height: 1 !important;
 }
 
 /* VS */
 .iko-vs {
   margin-top: 3px !important;
-  font-size: 7px !important;
+  font-size: 10px !important;
 }
 
-/* STATUS */
+/* UPCOMING / LIVE */
 .iko-status {
-  min-width: 48px !important;
-
+  min-width: 52px !important;
   margin-top: 4px !important;
-  padding: 3px 5px !important;
-
-  font-size: 7px !important;
+  padding: 4px 6px !important;
+  font-size: 10px !important;
 }
 
 /* COUNTDOWN */
