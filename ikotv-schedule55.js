@@ -1213,46 +1213,48 @@
 }
 
 /* =========================================================
-   IKOTV SIZE +3
+   IKOTV SIZE +6
 ========================================================= */
 
 /* LOGO KLUB */
 .iko-team img {
-  width: 33px !important;
-  height: 33px !important;
-  flex: 0 0 33px !important;
+  width: 36px !important;
+  height: 36px !important;
+  flex: 0 0 36px !important;
 }
 
 /* NAMA TIM */
 .iko-team {
-  font-size: 14px !important;
+  font-size: 17px !important;
   line-height: 1.15 !important;
 }
 
 /* KICKOFF TIME */
 .iko-time {
-  font-size: 18px !important;
+  font-size: 21px !important;
   line-height: 1 !important;
 }
 
 /* VS */
 .iko-vs {
   margin-top: 3px !important;
-  font-size: 10px !important;
+  font-size: 13px !important;
 }
 
 /* UPCOMING / LIVE */
 .iko-status {
-  min-width: 52px !important;
+  min-width: 55px !important;
   margin-top: 4px !important;
-  padding: 4px 6px !important;
-  font-size: 10px !important;
+  padding: 5px 7px !important;
+  font-size: 13px !important;
 }
 
 /* COUNTDOWN */
 .iko-countdown {
-  margin-top: 4px !important;
-  font-size: 9px !important;
+  margin-top: 5px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: .5px !important;
 }
 
 /* BUTTON */
