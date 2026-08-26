@@ -1343,6 +1343,47 @@
   }
 }
 
+/* =========================================================
+   IKOTV DATE + UPDATE COMPACT
+========================================================= */
+
+.iko-date {
+  min-height: 0 !important;
+  height: auto !important;
+
+  margin: 10px 0 7px !important;
+  padding: 6px 10px !important;
+
+  border-left-width: 3px !important;
+}
+
+/* TEXT TANGGAL */
+.iko-date-title {
+  font-size: 10px !important;
+  line-height: 1.2 !important;
+}
+
+/* UPDATE BUTTON */
+.iko-update-btn {
+  min-width: 72px !important;
+  width: auto !important;
+  height: 28px !important;
+
+  padding: 0 8px !important;
+
+  font-size: 8px !important;
+}
+
+/* ICON UPDATE */
+.iko-update-icon {
+  font-size: 14px !important;
+}
+
+/* TEXT UPDATE */
+.iko-update-text {
+  font-size: 8px !important;
+}
+
     `;
 
     document.head.appendChild(style);
