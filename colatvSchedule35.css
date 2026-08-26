@@ -715,5 +715,32 @@
 
     }
 
+/* ==========================================
+   FIX COLATV DATE ALIGNMENT
+   SEJAJAR DENGAN KOTAK MATCH
+========================================== */
 
+#colatvSchedule .cola-title {
+    width: auto !important;
+
+    /* samakan posisi dengan .cola-match */
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* Jika match card punya margin kiri/kanan,
+   title mengikuti area card */
+#colatvSchedule .cola-match {
+    box-sizing: border-box;
+}
+
+
+/* Pastikan parent tidak membuat title melebar */
+#colatvSchedule {
+    box-sizing: border-box;
+    width: 100%;
+}
 }
