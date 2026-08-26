@@ -1229,12 +1229,13 @@
   font-size: 13px !important;
 }
 
-/* UPCOMING / LIVE */
+/* UPCOMING / LIVE — PC/LAPTOP NORMAL */
 .iko-status {
   min-width: 55px !important;
   margin-top: 4px !important;
-  padding: 5px 7px !important;
-  font-size: 13px !important;
+  padding: 4px 7px !important;
+  font-size: 9px !important;
+  line-height: 1 !important;
 }
 
 /* COUNTDOWN */
