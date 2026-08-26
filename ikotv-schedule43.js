@@ -22,8 +22,8 @@
     scheduleSelector: "#ikotvSchedule",
     playerSelector: "#tv",
 
-    refreshMs: 60000,
-    countdownMs: 1000,
+    
+    countdownMs: 5000,
 
     // IKOTV match timestamps are treated as Unix seconds.
     // This only controls when a match is considered ended.
@@ -2250,20 +2250,97 @@ async function playIKOTVStream(url) {
 
     schedule.innerHTML = html;
 
-    schedule
-      .querySelectorAll("[data-ikotv-watch]")
-      .forEach(button => {
-        button.addEventListener(
-          "click",
-          () => {
-            openIKOMatch(
-              button.dataset.ikotvWatch
-            );
-          }
+setupUpdateButtons();
+
+schedule
+  .querySelectorAll("[data-ikotv-watch]")
+  .forEach(button => {
+
+    button.addEventListener(
+      "click",
+      () => {
+
+        openIKOMatch(
+          button.dataset.ikotvWatch
         );
-      });
+
+      }
+    );
+
+  });
   }
 
+/* =========================================================
+   MANUAL UPDATE BUTTON
+========================================================= */
+
+function setupUpdateButtons() {
+
+  const schedule =
+    document.querySelector(
+      CONFIG.scheduleSelector
+    );
+
+  if (!schedule) return;
+
+  schedule
+    .querySelectorAll(
+      "[data-ikotv-update]"
+    )
+    .forEach(button => {
+
+      button.onclick = async () => {
+
+        if (loadingSchedule) {
+          return;
+        }
+
+        button.classList.add("loading");
+
+        const icon =
+          button.querySelector(
+            ".iko-update-icon"
+          );
+
+        const text =
+          button.querySelector(
+            ".iko-update-text"
+          );
+
+        if (icon) {
+          icon.textContent = "⟳";
+        }
+
+        if (text) {
+          text.textContent = "UPDATING";
+        }
+
+        try {
+
+          await loadSchedule();
+
+        } finally {
+
+          button.classList.remove(
+            "loading"
+          );
+
+          if (icon) {
+            icon.textContent = "↻";
+          }
+
+          if (text) {
+            text.textContent = "UPDATE";
+          }
+
+        }
+
+      };
+
+    });
+
+}
+  
   /* =========================================================
      PLAYER UI
   ========================================================= */
@@ -3124,34 +3201,7 @@ renderSchedule();
     }
   }
 
-  /* =========================================================
-     AUTO REFRESH
-  ========================================================= */
-
-  function startAutoRefresh() {
-
-    setInterval(
-      () => {
-
-        loadSchedule();
-
-      },
-      CONFIG.refreshMs
-    );
-  }
-
-  function startCountdownTimer() {
-
-    setInterval(
-      () => {
-
-        updateCountdowns();
-
-      },
-      CONFIG.countdownMs
-    );
-  }
-
+ 
   /* =========================================================
      INIT
   ========================================================= */
@@ -3167,8 +3217,6 @@ renderSchedule();
       await loadLibraries();
 
       await loadSchedule();
-
-      startAutoRefresh();
 
       startCountdownTimer();
 
