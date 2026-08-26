@@ -23,7 +23,7 @@
     playerSelector: "#tv",
 
     
-    countdownMs: 5000,
+    countdownMs: 1000,
 
     // IKOTV match timestamps are treated as Unix seconds.
     // This only controls when a match is considered ended.
