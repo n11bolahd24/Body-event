@@ -29,34 +29,32 @@
 
 /* ==========================================
    COLATV DATE + UPDATE
-   ALIGN EXACTLY WITH MATCH CARD
+   EXACT MATCH CARD WIDTH
 ========================================== */
 
-.cola-title {
+#colatvSchedule .cola-title {
     position: sticky;
-
     top: 0;
-
     z-index: 9999;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
 
-    min-height: 0;
-    height: auto;
+    /* KUNCI UKURAN */
+    width: calc(100% - 20px) !important;
+    max-width: none !important;
 
-    /* SAMA DENGAN POSISI .cola-match */
-    width: calc(100% - 20px);
-
-    margin-top: 10px;
-    margin-bottom: 7px;
-
-    /* INI YANG MEMBUAT TENGAH */
-    margin-left: 10px;
-    margin-right: 10px;
+    /* KUNCI POSISI */
+    margin-top: 10px !important;
+    margin-bottom: 7px !important;
+    margin-left: 10px !important;
+    margin-right: 10px !important;
 
     padding: 6px 10px;
+
+    min-height: 0;
+    height: auto;
 
     background:
         linear-gradient(
@@ -73,11 +71,13 @@
 
     color: #fff;
 
-    box-sizing: border-box;
+    box-sizing: border-box !important;
 
     box-shadow:
         0 5px 18px rgba(0,0,0,.25);
 }
+
+
 /* ==========================================
    TANGGAL
 ========================================== */
@@ -717,4 +717,20 @@
 
     }
 
+}
+
+/* ==========================================
+   FORCE TITLE ALIGNMENT WITH MATCH
+========================================== */
+
+#colatvSchedule .cola-match {
+    width: calc(100% - 20px) !important;
+    margin-left: 10px !important;
+    margin-right: 10px !important;
+}
+
+#colatvSchedule .cola-title {
+    width: calc(100% - 20px) !important;
+    margin-left: 10px !important;
+    margin-right: 10px !important;
 }
