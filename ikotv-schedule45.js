@@ -487,7 +487,7 @@
 
 .iko-date {
   position: sticky;
-  top: 155px;
+  top: 115px;
   z-index: 100;
 
   display: flex;
@@ -1162,7 +1162,7 @@
   }
   
   .iko-date {
-  top: 145px;
+  top: 105px;
 
   min-height: 58px;
 
