@@ -2070,13 +2070,27 @@ async function playIKOTVStream(url) {
         const group = groups[key];
 
         html += `
-          <div class="iko-box">
-            <div class="iko-date">
-              ${escapeHTML(
-                formatDate(group[0].time)
-              )}
-            </div>
-        `;
+  <div class="iko-box">
+
+    <div class="iko-date">
+
+      <span class="iko-date-title">
+        ${escapeHTML(
+          formatDate(group[0].time)
+        )}
+      </span>
+
+      <button
+        type="button"
+        class="iko-update-btn"
+        data-ikotv-update
+      >
+        <span class="iko-update-icon">↻</span>
+        <span class="iko-update-text">UPDATE</span>
+      </button>
+
+    </div>
+`;
 
         group.forEach(match => {
           const status = getStatus(match);
