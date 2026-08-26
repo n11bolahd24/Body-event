@@ -482,13 +482,22 @@
 }
 
 /* =========================================================
-   DATE HEADER
+   STICKY DATE + UPDATE
 ========================================================= */
 
 .iko-date {
-  position: relative;
+  position: sticky;
+  top: 155px;
+  z-index: 100;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  min-height: 64px;
+
   margin: 25px 0 12px;
-  padding: 12px 16px;
+  padding: 10px 16px;
 
   background:
     linear-gradient(
@@ -503,13 +512,85 @@
   border-radius: 8px;
 
   color: #fff;
-  font-size: 13px;
-  font-weight: 800;
-
-  letter-spacing: .5px;
-  text-transform: uppercase;
 
   box-sizing: border-box;
+
+  box-shadow:
+    0 5px 18px rgba(0,0,0,.35);
+}
+
+/* =========================================================
+   UPDATE BUTTON
+========================================================= */
+
+.iko-update-btn {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 5px;
+
+  min-width: 92px;
+  height: 38px;
+
+  padding: 0 12px;
+
+  border: 1px solid #00d979;
+  border-radius: 7px;
+
+  background: rgba(0,0,0,.35);
+
+  color: #00d979;
+
+  font-size: 11px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  transition:
+    background .2s ease,
+    color .2s ease,
+    transform .15s ease;
+}
+
+.iko-update-btn:hover {
+  background: #00d979;
+  color: #001b0f;
+}
+
+.iko-update-btn:active {
+  transform: scale(.96);
+}
+
+.iko-update-btn.loading {
+  pointer-events: none;
+  opacity: .7;
+}
+
+.iko-update-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.iko-update-text {
+  line-height: 1;
+}
+
+/* spinner ketika update */
+.iko-update-btn.loading
+.iko-update-icon {
+  animation: ikoUpdateSpin .8s linear infinite;
+}
+
+@keyframes ikoUpdateSpin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* =========================================================
@@ -1079,6 +1160,29 @@
     height: 56.25vw;
     min-height: 190px;
   }
+  
+  .iko-date {
+  top: 145px;
+
+  min-height: 58px;
+
+  margin: 15px 0 8px;
+
+  padding: 8px 10px;
+}
+
+.iko-update-btn {
+  min-width: 82px;
+  height: 34px;
+
+  padding: 0 9px;
+
+  font-size: 9px;
+}
+
+.iko-update-icon {
+  font-size: 16px;
+}
 }
 
 /* =========================================================
