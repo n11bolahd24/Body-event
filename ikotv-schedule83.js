@@ -1,8 +1,11 @@
 /*!
- * IKOTV Auto Schedule
+ * IKOTV Auto Schedule + ArtPlayer
  * N11BOLAHD
  *
  * Requires:
+ * - https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.min.js
+ * - https://cdn.jsdelivr.net/npm/artplayer-plugin-hls-quality/dist/artplayer-plugin-hls-quality.js
+ * - Hls.js is loaded automatically by this script for browsers that need it.
  */
 
 (() => {
@@ -26,6 +29,13 @@
     // This only controls when a match is considered ended.
     matchDurationHours: 2,
 
+    // CDN libraries
+    artplayer:
+      "https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.min.js",
+    hls:
+      "https://cdn.jsdelivr.net/npm/hls.js@1.6.2/dist/hls.min.js",
+    hlsQuality:
+      "https://cdn.jsdelivr.net/npm/artplayer-plugin-hls-quality/dist/artplayer-plugin-hls-quality.js"
   };
 
   let matches = [];
