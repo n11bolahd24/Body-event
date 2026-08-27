@@ -755,8 +755,8 @@
 }
 
 .iko-status.upcoming {
-  background: #ffffff;
-  color: #aaa;
+  background: #525050;
+  color: #ffffff;
 }
 
 .iko-status.live {
