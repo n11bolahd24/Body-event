@@ -722,7 +722,7 @@
 .iko-vs {
   margin-top: 5px;
 
-  color: #555;
+  color: #ffffff;
 
   font-size: 9px;
   font-weight: 700;
@@ -755,7 +755,7 @@
 }
 
 .iko-status.upcoming {
-  background: #292929;
+  background: #ffffff;
   color: #aaa;
 }
 
@@ -914,7 +914,7 @@
   border-radius: 5px;
 
   background: #202020;
-  color: #aaa;
+  color: #ffffff;
 
   cursor: pointer;
 
