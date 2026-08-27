@@ -816,7 +816,7 @@
   border-radius: 7px;
 
   background: #00d979;
-  color: #ffffff;
+  color: #001b0f;
 
   cursor: pointer;
 
