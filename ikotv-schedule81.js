@@ -3335,7 +3335,94 @@ function updateCountdowns() {
     renderSchedule();
   }
 }
+/* =========================================================
+   REAL-TIME SCORE UPDATE
+========================================================= */
 
+let scoreUpdating = false;
+
+async function updateLiveScores() {
+
+  if (scoreUpdating || !matches.length) {
+    return;
+  }
+
+  scoreUpdating = true;
+
+  try {
+
+    const newMatches =
+      await fetchMatches();
+
+    newMatches.forEach(newMatch => {
+
+      const oldMatch =
+        matches.find(
+          m =>
+            String(m.id) ===
+            String(newMatch.id)
+        );
+
+      if (!oldMatch) return;
+
+      /*
+       * Update data score saja
+       */
+      oldMatch.homeScore =
+        newMatch.homeScore;
+
+      oldMatch.awayScore =
+        newMatch.awayScore;
+
+      /*
+       * Cari card pertandingan
+       */
+      const card =
+        document.querySelector(
+          `[data-ikotv-match="${CSS.escape(
+            String(newMatch.id)
+          )}"]`
+        );
+
+      if (!card) return;
+
+      /*
+       * Hanya update score
+       * tanpa render ulang card
+       */
+      const score =
+        card.querySelector(".iko-score");
+
+      if (
+        score &&
+        getStatus(oldMatch) === "live"
+      ) {
+
+        score.textContent =
+          `${oldMatch.homeScore} - ${oldMatch.awayScore}`;
+
+      }
+
+    });
+
+    console.log(
+      "[IKOTV] Live score updated."
+    );
+
+  } catch (error) {
+
+    console.warn(
+      "[IKOTV] Gagal update live score:",
+      error
+    );
+
+  } finally {
+
+    scoreUpdating = false;
+
+  }
+
+}
   /* =========================================================
      LOAD SCHEDULE
   ========================================================= */
@@ -3449,6 +3536,11 @@ function startCountdownTimer() {
       await loadSchedule();
 
       startCountdownTimer();
+
+      setInterval(
+  updateLiveScores,
+  30000
+);
 
       console.log(
         "[IKOTV] Initialized successfully."
