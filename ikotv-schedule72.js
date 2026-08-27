@@ -706,6 +706,9 @@
 
 .iko-time {
   color: #fff;
+  font-family:
+    "Courier New",
+    monospace;
 
   font-size: 20px;
   font-weight: 900;
