@@ -1467,25 +1467,80 @@
 }
 
 /* =========================================================
-   IKOTV — GLOBAL FONT
-   Samakan semua teks dengan countdown
+   IKOTV — FONT KHUSUS
+   Nama Team TETAP font default
 ========================================================= */
 
-#ikotvSchedule,
-#ikotvSchedule *,
-#tv,
-#tv * {
-  font-family:
-    "Courier New",
-    monospace !important;
+/* COMPETITION */
+.iko-comp {
+  font-family: "Courier New", monospace !important;
 }
+
+/* KICKOFF TIME */
+.iko-time {
+  font-family: "Courier New", monospace !important;
+}
+
+/* VS */
+.iko-vs {
+  font-family: "Courier New", monospace !important;
+}
+
+/* STATUS: UPCOMING / LIVE / ENDED */
+.iko-status {
+  font-family: "Courier New", monospace !important;
+}
+
+/* COUNTDOWN */
+.iko-countdown {
+  font-family: "Courier New", monospace !important;
+}
+
+/* WATCH LIVE / WAITING FOR KICKOFF */
+.iko-watch {
+  font-family: "Courier New", monospace !important;
+}
+
+/* UPDATE */
+.iko-update-btn,
+.iko-update-text {
+  font-family: "Courier New", monospace !important;
+}
+
+/* LIVE SERVER + NAMA SERVER */
+.iko-server-panel,
+.iko-server-title,
+.iko-live-server,
+.iko-server-list {
+  font-family: "Courier New", monospace !important;
+}
+
+/* PLAYER */
+.iko-player-title,
+.iko-close,
+.iko-server,
+.iko-note {
+  font-family: "Courier New", monospace !important;
+}
+
+/* LOADING / ERROR / EMPTY */
+.iko-loading,
+.iko-error,
+.iko-empty,
+.iko-server-loading,
+.iko-server-error {
+  font-family: "Courier New", monospace !important;
+}
+
+
 /* =========================================================
-   NAMA TIM — DEFAULT FONT
+   NAMA TEAM
+   KEMBALI KE FONT DEFAULT TEMPLATE
 ========================================================= */
 
 .iko-team,
 .iko-team span {
-  font-family: Arial, sans-serif !important;
+  font-family: inherit !important;
 }
 
 /* =========================================================
