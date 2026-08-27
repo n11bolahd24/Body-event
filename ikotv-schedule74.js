@@ -1480,6 +1480,24 @@
     monospace !important;
 }
 
+
+/* =========================================================
+   IKOTV — HOVER BACKGROUND SAJA
+========================================================= */
+
+.iko-card {
+  transition: background .2s ease !important;
+}
+
+.iko-card:hover {
+  background:
+    linear-gradient(
+      135deg,
+      #111b17 0%,
+      #17231e 50%,
+      #111b17 100%
+    ) !important;
+}
     `;
 
     document.head.appendChild(style);
