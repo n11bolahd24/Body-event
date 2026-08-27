@@ -2419,21 +2419,23 @@ async function playIKOTVStream(url) {
                   ${homeLogo}
                 </div>
 
-                <div class="iko-center">
+<div class="iko-time">
+  ${escapeHTML(
+    formatTime(match.time)
+  )}
+</div>
 
-                  <div class="iko-time">
-                    ${escapeHTML(
-                      formatTime(match.time)
-                    )}
-                  </div>
+<div class="iko-score">
+  ${
+    status === "live"
+      ? `${match.homeScore} - ${match.awayScore}`
+      : "VS"
+  }
+</div>
 
-                  <div class="iko-vs">
-                    VS
-                  </div>
-
-                  <div class="iko-status ${status}">
-                    ${statusText}
-                  </div>
+<div class="iko-status ${status}">
+  ${statusText}
+</div>
 
                   ${
                     cd
