@@ -1,11 +1,8 @@
 /*!
- * IKOTV Auto Schedule + ArtPlayer
+ * IKOTV Auto Schedule
  * N11BOLAHD
  *
  * Requires:
- * - https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.min.js
- * - https://cdn.jsdelivr.net/npm/artplayer-plugin-hls-quality/dist/artplayer-plugin-hls-quality.js
- * - Hls.js is loaded automatically by this script for browsers that need it.
  */
 
 (() => {
@@ -29,13 +26,6 @@
     // This only controls when a match is considered ended.
     matchDurationHours: 2,
 
-    // CDN libraries
-    artplayer:
-      "https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.min.js",
-    hls:
-      "https://cdn.jsdelivr.net/npm/hls.js@1.6.2/dist/hls.min.js",
-    hlsQuality:
-      "https://cdn.jsdelivr.net/npm/artplayer-plugin-hls-quality/dist/artplayer-plugin-hls-quality.js"
   };
 
   let matches = [];
@@ -228,26 +218,6 @@
       match?.match_status ??
       0
     ),
-
-    homeScore: Number(
-  match?.home_score ??
-  match?.homeScore ??
-  match?.home_score_live ??
-  match?.score_home ??
-  match?.hometeam?.score ??
-  match?.home_team?.score ??
-  0
-),
-
-awayScore: Number(
-  match?.away_score ??
-  match?.awayScore ??
-  match?.away_score_live ??
-  match?.score_away ??
-  match?.awayteam?.score ??
-  match?.away_team?.score ??
-  0
-),
 
     home:
       home.name_en ||
@@ -875,36 +845,7 @@ awayScore: Number(
 
   cursor: not-allowed;
 }
-/* =========================================================
-   IKOTV SCORE
-========================================================= */
 
-.iko-score {
-  margin-top: 5px;
-
-  color: #fff;
-
-  font-size: 13px;
-  font-weight: 900;
-
-  line-height: 1;
-
-  letter-spacing: 1px;
-
-  white-space: nowrap;
-}
-
-@media (max-width: 600px) {
-
-  .iko-score {
-    margin-top: 3px;
-
-    font-size: 9px !important;
-
-    letter-spacing: .7px;
-  }
-
-}
 /* =========================================================
    PLAYER TITLE
 ========================================================= */
@@ -2448,23 +2389,21 @@ async function playIKOTVStream(url) {
                   ${homeLogo}
                 </div>
 
-<div class="iko-time">
-  ${escapeHTML(
-    formatTime(match.time)
-  )}
-</div>
+                <div class="iko-center">
 
-<div class="iko-score">
-  ${
-    status === "live"
-      ? `${match.homeScore} - ${match.awayScore}`
-      : "VS"
-  }
-</div>
+                  <div class="iko-time">
+                    ${escapeHTML(
+                      formatTime(match.time)
+                    )}
+                  </div>
 
-<div class="iko-status ${status}">
-  ${statusText}
-</div>
+                  <div class="iko-vs">
+                    VS
+                  </div>
+
+                  <div class="iko-status ${status}">
+                    ${statusText}
+                  </div>
 
                   ${
                     cd
@@ -3335,94 +3274,7 @@ function updateCountdowns() {
     renderSchedule();
   }
 }
-/* =========================================================
-   REAL-TIME SCORE UPDATE
-========================================================= */
 
-let scoreUpdating = false;
-
-async function updateLiveScores() {
-
-  if (scoreUpdating || !matches.length) {
-    return;
-  }
-
-  scoreUpdating = true;
-
-  try {
-
-    const newMatches =
-      await fetchMatches();
-
-    newMatches.forEach(newMatch => {
-
-      const oldMatch =
-        matches.find(
-          m =>
-            String(m.id) ===
-            String(newMatch.id)
-        );
-
-      if (!oldMatch) return;
-
-      /*
-       * Update data score saja
-       */
-      oldMatch.homeScore =
-        newMatch.homeScore;
-
-      oldMatch.awayScore =
-        newMatch.awayScore;
-
-      /*
-       * Cari card pertandingan
-       */
-      const card =
-        document.querySelector(
-          `[data-ikotv-match="${CSS.escape(
-            String(newMatch.id)
-          )}"]`
-        );
-
-      if (!card) return;
-
-      /*
-       * Hanya update score
-       * tanpa render ulang card
-       */
-      const score =
-        card.querySelector(".iko-score");
-
-      if (
-        score &&
-        getStatus(oldMatch) === "live"
-      ) {
-
-        score.textContent =
-          `${oldMatch.homeScore} - ${oldMatch.awayScore}`;
-
-      }
-
-    });
-
-    console.log(
-      "[IKOTV] Live score updated."
-    );
-
-  } catch (error) {
-
-    console.warn(
-      "[IKOTV] Gagal update live score:",
-      error
-    );
-
-  } finally {
-
-    scoreUpdating = false;
-
-  }
-
-}
   /* =========================================================
      LOAD SCHEDULE
   ========================================================= */
@@ -3536,11 +3388,6 @@ function startCountdownTimer() {
       await loadSchedule();
 
       startCountdownTimer();
-
-      setInterval(
-  updateLiveScores,
-  30000
-);
 
       console.log(
         "[IKOTV] Initialized successfully."
