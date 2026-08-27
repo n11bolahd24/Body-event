@@ -875,7 +875,36 @@ awayScore: Number(
 
   cursor: not-allowed;
 }
+/* =========================================================
+   IKOTV SCORE
+========================================================= */
 
+.iko-score {
+  margin-top: 5px;
+
+  color: #fff;
+
+  font-size: 13px;
+  font-weight: 900;
+
+  line-height: 1;
+
+  letter-spacing: 1px;
+
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+
+  .iko-score {
+    margin-top: 3px;
+
+    font-size: 9px !important;
+
+    letter-spacing: .7px;
+  }
+
+}
 /* =========================================================
    PLAYER TITLE
 ========================================================= */
