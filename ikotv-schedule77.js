@@ -1480,15 +1480,12 @@
     monospace !important;
 }
 /* =========================================================
-   NAMA TIM — KEMBALI KE FONT DEFAULT
+   NAMA TIM — DEFAULT FONT
 ========================================================= */
 
-.iko-team {
-  font-family: inherit !important;
-}
-
+.iko-team,
 .iko-team span {
-  font-family: inherit !important;
+  font-family: Arial, sans-serif !important;
 }
 
 /* =========================================================
