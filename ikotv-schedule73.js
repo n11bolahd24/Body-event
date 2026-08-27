@@ -600,6 +600,10 @@
 
   color: #ffffff;
 
+  font-family:
+    "Courier New",
+    monospace;
+
   font-size: 11px;
   font-weight: 700;
 
@@ -648,6 +652,10 @@
   min-width: 0;
 
   gap: 10px;
+
+  font-family:
+    "Courier New",
+    monospace;
 
   font-size: 14px;
   font-weight: 700;
@@ -1456,6 +1464,20 @@
     white-space: nowrap !important;
   }
 
+}
+
+/* =========================================================
+   IKOTV — GLOBAL FONT
+   Samakan semua teks dengan countdown
+========================================================= */
+
+#ikotvSchedule,
+#ikotvSchedule *,
+#tv,
+#tv * {
+  font-family:
+    "Courier New",
+    monospace !important;
 }
 
     `;
