@@ -1560,7 +1560,19 @@
       #111b17 100%
     ) !important;
 }
-    `;
+/* =========================================================
+   FINAL — UKURAN WATCH LIVE & WAITING FOR KICKOFF SAMA
+   WARNA TETAP MENGIKUTI CSS LAMA
+========================================================= */
+
+.iko-watch {
+  width: 190px !important;
+  min-width: 190px !important;
+  max-width: calc(100% - 10px) !important;
+  box-sizing: border-box !important;
+}
+    
+      `;
 
     document.head.appendChild(style);
   }
