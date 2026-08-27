@@ -598,7 +598,7 @@
 
   border-bottom: 1px solid rgba(255,255,255,.06);
 
-  color: #999;
+  color: #ffffff;
 
   font-size: 11px;
   font-weight: 700;
