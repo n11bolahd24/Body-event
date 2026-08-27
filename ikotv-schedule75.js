@@ -850,7 +850,7 @@
 }
 
 .iko-watch.disabled {
-  background: #202020;
+  background: #525050;
   color: #ffffff;
 
   cursor: not-allowed;
