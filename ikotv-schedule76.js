@@ -1479,7 +1479,17 @@
     "Courier New",
     monospace !important;
 }
+/* =========================================================
+   NAMA TIM — KEMBALI KE FONT DEFAULT
+========================================================= */
 
+.iko-team {
+  font-family: inherit !important;
+}
+
+.iko-team span {
+  font-family: inherit !important;
+}
 
 /* =========================================================
    IKOTV — HOVER BACKGROUND SAJA
