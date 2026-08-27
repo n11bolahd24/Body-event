@@ -229,6 +229,26 @@
       0
     ),
 
+    homeScore: Number(
+  match?.home_score ??
+  match?.homeScore ??
+  match?.home_score_live ??
+  match?.score_home ??
+  match?.hometeam?.score ??
+  match?.home_team?.score ??
+  0
+),
+
+awayScore: Number(
+  match?.away_score ??
+  match?.awayScore ??
+  match?.away_score_live ??
+  match?.score_away ??
+  match?.awayteam?.score ??
+  match?.away_team?.score ??
+  0
+),
+
     home:
       home.name_en ||
       home.short_name_en ||
