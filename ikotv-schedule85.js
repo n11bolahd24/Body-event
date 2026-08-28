@@ -3401,7 +3401,101 @@ function startCountdownTimer() {
   );
 
 }
- 
+/* =========================================================
+   AUTO CHECK LIVE IKOTV
+   Match yang sudah hilang dari LIVE IKOTV
+   akan otomatis dihapus dari jadwal
+========================================================= */
+
+let liveMonitorStarted = false;
+
+function startLiveMonitor() {
+
+  if (liveMonitorStarted) {
+    return;
+  }
+
+  liveMonitorStarted = true;
+
+  setInterval(
+    async () => {
+
+      if (loadingSchedule) {
+        return;
+      }
+
+      try {
+
+        const oldMatches =
+          matches.map(match => ({
+            id: String(match.id),
+            time: match.time,
+            isLive: match.isLive === true
+          }));
+
+        const newMatches =
+          await fetchMatches();
+
+        const oldIDs =
+          oldMatches
+            .map(match => String(match.id))
+            .join(",");
+
+        const newIDs =
+          newMatches
+            .map(match => String(match.id))
+            .join(",");
+
+        const oldLive =
+          oldMatches
+            .filter(match => match.isLive)
+            .map(match => String(match.id))
+            .join(",");
+
+        const newLive =
+          newMatches
+            .filter(match => match.isLive)
+            .map(match => String(match.id))
+            .join(",");
+
+        const changed =
+          oldIDs !== newIDs ||
+          oldLive !== newLive;
+
+        matches =
+          newMatches;
+
+        /*
+         * Hanya render ulang kalau
+         * daftar pertandingan memang berubah.
+         *
+         * Jadi tidak render setiap 30 detik
+         * kalau tidak ada perubahan.
+         */
+        if (changed) {
+
+          console.log(
+            "[IKOTV] LIVE status berubah. Update schedule."
+          );
+
+          renderSchedule();
+
+        }
+
+      } catch (error) {
+
+        console.warn(
+          "[IKOTV] Auto LIVE check gagal:",
+          error
+        );
+
+      }
+
+    },
+    CONFIG.liveCheckMs
+  );
+
+} 
   /* =========================================================
      INIT
   ========================================================= */
@@ -3416,13 +3510,15 @@ function startCountdownTimer() {
 
       await loadLibraries();
 
-      await loadSchedule();
+     await loadSchedule();
 
-      startCountdownTimer();
+     startCountdownTimer();
 
-      console.log(
-        "[IKOTV] Initialized successfully."
-      );
+     startLiveMonitor();
+
+       console.log(
+  "[IKOTV] Initialized successfully."
+);
 
     } catch (error) {
 
