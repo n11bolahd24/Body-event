@@ -1887,19 +1887,39 @@
 
 });
     
-  const result =
-    Array.from(
-      merged.values()
-    )
-    .filter(
-      match =>
-        match.id &&
-        match.time > 0
-    )
-    .sort(
-      (a, b) =>
-        a.time - b.time
-    );
+  const now =
+  Math.floor(Date.now() / 1000);
+
+const result =
+  Array.from(
+    merged.values()
+  )
+  .filter(match => {
+
+    if (
+      !match.id ||
+      !match.time
+    ) {
+      return false;
+    }
+
+    const start =
+      Number(match.time);
+
+    // Belum kickoff → tetap tampil
+    if (now < start) {
+      return true;
+    }
+
+    // Sudah kickoff → hanya tampil
+    // kalau IKOTV masih menganggap LIVE
+    return match.isLive === true;
+
+  })
+  .sort(
+    (a, b) =>
+      a.time - b.time
+  );
 
   console.log(
     "[IKOTV] MERGED COUNT:",
