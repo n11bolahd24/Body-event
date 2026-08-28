@@ -2247,7 +2247,7 @@ async function playIKOTVStream(url) {
         padding:20px;
         box-sizing:border-box;
       ">
-        Gagal memuat stream IKOTV.
+        Gagal memuat stream.
       </div>
     `;
 
