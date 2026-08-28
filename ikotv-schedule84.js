@@ -1862,37 +1862,31 @@
   // pertandingan tersebut tetap masuk.
   liveMatches.forEach(match => {
 
-    const id =
-      String(match.id);
+  const id =
+    String(match.id);
 
-    if (merged.has(id)) {
+  if (merged.has(id)) {
 
-      // Pertahankan data jadwal
-      // tetapi gunakan informasi terbaru
-      // dari LIVE jika tersedia.
+    const old =
+      merged.get(id);
 
-      const old =
-        merged.get(id);
+    merged.set(id, {
+      ...old,
+      ...match,
+      isLive: true
+    });
 
-      merged.set(id, {
-        ...old,
-        ...match
-      });
+  } else {
 
-    } else {
+    merged.set(id, {
+      ...match,
+      isLive: true
+    });
 
-      // Match hanya ada di LIVE
-      // tetap masukkan ke jadwal.
+  }
 
-      merged.set(
-        id,
-        match
-      );
-
-    }
-
-  });
-
+});
+    
   const result =
     Array.from(
       merged.values()
