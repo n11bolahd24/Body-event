@@ -1503,10 +1503,6 @@
   font-family: "Courier New", monospace !important;
 }
 
-/* WATCH LIVE / WAITING FOR KICKOFF */
-.iko-watch {
-  font-family: "Courier New", monospace !important;
-}
 
 /* UPDATE */
 .iko-update-btn,
