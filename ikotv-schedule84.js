@@ -173,18 +173,25 @@
 
   function getStatus(match) {
 
-  const now = Math.floor(Date.now() / 1000);
+  const now =
+    Math.floor(Date.now() / 1000);
 
-  const start = Number(match.time || 0);
+  const start =
+    Number(match.time || 0);
 
-  const end =
-    start +
-    CONFIG.matchDurationHours * 3600;
+  // Jika IKOTV masih memasukkan match
+  // ke daftar LIVE
+  if (match.isLive === true) {
+    return "live";
+  }
 
-  if (now < start) return "upcoming";
+  // Pertandingan belum dimulai
+  if (now < start) {
+    return "upcoming";
+  }
 
-  if (now <= end) return "live";
-
+  // Match sudah lewat kickoff
+  // dan sudah tidak LIVE di IKOTV
   return "ended";
 }
 
