@@ -25,6 +25,9 @@
     
     countdownMs: 1000,
 
+    // Cek status LIVE IKOTV setiap 30 detik
+    liveCheckMs: 30000,
+
 
     // CDN libraries
     artplayer:
