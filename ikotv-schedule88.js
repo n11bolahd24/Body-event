@@ -2839,7 +2839,7 @@ if (type === "dash") {
         "
       >
 
-        Gagal memutar stream.
+        Failed to play the stream.
         <br>
         ${escapeHTML(
           error?.message || ""
