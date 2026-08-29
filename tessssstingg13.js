@@ -2063,42 +2063,24 @@ function getStreamType(url, videoData = {}) {
       ""
     ).toLowerCase();
 
-
   /*
    * ==========================================
-   * HD [auto] / IFRAME PLAYER
+   * IFRAME PLAYER
    * ==========================================
    *
-   * URL iframe berisi:
+   * Kalau URL adalah player.html
+   * dan mempunyai ?mpd=
    *
-   * ?mpd=...
-   * &keyId=...
-   * &key=...
+   * JANGAN bongkar MPD.
    *
-   * Jadi harus dimainkan sebagai DASH.
+   * Biarkan player eksternal yang memainkan.
    */
 
   if (
-    type === "iframe" &&
-    /[?&]mpd=/i.test(url)
+    type === "iframe" ||
+    /player\.html/i.test(lower)
   ) {
-    return "dash";
-  }
-
-
-  /*
-   * ==========================================
-   * EXPLICIT DASH
-   * ==========================================
-   */
-
-  if (
-    type === "dash" ||
-    type === "mpd" ||
-    type.includes("dash") ||
-    type.includes("mpd")
-  ) {
-    return "dash";
+    return "iframe";
   }
 
 
@@ -2127,9 +2109,18 @@ function getStreamType(url, videoData = {}) {
 
   /*
    * ==========================================
-   * URL MPD
+   * MPD
    * ==========================================
    */
+
+  if (
+    type === "dash" ||
+    type === "mpd" ||
+    type.includes("dash") ||
+    type.includes("mpd")
+  ) {
+    return "dash";
+  }
 
   if (
     /\.mpd(?:[?#]|$)/i.test(lower)
@@ -2140,7 +2131,7 @@ function getStreamType(url, videoData = {}) {
 
   /*
    * ==========================================
-   * EXPLICIT HLS
+   * HLS
    * ==========================================
    */
 
@@ -2152,13 +2143,6 @@ function getStreamType(url, videoData = {}) {
     return "hls";
   }
 
-
-  /*
-   * ==========================================
-   * URL M3U8
-   * ==========================================
-   */
-
   if (
     /\.m3u8(?:[?#]|$)/i.test(lower)
   ) {
@@ -2168,7 +2152,6 @@ function getStreamType(url, videoData = {}) {
 
   /*
    * DEFAULT
-   * ==========================================
    */
 
   return "hls";
@@ -2439,7 +2422,59 @@ function playIKOTVHLS(url, video) {
 
 }
 
+/* =========================================================
+   PLAY IFRAME
+========================================================= */
 
+function playIKOTVIframe(url) {
+
+  console.log(
+    "[IKOTV] PLAYER: IFRAME"
+  );
+
+  const tv =
+    document.getElementById("tv");
+
+  if (!tv) {
+    throw new Error(
+      "Element #tv tidak ditemukan."
+    );
+  }
+
+
+  tv.innerHTML = `
+    <div
+      id="ikotvIframeContainer"
+      style="
+        width:100%;
+        height:100%;
+        min-height:250px;
+        background:#000;
+        position:relative;
+        overflow:hidden;
+      "
+    >
+
+      <iframe
+        src="${escapeHTML(url)}"
+        allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+        allowfullscreen
+        frameborder="0"
+        scrolling="no"
+        style="
+          width:100%;
+          height:100%;
+          min-height:250px;
+          border:0;
+          display:block;
+          background:#000;
+        "
+      ></iframe>
+
+    </div>
+  `;
+
+}
 /* =========================================================
    NORMALIZE CLEARKEY
 ========================================================= */
@@ -2770,10 +2805,6 @@ async function playIKOTVDASH(
 
 }
 
-/* =========================================================
-   UNIVERSAL PLAY
-========================================================= */
-
 async function playIKOTVStream(
   url,
   videoData = {}
@@ -2792,7 +2823,6 @@ async function playIKOTVStream(
   const tv =
     document.getElementById("tv");
 
-
   if (!tv) {
 
     console.error(
@@ -2810,7 +2840,9 @@ async function playIKOTVStream(
 
 
   /*
-   * Tentukan jenis stream
+   * ==========================================
+   * TENTUKAN TYPE
+   * ==========================================
    */
 
   const type =
@@ -2818,29 +2850,6 @@ async function playIKOTVStream(
       url,
       videoData
     );
-
-  let dashData = null;
-
-if (type === "dash") {
-
-  dashData =
-    normalizeIKOTVDASH({
-      ...videoData,
-      url: url
-    });
-
-  if (
-    !dashData ||
-    !dashData.url
-  ) {
-
-    throw new Error(
-      "URL MPD Auto HD tidak ditemukan."
-    );
-
-  }
-
-}
 
 
   console.log(
@@ -2850,44 +2859,110 @@ if (type === "dash") {
 
 
   /*
-   * Bersihkan player lama
+   * ==========================================
+   * HAPUS PLAYER LAMA
+   * ==========================================
    */
 
   await destroyIKOTVPlayer();
 
 
   /*
-   * Buat video
+   * ==========================================
+   * IFRAME
+   * ==========================================
+   *
+   * Untuk URL seperti:
+   *
+   * player.html?mpd=...
+   *
+   * jangan bongkar MPD.
+   *
+   * Gunakan player eksternal.
+   */
+
+  if (
+    type === "iframe"
+  ) {
+
+    console.log(
+      "[IKOTV] Menggunakan external iframe player."
+    );
+
+    playIKOTVIframe(url);
+
+    return;
+  }
+
+
+  /*
+   * ==========================================
+   * DASH DATA
+   * ==========================================
+   */
+
+  let dashData = null;
+
+  if (
+    type === "dash"
+  ) {
+
+    dashData =
+      normalizeIKOTVDASH({
+        ...videoData,
+        url: url
+      });
+
+    if (
+      !dashData ||
+      !dashData.url
+    ) {
+
+      throw new Error(
+        "URL MPD tidak ditemukan."
+      );
+
+    }
+
+  }
+
+
+  /*
+   * ==========================================
+   * BUAT VIDEO
+   * ==========================================
    */
 
   tv.innerHTML = `
-  <div
-    id="ikotvVideoContainer"
-    class="shaka-video-container"
-    style="
-      width:100%;
-      height:100%;
-      min-height:250px;
-      background:#000;
-      position:relative;
-      overflow:hidden;
-    "
-  >
-    <video
-      id="ikotvVideo"
-      class="shaka-video"
-      autoplay
-      playsinline
-      preload="auto"
+    <div
+      id="ikotvVideoContainer"
+      class="shaka-video-container"
       style="
         width:100%;
         height:100%;
-        display:block;
+        min-height:250px;
         background:#000;
+        position:relative;
+        overflow:hidden;
       "
-    ></video>
-  </div>
-`;
+    >
+
+      <video
+        id="ikotvVideo"
+        class="shaka-video"
+        autoplay
+        playsinline
+        preload="auto"
+        style="
+          width:100%;
+          height:100%;
+          display:block;
+          background:#000;
+        "
+      ></video>
+
+    </div>
+  `;
 
 
   ikotvVideo =
@@ -2898,20 +2973,17 @@ if (type === "dash") {
 
   if (!ikotvVideo) {
 
-    console.error(
-      "[IKOTV] Video element gagal dibuat."
+    throw new Error(
+      "Video element gagal dibuat."
     );
 
-    return;
   }
 
 
   /*
-   * Jangan tambahkan cache-buster
-   * untuk MPD.
-   *
-   * Beberapa manifest DASH
-   * sensitif terhadap query tambahan.
+   * ==========================================
+   * HLS CACHE BUSTER
+   * ==========================================
    */
 
   const streamURL =
@@ -2954,19 +3026,26 @@ if (type === "dash") {
      * ==========================
      */
 
-    if (type === "dash") {
+    if (
+      type === "dash"
+    ) {
 
-  await playIKOTVDASH(
-    dashData.url,
-    {
-      ...videoData,
-      ...dashData
-    },
-    ikotvVideo
-  );
+      await playIKOTVDASH(
+        dashData.url,
+        {
+          ...videoData,
+          ...dashData
+        },
+        ikotvVideo
+      );
 
-  return;
-}
+      return;
+    }
+
+
+    throw new Error(
+      "Jenis stream tidak dikenali."
+    );
 
 
   } catch (error) {
@@ -2975,7 +3054,6 @@ if (type === "dash") {
       "[IKOTV] Player gagal:",
       error
     );
-
 
     tv.innerHTML = `
 
@@ -3019,8 +3097,7 @@ if (type === "dash") {
 
   }
 
-}
-  
+}  
   /* =========================================================
      SCHEDULE RENDER
   ========================================================= */
