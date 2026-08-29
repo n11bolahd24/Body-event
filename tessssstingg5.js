@@ -3446,39 +3446,144 @@ async function openIKOMatch(matchId) {
   }
 
 }
-  /* =========================================================
+/* =========================================================
    STREAM RESPONSE PARSER
-   HLS + MPD + CLEARKEY
+   SUPPORT:
+   - M3U8 / HLS
+   - MPD
+   - wakacha player.html?mpd=...&keyId=...&key=...
+   - kid + key
+   - clearKeys
 ========================================================= */
 
 function extractVideos(result) {
 
   const videos = [];
 
-
-  function addVideo(
-    item,
-    fallbackName = ""
-  ) {
+  function addVideo(item, fallbackName = "") {
 
     if (!item) return;
 
+    /* ==========================================
+       STRING URL
+    ========================================== */
 
-    /*
-     * ==========================
-     * STRING URL
-     * ==========================
-     */
+    if (typeof item === "string") {
 
-    if (
-      typeof item === "string"
-    ) {
+      const url = safeURL(item);
 
-      const url =
-        safeURL(item);
+      if (!url) return;
 
+      const lower = url.toLowerCase();
 
-      if (url) {
+      /* ------------------------------------------
+         WAKACHA MPD WRAPPER
+      ------------------------------------------ */
+
+      if (
+        lower.includes("player.html") &&
+        lower.includes("mpd=")
+      ) {
+
+        try {
+
+          const parsed =
+            new URL(url);
+
+          const mpd =
+            parsed.searchParams.get("mpd");
+
+          const keyId =
+            parsed.searchParams.get("keyId") ||
+            parsed.searchParams.get("kid");
+
+          const key =
+            parsed.searchParams.get("key");
+
+          if (mpd) {
+
+            videos.push({
+
+              url: url,
+
+              mpd: safeURL(mpd),
+
+              kid: keyId || "",
+
+              key: key || "",
+
+              clearKeys:
+                keyId && key
+                  ? {
+                      [keyId]: key
+                    }
+                  : null,
+
+              name:
+                fallbackName,
+
+              display_name:
+                fallbackName,
+
+              type_name:
+                fallbackName,
+
+              streamType:
+                "mpd"
+
+            });
+
+            return;
+          }
+
+        } catch (_) {}
+
+      }
+
+      /* ------------------------------------------
+         DIRECT MPD
+      ------------------------------------------ */
+
+      if (
+        lower.includes(".mpd")
+      ) {
+
+        videos.push({
+
+          url: url,
+
+          mpd: url,
+
+          kid: "",
+
+          key: "",
+
+          clearKeys: null,
+
+          name:
+            fallbackName,
+
+          display_name:
+            fallbackName,
+
+          type_name:
+            fallbackName,
+
+          streamType:
+            "mpd"
+
+        });
+
+        return;
+      }
+
+      /* ------------------------------------------
+         M3U8
+      ------------------------------------------ */
+
+      if (
+        lower.includes(".m3u8")
+      ) {
 
         videos.push({
 
@@ -3490,15 +3595,46 @@ function extractVideos(result) {
           display_name:
             fallbackName,
 
-          type_name: ""
+          type_name:
+            fallbackName,
+
+          streamType:
+            "hls"
 
         });
 
+        return;
       }
+
+      /* ------------------------------------------
+         URL BIASA
+      ------------------------------------------ */
+
+      videos.push({
+
+        url: url,
+
+        name:
+          fallbackName,
+
+        display_name:
+          fallbackName,
+
+        type_name:
+          fallbackName,
+
+        streamType:
+          "unknown"
+
+      });
 
       return;
     }
 
+
+    /* ==========================================
+       OBJECT
+    ========================================== */
 
     if (
       typeof item !== "object"
@@ -3507,13 +3643,7 @@ function extractVideos(result) {
     }
 
 
-    /*
-     * ==========================
-     * URL
-     * ==========================
-     */
-
-    const url =
+    const rawURL =
       item.url ||
       item.play_url ||
       item.playUrl ||
@@ -3521,9 +3651,6 @@ function extractVideos(result) {
       item.streamUrl ||
       item.m3u8 ||
       item.mpd ||
-      item.manifest ||
-      item.manifest_url ||
-      item.manifestUrl ||
       item.src ||
       item.file ||
       item.link ||
@@ -3531,175 +3658,325 @@ function extractVideos(result) {
 
 
     const validURL =
-      safeURL(url);
+      safeURL(rawURL);
 
 
-    if (!validURL) {
-      return;
-    }
+    /* ==========================================
+       NAMA SERVER
+    ========================================== */
+
+    const name =
+      item.name ||
+      item.server_name ||
+      item.serverName ||
+      fallbackName ||
+      "";
 
 
-    /*
-     * ==========================
-     * TYPE
-     * ==========================
-     */
+    const displayName =
+      item.display_name ||
+      item.displayName ||
+      item.server_name ||
+      item.serverName ||
+      item.name ||
+      item.type_name ||
+      fallbackName ||
+      "";
 
-    let type =
+
+    const typeName =
+      item.type_name ||
+      item.typeName ||
       item.type ||
-      item.format ||
-      item.protocol ||
       "";
 
 
-    /*
-     * MPD otomatis DASH
-     */
+    /* ==========================================
+       KID / KEY
+    ========================================== */
 
-    if (
-      /\.mpd(?:[?#]|$)/i.test(
-        validURL
-      )
-    ) {
-
-      type = "dash";
-
-    }
-
-
-    /*
-     * M3U8 otomatis HLS
-     */
-
-    else if (
-      /\.m3u8(?:[?#]|$)/i.test(
-        validURL
-      )
-    ) {
-
-      type = "hls";
-
-    }
-
-
-    /*
-     * ==========================
-     * KID / KEY
-     * ==========================
-     */
-
-    const kid =
+    let kid =
       item.kid ||
-      item.KID ||
-      item.kid_hex ||
-      item.kidHex ||
-      item.default_kid ||
-      item.defaultKID ||
+      item.keyId ||
+      item.key_id ||
+      item.keyID ||
       "";
 
 
-    const key =
+    let key =
       item.key ||
-      item.KEY ||
-      item.key_hex ||
-      item.keyHex ||
+      item.clearKey ||
       "";
 
-
-    /*
-     * ==========================
-     * CLEARKEY OBJECT
-     * ==========================
-     */
 
     let clearKeys =
       item.clearKeys ||
       item.clear_keys ||
-      item.clearkeys ||
       null;
 
 
-    /*
-     * Kalau API memberi kid/key
-     * ubah menjadi clearKeys
-     */
+    /* ==========================================
+       CLEARKEY OBJECT
+    ========================================== */
 
     if (
-      !clearKeys &&
-      kid &&
-      key
+      clearKeys &&
+      typeof clearKeys === "object"
     ) {
 
-      clearKeys = {
+      const firstKey =
+        Object.keys(clearKeys)[0];
 
-        [
-          String(kid)
-            .replace(/-/g, "")
-            .toLowerCase()
-        ]:
+      if (firstKey) {
 
-          String(key)
-            .replace(/-/g, "")
-            .toLowerCase()
+        kid =
+          kid ||
+          firstKey;
 
-      };
+        key =
+          key ||
+          clearKeys[firstKey];
+
+      }
 
     }
 
 
-    /*
-     * ==========================
-     * VIDEO OBJECT
-     * ==========================
-     */
+    /* ==========================================
+       DETEKSI URL WRAPPER
+       wakacha.github.io/player.html
+    ========================================== */
 
-    videos.push({
+    if (
+      validURL &&
+      validURL
+        .toLowerCase()
+        .includes("player.html")
+    ) {
 
-      url:
-        validURL,
+      try {
 
-      type:
-        type,
+        const parsed =
+          new URL(validURL);
 
-      kid:
-        kid,
+        const mpd =
+          parsed.searchParams.get("mpd");
 
-      key:
-        key,
+        const urlKid =
+          parsed.searchParams.get("keyId") ||
+          parsed.searchParams.get("kid");
 
-      clearKeys:
-        clearKeys,
+        const urlKey =
+          parsed.searchParams.get("key");
 
-      name:
-        item.name ||
-        item.server_name ||
-        item.serverName ||
-        fallbackName,
+        if (mpd) {
 
-      display_name:
-        item.display_name ||
-        item.displayName ||
-        item.server_name ||
-        item.serverName ||
-        item.name ||
-        fallbackName,
+          kid =
+            kid ||
+            urlKid ||
+            "";
 
-      type_name:
-        item.type_name ||
-        item.typeName ||
-        item.type ||
-        ""
+          key =
+            key ||
+            urlKey ||
+            "";
 
-    });
+          if (
+            kid &&
+            key
+          ) {
+
+            clearKeys = {
+              [kid]: key
+            };
+
+          }
+
+          videos.push({
+
+            url:
+              validURL,
+
+            mpd:
+              safeURL(mpd),
+
+            kid:
+              kid,
+
+            key:
+              key,
+
+            clearKeys:
+              clearKeys,
+
+            name:
+              name,
+
+            display_name:
+              displayName,
+
+            type_name:
+              typeName,
+
+            streamType:
+              "mpd"
+
+          });
+
+          return;
+
+        }
+
+      } catch (_) {}
+
+    }
+
+
+    /* ==========================================
+       DIRECT MPD
+    ========================================== */
+
+    if (
+      validURL &&
+      (
+        validURL
+          .toLowerCase()
+          .includes(".mpd")
+        ||
+        String(
+          item.mpd || ""
+        ).length > 0
+      )
+    ) {
+
+      const mpdURL =
+        safeURL(
+          item.mpd ||
+          validURL
+        );
+
+      if (mpdURL) {
+
+        videos.push({
+
+          url:
+            validURL,
+
+          mpd:
+            mpdURL,
+
+          kid:
+            kid,
+
+          key:
+            key,
+
+          clearKeys:
+            clearKeys,
+
+          name:
+            name,
+
+          display_name:
+            displayName,
+
+          type_name:
+            typeName,
+
+          streamType:
+            "mpd"
+
+        });
+
+        return;
+
+      }
+
+    }
+
+
+    /* ==========================================
+       M3U8
+    ========================================== */
+
+    if (
+      validURL &&
+      validURL
+        .toLowerCase()
+        .includes(".m3u8")
+    ) {
+
+      videos.push({
+
+        url:
+          validURL,
+
+        name:
+          name,
+
+        display_name:
+          displayName,
+
+        type_name:
+          typeName,
+
+        streamType:
+          "hls"
+
+      });
+
+      return;
+
+    }
+
+
+    /* ==========================================
+       URL LAIN
+    ========================================== */
+
+    if (validURL) {
+
+      videos.push({
+
+        url:
+          validURL,
+
+        kid:
+          kid,
+
+        key:
+          key,
+
+        clearKeys:
+          clearKeys,
+
+        name:
+          name,
+
+        display_name:
+          displayName,
+
+        type_name:
+          typeName,
+
+        streamType:
+          (
+            kid &&
+            key
+          )
+            ? "mpd"
+            : "unknown"
+
+      });
+
+    }
 
   }
 
 
-  /*
-   * ==========================
-   * CANDIDATES
-   * ==========================
-   */
+  /* ==========================================
+     CANDIDATES
+  ========================================== */
 
   const candidates = [
 
@@ -3719,7 +3996,8 @@ function extractVideos(result) {
 
 
   for (
-    const candidate of candidates
+    const candidate
+    of candidates
   ) {
 
     if (
@@ -3730,7 +4008,6 @@ function extractVideos(result) {
         item =>
           addVideo(item)
       );
-
 
       if (
         videos.length
@@ -3743,86 +4020,76 @@ function extractVideos(result) {
   }
 
 
-  /*
-   * ==========================
-   * RECURSIVE FALLBACK
-   * ==========================
-   */
+  /* ==========================================
+     RECURSIVE FALLBACK
+  ========================================== */
 
   if (
     !videos.length
   ) {
 
-    const recursiveScan =
-      value => {
+    function scan(value) {
 
-        if (
-          !value ||
-          typeof value !== "object"
-        ) {
-          return;
-        }
+      if (
+        !value ||
+        typeof value !== "object"
+      ) {
+        return;
+      }
 
+      if (
+        Array.isArray(value)
+      ) {
 
-        if (
-          Array.isArray(value)
-        ) {
+        value.forEach(
+          item =>
+            scan(item)
+        );
 
-          value.forEach(
-            item =>
-              recursiveScan(item)
-          );
+        return;
 
-          return;
-        }
-
-
-        const possibleURL =
-          value.url ||
-          value.play_url ||
-          value.playUrl ||
-          value.stream_url ||
-          value.streamUrl ||
-          value.m3u8 ||
-          value.mpd ||
-          value.manifest ||
-          value.manifest_url ||
-          value.manifestUrl ||
-          value.src ||
-          value.file ||
-          value.link;
+      }
 
 
-        if (
-          typeof possibleURL ===
-          "string" &&
-          safeURL(possibleURL)
-        ) {
-
-          addVideo(value);
-
-        }
-
-
-        Object.values(value)
-          .forEach(
-            child =>
-              recursiveScan(child)
-          );
-
-      };
+      const possibleURL =
+        value.url ||
+        value.play_url ||
+        value.playUrl ||
+        value.stream_url ||
+        value.streamUrl ||
+        value.m3u8 ||
+        value.mpd ||
+        value.src ||
+        value.file ||
+        value.link ||
+        "";
 
 
-    recursiveScan(result);
+      if (
+        typeof possibleURL === "string"
+      ) {
+
+        addVideo(value);
+
+      }
+
+
+      Object.values(value)
+        .forEach(
+          child =>
+            scan(child)
+        );
+
+    }
+
+    scan(result);
 
   }
 
 
-  /*
-   * ==========================
-   * UNIQUE URL
-   * ==========================
-   */
+  /* ==========================================
+     REMOVE DUPLICATE
+  ========================================== */
 
   const unique = [];
 
@@ -3833,13 +4100,22 @@ function extractVideos(result) {
   videos.forEach(
     video => {
 
+      const identity =
+        [
+          video.streamType,
+          video.url,
+          video.mpd,
+          video.kid,
+          video.key
+        ]
+        .join("|");
+
+
       if (
-        !seen.has(video.url)
+        !seen.has(identity)
       ) {
 
-        seen.add(
-          video.url
-        );
+        seen.add(identity);
 
         unique.push(
           video
@@ -3852,14 +4128,14 @@ function extractVideos(result) {
 
 
   console.log(
-    "[IKOTV] PARSED VIDEOS:",
+    "[IKOTV] PARSED SERVERS:",
     unique
   );
 
 
   return unique;
-}
-  
+
+}  
     /* =========================================================
      REFRESH / COUNTDOWN
   ========================================================= */
