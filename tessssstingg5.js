@@ -1638,25 +1638,17 @@
 
   async function loadLibraries() {
 
-  /* ==============================
-     HLS.JS
-  ============================== */
-
   await loadScript(
     CONFIG.hls,
     () => typeof window.Hls !== "undefined"
   );
-
-
-  /* ==============================
-     SHAKA PLAYER
-  ============================== */
 
   await loadScript(
     CONFIG.shaka,
     () => typeof window.shaka !== "undefined"
   );
 
+}
 
   /* ==============================
      SHAKA CSS
