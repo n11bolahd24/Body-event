@@ -1,11 +1,7 @@
 /*!
- * IKOTV Auto Schedule + ArtPlayer
+ * IKOTV Auto Schedule
  * N11BOLAHD
- *
- * Requires:
- * - https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.min.js
- * - https://cdn.jsdelivr.net/npm/artplayer-plugin-hls-quality/dist/artplayer-plugin-hls-quality.js
- * - Hls.js is loaded automatically by this script for browsers that need it.
+
  */
 
 (() => {
@@ -29,17 +25,18 @@
     liveCheckMs: 30000,
 
 
-    // CDN libraries
-    artplayer:
-      "https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.min.js",
-    hls:
-      "https://cdn.jsdelivr.net/npm/hls.js@1.6.2/dist/hls.min.js",
-    hlsQuality:
-      "https://cdn.jsdelivr.net/npm/artplayer-plugin-hls-quality/dist/artplayer-plugin-hls-quality.js"
-  };
+  /* ==============================
+     PLAYER LIBRARIES
+  ============================== */
+  hls:
+    "https://cdn.jsdelivr.net/npm/hls.js@1.6.2/dist/hls.min.js",
+  shaka:
+    "https://cdn.jsdelivr.net/npm/shaka-player@4.16.12/dist/shaka-player.compiled.min.js",
+  shakaCSS:
+    "https://cdn.jsdelivr.net/npm/shaka-player@4.16.12/dist/controls.min.css"
+};
 
   let matches = [];
-  let art = null;
   let currentMatchId = null;
   let currentVideos = [];
   let loadingSchedule = false;
@@ -1637,22 +1634,52 @@
   }
 
   async function loadLibraries() {
-    await loadScript(
-      CONFIG.artplayer,
-      () => typeof window.Artplayer !== "undefined"
-    );
 
-    await loadScript(
-      CONFIG.hls,
-      () => typeof window.Hls !== "undefined"
-    );
+  /* ==============================
+     HLS.JS
+  ============================== */
 
-    await loadScript(
-      CONFIG.hlsQuality,
-      () =>
-        typeof window.artplayerPluginHlsQuality !== "undefined"
-    );
+  await loadScript(
+    CONFIG.hls,
+    () => typeof window.Hls !== "undefined"
+  );
+
+
+  /* ==============================
+     SHAKA PLAYER
+  ============================== */
+
+  await loadScript(
+    CONFIG.shaka,
+    () => typeof window.shaka !== "undefined"
+  );
+
+
+  /* ==============================
+     SHAKA CSS
+  ============================== */
+
+  if (
+    !document.querySelector(
+      `link[href="${CONFIG.shakaCSS}"]`
+    )
+  ) {
+
+    const link =
+      document.createElement("link");
+
+    link.rel = "stylesheet";
+    link.href = CONFIG.shakaCSS;
+
+    document.head.appendChild(link);
   }
+
+
+  console.log(
+    "[IKOTV] HLS.js + Shaka Player loaded."
+  );
+
+}
 
   /* =========================================================
      API
@@ -1964,59 +1991,726 @@ const result =
     return result;
   }
 
-  /* =========================================================
-   IKOTV SHAKA PLAYER → #tv
+
+/* =========================================================
+   IKOTV HTML5 VIDEO + HLS.JS PLAYER
+   Menggunakan native video controls
+   seperti player pada script sebelumnya
 ========================================================= */
 
-let ikotvShakaPlayer = null;
+let ikotvHls = null;
+let ikotvShaka = null;
 let ikotvVideo = null;
 
-async function playIKOTVStream(url) {
+/* =========================================================
+   IKOTV UNIVERSAL PLAYER
 
-  if (!url) {
-    console.warn("[IKOTV] URL kosong");
-    return;
+   M3U8
+   -> HLS.js
+
+   MPD
+   -> Shaka Player
+
+   MPD + ClearKey
+   -> Shaka Player + DRM ClearKey
+========================================================= */
+
+async function destroyIKOTVPlayer() {
+
+  /* ==============================
+     DESTROY HLS
+  ============================== */
+
+  if (ikotvHls) {
+
+    try {
+      ikotvHls.destroy();
+    } catch (_) {}
+
+    ikotvHls = null;
   }
 
-  const tv = document.getElementById("tv");
 
-  if (!tv) {
-    console.error("[IKOTV] #tv tidak ditemukan");
-    return;
+  /* ==============================
+     DESTROY SHAKA
+  ============================== */
+
+  if (ikotvShaka) {
+
+    try {
+      await ikotvShaka.destroy();
+    } catch (_) {}
+
+    ikotvShaka = null;
   }
 
-  console.log("[IKOTV] RAW STREAM URL:", url);
+}
 
-  /* ==========================================
-     HAPUS PLAYER IKOTV SEBELUMNYA
-  ========================================== */
+
+function getStreamType(url, videoData = {}) {
+
+  const lower =
+    String(url || "").toLowerCase();
+
+  const type =
+    String(
+      videoData.type ||
+      videoData.format ||
+      videoData.protocol ||
+      videoData.type_name ||
+      videoData.typeName ||
+      ""
+    ).toLowerCase();
+
+
+  /*
+   * ==========================================
+   * HD [auto] / IFRAME PLAYER
+   * ==========================================
+   *
+   * URL iframe berisi:
+   *
+   * ?mpd=...
+   * &keyId=...
+   * &key=...
+   *
+   * Jadi harus dimainkan sebagai DASH.
+   */
+
+  if (
+    type === "iframe" &&
+    /[?&]mpd=/i.test(url)
+  ) {
+    return "dash";
+  }
+
+
+  /*
+   * ==========================================
+   * EXPLICIT DASH
+   * ==========================================
+   */
+
+  if (
+    type === "dash" ||
+    type === "mpd" ||
+    type.includes("dash") ||
+    type.includes("mpd")
+  ) {
+    return "dash";
+  }
+
+
+  /*
+   * ==========================================
+   * CLEARKEY
+   * ==========================================
+   */
+
+  if (
+    videoData.kid ||
+    videoData.KID ||
+    videoData.kid_hex ||
+    videoData.kidHex ||
+    videoData.key ||
+    videoData.KEY ||
+    videoData.key_hex ||
+    videoData.keyHex ||
+    videoData.clearKeys ||
+    videoData.clear_keys ||
+    videoData.clearkeys
+  ) {
+    return "dash";
+  }
+
+
+  /*
+   * ==========================================
+   * URL MPD
+   * ==========================================
+   */
+
+  if (
+    /\.mpd(?:[?#]|$)/i.test(lower)
+  ) {
+    return "dash";
+  }
+
+
+  /*
+   * ==========================================
+   * EXPLICIT HLS
+   * ==========================================
+   */
+
+  if (
+    type === "hls" ||
+    type === "m3u8" ||
+    type.includes("hls")
+  ) {
+    return "hls";
+  }
+
+
+  /*
+   * ==========================================
+   * URL M3U8
+   * ==========================================
+   */
+
+  if (
+    /\.m3u8(?:[?#]|$)/i.test(lower)
+  ) {
+    return "hls";
+  }
+
+
+  /*
+   * DEFAULT
+   * ==========================================
+   */
+
+  return "hls";
+}
+
+  function normalizeIKOTVDASH(videoData = {}) {
+
+  const originalURL =
+    String(videoData.url || "");
+
+  /*
+   * Kalau bukan iframe MPD,
+   * gunakan data biasa.
+   */
+
+  if (
+    !/[?&]mpd=/i.test(originalURL)
+  ) {
+
+    return {
+      url: originalURL,
+      kid:
+        videoData.kid ||
+        videoData.KID ||
+        "",
+      key:
+        videoData.key ||
+        videoData.KEY ||
+        "",
+      clearKeys:
+        videoData.clearKeys ||
+        null
+    };
+
+  }
+
 
   try {
 
-    if (ikotvShakaPlayer) {
-      await ikotvShakaPlayer.destroy();
-      ikotvShakaPlayer = null;
-    }
+    const iframeURL =
+      new URL(originalURL);
+
+    /*
+     * Ambil MPD
+     */
+
+    const mpd =
+      iframeURL.searchParams.get("mpd") || "";
+
+
+    /*
+     * Ambil KID
+     */
+
+    const kid =
+      iframeURL.searchParams.get("keyId") ||
+      iframeURL.searchParams.get("kid") ||
+      "";
+
+
+    /*
+     * Ambil KEY
+     */
+
+    const key =
+      iframeURL.searchParams.get("key") || "";
+
+
+    console.log(
+      "[IKOTV] AUTO HD MPD:",
+      mpd
+    );
+
+    console.log(
+      "[IKOTV] AUTO HD KID:",
+      kid
+    );
+
+    console.log(
+      "[IKOTV] AUTO HD KEY tersedia:",
+      !!key
+    );
+
+
+    return {
+
+      url:
+        mpd,
+
+      kid:
+        kid,
+
+      key:
+        key,
+
+      clearKeys:
+        kid && key
+          ? {
+              [String(kid)
+                .replace(/-/g, "")
+                .toLowerCase()
+              ]:
+                String(key)
+                  .replace(/-/g, "")
+                  .toLowerCase()
+            }
+          : null
+
+    };
 
   } catch (error) {
 
-    console.warn(
-      "[IKOTV] Gagal destroy Shaka:",
+    console.error(
+      "[IKOTV] Gagal parsing Auto HD:",
       error
+    );
+
+    return null;
+
+  }
+
+}
+  /* =========================================================
+   PLAY M3U8
+========================================================= */
+
+function playIKOTVHLS(url, video) {
+
+  return new Promise((resolve, reject) => {
+
+    console.log(
+      "[IKOTV] PLAYER: HLS.js"
+    );
+
+    if (
+      typeof window.Hls === "undefined"
+    ) {
+
+      reject(
+        new Error(
+          "HLS.js belum tersedia."
+        )
+      );
+
+      return;
+    }
+
+
+    /*
+     * Browser native HLS
+     */
+
+    if (
+      !window.Hls.isSupported() &&
+      video.canPlayType(
+        "application/vnd.apple.mpegurl"
+      )
+    ) {
+
+      console.log(
+        "[IKOTV] Menggunakan native HLS."
+      );
+
+      video.src = url;
+
+
+      video.addEventListener(
+        "loadedmetadata",
+        () => {
+
+          video
+            .play()
+            .catch(() => {});
+
+          resolve();
+
+        },
+        { once: true }
+      );
+
+      return;
+    }
+
+
+    /*
+     * HLS.js
+     */
+
+    if (
+      window.Hls.isSupported()
+    ) {
+
+      ikotvHls =
+        new window.Hls({
+
+          enableWorker: true,
+
+          lowLatencyMode: true,
+
+          backBufferLength: 30,
+
+          maxBufferLength: 30,
+
+          maxMaxBufferLength: 60
+
+        });
+
+
+      ikotvHls.loadSource(url);
+
+      ikotvHls.attachMedia(video);
+
+
+      ikotvHls.on(
+        window.Hls.Events.MANIFEST_PARSED,
+        () => {
+
+          console.log(
+            "[IKOTV] HLS manifest parsed."
+          );
+
+          video
+            .play()
+            .catch(() => {});
+
+          resolve();
+
+        }
+      );
+
+
+      ikotvHls.on(
+        window.Hls.Events.ERROR,
+        (event, data) => {
+
+          console.warn(
+            "[IKOTV] HLS error:",
+            data
+          );
+
+          if (
+            data.fatal
+          ) {
+
+            reject(
+              new Error(
+                "HLS fatal error: " +
+                data.type
+              )
+            );
+
+          }
+
+        }
+      );
+
+      return;
+    }
+
+
+    reject(
+      new Error(
+        "Browser tidak mendukung HLS."
+      )
+    );
+
+  });
+
+}
+
+
+/* =========================================================
+   NORMALIZE CLEARKEY
+========================================================= */
+
+function getClearKeys(videoData = {}) {
+
+  /*
+   * Jika API sudah mengirim
+   * object clearKeys
+   */
+
+  if (
+    videoData.clearKeys &&
+    typeof videoData.clearKeys === "object"
+  ) {
+
+    return videoData.clearKeys;
+  }
+
+
+  /*
+   * Jika API mengirim:
+   *
+   * kid
+   * key
+   */
+
+  const kid =
+    videoData.kid ||
+    videoData.KID ||
+    videoData.kid_hex ||
+    videoData.kidHex ||
+    "";
+
+
+  const key =
+    videoData.key ||
+    videoData.KEY ||
+    videoData.key_hex ||
+    videoData.keyHex ||
+    "";
+
+
+  if (
+    kid &&
+    key
+  ) {
+
+    return {
+      [String(kid).replace(/-/g, "").toLowerCase()]:
+        String(key).replace(/-/g, "").toLowerCase()
+    };
+
+  }
+
+
+  return null;
+}
+
+
+/* =========================================================
+   PLAY MPD / DASH
+========================================================= */
+
+async function playIKOTVDASH(
+  url,
+  videoData = {},
+  video
+) {
+
+  console.log(
+    "[IKOTV] PLAYER: Shaka Player"
+  );
+
+
+  if (
+    typeof window.shaka === "undefined"
+  ) {
+
+    throw new Error(
+      "Shaka Player belum tersedia."
     );
 
   }
 
-  /* ==========================================
-     BUAT VIDEO
-  ========================================== */
+
+  /*
+   * Buat Shaka
+   */
+
+  ikotvShaka =
+    new window.shaka.Player(video);
+
+
+  /*
+   * Error handler
+   */
+
+  ikotvShaka.addEventListener(
+    "error",
+    event => {
+
+      console.error(
+        "[IKOTV] Shaka error:",
+        event.detail
+      );
+
+    }
+  );
+
+
+  /*
+   * ClearKey
+   */
+
+  const clearKeys =
+    getClearKeys(videoData);
+
+
+  if (
+    clearKeys &&
+    Object.keys(clearKeys).length
+  ) {
+
+    console.log(
+      "[IKOTV] ClearKey configuration tersedia."
+    );
+
+
+    ikotvShaka.configure({
+
+      drm: {
+
+        clearKeys:
+
+          clearKeys
+
+      }
+
+    });
+
+  }
+
+
+  /*
+   * Load MPD
+   */
+
+  await ikotvShaka.load(url);
+
+
+  console.log(
+    "[IKOTV] MPD loaded successfully."
+  );
+
+
+  /*
+   * Play
+   */
+
+  video
+    .play()
+    .catch(error => {
+
+      console.warn(
+        "[IKOTV] Autoplay diblokir:",
+        error
+      );
+
+    });
+
+}
+
+
+/* =========================================================
+   UNIVERSAL PLAY
+========================================================= */
+
+async function playIKOTVStream(
+  url,
+  videoData = {}
+) {
+
+  if (!url) {
+
+    console.warn(
+      "[IKOTV] URL stream kosong."
+    );
+
+    return;
+  }
+
+
+  const tv =
+    document.getElementById("tv");
+
+
+  if (!tv) {
+
+    console.error(
+      "[IKOTV] #tv tidak ditemukan."
+    );
+
+    return;
+  }
+
+
+  console.log(
+    "[IKOTV] RAW STREAM:",
+    url
+  );
+
+
+  /*
+   * Tentukan jenis stream
+   */
+
+  const type =
+    getStreamType(
+      url,
+      videoData
+    );
+
+  let dashData = null;
+
+if (type === "dash") {
+
+  dashData =
+    normalizeIKOTVDASH({
+      ...videoData,
+      url: url
+    });
+
+  if (
+    !dashData ||
+    !dashData.url
+  ) {
+
+    throw new Error(
+      "URL MPD Auto HD tidak ditemukan."
+    );
+
+  }
+
+}
+
+
+  console.log(
+    "[IKOTV] STREAM TYPE:",
+    type
+  );
+
+
+  /*
+   * Bersihkan player lama
+   */
+
+  await destroyIKOTVPlayer();
+
+
+  /*
+   * Buat video
+   */
 
   tv.innerHTML = `
+
     <video
       id="ikotvVideo"
       controls
       autoplay
       playsinline
+      preload="auto"
       style="
         width:100%;
         height:100%;
@@ -2024,235 +2718,141 @@ async function playIKOTVStream(url) {
         background:#000;
       "
     ></video>
+
   `;
 
+
   ikotvVideo =
-    document.getElementById("ikotvVideo");
+    document.getElementById(
+      "ikotvVideo"
+    );
 
-  /* ==========================================
-     CEK SHAKA
-  ========================================== */
 
-  if (
-    typeof window.shaka === "undefined"
-  ) {
+  if (!ikotvVideo) {
 
     console.error(
-      "[IKOTV] Shaka Player belum tersedia"
+      "[IKOTV] Video element gagal dibuat."
     );
 
     return;
   }
 
+
+  /*
+   * Jangan tambahkan cache-buster
+   * untuk MPD.
+   *
+   * Beberapa manifest DASH
+   * sensitif terhadap query tambahan.
+   */
+
+  const streamURL =
+    type === "hls"
+
+      ? url +
+        (url.includes("?")
+          ? "&"
+          : "?") +
+        "_=" +
+        Date.now()
+
+      : url;
+
+
   try {
 
-    shaka.polyfill.installAll();
+    /*
+     * ==========================
+     * HLS
+     * ==========================
+     */
 
     if (
-      !shaka.Player.isBrowserSupported()
+      type === "hls"
     ) {
 
-      throw new Error(
-        "Browser tidak mendukung Shaka Player"
-      );
-
-    }
-
-    /* ==========================================
-       PARSE URL
-    ========================================== */
-
-    let streamURL = safeURL(url);
-
-    let keyId = null;
-    let key = null;
-
-    try {
-
-      const parsedURL =
-        new URL(url, window.location.href);
-
-      const mpd =
-        parsedURL.searchParams.get("mpd");
-
-      const parsedKeyId =
-        parsedURL.searchParams.get("keyId");
-
-      const parsedKey =
-        parsedURL.searchParams.get("key");
-
-      /*
-       * Kalau URL mengandung ?mpd=
-       * berarti ini DASH + ClearKey
-       */
-
-      if (mpd) {
-
-        streamURL = decodeURIComponent(mpd);
-
-        keyId =
-          parsedKeyId;
-
-        key =
-          parsedKey;
-
-        console.log(
-          "[IKOTV] DASH MPD:",
-          streamURL
-        );
-
-        console.log(
-          "[IKOTV] ClearKey ID:",
-          keyId
-        );
-
-        console.log(
-          "[IKOTV] ClearKey tersedia:",
-          !!key
-        );
-
-      }
-
-    } catch (parseError) {
-
-      console.warn(
-        "[IKOTV] Gagal parsing URL:",
-        parseError
-      );
-
-    }
-
-    if (!streamURL) {
-
-      throw new Error(
-        "URL stream tidak valid"
-      );
-
-    }
-
-    /* ==========================================
-       BUAT SHAKA
-    ========================================== */
-
-    ikotvShakaPlayer =
-      new shaka.Player(
+      await playIKOTVHLS(
+        streamURL,
         ikotvVideo
       );
 
-    /* ==========================================
-       CLEARKEY DRM
-    ========================================== */
-
-    if (keyId && key) {
-
-      console.log(
-        "[IKOTV] Menggunakan ClearKey DRM"
-      );
-
-      ikotvShakaPlayer.configure({
-
-        drm: {
-
-          clearKeys: {
-
-            [keyId]: key
-
-          }
-
-        }
-
-      });
-
+      return;
     }
 
-    /* ==========================================
-       SHAKA ERROR
-    ========================================== */
 
-    ikotvShakaPlayer.addEventListener(
-      "error",
-      event => {
+    /*
+     * ==========================
+     * DASH
+     * ==========================
+     */
 
-        console.error(
-          "[IKOTV] SHAKA ERROR:",
-          event.detail
-        );
+    if (type === "dash") {
 
-      }
-    );
-
-    /* ==========================================
-       LOAD STREAM
-    ========================================== */
-
-    console.log(
-      "[IKOTV] LOAD:",
-      streamURL
-    );
-
-    await ikotvShakaPlayer.load(
-      streamURL
-    );
-
-    console.log(
-      "[IKOTV] SHAKA PLAYING:",
-      streamURL
-    );
-
-    /* ==========================================
-       AUTOPLAY
-    ========================================== */
-
+  await playIKOTVDASH(
+    dashData.url,
+    {
+      ...videoData,
+      ...dashData
+    },
     ikotvVideo
-      .play()
-      .catch(error => {
+  );
 
-        console.warn(
-          "[IKOTV] Autoplay diblokir:",
-          error
-        );
+  return;
+}
 
-      });
 
   } catch (error) {
 
     console.error(
-      "[IKOTV] SHAKA LOAD ERROR:",
+      "[IKOTV] Player gagal:",
       error
     );
 
-    console.error(
-      "[IKOTV] ERROR NAME:",
-      error?.name
-    );
-
-    console.error(
-      "[IKOTV] ERROR MESSAGE:",
-      error?.message
-    );
 
     tv.innerHTML = `
-      <div style="
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        width:100%;
-        height:100%;
-        min-height:250px;
-        background:#000;
-        color:#ff7777;
-        font-family:Arial;
-        font-size:13px;
-        text-align:center;
-        padding:20px;
-        box-sizing:border-box;
-      ">
-        Gagal memuat stream.
+
+      <div
+        style="
+          display:flex;
+          align-items:center;
+          justify-content:center;
+
+          width:100%;
+          height:100%;
+          min-height:250px;
+
+          background:#000;
+
+          color:#ff7777;
+
+          font-family:
+            'Courier New',
+            monospace;
+
+          font-size:12px;
+
+          text-align:center;
+
+          padding:20px;
+
+          box-sizing:border-box;
+        "
+      >
+
+        Gagal memutar stream.
+        <br>
+        ${escapeHTML(
+          error?.message || ""
+        )}
+
       </div>
+
     `;
 
   }
+
 }
+  
   /* =========================================================
      SCHEDULE RENDER
   ========================================================= */
@@ -2560,245 +3160,6 @@ function setupUpdateButtons() {
 
 }
   
-  /* =========================================================
-     PLAYER UI
-  ========================================================= */
-
-  function showPlayer(match, videos) {
-
-  const tv = document.getElementById("tv");
-
-  if (!tv) {
-    console.error("[IKOTV] Element #tv tidak ditemukan");
-    return;
-  }
-
-  const validVideos = videos.filter(
-    v => safeURL(v.url)
-  );
-
-  currentVideos = validVideos;
-
-  const title =
-    `${match.home} vs ${match.away}`;
-
-  /*
-   * IKOTV MENGGUNAKAN TV UTAMA
-   */
-  tv.innerHTML = `
-    <div class="iko-tv-wrapper">
-
-      
-
-      <div id="ikotvArt"></div>
-
-      <div
-        class="iko-servers"
-        id="ikoServers"
-      ></div>
-
-      <div class="iko-note">
-        IKOTV • ArtPlayer • HLS
-      </div>
-
-    </div>
-  `;
-
-  
-
-  renderServers();
-
-  /*
-   * MAIN TV
-   */
-  playVideo(
-    validVideos[0]?.url || "",
-    validVideos[0]
-  );
-}
-
-  function renderServers(activeIndex = 0) {
-    const box = $("#ikoServers");
-
-    if (!box) return;
-
-    if (!currentVideos.length) {
-      box.innerHTML = "";
-      return;
-    }
-
-    box.innerHTML =
-      currentVideos
-        .map((video, index) => {
-
-          const label =
-            video.display_name ||
-            video.name ||
-            video.type_name ||
-            `SERVER ${index + 1}`;
-
-          return `
-            <button
-              class="iko-server ${
-                index === activeIndex
-                  ? "active"
-                  : ""
-              }"
-              data-iko-server="${index}"
-            >
-              ${escapeHTML(label)}
-            </button>
-          `;
-        })
-        .join("");
-
-    box
-      .querySelectorAll(
-        "[data-iko-server]"
-      )
-      .forEach(button => {
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            const index =
-              Number(
-                button.dataset.ikoServer
-              );
-
-            renderServers(index);
-
-            playVideo(
-              currentVideos[index].url,
-              currentVideos[index]
-            );
-          }
-        );
-
-      });
-  }
-    /* =========================================================
-     VIDEO PLAYER
-  ========================================================= */
-
-  async function playVideo(url, videoData = {}) {
-    const container = $("#ikotvArt");
-
-    if (!container) return;
-
-    const streamURL = safeURL(url);
-
-    if (!streamURL) {
-      container.innerHTML = `
-        <div class="iko-error">
-          URL stream tidak valid.
-        </div>
-      `;
-      return;
-    }
-
-    if (art) {
-      try {
-        art.destroy(false);
-      } catch (_) {}
-
-      art = null;
-    }
-
-    container.innerHTML = "";
-
-    try {
-      const options = {
-        container: container,
-        url: streamURL,
-        autoplay: true,
-        muted: false,
-        volume: 0.8,
-        fullscreen: true,
-        fullscreenWeb: true,
-        pip: true,
-        screenshot: false,
-        setting: true,
-        playbackRate: true,
-        hotkey: true,
-        mutex: true,
-        miniProgressBar: false,
-        theme: "#00c878",
-        lang: "en",
-        moreVideoAttr: {
-          playsInline: true,
-          preload: "auto"
-        }
-      };
-
-      if (
-        typeof window.Hls !== "undefined" &&
-        window.Hls.isSupported()
-      ) {
-        options.customType = function(video, url) {
-          const hls = new window.Hls({
-            enableWorker: true,
-            lowLatencyMode: true
-          });
-
-          hls.loadSource(url);
-          hls.attachMedia(video);
-
-          hls.on(
-            window.Hls.Events.MANIFEST_PARSED,
-            () => {
-              video.play().catch(() => {});
-            }
-          );
-
-          video.addEventListener(
-            "error",
-            () => {
-              console.warn(
-                "[IKOTV] Video error",
-                video.error
-              );
-            }
-          );
-        };
-      }
-
-      art = new window.Artplayer(options);
-
-      art.on(
-        "ready",
-        () => {
-          console.log(
-            "[IKOTV] ArtPlayer ready"
-          );
-        }
-      );
-
-      art.on(
-        "error",
-        error => {
-          console.warn(
-            "[IKOTV] ArtPlayer error:",
-            error
-          );
-        }
-      );
-
-    } catch (error) {
-
-      console.error(
-        "[IKOTV] Player error:",
-        error
-      );
-
-      container.innerHTML = `
-        <div class="iko-error">
-          Gagal memuat player.
-        </div>
-      `;
-    }
-  }
 
 /* =========================================================
    OPEN IKOTV MATCH
@@ -2993,7 +3354,8 @@ async function openIKOMatch(matchId) {
             );
 
             playIKOTVStream(
-              video.url
+             video.url,
+             video
             );
 
           }
@@ -3045,164 +3407,419 @@ async function openIKOMatch(matchId) {
 
 }
   /* =========================================================
-     STREAM RESPONSE PARSER
-  ========================================================= */
+   STREAM RESPONSE PARSER
+   HLS + MPD + CLEARKEY
+========================================================= */
 
-  function extractVideos(result) {
-    const videos = [];
+function extractVideos(result) {
 
-    function addVideo(item, fallbackName = "") {
+  const videos = [];
 
-      if (!item) return;
 
-      if (typeof item === "string") {
+  function addVideo(
+    item,
+    fallbackName = ""
+  ) {
 
-        const url = safeURL(item);
+    if (!item) return;
 
-        if (url) {
-          videos.push({
-            url: url,
-            name: fallbackName
-          });
-        }
 
-        return;
-      }
+    /*
+     * ==========================
+     * STRING URL
+     * ==========================
+     */
 
-      if (typeof item !== "object") {
-        return;
-      }
+    if (
+      typeof item === "string"
+    ) {
 
       const url =
-        item.url ||
-        item.play_url ||
-        item.playUrl ||
-        item.stream_url ||
-        item.streamUrl ||
-        item.m3u8 ||
-        item.src ||
-        item.file ||
-        item.link ||
-        "";
+        safeURL(item);
 
-      const validURL =
-        safeURL(url);
 
-      if (!validURL) return;
+      if (url) {
 
-      videos.push({
-        url: validURL,
+        videos.push({
 
-        name:
-          item.name ||
-          item.server_name ||
-          item.serverName ||
-          fallbackName,
+          url: url,
 
-        display_name:
-          item.display_name ||
-          item.displayName ||
-          item.server_name ||
-          item.serverName ||
-          item.name ||
-          fallbackName,
+          name:
+            fallbackName,
 
-        type_name:
-          item.type_name ||
-          item.typeName ||
-          item.type ||
-          ""
-      });
-    }
+          display_name:
+            fallbackName,
 
-    const candidates = [
-      result?.data?.videos,
-      result?.data?.streams,
-      result?.data?.servers,
-      result?.data?.list,
-      result?.videos,
-      result?.streams,
-      result?.servers,
-      result?.list,
-      result?.data
-    ];
+          type_name: ""
 
-    for (const candidate of candidates) {
-
-      if (Array.isArray(candidate)) {
-
-        candidate.forEach(
-          item => addVideo(item)
-        );
-
-        if (videos.length) {
-          break;
-        }
-      }
-    }
-
-    if (!videos.length) {
-
-      const recursiveScan =
-        value => {
-
-          if (!value || typeof value !== "object") {
-            return;
-          }
-
-          if (Array.isArray(value)) {
-
-            value.forEach(
-              item =>
-                recursiveScan(item)
-            );
-
-            return;
-          }
-
-          const possibleURL =
-            value.url ||
-            value.play_url ||
-            value.playUrl ||
-            value.stream_url ||
-            value.streamUrl ||
-            value.m3u8 ||
-            value.src ||
-            value.file ||
-            value.link;
-
-          if (
-            typeof possibleURL === "string" &&
-            safeURL(possibleURL)
-          ) {
-            addVideo(value);
-          }
-
-          Object.values(value)
-            .forEach(
-              child =>
-                recursiveScan(child)
-            );
-        };
-
-      recursiveScan(result);
-    }
-
-    const unique = [];
-    const seen = new Set();
-
-    videos.forEach(video => {
-
-      if (!seen.has(video.url)) {
-
-        seen.add(video.url);
-        unique.push(video);
+        });
 
       }
+
+      return;
+    }
+
+
+    if (
+      typeof item !== "object"
+    ) {
+      return;
+    }
+
+
+    /*
+     * ==========================
+     * URL
+     * ==========================
+     */
+
+    const url =
+      item.url ||
+      item.play_url ||
+      item.playUrl ||
+      item.stream_url ||
+      item.streamUrl ||
+      item.m3u8 ||
+      item.mpd ||
+      item.manifest ||
+      item.manifest_url ||
+      item.manifestUrl ||
+      item.src ||
+      item.file ||
+      item.link ||
+      "";
+
+
+    const validURL =
+      safeURL(url);
+
+
+    if (!validURL) {
+      return;
+    }
+
+
+    /*
+     * ==========================
+     * TYPE
+     * ==========================
+     */
+
+    let type =
+      item.type ||
+      item.format ||
+      item.protocol ||
+      "";
+
+
+    /*
+     * MPD otomatis DASH
+     */
+
+    if (
+      /\.mpd(?:[?#]|$)/i.test(
+        validURL
+      )
+    ) {
+
+      type = "dash";
+
+    }
+
+
+    /*
+     * M3U8 otomatis HLS
+     */
+
+    else if (
+      /\.m3u8(?:[?#]|$)/i.test(
+        validURL
+      )
+    ) {
+
+      type = "hls";
+
+    }
+
+
+    /*
+     * ==========================
+     * KID / KEY
+     * ==========================
+     */
+
+    const kid =
+      item.kid ||
+      item.KID ||
+      item.kid_hex ||
+      item.kidHex ||
+      item.default_kid ||
+      item.defaultKID ||
+      "";
+
+
+    const key =
+      item.key ||
+      item.KEY ||
+      item.key_hex ||
+      item.keyHex ||
+      "";
+
+
+    /*
+     * ==========================
+     * CLEARKEY OBJECT
+     * ==========================
+     */
+
+    let clearKeys =
+      item.clearKeys ||
+      item.clear_keys ||
+      item.clearkeys ||
+      null;
+
+
+    /*
+     * Kalau API memberi kid/key
+     * ubah menjadi clearKeys
+     */
+
+    if (
+      !clearKeys &&
+      kid &&
+      key
+    ) {
+
+      clearKeys = {
+
+        [
+          String(kid)
+            .replace(/-/g, "")
+            .toLowerCase()
+        ]:
+
+          String(key)
+            .replace(/-/g, "")
+            .toLowerCase()
+
+      };
+
+    }
+
+
+    /*
+     * ==========================
+     * VIDEO OBJECT
+     * ==========================
+     */
+
+    videos.push({
+
+      url:
+        validURL,
+
+      type:
+        type,
+
+      kid:
+        kid,
+
+      key:
+        key,
+
+      clearKeys:
+        clearKeys,
+
+      name:
+        item.name ||
+        item.server_name ||
+        item.serverName ||
+        fallbackName,
+
+      display_name:
+        item.display_name ||
+        item.displayName ||
+        item.server_name ||
+        item.serverName ||
+        item.name ||
+        fallbackName,
+
+      type_name:
+        item.type_name ||
+        item.typeName ||
+        item.type ||
+        ""
+
     });
 
-    return unique;
   }
+
+
+  /*
+   * ==========================
+   * CANDIDATES
+   * ==========================
+   */
+
+  const candidates = [
+
+    result?.data?.videos,
+    result?.data?.streams,
+    result?.data?.servers,
+    result?.data?.list,
+
+    result?.videos,
+    result?.streams,
+    result?.servers,
+    result?.list,
+
+    result?.data
+
+  ];
+
+
+  for (
+    const candidate of candidates
+  ) {
+
+    if (
+      Array.isArray(candidate)
+    ) {
+
+      candidate.forEach(
+        item =>
+          addVideo(item)
+      );
+
+
+      if (
+        videos.length
+      ) {
+        break;
+      }
+
+    }
+
+  }
+
+
+  /*
+   * ==========================
+   * RECURSIVE FALLBACK
+   * ==========================
+   */
+
+  if (
+    !videos.length
+  ) {
+
+    const recursiveScan =
+      value => {
+
+        if (
+          !value ||
+          typeof value !== "object"
+        ) {
+          return;
+        }
+
+
+        if (
+          Array.isArray(value)
+        ) {
+
+          value.forEach(
+            item =>
+              recursiveScan(item)
+          );
+
+          return;
+        }
+
+
+        const possibleURL =
+          value.url ||
+          value.play_url ||
+          value.playUrl ||
+          value.stream_url ||
+          value.streamUrl ||
+          value.m3u8 ||
+          value.mpd ||
+          value.manifest ||
+          value.manifest_url ||
+          value.manifestUrl ||
+          value.src ||
+          value.file ||
+          value.link;
+
+
+        if (
+          typeof possibleURL ===
+          "string" &&
+          safeURL(possibleURL)
+        ) {
+
+          addVideo(value);
+
+        }
+
+
+        Object.values(value)
+          .forEach(
+            child =>
+              recursiveScan(child)
+          );
+
+      };
+
+
+    recursiveScan(result);
+
+  }
+
+
+  /*
+   * ==========================
+   * UNIQUE URL
+   * ==========================
+   */
+
+  const unique = [];
+
+  const seen =
+    new Set();
+
+
+  videos.forEach(
+    video => {
+
+      if (
+        !seen.has(video.url)
+      ) {
+
+        seen.add(
+          video.url
+        );
+
+        unique.push(
+          video
+        );
+
+      }
+
+    }
+  );
+
+
+  console.log(
+    "[IKOTV] PARSED VIDEOS:",
+    unique
+  );
+
+
+  return unique;
+}
+  
     /* =========================================================
      REFRESH / COUNTDOWN
   ========================================================= */
