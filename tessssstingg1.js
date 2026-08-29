@@ -1964,12 +1964,6 @@ const result =
     return result;
   }
 
-  /* =========================================================
-   IKOTV SHAKA PLAYER → #tv
-========================================================= */
-
-let ikotvShakaPlayer = null;
-let ikotvVideo = null;
 
 /* =========================================================
    IKOTV HTML5 VIDEO + HLS.JS PLAYER
