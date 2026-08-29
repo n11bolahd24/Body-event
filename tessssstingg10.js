@@ -2047,39 +2047,68 @@ async function destroyIKOTVPlayer() {
 }
 
 
-/* =========================================================
-   DETECT STREAM TYPE
-========================================================= */
-
 function getStreamType(url, videoData = {}) {
 
   const lower =
-    String(url || "")
-      .toLowerCase();
+    String(url || "").toLowerCase();
+
+  const type =
+    String(
+      videoData.type ||
+      videoData.format ||
+      videoData.protocol ||
+      videoData.type_name ||
+      videoData.typeName ||
+      ""
+    ).toLowerCase();
 
   /*
-   * Explicit type dari API
+   * ==========================================
+   * 1. EXPLICIT DASH / MPD
+   * ==========================================
    */
 
   if (
-    videoData.type === "dash" ||
-    videoData.type === "mpd" ||
-    videoData.type_name === "mpd"
+    type === "dash" ||
+    type === "mpd" ||
+    type.includes("dash") ||
+    type.includes("mpd")
   ) {
     return "dash";
   }
 
 
+  /*
+   * ==========================================
+   * 2. ADA DATA DRM / CLEARKEY
+   * ==========================================
+   *
+   * Kalau ada KID + KEY, anggap DASH.
+   */
+
   if (
-    videoData.type === "hls" ||
-    videoData.type === "m3u8"
+    videoData.kid ||
+    videoData.KID ||
+    videoData.kid_hex ||
+    videoData.kidHex ||
+    videoData.default_kid ||
+    videoData.defaultKID ||
+    videoData.key ||
+    videoData.KEY ||
+    videoData.key_hex ||
+    videoData.keyHex ||
+    videoData.clearKeys ||
+    videoData.clear_keys ||
+    videoData.clearkeys
   ) {
-    return "hls";
+    return "dash";
   }
 
 
   /*
-   * Berdasarkan extension URL
+   * ==========================================
+   * 3. URL .MPD
+   * ==========================================
    */
 
   if (
@@ -2089,6 +2118,27 @@ function getStreamType(url, videoData = {}) {
   }
 
 
+  /*
+   * ==========================================
+   * 4. EXPLICIT HLS
+   * ==========================================
+   */
+
+  if (
+    type === "hls" ||
+    type === "m3u8" ||
+    type.includes("hls")
+  ) {
+    return "hls";
+  }
+
+
+  /*
+   * ==========================================
+   * 5. URL .M3U8
+   * ==========================================
+   */
+
   if (
     /\.m3u8(?:[?#]|$)/i.test(lower)
   ) {
@@ -2097,29 +2147,16 @@ function getStreamType(url, videoData = {}) {
 
 
   /*
-   * URL kadang tidak punya extension.
+   * ==========================================
+   * 6. DEFAULT
+   * ==========================================
    *
-   * Jika terdapat data ClearKey,
-   * anggap DASH.
-   */
-
-  if (
-    videoData.kid ||
-    videoData.key ||
-    videoData.clearKeys
-  ) {
-    return "dash";
-  }
-
-
-  /*
-   * Default
+   * Tetap HLS kalau benar-benar tidak
+   * ada petunjuk bahwa stream adalah DASH.
    */
 
   return "hls";
 }
-
-
 /* =========================================================
    PLAY M3U8
 ========================================================= */
