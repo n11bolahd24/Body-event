@@ -1,9 +1,7 @@
 /*!
- * IKOTV Auto Schedule + ArtPlayer
+ * IKOTV Auto Schedule
  * N11BOLAHD
- *
- * Requires:
- * - Hls.js is loaded automatically by this script for browsers that need it.
+
  */
 
 (() => {
