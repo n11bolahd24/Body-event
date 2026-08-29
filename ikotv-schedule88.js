@@ -3264,7 +3264,7 @@ async function openIKOMatch(matchId) {
 
       panel.innerHTML = `
         <div class="iko-server-error">
-          Server stream tidak tersedia.
+          Stream server is unavailable..
         </div>
       `;
 
