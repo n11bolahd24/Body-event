@@ -33,7 +33,9 @@
   shaka:
     "https://cdn.jsdelivr.net/npm/shaka-player@4.16.12/dist/shaka-player.compiled.min.js",
   shakaCSS:
-    "https://cdn.jsdelivr.net/npm/shaka-player@4.16.12/dist/controls.min.css"
+    "https://cdn.jsdelivr.net/npm/shaka-player@4.16.12/dist/controls.min.css",
+    shaka:
+  "https://cdn.jsdelivr.net/npm/shaka-player@4.16.0/dist/shaka-player.compiled.js",
 };
 
   let matches = [];
