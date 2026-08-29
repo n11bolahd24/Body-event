@@ -2042,6 +2042,7 @@ async function destroyIKOTVPlayer() {
     } catch (_) {}
 
     ikotvShaka = null;
+    window.ikotvShakaUI = null;
   }
 
 }
@@ -2510,9 +2511,8 @@ async function playIKOTVDASH(
 ) {
 
   console.log(
-    "[IKOTV] PLAYER: Shaka Player"
+    "[IKOTV] PLAYER: Shaka Player + UI"
   );
-
 
   if (
     typeof window.shaka === "undefined"
@@ -2524,9 +2524,10 @@ async function playIKOTVDASH(
 
   }
 
-
   /*
-   * Buat Shaka
+   * ==========================================
+   * SHAKA PLAYER
+   * ==========================================
    */
 
   ikotvShaka =
@@ -2534,7 +2535,9 @@ async function playIKOTVDASH(
 
 
   /*
-   * Error handler
+   * ==========================================
+   * SHAKA ERROR
+   * ==========================================
    */
 
   ikotvShaka.addEventListener(
@@ -2551,7 +2554,9 @@ async function playIKOTVDASH(
 
 
   /*
-   * ClearKey
+   * ==========================================
+   * CLEARKEY
+   * ==========================================
    */
 
   const clearKeys =
@@ -2567,13 +2572,11 @@ async function playIKOTVDASH(
       "[IKOTV] ClearKey configuration tersedia."
     );
 
-
     ikotvShaka.configure({
 
       drm: {
 
         clearKeys:
-
           clearKeys
 
       }
@@ -2584,7 +2587,9 @@ async function playIKOTVDASH(
 
 
   /*
-   * Load MPD
+   * ==========================================
+   * LOAD MPD
+   * ==========================================
    */
 
   await ikotvShaka.load(url);
@@ -2596,7 +2601,132 @@ async function playIKOTVDASH(
 
 
   /*
-   * Play
+   * ==========================================
+   * SHAKA UI
+   * ==========================================
+   */
+
+  const container =
+    document.getElementById(
+      "ikotvVideoContainer"
+    );
+
+
+  if (
+    !container
+  ) {
+
+    throw new Error(
+      "Container Shaka tidak ditemukan."
+    );
+
+  }
+
+
+  /*
+   * Pastikan Shaka UI tersedia
+   */
+
+  if (
+    !window.shaka.ui ||
+    !window.shaka.ui.Overlay
+  ) {
+
+    throw new Error(
+      "Shaka UI belum tersedia."
+    );
+
+  }
+
+
+  /*
+   * ==========================================
+   * BUAT SHAKA UI
+   * ==========================================
+   */
+
+  const ui =
+    new window.shaka.ui.Overlay(
+      ikotvShaka,
+      container,
+      video
+    );
+
+
+  /*
+   * ==========================================
+   * KONFIGURASI UI
+   * ==========================================
+   */
+
+  ui.configure({
+
+    controlPanelElements: [
+
+      "play_pause",
+
+      "mute",
+
+      "volume",
+
+      "time_and_duration",
+
+      "spacer",
+
+      "quality",
+
+      "fullscreen",
+
+      "overflow_menu"
+
+    ],
+
+    overflowMenuButtons: [
+
+      "quality",
+
+      "language",
+
+      "picture_in_picture",
+
+      "playback_rate",
+
+      "statistics"
+
+    ],
+
+    addBigPlayButton: true,
+
+    addSeekBar: true,
+
+    seekBarColors: {
+
+      base: "rgba(255,255,255,.3)",
+
+      buffered:
+        "rgba(255,255,255,.5)",
+
+      played:
+        "#00d979"
+
+    }
+
+  });
+
+
+  /*
+   * ==========================================
+   * SIMPAN UI
+   * ==========================================
+   */
+
+  window.ikotvShakaUI = ui;
+
+
+  /*
+   * ==========================================
+   * PLAY
+   * ==========================================
    */
 
   video
@@ -2610,8 +2740,35 @@ async function playIKOTVDASH(
 
     });
 
-}
 
+  /*
+   * ==========================================
+   * CEK RESOLUSI
+   * ==========================================
+   */
+
+  const tracks =
+    ikotvShaka.getVariantTracks();
+
+
+  console.log(
+    "[IKOTV] DASH VARIANTS:",
+    tracks
+  );
+
+
+  console.log(
+    "[IKOTV] RESOLUSI TERSEDIA:",
+    tracks
+      .filter(track => track.height)
+      .map(track => ({
+        height: track.height,
+        width: track.width,
+        bandwidth: track.bandwidth
+      }))
+  );
+
+}
 
 /* =========================================================
    UNIVERSAL PLAY
@@ -2704,10 +2861,21 @@ if (type === "dash") {
    */
 
   tv.innerHTML = `
-
+  <div
+    id="ikotvVideoContainer"
+    class="shaka-video-container"
+    style="
+      width:100%;
+      height:100%;
+      min-height:250px;
+      background:#000;
+      position:relative;
+      overflow:hidden;
+    "
+  >
     <video
       id="ikotvVideo"
-      controls
+      class="shaka-video"
       autoplay
       playsinline
       preload="auto"
@@ -2718,8 +2886,8 @@ if (type === "dash") {
         background:#000;
       "
     ></video>
-
-  `;
+  </div>
+`;
 
 
   ikotvVideo =
