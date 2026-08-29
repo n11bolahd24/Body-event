@@ -3341,9 +3341,9 @@ async function openIKOMatch(matchId) {
             );
 
             playIKOTVStream(
-             video.url,
-             video
-            );
+  video.url,
+  video
+);
 
           }
         );
