@@ -30,12 +30,8 @@
 
 
     // CDN libraries
-    artplayer:
-      "https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.min.js",
     hls:
       "https://cdn.jsdelivr.net/npm/hls.js@1.6.2/dist/hls.min.js",
-    hlsQuality:
-      "https://cdn.jsdelivr.net/npm/artplayer-plugin-hls-quality/dist/artplayer-plugin-hls-quality.js"
   };
 
   let matches = [];
@@ -1637,21 +1633,13 @@
   }
 
   async function loadLibraries() {
-    await loadScript(
-      CONFIG.artplayer,
-      () => typeof window.Artplayer !== "undefined"
-    );
-
+    
     await loadScript(
       CONFIG.hls,
       () => typeof window.Hls !== "undefined"
     );
 
-    await loadScript(
-      CONFIG.hlsQuality,
-      () =>
-        typeof window.artplayerPluginHlsQuality !== "undefined"
-    );
+    
   }
 
   /* =========================================================
@@ -2673,10 +2661,9 @@ function setupUpdateButtons() {
   /*
    * MAIN TV
    */
-  playVideo(
-    validVideos[0]?.url || "",
-    validVideos[0]
-  );
+  playIKOTVStream(
+  validVideos[0]?.url || ""
+);
 }
 
   function renderServers(activeIndex = 0) {
