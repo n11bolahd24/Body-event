@@ -2062,9 +2062,32 @@ function getStreamType(url, videoData = {}) {
       ""
     ).toLowerCase();
 
+
   /*
    * ==========================================
-   * 1. EXPLICIT DASH / MPD
+   * HD [auto] / IFRAME PLAYER
+   * ==========================================
+   *
+   * URL iframe berisi:
+   *
+   * ?mpd=...
+   * &keyId=...
+   * &key=...
+   *
+   * Jadi harus dimainkan sebagai DASH.
+   */
+
+  if (
+    type === "iframe" &&
+    /[?&]mpd=/i.test(url)
+  ) {
+    return "dash";
+  }
+
+
+  /*
+   * ==========================================
+   * EXPLICIT DASH
    * ==========================================
    */
 
@@ -2080,10 +2103,8 @@ function getStreamType(url, videoData = {}) {
 
   /*
    * ==========================================
-   * 2. ADA DATA DRM / CLEARKEY
+   * CLEARKEY
    * ==========================================
-   *
-   * Kalau ada KID + KEY, anggap DASH.
    */
 
   if (
@@ -2091,8 +2112,6 @@ function getStreamType(url, videoData = {}) {
     videoData.KID ||
     videoData.kid_hex ||
     videoData.kidHex ||
-    videoData.default_kid ||
-    videoData.defaultKID ||
     videoData.key ||
     videoData.KEY ||
     videoData.key_hex ||
@@ -2107,7 +2126,7 @@ function getStreamType(url, videoData = {}) {
 
   /*
    * ==========================================
-   * 3. URL .MPD
+   * URL MPD
    * ==========================================
    */
 
@@ -2120,7 +2139,7 @@ function getStreamType(url, videoData = {}) {
 
   /*
    * ==========================================
-   * 4. EXPLICIT HLS
+   * EXPLICIT HLS
    * ==========================================
    */
 
@@ -2135,7 +2154,7 @@ function getStreamType(url, videoData = {}) {
 
   /*
    * ==========================================
-   * 5. URL .M3U8
+   * URL M3U8
    * ==========================================
    */
 
@@ -2147,17 +2166,131 @@ function getStreamType(url, videoData = {}) {
 
 
   /*
+   * DEFAULT
    * ==========================================
-   * 6. DEFAULT
-   * ==========================================
-   *
-   * Tetap HLS kalau benar-benar tidak
-   * ada petunjuk bahwa stream adalah DASH.
    */
 
   return "hls";
 }
-/* =========================================================
+
+  function normalizeIKOTVDASH(videoData = {}) {
+
+  const originalURL =
+    String(videoData.url || "");
+
+  /*
+   * Kalau bukan iframe MPD,
+   * gunakan data biasa.
+   */
+
+  if (
+    !/[?&]mpd=/i.test(originalURL)
+  ) {
+
+    return {
+      url: originalURL,
+      kid:
+        videoData.kid ||
+        videoData.KID ||
+        "",
+      key:
+        videoData.key ||
+        videoData.KEY ||
+        "",
+      clearKeys:
+        videoData.clearKeys ||
+        null
+    };
+
+  }
+
+
+  try {
+
+    const iframeURL =
+      new URL(originalURL);
+
+    /*
+     * Ambil MPD
+     */
+
+    const mpd =
+      iframeURL.searchParams.get("mpd") || "";
+
+
+    /*
+     * Ambil KID
+     */
+
+    const kid =
+      iframeURL.searchParams.get("keyId") ||
+      iframeURL.searchParams.get("kid") ||
+      "";
+
+
+    /*
+     * Ambil KEY
+     */
+
+    const key =
+      iframeURL.searchParams.get("key") || "";
+
+
+    console.log(
+      "[IKOTV] AUTO HD MPD:",
+      mpd
+    );
+
+    console.log(
+      "[IKOTV] AUTO HD KID:",
+      kid
+    );
+
+    console.log(
+      "[IKOTV] AUTO HD KEY tersedia:",
+      !!key
+    );
+
+
+    return {
+
+      url:
+        mpd,
+
+      kid:
+        kid,
+
+      key:
+        key,
+
+      clearKeys:
+        kid && key
+          ? {
+              [String(kid)
+                .replace(/-/g, "")
+                .toLowerCase()
+              ]:
+                String(key)
+                  .replace(/-/g, "")
+                  .toLowerCase()
+            }
+          : null
+
+    };
+
+  } catch (error) {
+
+    console.error(
+      "[IKOTV] Gagal parsing Auto HD:",
+      error
+    );
+
+    return null;
+
+  }
+
+}
+  /* =========================================================
    PLAY M3U8
 ========================================================= */
 
@@ -2529,6 +2662,29 @@ async function playIKOTVStream(
       videoData
     );
 
+  let dashData = null;
+
+if (type === "dash") {
+
+  dashData =
+    normalizeIKOTVDASH({
+      ...videoData,
+      url: url
+    });
+
+  if (
+    !dashData ||
+    !dashData.url
+  ) {
+
+    throw new Error(
+      "URL MPD Auto HD tidak ditemukan."
+    );
+
+  }
+
+}
+
 
   console.log(
     "[IKOTV] STREAM TYPE:",
@@ -2630,18 +2786,19 @@ async function playIKOTVStream(
      * ==========================
      */
 
-    if (
-      type === "dash"
-    ) {
+    if (type === "dash") {
 
-      await playIKOTVDASH(
-        streamURL,
-        videoData,
-        ikotvVideo
-      );
+  await playIKOTVDASH(
+    dashData.url,
+    {
+      ...videoData,
+      ...dashData
+    },
+    ikotvVideo
+  );
 
-      return;
-    }
+  return;
+}
 
 
   } catch (error) {
