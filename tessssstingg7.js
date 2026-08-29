@@ -32,10 +32,10 @@
     "https://cdn.jsdelivr.net/npm/hls.js@1.6.2/dist/hls.min.js",
   shaka:
     "https://cdn.jsdelivr.net/npm/shaka-player@4.16.12/dist/shaka-player.compiled.min.js",
+  shaka:
+    "https://cdn.jsdelivr.net/npm/shaka-player@4.16.0/dist/shaka-player.compiled.js",
   shakaCSS:
-    "https://cdn.jsdelivr.net/npm/shaka-player@4.16.12/dist/controls.min.css",
-    shaka:
-  "https://cdn.jsdelivr.net/npm/shaka-player@4.16.0/dist/shaka-player.compiled.js",
+    "https://cdn.jsdelivr.net/npm/shaka-player@4.16.12/dist/controls.min.css"
 };
 
   let matches = [];
@@ -1636,7 +1636,7 @@
     });
   }
 
-  async function loadLibraries() {
+async function loadLibraries() {
 
   await loadScript(
     CONFIG.hls,
@@ -1649,6 +1649,7 @@
   );
 
 }
+
 
   /* ==============================
      SHAKA CSS
@@ -3341,9 +3342,9 @@ async function openIKOMatch(matchId) {
             );
 
             playIKOTVStream(
-  video.url,
-  video
-);
+             video.url,
+             video
+            );
 
           }
         );
