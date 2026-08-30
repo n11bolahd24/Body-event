@@ -3282,7 +3282,7 @@ async function openIKOMatch(matchId) {
 
     panel.innerHTML = `
       <div class="iko-server-title">
-        LIVE SERVER
+        LIVE SERVER : 👇
       </div>
 
       <div class="iko-server-list">
