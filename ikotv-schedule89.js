@@ -350,7 +350,7 @@
   border-radius: 5px;
 
   background: #202020;
-  color: #aaa;
+  color: #fff;
 
   cursor: pointer;
 
