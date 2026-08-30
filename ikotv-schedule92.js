@@ -1764,7 +1764,7 @@
     if (error.name === "AbortError") {
 
       throw new Error(
-        "Request timeout 30 detik"
+        "Request timeout 30s"
       );
 
     }
