@@ -329,9 +329,9 @@
 .iko-server-title {
   margin-bottom: 7px;
 
-  color: #777;
+  color: #fff;
 
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 900;
 
   letter-spacing: .7px;
@@ -354,7 +354,7 @@
 
   cursor: pointer;
 
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 800;
 
   transition:
