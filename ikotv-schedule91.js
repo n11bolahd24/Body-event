@@ -3963,7 +3963,7 @@ renderSchedule();
 
   schedule.innerHTML = `
     <div class="iko-error">
-      Gagal memuat jadwal.
+      Failed to load the schedule. Turn your internet connection off and on, then try again!
       <br>
       <small>
         ${escapeHTML(
