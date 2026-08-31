@@ -4006,12 +4006,13 @@ function updateCountdowns() {
     if (!statusElement) return;
 
     const displayedStatus =
-      statusElement.classList.contains("live")
-        ? "live"
-        : statusElement.classList.contains("ended")
-          ? "ended"
-          : "upcoming";
-
+  statusElement.classList.contains("live")
+    ? "live"
+    : statusElement.classList.contains("ended")
+      ? "ended"
+      : statusElement.classList.contains("waiting")
+        ? "waiting"
+        : "upcoming";
     /*
      * HANYA render ulang kalau status
      * pertandingan benar-benar berubah.
