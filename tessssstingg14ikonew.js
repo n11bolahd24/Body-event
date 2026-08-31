@@ -329,9 +329,9 @@
 .iko-server-title {
   margin-bottom: 7px;
 
-  color: #777;
+  color: #fff;
 
-  font-size: 8px;
+  font-size: 10px;
   font-weight: 900;
 
   letter-spacing: .7px;
@@ -350,11 +350,11 @@
   border-radius: 5px;
 
   background: #202020;
-  color: #aaa;
+  color: #fff;
 
   cursor: pointer;
 
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 800;
 
   transition:
@@ -1764,7 +1764,7 @@
     if (error.name === "AbortError") {
 
       throw new Error(
-        "Request timeout 30 detik"
+        "Request timeout 30s"
       );
 
     }
@@ -2839,7 +2839,7 @@ if (type === "dash") {
         "
       >
 
-        Gagal memutar stream.
+        Failed to play the stream.
         <br>
         ${escapeHTML(
           error?.message || ""
@@ -3264,7 +3264,7 @@ async function openIKOMatch(matchId) {
 
       panel.innerHTML = `
         <div class="iko-server-error">
-          Server stream tidak tersedia.
+          Stream server is unavailable..
         </div>
       `;
 
@@ -3282,7 +3282,7 @@ async function openIKOMatch(matchId) {
 
     panel.innerHTML = `
       <div class="iko-server-title">
-        LIVE SERVER
+        LIVE SERVER : 👇
       </div>
 
       <div class="iko-server-list">
@@ -3963,7 +3963,7 @@ renderSchedule();
 
   schedule.innerHTML = `
     <div class="iko-error">
-      Gagal memuat jadwal.
+      Failed to load the schedule. Turn your internet connection off and on, then try again!
       <br>
       <small>
         ${escapeHTML(
