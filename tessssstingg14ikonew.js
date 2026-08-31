@@ -2450,7 +2450,106 @@ function playIKOTVHLS(url, video) {
 
 }
 
+/* =========================================================
+   PLAY IFRAME
+========================================================= */
 
+function playIKOTVIframe(url, videoData = {}) {
+
+  return new Promise((resolve, reject) => {
+
+    console.log(
+      "[IKOTV] PLAYER: IFRAME"
+    );
+
+    if (!url) {
+
+      reject(
+        new Error(
+          "URL iframe kosong."
+        )
+      );
+
+      return;
+    }
+
+
+    const tv =
+      document.getElementById("tv");
+
+
+    if (!tv) {
+
+      reject(
+        new Error(
+          "#tv tidak ditemukan."
+        )
+      );
+
+      return;
+    }
+
+
+    /*
+     * Bersihkan video/player lama
+     */
+
+    try {
+
+      if (ikotvHls) {
+
+        ikotvHls.destroy();
+
+        ikotvHls = null;
+
+      }
+
+    } catch (e) {
+
+      console.warn(
+        "[IKOTV] Gagal destroy HLS:",
+        e
+      );
+
+    }
+
+
+    /*
+     * Buat iframe
+     */
+
+    tv.innerHTML = `
+      <iframe
+        src="${escapeHTML(url)}"
+        allow="autoplay; fullscreen; encrypted-media"
+        allowfullscreen
+        frameborder="0"
+        scrolling="no"
+        style="
+          width:100%;
+          height:100%;
+          min-height:250px;
+          display:block;
+          border:0;
+          background:#000;
+        "
+      ></iframe>
+    `;
+
+
+    console.log(
+      "[IKOTV] IFRAME loaded:",
+      url
+    );
+
+
+    resolve();
+
+  });
+
+}
+
+  
 /* =========================================================
    NORMALIZE CLEARKEY
 ========================================================= */
