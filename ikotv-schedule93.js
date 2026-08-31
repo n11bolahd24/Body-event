@@ -187,9 +187,9 @@
     return "upcoming";
   }
 
-  // Match sudah lewat kickoff
-  // dan sudah tidak LIVE di IKOTV
-  return "ended";
+  // Sudah kickoff tetapi IKOTV
+  // belum mendeteksi LIVE
+  return "waiting";
 }
 
   function normalizeMatch(match) {
@@ -770,6 +770,11 @@
 }
 
 .iko-status.upcoming {
+  background: #525050;
+  color: #ffffff;
+}
+
+.iko-status.waiting {
   background: #525050;
   color: #ffffff;
 }
@@ -3045,42 +3050,59 @@ if (type === "dash") {
           let liveClass = "";
 
           if (status === "live") {
-            statusText = "LIVE";
-            liveClass = "live";
+  statusText = "LIVE";
+  liveClass = "live";
 
-            button = `
-              <button
-                class="iko-watch"
-                data-ikotv-watch="${escapeHTML(match.id)}"
-              >
-                WATCH LIVE
-              </button>
-            `;
-          } else if (status === "ended") {
-            statusText = "ENDED";
+  button = `
+    <button
+      class="iko-watch"
+      data-ikotv-watch="${escapeHTML(match.id)}"
+    >
+      WATCH LIVE
+    </button>
+  `;
 
-            button = `
-  <button
-    class="iko-watch disabled"
-    disabled
-  >
-    WAITING FOR KICKOFF
-  </button>
-`;
-          } else {
-            const cd = countdown(match.time);
+} else if (status === "waiting") {
 
-            statusText = "UPCOMING";
+  statusText = "WAITING";
 
-            button = `
-              <button
-                class="iko-watch disabled"
-                disabled
-              >
-                 WAITING FOR KICKOFF
-              </button>
-            `;
-          }
+  button = `
+    <button
+      class="iko-watch disabled"
+      disabled
+    >
+      WAITING FOR KICKOFF
+    </button>
+  `;
+
+} else if (status === "ended") {
+
+  statusText = "ENDED";
+
+  button = `
+    <button
+      class="iko-watch disabled"
+      disabled
+    >
+      WAITING FOR KICKOFF
+    </button>
+  `;
+
+} else {
+
+  const cd = countdown(match.time);
+
+  statusText = "UPCOMING";
+
+  button = `
+    <button
+      class="iko-watch disabled"
+      disabled
+    >
+      WAITING FOR KICKOFF
+    </button>
+  `;
+}
 
           const cd =
             status === "upcoming"
@@ -3984,12 +4006,13 @@ function updateCountdowns() {
     if (!statusElement) return;
 
     const displayedStatus =
-      statusElement.classList.contains("live")
-        ? "live"
-        : statusElement.classList.contains("ended")
-          ? "ended"
-          : "upcoming";
-
+  statusElement.classList.contains("live")
+    ? "live"
+    : statusElement.classList.contains("ended")
+      ? "ended"
+      : statusElement.classList.contains("waiting")
+        ? "waiting"
+        : "upcoming";
     /*
      * HANYA render ulang kalau status
      * pertandingan benar-benar berubah.
