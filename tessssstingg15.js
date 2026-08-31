@@ -774,6 +774,11 @@
   color: #ffffff;
 }
 
+.iko-status.waiting {
+  background: #525050;
+  color: #ffffff;
+}
+
 .iko-status.live {
   background: #00d979;
   color: #001b0f;
@@ -3045,42 +3050,59 @@ if (type === "dash") {
           let liveClass = "";
 
           if (status === "live") {
-            statusText = "LIVE";
-            liveClass = "live";
+  statusText = "LIVE";
+  liveClass = "live";
 
-            button = `
-              <button
-                class="iko-watch"
-                data-ikotv-watch="${escapeHTML(match.id)}"
-              >
-                WATCH LIVE
-              </button>
-            `;
-          } else if (status === "ended") {
-            statusText = "ENDED";
+  button = `
+    <button
+      class="iko-watch"
+      data-ikotv-watch="${escapeHTML(match.id)}"
+    >
+      WATCH LIVE
+    </button>
+  `;
 
-            button = `
-  <button
-    class="iko-watch disabled"
-    disabled
-  >
-    WAITING FOR KICKOFF
-  </button>
-`;
-          } else {
-            const cd = countdown(match.time);
+} else if (status === "waiting") {
 
-            statusText = "UPCOMING";
+  statusText = "WAITING";
 
-            button = `
-              <button
-                class="iko-watch disabled"
-                disabled
-              >
-                 WAITING FOR KICKOFF
-              </button>
-            `;
-          }
+  button = `
+    <button
+      class="iko-watch disabled"
+      disabled
+    >
+      WAITING FOR KICKOFF
+    </button>
+  `;
+
+} else if (status === "ended") {
+
+  statusText = "ENDED";
+
+  button = `
+    <button
+      class="iko-watch disabled"
+      disabled
+    >
+      WAITING FOR KICKOFF
+    </button>
+  `;
+
+} else {
+
+  const cd = countdown(match.time);
+
+  statusText = "UPCOMING";
+
+  button = `
+    <button
+      class="iko-watch disabled"
+      disabled
+    >
+      WAITING FOR KICKOFF
+    </button>
+  `;
+}
 
           const cd =
             status === "upcoming"
