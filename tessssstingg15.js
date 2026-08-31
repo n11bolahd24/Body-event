@@ -2873,31 +2873,46 @@ if (type === "dash") {
   try {
 
     /*
-     * ==========================
-     * HLS
-     * ==========================
-     */
+ * ==========================
+ * HLS
+ * ==========================
+ */
 
-    if (
-      type === "hls"
-    ) {
+if (type === "hls") {
 
-      await playIKOTVHLS(
-        streamURL,
-        ikotvVideo
-      );
+  await playIKOTVHLS(
+    streamURL,
+    ikotvVideo
+  );
 
-      return;
-    }
+  return;
+}
 
 
-    /*
-     * ==========================
-     * DASH
-     * ==========================
-     */
+/*
+ * ==========================
+ * IFRAME
+ * ==========================
+ */
 
-    if (type === "dash") {
+if (type === "iframe") {
+
+  await playIKOTVIframe(
+    url,
+    videoData
+  );
+
+  return;
+}
+
+
+/*
+ * ==========================
+ * DASH
+ * ==========================
+ */
+
+if (type === "dash") {
 
   await playIKOTVDASH(
     dashData.url,
