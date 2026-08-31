@@ -1939,9 +1939,14 @@ const result =
       return true;
     }
 
-    // Sudah kickoff → hanya tampil
-    // kalau IKOTV masih menganggap LIVE
-    return match.isLive === true;
+    // Sudah kickoff tetapi belum terdeteksi LIVE
+    // → TETAP tampil sebagai WAITING
+    if (!match.isLive) {
+      return true;
+    }
+
+    // Sudah LIVE → tetap tampil
+    return true;
 
   })
   .sort(
