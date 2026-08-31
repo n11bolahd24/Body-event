@@ -2165,6 +2165,17 @@ function getStreamType(url, videoData = {}) {
   }
 
 
+   /*
+   * ==========================================
+   * IFRAME PLAYER
+   * ==========================================
+   */
+
+  if (type === "iframe") {
+    return "iframe";
+  }
+
+
   /*
    * DEFAULT
    * ==========================================
@@ -2173,6 +2184,7 @@ function getStreamType(url, videoData = {}) {
   return "hls";
 }
 
+  
   function normalizeIKOTVDASH(videoData = {}) {
 
   const originalURL =
