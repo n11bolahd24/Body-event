@@ -2165,6 +2165,17 @@ function getStreamType(url, videoData = {}) {
   }
 
 
+   /*
+   * ==========================================
+   * IFRAME PLAYER
+   * ==========================================
+   */
+
+  if (type === "iframe") {
+    return "iframe";
+  }
+
+
   /*
    * DEFAULT
    * ==========================================
@@ -2173,6 +2184,7 @@ function getStreamType(url, videoData = {}) {
   return "hls";
 }
 
+  
   function normalizeIKOTVDASH(videoData = {}) {
 
   const originalURL =
@@ -2438,7 +2450,106 @@ function playIKOTVHLS(url, video) {
 
 }
 
+/* =========================================================
+   PLAY IFRAME
+========================================================= */
 
+function playIKOTVIframe(url, videoData = {}) {
+
+  return new Promise((resolve, reject) => {
+
+    console.log(
+      "[IKOTV] PLAYER: IFRAME"
+    );
+
+    if (!url) {
+
+      reject(
+        new Error(
+          "URL iframe kosong."
+        )
+      );
+
+      return;
+    }
+
+
+    const tv =
+      document.getElementById("tv");
+
+
+    if (!tv) {
+
+      reject(
+        new Error(
+          "#tv tidak ditemukan."
+        )
+      );
+
+      return;
+    }
+
+
+    /*
+     * Bersihkan video/player lama
+     */
+
+    try {
+
+      if (ikotvHls) {
+
+        ikotvHls.destroy();
+
+        ikotvHls = null;
+
+      }
+
+    } catch (e) {
+
+      console.warn(
+        "[IKOTV] Gagal destroy HLS:",
+        e
+      );
+
+    }
+
+
+    /*
+     * Buat iframe
+     */
+
+    tv.innerHTML = `
+      <iframe
+        src="${escapeHTML(url)}"
+        allow="autoplay; fullscreen; encrypted-media"
+        allowfullscreen
+        frameborder="0"
+        scrolling="no"
+        style="
+          width:100%;
+          height:100%;
+          min-height:250px;
+          display:block;
+          border:0;
+          background:#000;
+        "
+      ></iframe>
+    `;
+
+
+    console.log(
+      "[IKOTV] IFRAME loaded:",
+      url
+    );
+
+
+    resolve();
+
+  });
+
+}
+
+  
 /* =========================================================
    NORMALIZE CLEARKEY
 ========================================================= */
@@ -2762,31 +2873,46 @@ if (type === "dash") {
   try {
 
     /*
-     * ==========================
-     * HLS
-     * ==========================
-     */
+ * ==========================
+ * HLS
+ * ==========================
+ */
 
-    if (
-      type === "hls"
-    ) {
+if (type === "hls") {
 
-      await playIKOTVHLS(
-        streamURL,
-        ikotvVideo
-      );
+  await playIKOTVHLS(
+    streamURL,
+    ikotvVideo
+  );
 
-      return;
-    }
+  return;
+}
 
 
-    /*
-     * ==========================
-     * DASH
-     * ==========================
-     */
+/*
+ * ==========================
+ * IFRAME
+ * ==========================
+ */
 
-    if (type === "dash") {
+if (type === "iframe") {
+
+  await playIKOTVIframe(
+    url,
+    videoData
+  );
+
+  return;
+}
+
+
+/*
+ * ==========================
+ * DASH
+ * ==========================
+ */
+
+if (type === "dash") {
 
   await playIKOTVDASH(
     dashData.url,
