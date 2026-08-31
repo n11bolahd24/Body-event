@@ -187,9 +187,9 @@
     return "upcoming";
   }
 
-  // Match sudah lewat kickoff
-  // dan sudah tidak LIVE di IKOTV
-  return "ended";
+  // Sudah kickoff tetapi IKOTV
+  // belum mendeteksi LIVE
+  return "waiting";
 }
 
   function normalizeMatch(match) {
