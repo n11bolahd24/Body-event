@@ -2073,26 +2073,22 @@ function getStreamType(url, videoData = {}) {
     ).toLowerCase();
 
 
-  /*
-   * ==========================================
-   * HD [auto] / IFRAME PLAYER
-   * ==========================================
-   *
-   * URL iframe berisi:
-   *
-   * ?mpd=...
-   * &keyId=...
-   * &key=...
-   *
-   * Jadi harus dimainkan sebagai DASH.
-   */
-
-  if (
-    type === "iframe" &&
-    /[?&]mpd=/i.test(url)
-  ) {
-    return "dash";
-  }
+ /*
+ * ==========================================
+ * HD [auto] / IFRAME PLAYER
+ * ==========================================
+ *
+ * Walaupun URL iframe berisi:
+ *
+ * ?mpd=...
+ * &keyId=...
+ * &key=...
+ *
+ * tetap dimainkan sebagai IFRAME.
+ */
+if (type === "iframe") {
+  return "iframe";
+}
 
 
   /*
