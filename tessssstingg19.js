@@ -2379,20 +2379,27 @@ function playIKOTVHLS(url, video) {
     ) {
 
       ikotvHls =
-        new window.Hls({
+  new window.Hls({
 
-          enableWorker: true,
+    enableWorker: true,
 
-          lowLatencyMode: true,
+    lowLatencyMode: false,
 
-          backBufferLength: 30,
+    backBufferLength: 30,
 
-          maxBufferLength: 30,
+    maxBufferLength: 60,
 
-          maxMaxBufferLength: 60
+    maxMaxBufferLength: 120,
 
-        });
+    startFragPrefetch: true,
 
+    maxBufferHole: 0.5,
+
+    nudgeOffset: 0.1,
+
+    nudgeMaxRetry: 5
+
+  });
 
       ikotvHls.loadSource(url);
 
