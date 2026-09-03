@@ -2425,29 +2425,66 @@ function playIKOTVHLS(url, video) {
 
 
       ikotvHls.on(
-        window.Hls.Events.ERROR,
-        (event, data) => {
+  window.Hls.Events.ERROR,
+  (event, data) => {
 
-          console.warn(
-            "[IKOTV] HLS error:",
-            data
-          );
+    console.warn(
+      "[IKOTV] HLS error:",
+      data
+    );
 
-          if (
-            data.fatal
-          ) {
+    /* ==========================================
+       BUFFER STALL
+    ========================================== */
 
-            reject(
-              new Error(
-                "HLS fatal error: " +
-                data.type
-              )
-            );
+    if (
+      data.details ===
+      window.Hls.ErrorDetails.BUFFER_STALLED_ERROR
+    ) {
 
-          }
-
-        }
+      console.warn(
+        "[IKOTV] Buffer stalled. Mencoba recovery..."
       );
+
+      try {
+
+        ikotvHls.startLoad();
+
+      } catch (error) {
+
+        console.warn(
+          "[IKOTV] Buffer recovery gagal:",
+          error
+        );
+
+      }
+
+      return;
+    }
+
+
+    /* ==========================================
+       FATAL ERROR
+    ========================================== */
+
+    if (data.fatal) {
+
+      console.error(
+        "[IKOTV] HLS fatal error:",
+        data
+      );
+
+      reject(
+        new Error(
+          "HLS fatal error: " +
+          data.type
+        )
+      );
+
+    }
+
+  }
+);
 
       return;
     }
