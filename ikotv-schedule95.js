@@ -2869,7 +2869,6 @@ if (type === "dash") {
     <video
       id="ikotvVideo"
       controls
-      autoplay
       playsinline
       preload="auto"
       style="
