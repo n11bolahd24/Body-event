@@ -1397,181 +1397,454 @@ async function playColaMatch(match_uuid, btn){
 
 
 // ==========================================
-// SHAKA PLAYER COLATV + UI + QUALITY
+// COLATV HLS PLAYER
+// UI SAMA SEPERTI IKOTV
 // ==========================================
 
-let shakaPlayer;
-let shakaUI;
+let colaHls = null;
+let colaVideo = null;
 
+
+// ==========================================
+// LOAD HLS.JS
+// ==========================================
+
+function loadColaHLS(){
+
+    return new Promise((resolve,reject)=>{
+
+        if(typeof window.Hls !== "undefined"){
+            resolve();
+            return;
+        }
+
+        const existing =
+            document.querySelector(
+                'script[data-colatv-hls]'
+            );
+
+        if(existing){
+
+            existing.addEventListener(
+                "load",
+                ()=>resolve(),
+                {once:true}
+            );
+
+            existing.addEventListener(
+                "error",
+                ()=>reject(
+                    new Error("Gagal memuat HLS.js")
+                ),
+                {once:true}
+            );
+
+            return;
+        }
+
+        const script =
+            document.createElement("script");
+
+        script.src =
+            "https://cdn.jsdelivr.net/npm/hls.js@1.6.2/dist/hls.min.js";
+
+        script.async = true;
+
+        script.dataset.colatvHls = "true";
+
+        script.onload =
+            ()=>resolve();
+
+        script.onerror =
+            ()=>reject(
+                new Error("Gagal memuat HLS.js")
+            );
+
+        document.head.appendChild(script);
+
+    });
+
+}
+
+
+// ==========================================
+// DESTROY COLATV PLAYER
+// ==========================================
+
+function destroyColaPlayer(){
+
+    if(colaHls){
+
+        try{
+
+            colaHls.destroy();
+
+        }catch(e){}
+
+        colaHls = null;
+
+    }
+
+    colaVideo = null;
+
+}
+
+
+// ==========================================
+// PLAY HLS / M3U8
+// ==========================================
 
 async function playColaStream(url){
 
-    const tv = document.getElementById("tv");
+    const tv =
+        document.getElementById("tv");
 
-    if(!tv) return;
+    if(!tv){
 
-
-    tv.innerHTML = `
-
-<div id="shakaContainer"
-class="shaka-video-container"
-style="
-position:absolute;
-top:0;
-left:0;
-right:0;
-bottom:0;
-">
-
-<video id="colaVideo"
-autoplay
-playsinline
-style="
-width:100%;
-height:100%;
-object-fit:contain;
-background:#000;
-">
-</video>
-
-</div>
-
-`;
-
-
-    const video =
-    document.getElementById("colaVideo");
-
-
-    const container =
-    document.getElementById("shakaContainer");
-
-
-
-    shaka.polyfill.installAll();
-
-
-
-    if(!shaka.Player.isBrowserSupported()){
-
-        alert(
-        "Browser tidak support Shaka Player"
+        console.error(
+            "[COLATV] #tv tidak ditemukan."
         );
 
         return;
     }
 
 
+    if(!url){
 
-    // hapus player lama
-    if(shakaPlayer){
+        alert(
+            "Stream tidak tersedia"
+        );
 
-        shakaPlayer.destroy();
-
+        return;
     }
 
 
-
-    shakaPlayer =
-    new shaka.Player(video);
-
-
-
-    shakaPlayer.configure({
-
-        streaming:{
-
-            rebufferingGoal:2,
-
-            bufferingGoal:30,
-
-            retryParameters:{
-                maxAttempts:8,
-                baseDelay:1000
-            }
-
-        },
+    console.log(
+        "[COLATV] PLAY HLS:",
+        url
+    );
 
 
-        abr:{
+    // ==========================================
+    // HAPUS PLAYER LAMA
+    // ==========================================
 
-            enabled:true,
-
-            defaultBandwidthEstimate:1000000
-
-        }
-
-    });
+    destroyColaPlayer();
 
 
-
-    shakaPlayer.addEventListener(
-    "error",
-    e=>{
-
-        console.log(
-        "SHAKA ERROR:",
-        e.detail
-        );
-
-    });
-
-
-
-    // aktifkan UI Shaka
-    shakaUI =
-new shaka.ui.Overlay(
-    shakaPlayer,
-    container,
-    video
-);
-
-
-const controls =
-shakaUI.getControls();
-
-
-controls.getConfig().overflowMenuButtons = [
-    'quality',
-    'picture_in_picture',
-    'cast'
-];
-
-
+    // ==========================================
+    // LOAD HLS.JS
+    // ==========================================
 
     try{
 
+        await loadColaHLS();
 
-        await shakaPlayer.load(url);
+    }catch(error){
+
+        console.error(
+            "[COLATV] HLS.js ERROR:",
+            error
+        );
+
+        tv.innerHTML = `
+
+        <div
+            style="
+                display:flex;
+                align-items:center;
+                justify-content:center;
+
+                width:100%;
+                height:100%;
+                min-height:250px;
+
+                background:#000;
+
+                color:#ff7777;
+
+                font-family:'Courier New',monospace;
+
+                font-size:12px;
+
+                text-align:center;
+
+                padding:20px;
+
+                box-sizing:border-box;
+            "
+        >
+
+            Failed to load HLS player.
+
+        </div>
+
+        `;
+
+        return;
+
+    }
 
 
+    // ==========================================
+    // BUAT VIDEO
+    // ==========================================
 
-        console.log(
-        "SHAKA PLAYING:",
-        url
+    tv.innerHTML = `
+
+    <video
+        id="colaVideo"
+        controls
+        playsinline
+        preload="auto"
+        style="
+            width:100%;
+            height:100%;
+            display:block;
+            background:#000;
+        "
+    ></video>
+
+    `;
+
+
+    colaVideo =
+        document.getElementById(
+            "colaVideo"
         );
 
 
+    if(!colaVideo){
 
-        // autoplay
-        video.play()
-        .catch(()=>{});
+        console.error(
+            "[COLATV] Video element gagal dibuat."
+        );
 
-
-
+        return;
     }
-    catch(error){
 
+
+    // ==========================================
+    // NATIVE HLS
+    // ==========================================
+
+    if(
+        !window.Hls.isSupported() &&
+        colaVideo.canPlayType(
+            "application/vnd.apple.mpegurl"
+        )
+    ){
 
         console.log(
-        "SHAKA LOAD ERROR:",
-        error
+            "[COLATV] Menggunakan native HLS."
+        );
+
+        colaVideo.src = url;
+
+
+        colaVideo.addEventListener(
+            "loadedmetadata",
+            ()=>{
+
+                colaVideo
+                    .play()
+                    .catch(
+                        ()=>{}
+                    );
+
+            },
+            {once:true}
         );
 
 
+        return;
     }
 
 
+    // ==========================================
+    // HLS.JS
+    // ==========================================
+
+    if(window.Hls.isSupported()){
+
+        console.log(
+            "[COLATV] Menggunakan HLS.js."
+        );
+
+
+        colaHls =
+            new window.Hls({
+
+                enableWorker:true,
+
+                lowLatencyMode:false,
+
+                backBufferLength:30,
+
+                maxBufferLength:60,
+
+                maxMaxBufferLength:120,
+
+                startFragPrefetch:true,
+
+                maxBufferHole:0.5,
+
+                nudgeOffset:0.1,
+
+                nudgeMaxRetry:5
+
+            });
+
+
+        colaHls.loadSource(url);
+
+        colaHls.attachMedia(
+            colaVideo
+        );
+
+
+        // ==========================================
+        // MANIFEST PARSED
+        // ==========================================
+
+        colaHls.on(
+            window.Hls.Events.MANIFEST_PARSED,
+            ()=>{
+
+                console.log(
+                    "[COLATV] HLS manifest parsed."
+                );
+
+
+                colaVideo
+                    .play()
+                    .catch(
+                        ()=>{}
+                    );
+
+            }
+        );
+
+
+        // ==========================================
+        // ERROR
+        // ==========================================
+
+        colaHls.on(
+            window.Hls.Events.ERROR,
+            (event,data)=>{
+
+                console.warn(
+                    "[COLATV] HLS error:",
+                    data
+                );
+
+
+                // ======================================
+                // BUFFER STALL
+                // ======================================
+
+                if(
+                    data.details ===
+                    window.Hls.ErrorDetails
+                        .BUFFER_STALLED_ERROR
+                ){
+
+                    console.warn(
+                        "[COLATV] Buffer stalled. Recovery..."
+                    );
+
+
+                    try{
+
+                        colaHls.startLoad();
+
+                    }catch(error){
+
+                        console.warn(
+                            "[COLATV] Recovery gagal:",
+                            error
+                        );
+
+                    }
+
+                    return;
+                }
+
+
+                // ======================================
+                // FATAL ERROR
+                // ======================================
+
+                if(data.fatal){
+
+                    console.error(
+                        "[COLATV] HLS fatal error:",
+                        data
+                    );
+
+
+                    try{
+
+                        colaHls.destroy();
+
+                    }catch(e){}
+
+
+                    colaHls = null;
+
+                }
+
+            }
+        );
+
+
+        return;
+    }
+
+
+    // ==========================================
+    // BROWSER TIDAK SUPPORT HLS
+    // ==========================================
+
+    console.error(
+        "[COLATV] Browser tidak mendukung HLS."
+    );
+
+
+    tv.innerHTML = `
+
+    <div
+        style="
+            display:flex;
+            align-items:center;
+            justify-content:center;
+
+            width:100%;
+            height:100%;
+            min-height:250px;
+
+            background:#000;
+
+            color:#ff7777;
+
+            font-family:'Courier New',monospace;
+
+            font-size:12px;
+
+            text-align:center;
+
+            padding:20px;
+
+            box-sizing:border-box;
+        "
+    >
+
+        Browser tidak mendukung HLS.
+
+    </div>
+
+    `;
 
 }
 // ==========================================
