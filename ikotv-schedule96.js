@@ -2576,13 +2576,14 @@ function playIKOTVIframe(url, videoData = {}) {
         frameborder="0"
         scrolling="no"
         style="
-          width:100%;
-          height:100%;
-          min-height:250px;
-          display:block;
-          border:0;
-          background:#000;
-        "
+  width:100%;
+  height:100%;
+  display:block;
+  border:0;
+  margin:0;
+  padding:0;
+  background:#000;
+"
       ></iframe>
     `;
 
