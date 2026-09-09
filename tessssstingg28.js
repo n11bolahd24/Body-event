@@ -3363,6 +3363,22 @@ function setupSearchButtons() {
 
     input.oninput = () => {
       const keyword = input.value.trim().toLowerCase();
+        // Jika kolom pencarian dikosongkan,
+  // kembalikan semua jadwal seperti semula
+  if (!keyword) {
+    schedule.querySelectorAll(".iko-box").forEach(box => {
+      box.style.display = "";
+
+      box.querySelectorAll(".iko-card").forEach(card => {
+        card.style.display = "";
+      });
+    });
+
+    const message = schedule.querySelector(".iko-search-not-found");
+    if (message) message.remove();
+
+    return;
+  }
       let totalFound = 0;
 
       schedule.querySelectorAll(".iko-box").forEach(box => {
