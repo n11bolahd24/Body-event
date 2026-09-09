@@ -3458,14 +3458,21 @@ function setupSearchButtons() {
     // =========================
     if (firstMatchDate) {
 
-      const actions =
-        firstMatchDate.querySelector(".iko-date-actions");
+  const actions =
+    firstMatchDate.querySelector(".iko-date-actions");
 
-      if (actions) {
-        actions.prepend(input);
-      }
+  if (actions && input.parentElement !== actions) {
+    actions.prepend(input);
+  }
 
-    } else {
+  // Tetap fokus ke Search Match
+  input.focus();
+
+  // Cursor tetap di paling kanan
+  const length = input.value.length;
+  input.setSelectionRange(length, length);
+
+} else {
 
       // =========================
       // TIDAK ADA HASIL
