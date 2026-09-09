@@ -3365,33 +3365,40 @@ function setupSearchButtons() {
   input.oninput = () => {
     const keyword = input.value.trim().toLowerCase();
 
-    const dates = [...schedule.querySelectorAll(".iko-date")];
     const boxes = [...schedule.querySelectorAll(".iko-box")];
 
     // =========================
     // SEARCH KOSONG
     // =========================
     if (!keyword) {
-      dates.forEach(date => {
-        date.style.display = "";
-      });
 
       boxes.forEach(box => {
         box.style.display = "";
+
+        box.querySelector(".iko-date").style.display = "";
 
         box.querySelectorAll(".iko-card").forEach(card => {
           card.style.display = "";
         });
       });
 
-      const message = schedule.querySelector(".iko-search-not-found");
-      if (message) message.remove();
+      const message =
+        schedule.querySelector(".iko-search-not-found");
+
+      if (message) {
+        message.remove();
+      }
 
       // Kembalikan Search Match ke tanggal pertama
-      const firstDate = schedule.querySelector(".iko-date");
+      const firstBox = boxes[0];
 
-      if (firstDate) {
-        firstDate.querySelector(".iko-date-actions").prepend(input);
+      if (firstBox) {
+        const actions =
+          firstBox.querySelector(".iko-date-actions");
+
+        if (actions) {
+          actions.prepend(input);
+        }
       }
 
       return;
@@ -3404,32 +3411,43 @@ function setupSearchButtons() {
     let totalFound = 0;
 
     boxes.forEach(box => {
+
+      const date =
+        box.querySelector(".iko-date");
+
       let foundInBox = false;
 
       box.querySelectorAll(".iko-card").forEach(card => {
-        const text = card.textContent.toLowerCase();
-        const match = text.includes(keyword);
 
-        card.style.display = match ? "" : "none";
+        const text =
+          card.textContent.toLowerCase();
+
+        const match =
+          text.includes(keyword);
+
+        card.style.display =
+          match ? "" : "none";
 
         if (match) {
           foundInBox = true;
           totalFound++;
         }
+
       });
 
-      const date = box.previousElementSibling;
-
+      // Ada pertandingan yang cocok
       if (foundInBox) {
+
+        box.style.display = "";
         date.style.display = "";
 
         if (!firstMatchDate) {
           firstMatchDate = date;
         }
 
-        box.style.display = "";
       } else {
-        date.style.display = "none";
+
+        // Tidak ada pertandingan yang cocok
         box.style.display = "none";
       }
     });
@@ -3439,23 +3457,67 @@ function setupSearchButtons() {
     // TANGGAL PERTAMA YANG COCOK
     // =========================
     if (firstMatchDate) {
-      firstMatchDate.querySelector(".iko-date-actions").prepend(input);
+
+      const actions =
+        firstMatchDate.querySelector(".iko-date-actions");
+
+      if (actions) {
+        actions.prepend(input);
+      }
+
+    } else {
+
+      // =========================
+      // TIDAK ADA HASIL
+      // =========================
+
+      // Tetap tampilkan tanggal pertama
+      // supaya Search Match masih bisa dihapus
+      const firstBox = boxes[0];
+
+      if (firstBox) {
+
+        firstBox.style.display = "";
+
+        const firstDate =
+          firstBox.querySelector(".iko-date");
+
+        firstDate.style.display = "";
+
+        const actions =
+          firstDate.querySelector(".iko-date-actions");
+
+        if (actions) {
+          actions.prepend(input);
+        }
+      }
     }
 
     // =========================
     // MATCH NOT FOUND
     // =========================
-    const oldMessage = schedule.querySelector(".iko-search-not-found");
-    if (oldMessage) oldMessage.remove();
+    const oldMessage =
+      schedule.querySelector(".iko-search-not-found");
+
+    if (oldMessage) {
+      oldMessage.remove();
+    }
 
     if (totalFound === 0) {
-      const message = document.createElement("div");
-      message.className = "iko-search-not-found";
-      message.textContent = "MATCH NOT FOUND";
+
+      const message =
+        document.createElement("div");
+
+      message.className =
+        "iko-search-not-found";
+
+      message.textContent =
+        "MATCH NOT FOUND";
+
       schedule.appendChild(message);
     }
   };
-}  
+}
 /* =========================================================
    MANUAL UPDATE BUTTON
 ========================================================= */
