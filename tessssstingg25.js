@@ -565,22 +565,15 @@
 .iko-search-input {
   width: 130px;
   height: 28px;
-
   box-sizing: border-box;
-
   padding: 0 8px;
-
   border: 1px solid rgba(255,255,255,.12);
   border-radius: 7px;
-
   background: rgba(0,0,0,.45);
   color: #fff;
-
   outline: none;
-
-  font-family: "Courier New", monospace !important;
-  font-size: 8px;
-  font-weight: 900;
+  font-size: 14px;
+  font-weight: normal;
 }
 
 .iko-search-input::placeholder {
@@ -1364,7 +1357,7 @@
   .iko-search-input {
     width: 105px;
     height: 28px;
-    font-size: 7px;
+    font-size: 10px;
     padding: 0 7px;
   }
 
