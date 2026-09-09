@@ -3380,30 +3380,40 @@ function setupSearchButtons() {
           }
         });
 
-        // Jangan hilangkan box jadwal
-        box.style.display = "";
+        // Saat mencari, tanggal yang tidak punya hasil disembunyikan
+        if (keyword) {
+          box.style.display = foundInBox > 0 ? "" : "none";
+        } else {
+          box.style.display = "";
+        }
 
-        // Tampilkan / sembunyikan pesan "tidak ditemukan"
-        let notFound = box.querySelector(".iko-search-not-found");
-
-        if (foundInBox === 0 && keyword) {
-          if (!notFound) {
-            notFound = document.createElement("div");
-            notFound.className = "iko-search-not-found";
-            notFound.textContent = "MATCH NOT FOUND";
-            box.appendChild(notFound);
-          }
-
-          notFound.style.display = "";
-        } else if (notFound) {
-          notFound.style.display = "none";
+        // Hapus pesan lama
+        const notFound = box.querySelector(".iko-search-not-found");
+        if (notFound) {
+          notFound.remove();
         }
       });
+
+      // Kalau benar-benar tidak ada hasil di seluruh jadwal
+      if (keyword && totalFound === 0) {
+        let message = schedule.querySelector(".iko-search-not-found");
+
+        if (!message) {
+          message = document.createElement("div");
+          message.className = "iko-search-not-found";
+          message.textContent = "MATCH NOT FOUND";
+          schedule.appendChild(message);
+        }
+      } else {
+        const message = schedule.querySelector(".iko-search-not-found");
+        if (message) {
+          message.remove();
+        }
+      }
     };
 
   });
-}
-  
+}  
 /* =========================================================
    MANUAL UPDATE BUTTON
 ========================================================= */
