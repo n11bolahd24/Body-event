@@ -560,43 +560,7 @@
   flex-shrink: 0;
 }
 
-.iko-search-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 
-  height: 28px;
-  padding: 0 9px;
-
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 7px;
-
-  background: rgba(0,0,0,.35);
-  color: #fff;
-
-  font-family: "Courier New", monospace !important;
-  font-size: 8px;
-  font-weight: 900;
-
-  cursor: pointer;
-
-  white-space: nowrap;
-
-  transition:
-    background .2s ease,
-    color .2s ease,
-    border-color .2s ease;
-}
-
-.iko-search-btn:hover {
-  background: #00d979;
-  border-color: #00d979;
-  color: #001b0f;
-}
-
-.iko-search-btn:active {
-  transform: scale(.96);
-}
 
 .iko-search-input {
   width: 130px;
@@ -1393,11 +1357,7 @@
   gap: 4px;
 }
 
-.iko-search-btn {
-  height: 28px;
-  padding: 0 7px;
-  font-size: 7px;
-}
+
 
 @media (max-width: 600px) {
 
@@ -3174,21 +3134,21 @@ if (type === "dash") {
     )}
   </span>
 
-  <div class="iko-date-actions">
+ <div class="iko-date-actions">
 
-    <button
-      type="button"
-      class="iko-search-btn"
-      data-ikotv-search
-    >
-      SEARCH MATCH
-    </button>
+  <input
+    type="text"
+    class="iko-search-input"
+    data-ikotv-search
+    placeholder="Search match..."
+    autocomplete="off"
+  >
 
-    <button
-      type="button"
-      class="iko-update-btn"
-      data-ikotv-update
-    >
+  <button
+    type="button"
+    class="iko-update-btn"
+    data-ikotv-update
+  >
       <span class="iko-update-icon">↻</span>
       <span class="iko-update-text">UPDATE</span>
     </button>
@@ -3395,7 +3355,7 @@ schedule
   }
 
 /* =========================================================
-   SEARCH MATCH
+   SEARCH MATCH — INPUT LANGSUNG
 ========================================================= */
 
 function setupSearchButtons() {
@@ -3409,133 +3369,63 @@ function setupSearchButtons() {
 
   schedule
     .querySelectorAll("[data-ikotv-search]")
-    .forEach(button => {
+    .forEach(input => {
 
-      button.onclick = () => {
+      input.oninput = () => {
 
-        const actions =
-          button.closest(".iko-date-actions");
+        const keyword =
+          input.value
+            .trim()
+            .toLowerCase();
 
-        if (!actions) return;
+        const boxes =
+          schedule.querySelectorAll(
+            ".iko-box"
+          );
 
-        /* Jangan buat input dua kali */
-        if (
-          actions.querySelector(
-            ".iko-search-input"
-          )
-        ) {
-          return;
-        }
+        boxes.forEach(box => {
 
-        const input =
-          document.createElement("input");
+          const cards =
+            box.querySelectorAll(
+              ".iko-card"
+            );
 
-        input.type = "text";
-        input.className =
-          "iko-search-input";
+          let found = false;
 
-        input.placeholder =
-          "Search match...";
+          cards.forEach(card => {
 
-        input.autocomplete = "off";
-
-        /* Ganti tombol dengan input */
-        button.style.display = "none";
-
-        actions.insertBefore(
-          input,
-          actions.firstChild
-        );
-
-        input.focus();
-
-        /* =================================================
-           FILTER MATCH
-        ================================================= */
-
-        input.addEventListener(
-          "input",
-          () => {
-
-            const keyword =
-              input.value
-                .trim()
+            const text =
+              card.textContent
                 .toLowerCase();
 
-            const boxes =
-              schedule.querySelectorAll(
-                ".iko-box"
-              );
+            const match =
+              !keyword ||
+              text.includes(keyword);
 
-            boxes.forEach(box => {
+            card.style.display =
+              match ? "" : "none";
 
-              const cards =
-                box.querySelectorAll(
-                  ".iko-card"
-                );
-
-              let found = false;
-
-              cards.forEach(card => {
-
-                const text =
-                  card.textContent
-                    .toLowerCase();
-
-                const match =
-                  !keyword ||
-                  text.includes(keyword);
-
-                card.style.display =
-                  match ? "" : "none";
-
-                if (match) {
-                  found = true;
-                }
-
-              });
-
-              /* Sembunyikan tanggal jika
-                 tidak ada pertandingan */
-              box.style.display =
-                found ? "" : "none";
-
-            });
-
-          }
-        );
-
-        /* ENTER = tetap mencari */
-        input.addEventListener(
-          "keydown",
-          event => {
-
-            if (
-              event.key === "Escape"
-            ) {
-
-              input.value = "";
-
-              input.dispatchEvent(
-                new Event("input")
-              );
-
-              input.remove();
-
-              button.style.display =
-                "inline-flex";
-
-              button.focus();
+            if (match) {
+              found = true;
             }
 
-          }
-        );
+          });
+
+          /*
+           * Kalau tidak ada match
+           * pada tanggal tersebut,
+           * sembunyikan tanggalnya.
+           */
+          box.style.display =
+            found ? "" : "none";
+
+        });
 
       };
 
     });
 
-}  
+}
 /* =========================================================
    MANUAL UPDATE BUTTON
 ========================================================= */
