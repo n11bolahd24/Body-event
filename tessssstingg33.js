@@ -3512,17 +3512,24 @@ function setupSearchButtons() {
 
     if (totalFound === 0) {
 
-      const message =
-        document.createElement("div");
+  const message =
+    document.createElement("div");
 
-      message.className =
-        "iko-search-not-found";
+  message.className =
+    "iko-search-not-found";
 
-      message.textContent =
-        "MATCH NOT FOUND";
+  message.textContent =
+    "MATCH NOT FOUND";
 
-      schedule.appendChild(message);
-    }
+  schedule.appendChild(message);
+
+  // Tetap fokus di Search Match
+  input.focus();
+
+  // Cursor tetap di akhir teks
+  const length = input.value.length;
+  input.setSelectionRange(length, length);
+}
   };
 }
 /* =========================================================
