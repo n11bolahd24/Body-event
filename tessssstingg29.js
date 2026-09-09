@@ -3363,73 +3363,47 @@ function setupSearchButtons() {
 
     input.oninput = () => {
       const keyword = input.value.trim().toLowerCase();
-        // Jika kolom pencarian dikosongkan,
-  // kembalikan semua jadwal seperti semula
-  if (!keyword) {
-    schedule.querySelectorAll(".iko-box").forEach(box => {
-      box.style.display = "";
-
-      box.querySelectorAll(".iko-card").forEach(card => {
-        card.style.display = "";
-      });
-    });
-
-    const message = schedule.querySelector(".iko-search-not-found");
-    if (message) message.remove();
-
-    return;
-  }
       let totalFound = 0;
 
+      // Hapus pesan MATCH NOT FOUND lama
+      const oldMessage = schedule.querySelector(".iko-search-not-found");
+      if (oldMessage) oldMessage.remove();
+
       schedule.querySelectorAll(".iko-box").forEach(box => {
-        let foundInBox = 0;
 
         box.querySelectorAll(".iko-card").forEach(card => {
           const text = card.textContent.toLowerCase();
           const match = !keyword || text.includes(keyword);
 
+          // Hanya sembunyikan pertandingan
           card.style.display = match ? "" : "none";
 
           if (match) {
-            foundInBox++;
             totalFound++;
           }
         });
 
-        // Saat mencari, tanggal yang tidak punya hasil disembunyikan
-        if (keyword) {
-          box.style.display = foundInBox > 0 ? "" : "none";
-        } else {
-          box.style.display = "";
-        }
-
-        // Hapus pesan lama
-        const notFound = box.querySelector(".iko-search-not-found");
-        if (notFound) {
-          notFound.remove();
-        }
+        // JANGAN sembunyikan .iko-box
+        box.style.display = "";
       });
 
-      // Kalau benar-benar tidak ada hasil di seluruh jadwal
-      if (keyword && totalFound === 0) {
-        let message = schedule.querySelector(".iko-search-not-found");
+      // Jika pencarian kosong → semua pertandingan kembali
+      if (!keyword) {
+        return;
+      }
 
-        if (!message) {
-          message = document.createElement("div");
-          message.className = "iko-search-not-found";
-          message.textContent = "MATCH NOT FOUND";
-          schedule.appendChild(message);
-        }
-      } else {
-        const message = schedule.querySelector(".iko-search-not-found");
-        if (message) {
-          message.remove();
-        }
+      // Kalau tidak ada pertandingan sama sekali
+      if (totalFound === 0) {
+        const message = document.createElement("div");
+        message.className = "iko-search-not-found";
+        message.textContent = "MATCH NOT FOUND";
+        schedule.appendChild(message);
       }
     };
 
   });
-}  
+}
+  
 /* =========================================================
    MANUAL UPDATE BUTTON
 ========================================================= */
