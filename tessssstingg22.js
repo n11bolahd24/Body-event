@@ -550,6 +550,55 @@
 }
 
 /* =========================================================
+   SEARCH MATCH BUTTON
+========================================================= */
+
+.iko-date-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.iko-search-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 28px;
+  padding: 0 9px;
+
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 7px;
+
+  background: rgba(0,0,0,.35);
+  color: #fff;
+
+  font-family: "Courier New", monospace !important;
+  font-size: 8px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition:
+    background .2s ease,
+    color .2s ease,
+    border-color .2s ease;
+}
+
+.iko-search-btn:hover {
+  background: #00d979;
+  border-color: #00d979;
+  color: #001b0f;
+}
+
+.iko-search-btn:active {
+  transform: scale(.96);
+}
+
+/* =========================================================
    MATCH CARD
 ========================================================= */
 
@@ -1311,6 +1360,17 @@
 /* MOBILE */
 @media (max-width: 600px) {
 
+  .iko-date-actions {
+  gap: 4px;
+}
+
+.iko-search-btn {
+  height: 28px;
+  padding: 0 7px;
+  font-size: 7px;
+}
+
+  
   .iko-card {
     padding: 9px 8px !important;
   }
@@ -3069,22 +3129,34 @@ if (type === "dash") {
 
     <div class="iko-date">
 
-      <span class="iko-date-title">
-        ${escapeHTML(
-          formatDate(group[0].time)
-        )}
-      </span>
+  <span class="iko-date-title">
+    ${escapeHTML(
+      formatDate(group[0].time)
+    )}
+  </span>
 
-      <button
-        type="button"
-        class="iko-update-btn"
-        data-ikotv-update
-      >
-        <span class="iko-update-icon">↻</span>
-        <span class="iko-update-text">UPDATE</span>
-      </button>
+  <div class="iko-date-actions">
 
-    </div>
+    <button
+      type="button"
+      class="iko-search-btn"
+      data-ikotv-search
+    >
+      SEARCH MATCH
+    </button>
+
+    <button
+      type="button"
+      class="iko-update-btn"
+      data-ikotv-update
+    >
+      <span class="iko-update-icon">↻</span>
+      <span class="iko-update-text">UPDATE</span>
+    </button>
+
+  </div>
+
+</div>
 `;
 
         group.forEach(match => {
