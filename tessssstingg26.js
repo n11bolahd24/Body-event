@@ -584,6 +584,14 @@
   border-color: #00d979;
 }
 
+.iko-search-not-found {
+  text-align: center;
+  padding: 15px 10px;
+  color: #aaa;
+  font-size: 12px;
+  font-weight: normal;
+}
+
 /* =========================================================
    MATCH CARD
 ========================================================= */
@@ -3347,78 +3355,55 @@ schedule
   });
   }
 
-/* =========================================================
-   SEARCH MATCH — INPUT LANGSUNG
-========================================================= */
-
 function setupSearchButtons() {
-
-  const schedule =
-    document.querySelector(
-      CONFIG.scheduleSelector
-    );
-
+  const schedule = document.querySelector(CONFIG.scheduleSelector);
   if (!schedule) return;
 
-  schedule
-    .querySelectorAll("[data-ikotv-search]")
-    .forEach(input => {
+  schedule.querySelectorAll("[data-ikotv-search]").forEach(input => {
 
-      input.oninput = () => {
+    input.oninput = () => {
+      const keyword = input.value.trim().toLowerCase();
+      let totalFound = 0;
 
-        const keyword =
-          input.value
-            .trim()
-            .toLowerCase();
+      schedule.querySelectorAll(".iko-box").forEach(box => {
+        let foundInBox = 0;
 
-        const boxes =
-          schedule.querySelectorAll(
-            ".iko-box"
-          );
+        box.querySelectorAll(".iko-card").forEach(card => {
+          const text = card.textContent.toLowerCase();
+          const match = !keyword || text.includes(keyword);
 
-        boxes.forEach(box => {
+          card.style.display = match ? "" : "none";
 
-          const cards =
-            box.querySelectorAll(
-              ".iko-card"
-            );
-
-          let found = false;
-
-          cards.forEach(card => {
-
-            const text =
-              card.textContent
-                .toLowerCase();
-
-            const match =
-              !keyword ||
-              text.includes(keyword);
-
-            card.style.display =
-              match ? "" : "none";
-
-            if (match) {
-              found = true;
-            }
-
-          });
-
-          /*
-           * Kalau tidak ada match
-           * pada tanggal tersebut,
-           * sembunyikan tanggalnya.
-           */
-          box.style.display =
-            found ? "" : "none";
-
+          if (match) {
+            foundInBox++;
+            totalFound++;
+          }
         });
 
-      };
+        // Jangan hilangkan box jadwal
+        box.style.display = "";
 
-    });
+        // Tampilkan / sembunyikan pesan "tidak ditemukan"
+        let notFound = box.querySelector(".iko-search-not-found");
 
+        if (foundInBox === 0 && keyword) {
+          if (!notFound) {
+            notFound = document.createElement("div");
+            notFound.className = "iko-search-not-found";
+            notFound.textContent = "MATCH NOT FOUND";
+            box.appendChild(notFound);
+          }
+
+          notFound.style.display = "";
+        } else if (notFound) {
+          notFound.style.display = "none";
+        }
+      });
+    };
+
+  });
 }
+  
 /* =========================================================
    MANUAL UPDATE BUTTON
 ========================================================= */
