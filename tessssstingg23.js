@@ -598,6 +598,35 @@
   transform: scale(.96);
 }
 
+.iko-search-input {
+  width: 130px;
+  height: 28px;
+
+  box-sizing: border-box;
+
+  padding: 0 8px;
+
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 7px;
+
+  background: rgba(0,0,0,.45);
+  color: #fff;
+
+  outline: none;
+
+  font-family: "Courier New", monospace !important;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.iko-search-input::placeholder {
+  color: rgba(255,255,255,.55);
+}
+
+.iko-search-input:focus {
+  border-color: #00d979;
+}
+
 /* =========================================================
    MATCH CARD
 ========================================================= */
@@ -1370,6 +1399,16 @@
   font-size: 7px;
 }
 
+@media (max-width: 600px) {
+
+  .iko-search-input {
+    width: 105px;
+    height: 28px;
+    font-size: 7px;
+    padding: 0 7px;
+  }
+
+}
   
   .iko-card {
     padding: 9px 8px !important;
@@ -3335,6 +3374,7 @@ if (type === "dash") {
     schedule.innerHTML = html;
 
 setupUpdateButtons();
+setupSearchButtons();    
 
 schedule
   .querySelectorAll("[data-ikotv-watch]")
@@ -3354,6 +3394,148 @@ schedule
   });
   }
 
+/* =========================================================
+   SEARCH MATCH
+========================================================= */
+
+function setupSearchButtons() {
+
+  const schedule =
+    document.querySelector(
+      CONFIG.scheduleSelector
+    );
+
+  if (!schedule) return;
+
+  schedule
+    .querySelectorAll("[data-ikotv-search]")
+    .forEach(button => {
+
+      button.onclick = () => {
+
+        const actions =
+          button.closest(".iko-date-actions");
+
+        if (!actions) return;
+
+        /* Jangan buat input dua kali */
+        if (
+          actions.querySelector(
+            ".iko-search-input"
+          )
+        ) {
+          return;
+        }
+
+        const input =
+          document.createElement("input");
+
+        input.type = "text";
+        input.className =
+          "iko-search-input";
+
+        input.placeholder =
+          "Search match...";
+
+        input.autocomplete = "off";
+
+        /* Ganti tombol dengan input */
+        button.style.display = "none";
+
+        actions.insertBefore(
+          input,
+          actions.firstChild
+        );
+
+        input.focus();
+
+        /* =================================================
+           FILTER MATCH
+        ================================================= */
+
+        input.addEventListener(
+          "input",
+          () => {
+
+            const keyword =
+              input.value
+                .trim()
+                .toLowerCase();
+
+            const boxes =
+              schedule.querySelectorAll(
+                ".iko-box"
+              );
+
+            boxes.forEach(box => {
+
+              const cards =
+                box.querySelectorAll(
+                  ".iko-card"
+                );
+
+              let found = false;
+
+              cards.forEach(card => {
+
+                const text =
+                  card.textContent
+                    .toLowerCase();
+
+                const match =
+                  !keyword ||
+                  text.includes(keyword);
+
+                card.style.display =
+                  match ? "" : "none";
+
+                if (match) {
+                  found = true;
+                }
+
+              });
+
+              /* Sembunyikan tanggal jika
+                 tidak ada pertandingan */
+              box.style.display =
+                found ? "" : "none";
+
+            });
+
+          }
+        );
+
+        /* ENTER = tetap mencari */
+        input.addEventListener(
+          "keydown",
+          event => {
+
+            if (
+              event.key === "Escape"
+            ) {
+
+              input.value = "";
+
+              input.dispatchEvent(
+                new Event("input")
+              );
+
+              input.remove();
+
+              button.style.display =
+                "inline-flex";
+
+              button.focus();
+            }
+
+          }
+        );
+
+      };
+
+    });
+
+}  
 /* =========================================================
    MANUAL UPDATE BUTTON
 ========================================================= */
