@@ -3732,11 +3732,16 @@ async function openIKOMatch(matchId) {
 
         ${videos.map((video, index) => {
 
-          const label =
-            video.display_name ||
-            video.name ||
-            video.type_name ||
-            `LIVE ${index + 1}`;
+  const originalLabel =
+  video.display_name ||
+  video.name ||
+  video.type_name ||
+  `LIVE ${index + 1}`;
+
+const label =
+  /^SC\d+$/i.test(String(originalLabel).trim())
+    ? String(originalLabel).trim().replace(/^SC/i, "CH")
+    : originalLabel;
 
           return `
             <button
