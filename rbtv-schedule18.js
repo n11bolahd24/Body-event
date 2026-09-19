@@ -990,7 +990,6 @@ if (
 
 }
 
-
     /*
      * Deduplicate logo
      */
