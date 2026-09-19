@@ -1759,51 +1759,21 @@ console.log({
 
       function rbCreateScheduleContainer() {
 
-        let container =
-          document.getElementById(
-            "rbtvSchedule"
-          );
+  const container =
+    document.getElementById("rbtvSchedule");
 
-        if (container) {
-          return container;
-        }
+  if (!container) {
 
+    console.error(
+      "%c[RBTV] #rbtvSchedule TIDAK DITEMUKAN DI HTML",
+      "color:red;font-weight:bold"
+    );
 
-        container =
-          document.createElement("div");
+    return null;
+  }
 
-        container.id =
-          "rbtvSchedule";
-
-
-        /*
-         * Cari tempat yang paling masuk akal
-         * kalau container belum dibuat di Blogger.
-         */
-
-        const existing =
-          document.querySelector(
-            "#rbtvSchedule"
-          );
-
-
-        if (existing) {
-          return existing;
-        }
-
-
-        /*
-         * Masukkan ke body.
-         */
-
-        document.body.appendChild(
-          container
-        );
-
-
-        return container;
-      }
-
+  return container;
+}
 
       function rbInjectScheduleCSS() {
 
