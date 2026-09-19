@@ -1,5 +1,4 @@
 
-
 /*!
  * RBTV+ Auto Schedule
  * N11BOLAHD
@@ -1759,21 +1758,51 @@ console.log({
 
       function rbCreateScheduleContainer() {
 
-  const container =
-    document.getElementById("rbtvSchedule");
+        let container =
+          document.getElementById(
+            "rbtvSchedule"
+          );
 
-  if (!container) {
+        if (container) {
+          return container;
+        }
 
-    console.error(
-      "%c[RBTV] #rbtvSchedule TIDAK DITEMUKAN DI HTML",
-      "color:red;font-weight:bold"
-    );
 
-    return null;
-  }
+        container =
+          document.createElement("div");
 
-  return container;
-}
+        container.id =
+          "rbtvSchedule";
+
+
+        /*
+         * Cari tempat yang paling masuk akal
+         * kalau container belum dibuat di Blogger.
+         */
+
+        const existing =
+          document.querySelector(
+            "#rbtvSchedule"
+          );
+
+
+        if (existing) {
+          return existing;
+        }
+
+
+        /*
+         * Masukkan ke body.
+         */
+
+        document.body.appendChild(
+          container
+        );
+
+
+        return container;
+      }
+
 
       function rbInjectScheduleCSS() {
 
