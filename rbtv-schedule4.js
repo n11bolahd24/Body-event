@@ -282,4 +282,157 @@
 
   start();
 
+
+  // =========================================================
+  // RBTV RAW MATCH BYTE ANALYZER
+  // =========================================================
+
+  function hexDump(buffer, start, end) {
+
+    const bytes = new Uint8Array(buffer);
+
+    start = Math.max(0, start);
+    end = Math.min(bytes.length, end);
+
+    const rows = [];
+
+    for (let i = start; i < end; i += 16) {
+
+      const chunk = [];
+
+      for (let j = i; j < Math.min(i + 16, end); j++) {
+        chunk.push(
+          bytes[j]
+            .toString(16)
+            .padStart(2, "0")
+        );
+      }
+
+      rows.push(
+        i.toString(16).padStart(6, "0") +
+        "  " +
+        chunk.join(" ")
+      );
+    }
+
+    return rows.join("\n");
+  }
+
+  function findBytes(buffer, text) {
+
+    const bytes = new Uint8Array(buffer);
+    const target = new TextEncoder().encode(text);
+
+    const positions = [];
+
+    outer:
+    for (let i = 0; i <= bytes.length - target.length; i++) {
+
+      for (let j = 0; j < target.length; j++) {
+
+        if (bytes[i + j] !== target[j]) {
+          continue outer;
+        }
+
+      }
+
+      positions.push(i);
+    }
+
+    return positions;
+  }
+
+  async function rawMatchAnalyzer() {
+
+    try {
+
+      console.log(
+        "%c[RBTV RAW] FETCH",
+        "font-weight:bold;"
+      );
+
+      const response = await fetch(API, {
+        method: "GET",
+        cache: "no-store"
+      });
+
+      const buffer = await response.arrayBuffer();
+
+      console.log(
+        "[RBTV RAW] SIZE:",
+        buffer.byteLength
+      );
+
+      const targets = [
+        "real-salt-lake-vs-vancouver-whitecaps",
+        "Real Salt Lake vs Vancouver Whitecaps",
+        "Minnesota United FC vs Los Angeles Galaxy",
+        "minnesota-united-fc-vs-los-angeles-galaxy"
+      ];
+
+      targets.forEach(function (target) {
+
+        const positions = findBytes(buffer, target);
+
+        console.log(
+          "%c[RBTV RAW] TARGET:",
+          "font-weight:bold;",
+          target
+        );
+
+        console.log(
+          "[RBTV RAW] POSITIONS:",
+          positions
+        );
+
+        positions.forEach(function (pos) {
+
+          console.log(
+            "%c[RBTV RAW] HEX AROUND:",
+            "font-weight:bold;font-size:14px;",
+            target,
+            "offset:",
+            pos
+          );
+
+          console.log(
+            hexDump(
+              buffer,
+              pos - 300,
+              pos + target.length + 300
+            )
+          );
+
+        });
+
+      });
+
+      window.RBTVRawAnalyzer = {
+        findBytes: function (text) {
+          return findBytes(buffer, text);
+        },
+        hexDump: function (start, end) {
+          return hexDump(buffer, start, end);
+        },
+        buffer: buffer
+      };
+
+      console.log(
+        "%c[RBTV RAW] READY",
+        "color:green;font-weight:bold;"
+      );
+
+    } catch (error) {
+
+      console.error(
+        "[RBTV RAW] ERROR:",
+        error
+      );
+
+    }
+
+  }
+
+  rawMatchAnalyzer();
+  
 })();
