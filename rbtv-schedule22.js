@@ -967,21 +967,27 @@
      * Team objects
      */
 
-   const teamObjects =
+    const teamObjects =
   rbFindTeamObjects(
     recordBytes
   );
 
-console.log(
-  "%c[RBTV MATCH TEAM DEBUG]",
-  "color:#ff9800;font-weight:bold",
-  {
-    title: title,
+if (
+  /TGE Dieppe Bay Eagles/i.test(home) ||
+  /Old Road Jets/i.test(away)
+) {
+
+  console.log(
+    "%c[RBTV PROBLEM MATCH TEAM OBJECTS]",
+    "color:red;font-weight:bold"
+  );
+
+  console.log({
     home: home,
     away: away,
-    teamObjects: teamObjects
-  }
-);
+    teamObjects: rbFindTeamObjects(recordBytes)
+  });
+
 }
 
     /*
