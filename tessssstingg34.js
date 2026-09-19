@@ -1,5 +1,5 @@
 /*!
- * IKOTV Auto Schedule
+ * RBTV Auto Schedule
  * N11BOLAHD
 
  */
@@ -9,10 +9,10 @@
 
   const CONFIG = {
     api: {
-      matches: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/",
-      matchInfo: "https://ikotv.cc/api/match-info",
-      streamUrl: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/stream-url"
-    },
+  matches: "https://apis-data10.tcllu137fien.ru/api/match/live",
+  matchInfo: "https://apis-data10.tcllu137fien.ru/api/common/bs",
+  streamUrl: "https://apis-data10.tcllu137fien.ru/api/common/bs"
+},
 
     // Change these only if you want another placement.
     scheduleSelector: "#ikotvSchedule",
@@ -192,87 +192,104 @@
   return "waiting";
 }
 
-  function normalizeMatch(match) {
+  function normalizeMatch(result) {
+  const arr =
+    result?.data?.matches ||
+    result?.data?.matchs ||
+    result?.data?.list ||
+    result?.data ||
+    result?.matches ||
+    result?.matchs ||
+    result?.list ||
+    [];
 
-  const home =
-    match?.hometeam ||
-    match?.home_team ||
-    match?.home ||
-    {};
+  if (!Array.isArray(arr)) {
+    console.warn("[RBTV] MATCH ARRAY TIDAK DITEMUKAN:", result);
+    return [];
+  }
 
-  const away =
-    match?.awayteam ||
-    match?.away_team ||
-    match?.away ||
-    {};
+  return arr.map((match, index) => {
+    const home =
+      match.home ||
+      match.homeTeam ||
+      match.home_team ||
+      {};
 
-  const comp =
-    match?.matchevent ||
-    match?.competition ||
-    {};
+    const away =
+      match.away ||
+      match.awayTeam ||
+      match.away_team ||
+      {};
 
-  return {
+    const league =
+      match.competition ||
+      match.league ||
+      match.tournament ||
+      {};
 
-    id: String(
-      match?.id ??
-      match?.match_id ??
-      match?.matchId ??
-      ""
-    ),
+    return {
+      id:
+        match.id ??
+        match.matchId ??
+        match.match_id ??
+        match.eventId ??
+        ("rbtv-" + index),
 
-    time: Number(
-      match?.time ??
-      match?.match_time ??
-      match?.matchTime ??
-      0
-    ),
+      time:
+        match.time ??
+        match.startTime ??
+        match.start_time ??
+        match.matchTime ??
+        match.match_time,
 
-    statusRaw: Number(
-      match?.status ??
-      match?.match_status ??
-      0
-    ),
+      competition:
+        typeof league === "string"
+          ? league
+          : league.name ||
+            league.title ||
+            "Football",
 
-    home:
-      home.name_en ||
-      home.short_name_en ||
-      home.name ||
-      home.name_zh ||
-      "Home",
+      home:
+        typeof home === "string"
+          ? home
+          : home.name ||
+            home.teamName ||
+            match.homeName ||
+            match.home_name ||
+            "HOME",
 
-    away:
-      away.name_en ||
-      away.short_name_en ||
-      away.name ||
-      away.name_zh ||
-      "Away",
+      away:
+        typeof away === "string"
+          ? away
+          : away.name ||
+            away.teamName ||
+            match.awayName ||
+            match.away_name ||
+            "AWAY",
 
-    homeLogo: safeURL(
-      home.logo_rt ||
-      home.logo ||
-      ""
-    ),
+      homeLogo:
+        home.logo ||
+        home.image ||
+        home.logoUrl ||
+        match.homeLogo ||
+        match.home_logo ||
+        "",
 
-    awayLogo: safeURL(
-      away.logo_rt ||
-      away.logo ||
-      ""
-    ),
+      awayLogo:
+        away.logo ||
+        away.image ||
+        away.logoUrl ||
+        match.awayLogo ||
+        match.away_logo ||
+        "",
 
-    competition:
-      comp.name_en ||
-      comp.short_name_en ||
-      comp.name ||
-      comp.name_zh ||
-      "Football",
-
-    competitionLogo: safeURL(
-      comp.logo_rt ||
-      comp.logo ||
-      ""
-    )
-
-  };
+      isLive:
+        match.isLive === true ||
+        match.live === true ||
+        match.status === "live" ||
+        match.status === 1
+    };
+  });
 }
 
   /* =========================================================
@@ -1849,218 +1866,30 @@
 }
 
   async function fetchMatches() {
+  const url =
+    CONFIG.api.matches +
+    "?sportType=1&language=34&stream=true&_=" +
+    Date.now();
 
-  console.log("[IKOTV] Mengambil ALL + LIVE...");
-
-  const [allResult, liveResult] =
-    await Promise.all([
-
-      // ==========================
-      // SEMUA JADWAL
-      // ==========================
-      postJSON(
-        CONFIG.api.matches,
-        {
-          date: null,
-          filter: "all",
-          sport: "football"
-        }
-      ),
-
-      // ==========================
-      // MATCH YANG SEDANG LIVE
-      // ==========================
-      postJSON(
-        CONFIG.api.matches,
-        {
-          date: null,
-          filter: "live",
-          sport: "football"
-        }
-      )
-
-    ]);
-
-  console.log(
-    "[IKOTV] ALL:",
-    allResult
-  );
-
-  console.log(
-    "[IKOTV] LIVE:",
-    liveResult
-  );
-
-  // ==========================
-  // PARSE ALL
-  // ==========================
-
-  const allMatches =
-    getArray(allResult)
-      .map(normalizeMatch)
-      .filter(
-        match =>
-          match.id &&
-          match.time > 0
-      );
-
-  // ==========================
-  // PARSE LIVE
-  // ==========================
-
-  const liveMatches =
-    getArray(liveResult)
-      .map(normalizeMatch)
-      .filter(
-        match =>
-          match.id &&
-          match.time > 0
-      );
-
-  console.log(
-    "[IKOTV] ALL COUNT:",
-    allMatches.length
-  );
-
-  console.log(
-    "[IKOTV] LIVE COUNT:",
-    liveMatches.length
-  );
-
-  // ==========================
-  // GABUNG ALL + LIVE
-  // ==========================
-
-  const merged =
-    new Map();
-
-  // Masukkan semua jadwal
-  allMatches.forEach(match => {
-
-    merged.set(
-      String(match.id),
-      match
-    );
-
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Accept": "application/json"
+    },
+    mode: "cors",
+    cache: "no-store"
   });
 
-  // Masukkan LIVE
-  // Kalau pertandingan sudah hilang
-  // dari ALL tetapi muncul di LIVE,
-  // pertandingan tersebut tetap masuk.
-  liveMatches.forEach(match => {
-
-  const id =
-    String(match.id);
-
-  if (merged.has(id)) {
-
-    const old =
-      merged.get(id);
-
-    merged.set(id, {
-      ...old,
-      ...match,
-      isLive: true
-    });
-
-  } else {
-
-    merged.set(id, {
-      ...match,
-      isLive: true
-    });
-
+  if (!response.ok) {
+    throw new Error("RBTV API HTTP " + response.status);
   }
 
-});
-    
-  const now =
-  Math.floor(Date.now() / 1000);
+  const result = await response.json();
 
-const result =
-  Array.from(
-    merged.values()
-  )
-  .filter(match => {
+  console.log("[RBTV] MATCH RESPONSE:", result);
 
-    if (
-      !match.id ||
-      !match.time
-    ) {
-      return false;
-    }
-
-    const start =
-      Number(match.time);
-
-    // Belum kickoff → tetap tampil
-    if (now < start) {
-      return true;
-    }
-
-    // Sudah kickoff tetapi belum terdeteksi LIVE
-    // → TETAP tampil sebagai WAITING
-    if (!match.isLive) {
-      return true;
-    }
-
-    // Sudah LIVE → tetap tampil
-    return true;
-
-  })
-  .sort(
-    (a, b) =>
-      a.time - b.time
-  );
-
-  console.log(
-    "[IKOTV] MERGED COUNT:",
-    result.length
-  );
-
-  console.log(
-    "[IKOTV] MERGED MATCHES:",
-    result
-  );
-
-  return result;
+  return normalizeMatch(result);
 }
-
-  async function fetchMatchInfo(matchId) {
-    const result = await postJSON(
-      CONFIG.api.matchInfo,
-      {
-        matchid: String(matchId),
-        sport: "football"
-      }
-    );
-
-    console.log(
-      "[IKOTV] match-info:",
-      result
-    );
-
-    return result;
-  }
-
-  async function fetchStreamURL(matchId) {
-    const result = await postJSON(
-      CONFIG.api.streamUrl,
-      {
-        matchid: String(matchId),
-        sport: "football"
-      }
-    );
-
-    console.log(
-      "[IKOTV] stream-url:",
-      result
-    );
-
-    return result;
-  }
-
 
 /* =========================================================
    IKOTV HTML5 VIDEO + HLS.JS PLAYER
@@ -3732,11 +3561,16 @@ async function openIKOMatch(matchId) {
 
         ${videos.map((video, index) => {
 
-          const label =
-            video.display_name ||
-            video.name ||
-            video.type_name ||
-            `LIVE ${index + 1}`;
+  const originalLabel =
+  video.display_name ||
+  video.name ||
+  video.type_name ||
+  `LIVE ${index + 1}`;
+
+const label =
+  /^SC\d+$/i.test(String(originalLabel).trim())
+    ? String(originalLabel).trim().replace(/^SC/i, "CH")
+    : originalLabel;
 
           return `
             <button
