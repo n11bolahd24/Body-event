@@ -683,40 +683,6 @@
   } else {
     init();
 
-    <script>
-fetch("https://apis-data10.tcllu137fien.ru/sfver915c76f70397a83f69a18051c6c8d037e40acf/api/match/live?sportType=1&language=34&stream=true", {
-  method: "GET",
-  headers: {
-    "Accept": "application/json, text/plain, */*"
-  },
-  cache: "no-store"
-})
-.then(async response => {
-  console.log("RBTV HTTP STATUS:", response.status);
-  console.log("RBTV CONTENT-TYPE:", response.headers.get("content-type"));
-
-  const buffer = await response.arrayBuffer();
-
-  console.log("RBTV BYTE LENGTH:", buffer.byteLength);
-
-  const bytes = new Uint8Array(buffer);
-
-  console.log(
-    "RBTV FIRST 100 BYTES:",
-    Array.from(bytes.slice(0, 100))
-  );
-
-  const text = new TextDecoder("utf-8").decode(bytes);
-
-  console.log(
-    "RBTV TEXT PREVIEW:",
-    text.substring(0, 3000)
-  );
-})
-.catch(error => {
-  console.error("RBTV FETCH ERROR:", error);
-});
-</script>
   }
 
 })();
