@@ -1,9 +1,8 @@
-
-
+```javascript
 /*!
  * RBTV+ Auto Schedule
  * N11BOLAHD
- * SCHEDULE / API DECODER ONLY
+ * SCHEDULE / API DECODER + RENDER
  */
 
 (function () {
@@ -210,18 +209,11 @@
 
     let s = str;
 
-    /*
-     * Buang BOM / zero-width
-     */
 
     s = s
       .replace(/^\uFEFF/, "")
       .replace(/[\u200B-\u200D\u2060]/g, "");
 
-
-    /*
-     * Buang karakter kontrol
-     */
 
     s = s.replace(
       /[\x00-\x1F\x7F]/g,
@@ -231,15 +223,6 @@
 
     s = s.trim();
 
-
-    /*
-     * Karakter protobuf yang kadang
-     * terbaca sebagai bagian nama.
-     *
-     * Contoh:
-     * &TGE Dieppe Bay Eagles
-     * 1New York City Football Club
-     */
 
     s = s.replace(
       /^[^A-Za-zÀ-ÿ0-9]+/,
@@ -346,10 +329,6 @@
       }
 
 
-      /*
-       * Nested protobuf
-       */
-
       rbCollectStrings(
         bytes,
         depth + 1,
@@ -362,97 +341,46 @@
   }
 
 
- /* =========================================================
-   FIND TEAM OBJECTS
-   FIX TEAM LOGO MATCHING
-========================================================= */
+  /* =========================================================
+     FIND TEAM OBJECTS
+  ========================================================= */
 
-function rbFindTeamObjects(
-  buf,
-  depth = 0,
-  result = []
-) {
+  function rbFindTeamObjects(
+    buf,
+    depth = 0,
+    result = []
+  ) {
 
-  if (!buf || depth > 8) {
-    return result;
-  }
-
-
-  const fields =
-    rbReadFields(buf);
-
-
-  /*
-   * Cari logo TEAM yang berada
-   * di message ini / child langsung.
-   *
-   * Jangan menggunakan semua string
-   * recursive sekaligus karena logo team
-   * lain bisa ikut terbaca.
-   */
-
-  const directStrings = [];
-
-
-  for (const f of fields) {
-
-    if (f.wireType !== 2) {
-      continue;
+    if (!buf || depth > 8) {
+      return result;
     }
 
 
-    const text =
-      rbBytesToString(f.value);
+    const fields =
+      rbReadFields(buf);
 
 
-    if (!text) {
-      continue;
-    }
+    const directStrings = [];
 
 
-    const clean =
-      rbCleanText(text);
+    for (const f of fields) {
+
+      if (f.wireType !== 2) {
+        continue;
+      }
 
 
-    if (!clean) {
-      continue;
-    }
+      const text =
+        rbBytesToString(f.value);
 
 
-    directStrings.push({
-      field: f.fieldNo,
-      text: clean,
-      bytes: f.value
-    });
+      if (!text) {
+        continue;
+      }
 
-  }
-
-
-  /*
-   * Logo team yang ditemukan
-   * langsung di message ini.
-   */
-
-  const directLogo =
-    directStrings.find(x =>
-      rbIsTeamLogo(x.text)
-    );
-
-
-  if (directLogo) {
-
-    const possibleNames = [];
-
-
-    /*
-     * Nama team harus berasal dari
-     * message yang sama.
-     */
-
-    for (const x of directStrings) {
 
       const clean =
-        rbCleanText(x.text);
+        rbCleanText(text);
 
 
       if (!clean) {
@@ -460,120 +388,138 @@ function rbFindTeamObjects(
       }
 
 
-      if (
-        rbLooksLikeUrl(clean)
-      ) {
-        continue;
-      }
-
-
-      if (
-        /^\d+$/.test(clean)
-      ) {
-        continue;
-      }
-
-
-      if (
-        /^\d{4}$/.test(clean)
-      ) {
-        continue;
-      }
-
-
-      if (
-        clean.length < 2 ||
-        clean.length > 120
-      ) {
-        continue;
-      }
-
-
-      if (
-        /\svs\s/i.test(clean) ||
-        /-vs-/i.test(clean)
-      ) {
-        continue;
-      }
-
-
-      if (
-        clean === "SuccessR" ||
-        clean === "def"
-      ) {
-        continue;
-      }
-
-
-      possibleNames.push(clean);
-
-    }
-
-
-    /*
-     * Ambil kandidat nama terakhir.
-     */
-
-    let possibleName = "";
-
-
-    if (possibleNames.length) {
-
-      possibleName =
-        possibleNames[
-          possibleNames.length - 1
-        ];
-
-    }
-
-
-    /*
-     * Simpan hanya kalau memang
-     * ada nama team.
-     */
-
-    if (possibleName) {
-
-      result.push({
-
-        name:
-          possibleName,
-
-        logo:
-          directLogo.text,
-
-        depth
-
+      directStrings.push({
+        field: f.fieldNo,
+        text: clean,
+        bytes: f.value
       });
 
     }
 
-  }
+
+    const directLogo =
+      directStrings.find(x =>
+        rbIsTeamLogo(x.text)
+      );
 
 
-  /*
-   * Sekarang baru turun ke nested
-   * message satu per satu.
-   */
+    if (directLogo) {
 
-  for (const f of fields) {
+      const possibleNames = [];
 
-    if (f.wireType !== 2) {
-      continue;
+
+      for (const x of directStrings) {
+
+        const clean =
+          rbCleanText(x.text);
+
+
+        if (!clean) {
+          continue;
+        }
+
+
+        if (
+          rbLooksLikeUrl(clean)
+        ) {
+          continue;
+        }
+
+
+        if (
+          /^\d+$/.test(clean)
+        ) {
+          continue;
+        }
+
+
+        if (
+          /^\d{4}$/.test(clean)
+        ) {
+          continue;
+        }
+
+
+        if (
+          clean.length < 2 ||
+          clean.length > 120
+        ) {
+          continue;
+        }
+
+
+        if (
+          /\svs\s/i.test(clean) ||
+          /-vs-/i.test(clean)
+        ) {
+          continue;
+        }
+
+
+        if (
+          clean === "SuccessR" ||
+          clean === "def"
+        ) {
+          continue;
+        }
+
+
+        possibleNames.push(clean);
+
+      }
+
+
+      let possibleName = "";
+
+
+      if (possibleNames.length) {
+
+        possibleName =
+          possibleNames[
+            possibleNames.length - 1
+          ];
+
+      }
+
+
+      if (possibleName) {
+
+        result.push({
+
+          name:
+            possibleName,
+
+          logo:
+            directLogo.text,
+
+          depth
+
+        });
+
+      }
+
     }
 
 
-    rbFindTeamObjects(
-      f.value,
-      depth + 1,
-      result
-    );
+    for (const f of fields) {
 
+      if (f.wireType !== 2) {
+        continue;
+      }
+
+
+      rbFindTeamObjects(
+        f.value,
+        depth + 1,
+        result
+      );
+
+    }
+
+
+    return result;
   }
 
-
-  return result;
-}
 
   /* =========================================================
      FIND COMPETITION
@@ -662,12 +608,6 @@ function rbFindTeamObjects(
         }
 
 
-        /*
-         * Jika message ini mempunyai
-         * competition logo, cari nama
-         * pada message yang sama.
-         */
-
         if (localLogo) {
 
           for (
@@ -720,13 +660,6 @@ function rbFindTeamObjects(
             }
 
 
-            /*
-             * Hindari data seperti:
-             * SuccessR
-             * 2026
-             * def
-             */
-
             if (
               clean === "SuccessR" ||
               clean === "def"
@@ -745,11 +678,6 @@ function rbFindTeamObjects(
           }
         }
 
-
-        /*
-         * Kalau belum ketemu,
-         * turun ke nested message.
-         */
 
         if (!competitionName) {
 
@@ -881,10 +809,6 @@ function rbFindTeamObjects(
     }
 
 
-    /*
-     * Fallback menggunakan slug.
-     */
-
     if (
       (!home || !away) &&
       slug
@@ -929,8 +853,6 @@ function rbFindTeamObjects(
 
   /* =========================================================
      MATCH DATE
-     IMPORTANT:
-     TOP LEVEL FIELD 3 ONLY
   ========================================================= */
 
   function rbGetMatchDate(
@@ -1027,285 +949,245 @@ function rbFindTeamObjects(
     }
 
 
-/*
- * Team objects
- */
+    /* TEAM OBJECTS */
 
-const teamObjects =
-  rbFindTeamObjects(
-    recordBytes
-  );
-
-
-/*
- * Deduplicate berdasarkan
- * pasangan nama + logo.
- */
-
-const uniqueTeams = [];
-
-
-for (const t of teamObjects) {
-
-  if (!t.logo) {
-    continue;
-  }
-
-
-  const exists =
-    uniqueTeams.some(
-      x =>
-        x.name === t.name &&
-        x.logo === t.logo
-    );
-
-
-  if (!exists) {
-
-    uniqueTeams.push(t);
-
-  }
-
-}
-
-
-/*
- * =========================================================
- * MATCH TEAM LOGO
- * =========================================================
- */
-
-let homeLogo = "";
-let awayLogo = "";
-
-
-const homeLower =
-  home
-    .toLowerCase()
-    .trim();
-
-
-const awayLower =
-  away
-    .toLowerCase()
-    .trim();
-
-
-/*
- * Exact match terlebih dahulu.
- */
-
-for (const t of uniqueTeams) {
-
-  const name =
-    rbCleanText(
-      t.name
-    );
-
-
-  if (!name) {
-    continue;
-  }
-
-
-  const nameLower =
-    name
-      .toLowerCase()
-      .trim();
-
-
-  if (
-    !homeLogo &&
-    nameLower === homeLower
-  ) {
-
-    homeLogo =
-      t.logo;
-
-  }
-
-
-  if (
-    !awayLogo &&
-    nameLower === awayLower
-  ) {
-
-    awayLogo =
-      t.logo;
-
-  }
-
-}
-
-
-/*
- * Partial match sebagai fallback.
- */
-
-if (!homeLogo) {
-
-  for (const t of uniqueTeams) {
-
-    const name =
-      rbCleanText(
-        t.name
+    const teamObjects =
+      rbFindTeamObjects(
+        recordBytes
       );
 
 
-    if (!name) {
-      continue;
-    }
+    const uniqueTeams = [];
 
 
-    const nameLower =
-      name
-        .toLowerCase()
-        .trim();
+    for (const t of teamObjects) {
+
+      if (!t.logo) {
+        continue;
+      }
 
 
-    if (
-      homeLower.includes(nameLower) ||
-      nameLower.includes(homeLower)
-    ) {
-
-      homeLogo =
-        t.logo;
-
-      break;
-
-    }
-
-  }
-
-}
+      const exists =
+        uniqueTeams.some(
+          x =>
+            x.name === t.name &&
+            x.logo === t.logo
+        );
 
 
-if (!awayLogo) {
+      if (!exists) {
 
-  for (const t of uniqueTeams) {
-
-    const name =
-      rbCleanText(
-        t.name
-      );
-
-
-    if (!name) {
-      continue;
-    }
-
-
-    const nameLower =
-      name
-        .toLowerCase()
-        .trim();
-
-
-    if (
-      awayLower.includes(nameLower) ||
-      nameLower.includes(awayLower)
-    ) {
-
-      /*
-       * Jangan gunakan logo yang sama
-       * kalau sebenarnya ada object team
-       * lain yang cocok.
-       */
-
-      if (
-        t.logo !== homeLogo
-      ) {
-
-        awayLogo =
-          t.logo;
-
-        break;
+        uniqueTeams.push(t);
 
       }
 
     }
 
-  }
 
-}
+    /* MATCH TEAM LOGO */
 
-
-/*
- * Fallback berdasarkan urutan
- * hanya kalau pencocokan nama gagal.
- */
-
-const logos =
-  uniqueTeams
-    .map(x => x.logo)
-    .filter(Boolean);
+    let homeLogo = "";
+    let awayLogo = "";
 
 
-/*
- * Home fallback.
- */
-
-if (
-  !homeLogo &&
-  logos[0]
-) {
-
-  homeLogo =
-    logos[0];
-
-}
+    const homeLower =
+      home
+        .toLowerCase()
+        .trim();
 
 
-/*
- * Away fallback.
- *
- * Jangan pernah sengaja membuat
- * awayLogo = homeLogo.
- */
+    const awayLower =
+      away
+        .toLowerCase()
+        .trim();
 
-if (
-  !awayLogo
-) {
 
-  const secondLogo =
-    logos.find(
-      logo =>
-        logo !== homeLogo
+    /* Exact match */
+
+    for (const t of uniqueTeams) {
+
+      const name =
+        rbCleanText(
+          t.name
+        );
+
+
+      if (!name) {
+        continue;
+      }
+
+
+      const nameLower =
+        name
+          .toLowerCase()
+          .trim();
+
+
+      if (
+        !homeLogo &&
+        nameLower === homeLower
+      ) {
+
+        homeLogo =
+          t.logo;
+
+      }
+
+
+      if (
+        !awayLogo &&
+        nameLower === awayLower
+      ) {
+
+        awayLogo =
+          t.logo;
+
+      }
+
+    }
+
+
+    /* Partial match */
+
+    if (!homeLogo) {
+
+      for (const t of uniqueTeams) {
+
+        const name =
+          rbCleanText(
+            t.name
+          );
+
+
+        if (!name) {
+          continue;
+        }
+
+
+        const nameLower =
+          name
+            .toLowerCase()
+            .trim();
+
+
+        if (
+          homeLower.includes(nameLower) ||
+          nameLower.includes(homeLower)
+        ) {
+
+          homeLogo =
+            t.logo;
+
+          break;
+
+        }
+
+      }
+
+    }
+
+
+    if (!awayLogo) {
+
+      for (const t of uniqueTeams) {
+
+        const name =
+          rbCleanText(
+            t.name
+          );
+
+
+        if (!name) {
+          continue;
+        }
+
+
+        const nameLower =
+          name
+            .toLowerCase()
+            .trim();
+
+
+        if (
+          awayLower.includes(nameLower) ||
+          nameLower.includes(awayLower)
+        ) {
+
+          if (
+            t.logo !== homeLogo
+          ) {
+
+            awayLogo =
+              t.logo;
+
+            break;
+
+          }
+
+        }
+
+      }
+
+    }
+
+
+    /* Logo fallback */
+
+    const logos =
+      uniqueTeams
+        .map(x => x.logo)
+        .filter(Boolean);
+
+
+    if (
+      !homeLogo &&
+      logos[0]
+    ) {
+
+      homeLogo =
+        logos[0];
+
+    }
+
+
+    if (!awayLogo) {
+
+      const secondLogo =
+        logos.find(
+          logo =>
+            logo !== homeLogo
+        );
+
+
+      if (secondLogo) {
+
+        awayLogo =
+          secondLogo;
+
+      }
+
+    }
+
+
+    console.log(
+      "%c[RBTV TEAM OBJECTS]",
+      "color:#00d979;font-weight:bold"
     );
 
 
-  if (secondLogo) {
+    console.log({
 
-    awayLogo =
-      secondLogo;
+      home,
+      away,
+      teamObjects,
+      uniqueTeams,
+      homeLogo,
+      awayLogo
 
-  }
-
-}
-
-
-/*
- * DEBUG TEAM OBJECTS
- */
-
-console.log(
-  "%c[RBTV TEAM OBJECTS]",
-  "color:#00d979;font-weight:bold"
-);
-
-console.log({
-  home,
-  away,
-  teamObjects,
-  uniqueTeams,
-  homeLogo,
-  awayLogo
-});
+    });
 
 
-    /*
-     * Competition
-     */
+    /* COMPETITION */
 
     const competitionData =
       rbFindCompetition(
@@ -1362,7 +1244,9 @@ console.log({
       recordStart,
 
       recordLength
+
     };
+
   }
 
 
@@ -1382,12 +1266,6 @@ console.log({
       i < buffer.length;
       i++
     ) {
-
-      /*
-       * field 1 length-delimited
-       *
-       * 0A <length> <payload>
-       */
 
       if (
         buffer[i] !== 0x0A
@@ -1439,11 +1317,6 @@ console.log({
         );
 
 
-      /*
-       * Match record harus mempunyai
-       * slug -vs-
-       */
-
       let hasSlug = false;
 
 
@@ -1469,6 +1342,7 @@ console.log({
 
           break;
         }
+
       }
 
 
@@ -1485,12 +1359,9 @@ console.log({
           len,
 
         payload
+
       });
 
-
-      /*
-       * Lompat melewati record.
-       */
 
       if (
         payloadEnd > i
@@ -1498,11 +1369,210 @@ console.log({
 
         i =
           payloadEnd - 1;
+
       }
+
     }
 
 
     return records;
+  }
+
+
+  /* =========================================================
+     RENDER RBTV SCHEDULE
+  ========================================================= */
+
+  function rbRenderSchedule(matches) {
+
+    const container =
+      document.querySelector(
+        "#rbtvSchedule"
+      );
+
+
+    if (!container) {
+
+      console.error(
+        "%c[RBTV] #rbtvSchedule TIDAK DITEMUKAN",
+        "color:red;font-weight:bold"
+      );
+
+      return;
+
+    }
+
+
+    if (
+      !matches ||
+      !matches.length
+    ) {
+
+      container.innerHTML = `
+        <div class="iko-loading">
+          Match not found
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    let html = "";
+
+
+    matches.forEach(
+      match => {
+
+        const date =
+          new Date(
+            match.matchDate
+          );
+
+
+        const time =
+          date.toLocaleTimeString(
+            "id-ID",
+            {
+              timeZone:
+                "Asia/Jakarta",
+
+              hour:
+                "2-digit",
+
+              minute:
+                "2-digit",
+
+              hour12:
+                false
+            }
+          );
+
+
+        let competitionHTML = "";
+
+
+        if (
+          match.competitionLogo
+        ) {
+
+          competitionHTML = `
+            <img
+              src="${match.competitionLogo}"
+              alt=""
+              class="rbtv-competition-logo"
+              loading="lazy"
+            >
+          `;
+
+        }
+
+
+        html += `
+
+          <div
+            class="rbtv-match"
+            data-match-no="${match.no}"
+          >
+
+            <div class="rbtv-match-header">
+
+              <span class="rbtv-match-no">
+                ${match.no}
+              </span>
+
+
+              <span class="rbtv-time">
+                ${time}
+              </span>
+
+
+              <span class="rbtv-competition">
+
+                ${competitionHTML}
+
+                <span>
+                  ${match.competition || "Football"}
+                </span>
+
+              </span>
+
+            </div>
+
+
+            <div class="rbtv-teams">
+
+
+              <div class="rbtv-team">
+
+                ${
+                  match.homeLogo
+                    ? `
+                      <img
+                        src="${match.homeLogo}"
+                        alt="${match.home}"
+                        loading="lazy"
+                      >
+                    `
+                    : ""
+                }
+
+
+                <span>
+                  ${match.home}
+                </span>
+
+              </div>
+
+
+              <div class="rbtv-vs">
+                VS
+              </div>
+
+
+              <div class="rbtv-team">
+
+                ${
+                  match.awayLogo
+                    ? `
+                      <img
+                        src="${match.awayLogo}"
+                        alt="${match.away}"
+                        loading="lazy"
+                      >
+                    `
+                    : ""
+                }
+
+
+                <span>
+                  ${match.away}
+                </span>
+
+              </div>
+
+
+            </div>
+
+          </div>
+
+        `;
+
+      }
+    );
+
+
+    container.innerHTML =
+      html;
+
+
+    console.log(
+      "%c[RBTV] SCHEDULE RENDERED:",
+      "color:#00d979;font-weight:bold",
+      matches.length
+    );
+
   }
 
 
@@ -1516,15 +1586,20 @@ console.log({
       await fetch(
         RBTV_API,
         {
-          method: "GET",
+
+          method:
+            "GET",
 
           headers: {
+
             "Accept":
               "application/json, text/plain, */*"
+
           },
 
           cache:
             "no-store"
+
         }
       );
 
@@ -1542,6 +1617,7 @@ console.log({
         "RBTV API HTTP " +
         response.status
       );
+
     }
 
 
@@ -1559,6 +1635,7 @@ console.log({
 
 
     return buffer;
+
   }
 
 
@@ -1610,12 +1687,11 @@ console.log({
         matches.push(
           match
         );
+
       }
 
 
-      /*
-       * Sort chronological
-       */
+      /* SORT CHRONOLOGICAL */
 
       matches.sort(
         (a, b) =>
@@ -1624,9 +1700,7 @@ console.log({
       );
 
 
-      /*
-       * Number
-       */
+      /* NUMBER */
 
       matches.forEach(
         (match, index) => {
@@ -1707,6 +1781,7 @@ console.log({
             console.log(
               i + 1,
               {
+
                 competition:
                   m.competition,
 
@@ -1724,15 +1799,17 @@ console.log({
 
                 awayLogo:
                   m.awayLogo
+
               }
             );
+
           }
         );
 
 
-      /*
-       * Global
-       */
+      /* =====================================================
+         GLOBAL
+      ===================================================== */
 
       window.RBTV_MATCHES =
         matches;
@@ -1744,6 +1821,15 @@ console.log({
       );
 
 
+      /* =====================================================
+         RENDER TO BLOGGER
+      ===================================================== */
+
+      rbRenderSchedule(
+        matches
+      );
+
+
     } catch (error) {
 
       console.error(
@@ -1752,11 +1838,48 @@ console.log({
         error
       );
 
+
+      const container =
+        document.querySelector(
+          "#rbtvSchedule"
+        );
+
+
+      if (container) {
+
+        container.innerHTML = `
+          <div class="iko-loading">
+            Failed to load RBTV schedule
+          </div>
+        `;
+
+      }
+
     }
 
   }
 
 
-  init();
+  /* =========================================================
+     WAIT FOR BLOGGER HTML
+  ========================================================= */
+
+  if (
+    document.readyState ===
+    "loading"
+  ) {
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      init
+    );
+
+  } else {
+
+    init();
+
+  }
+
 
 })();
+```
