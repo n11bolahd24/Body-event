@@ -968,9 +968,15 @@
      */
 
     const teamObjects =
-      rbFindTeamObjects(
-        recordBytes
-      );
+  rbFindTeamObjects(
+    recordBytes
+  );
+
+console.log(
+  "%c[RBTV TEAM OBJECTS DEBUG]",
+  "color:#ff9800;font-weight:bold",
+  teamObjects
+);
 
 
     /*
