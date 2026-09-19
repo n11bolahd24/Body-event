@@ -1078,23 +1078,28 @@
 
 
     if (
-      !homeLogo &&
-      logos[0]
-    ) {
+  !homeLogo &&
+  logos[0]
+) {
 
-      homeLogo =
-        logos[0];
-    }
+  homeLogo =
+    logos[0];
+}
 
+/*
+ * Jangan duplikasi homeLogo menjadi awayLogo.
+ * Away hanya boleh diisi jika memang ditemukan
+ * logo team kedua.
+ */
+if (
+  !awayLogo &&
+  logos.length >= 2 &&
+  logos[1] !== homeLogo
+) {
 
-    if (
-      !awayLogo &&
-      logos[1]
-    ) {
-
-      awayLogo =
-        logos[1];
-    }
+  awayLogo =
+    logos[1];
+}
 
 
     /*
