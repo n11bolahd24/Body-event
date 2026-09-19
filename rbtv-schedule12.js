@@ -968,6 +968,19 @@
       );
 
       console.log(
+  "%c[RBTV FIRST 3 MATCH FULL]",
+  "color:#00d979;font-weight:bold"
+);
+
+console.log(
+  JSON.stringify(
+    matches.slice(0, 3),
+    null,
+    2
+  )
+);
+
+      console.log(
         "%c[RBTV MATCH 2]",
         "color:#00d979;font-weight:bold"
       );
