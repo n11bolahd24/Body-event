@@ -362,156 +362,218 @@
   }
 
 
-  /* =========================================================
-     FIND TEAM OBJECTS
-  ========================================================= */
+ /* =========================================================
+   FIND TEAM OBJECTS
+   FIX TEAM LOGO MATCHING
+========================================================= */
 
-  function rbFindTeamObjects(
-    buf,
-    depth = 0,
-    result = []
-  ) {
+function rbFindTeamObjects(
+  buf,
+  depth = 0,
+  result = []
+) {
 
-    if (!buf || depth > 8) {
-      return result;
+  if (!buf || depth > 8) {
+    return result;
+  }
+
+
+  const fields =
+    rbReadFields(buf);
+
+
+  /*
+   * Cari logo TEAM yang berada
+   * di message ini / child langsung.
+   *
+   * Jangan menggunakan semua string
+   * recursive sekaligus karena logo team
+   * lain bisa ikut terbaca.
+   */
+
+  const directStrings = [];
+
+
+  for (const f of fields) {
+
+    if (f.wireType !== 2) {
+      continue;
     }
 
 
-    const fields =
-      rbReadFields(buf);
+    const text =
+      rbBytesToString(f.value);
 
 
-    for (const f of fields) {
+    if (!text) {
+      continue;
+    }
 
-      if (f.wireType !== 2) {
+
+    const clean =
+      rbCleanText(text);
+
+
+    if (!clean) {
+      continue;
+    }
+
+
+    directStrings.push({
+      field: f.fieldNo,
+      text: clean,
+      bytes: f.value
+    });
+
+  }
+
+
+  /*
+   * Logo team yang ditemukan
+   * langsung di message ini.
+   */
+
+  const directLogo =
+    directStrings.find(x =>
+      rbIsTeamLogo(x.text)
+    );
+
+
+  if (directLogo) {
+
+    const possibleNames = [];
+
+
+    /*
+     * Nama team harus berasal dari
+     * message yang sama.
+     */
+
+    for (const x of directStrings) {
+
+      const clean =
+        rbCleanText(x.text);
+
+
+      if (!clean) {
         continue;
       }
 
 
-      const nested =
-        f.value;
-
-
-      const strings =
-        rbCollectStrings(nested);
-
-
-      const logoObj =
-        strings.find(x =>
-          rbIsTeamLogo(x.text)
-        );
-
-
-      if (logoObj) {
-
-        let possibleNames = [];
-
-
-        /*
-         * Cari semua string pendek yang
-         * kemungkinan nama team.
-         */
-
-        for (const x of strings) {
-
-          const clean =
-            rbCleanText(x.text);
-
-
-          if (!clean) {
-            continue;
-          }
-
-
-          if (
-            rbLooksLikeUrl(clean)
-          ) {
-            continue;
-          }
-
-
-          if (
-            /^\d+$/.test(clean)
-          ) {
-            continue;
-          }
-
-
-          if (
-            /^\d{4}$/.test(clean)
-          ) {
-            continue;
-          }
-
-
-          if (
-            clean.length < 2 ||
-            clean.length > 120
-          ) {
-            continue;
-          }
-
-
-          /*
-           * Jangan ambil title pertandingan
-           * sebagai nama team.
-           */
-
-          if (
-            /\svs\s/i.test(clean) ||
-            /-vs-/i.test(clean)
-          ) {
-            continue;
-          }
-
-
-          possibleNames.push(clean);
-        }
-
-
-        /*
-         * Ambil kandidat nama terakhir.
-         */
-
-        let possibleName = "";
-
-
-        if (possibleNames.length) {
-
-          possibleName =
-            possibleNames[
-              possibleNames.length - 1
-            ];
-        }
-
-
-        result.push({
-
-          name: possibleName,
-
-          logo: logoObj.text,
-
-          depth
-
-        });
+      if (
+        rbLooksLikeUrl(clean)
+      ) {
+        continue;
       }
 
 
-      /*
-       * Rekursif
-       */
+      if (
+        /^\d+$/.test(clean)
+      ) {
+        continue;
+      }
 
-      rbFindTeamObjects(
-        nested,
-        depth + 1,
-        result
-      );
+
+      if (
+        /^\d{4}$/.test(clean)
+      ) {
+        continue;
+      }
+
+
+      if (
+        clean.length < 2 ||
+        clean.length > 120
+      ) {
+        continue;
+      }
+
+
+      if (
+        /\svs\s/i.test(clean) ||
+        /-vs-/i.test(clean)
+      ) {
+        continue;
+      }
+
+
+      if (
+        clean === "SuccessR" ||
+        clean === "def"
+      ) {
+        continue;
+      }
+
+
+      possibleNames.push(clean);
+
     }
 
 
-    return result;
+    /*
+     * Ambil kandidat nama terakhir.
+     */
+
+    let possibleName = "";
+
+
+    if (possibleNames.length) {
+
+      possibleName =
+        possibleNames[
+          possibleNames.length - 1
+        ];
+
+    }
+
+
+    /*
+     * Simpan hanya kalau memang
+     * ada nama team.
+     */
+
+    if (possibleName) {
+
+      result.push({
+
+        name:
+          possibleName,
+
+        logo:
+          directLogo.text,
+
+        depth
+
+      });
+
+    }
+
   }
 
+
+  /*
+   * Sekarang baru turun ke nested
+   * message satu per satu.
+   */
+
+  for (const f of fields) {
+
+    if (f.wireType !== 2) {
+      continue;
+    }
+
+
+    rbFindTeamObjects(
+      f.value,
+      depth + 1,
+      result
+    );
+
+  }
+
+
+  return result;
+}
 
   /* =========================================================
      FIND COMPETITION
@@ -965,160 +1027,280 @@
     }
 
 
-    /*
-     * Team objects
-     */
+/*
+ * Team objects
+ */
 
-    const teamObjects =
+const teamObjects =
   rbFindTeamObjects(
     recordBytes
   );
 
-if (
-  /TGE Dieppe Bay Eagles/i.test(home) ||
-  /Old Road Jets/i.test(away)
-) {
 
-  console.log(
-    "%c[RBTV PROBLEM MATCH TEAM OBJECTS]",
-    "color:red;font-weight:bold"
-  );
+/*
+ * Deduplicate berdasarkan
+ * pasangan nama + logo.
+ */
 
-  console.log({
-    home: home,
-    away: away,
-    teamObjects: rbFindTeamObjects(recordBytes)
-  });
+const uniqueTeams = [];
+
+
+for (const t of teamObjects) {
+
+  if (!t.logo) {
+    continue;
+  }
+
+
+  const exists =
+    uniqueTeams.some(
+      x =>
+        x.name === t.name &&
+        x.logo === t.logo
+    );
+
+
+  if (!exists) {
+
+    uniqueTeams.push(t);
+
+  }
 
 }
 
-    /*
-     * Deduplicate logo
-     */
 
-    const uniqueTeams = [];
+/*
+ * =========================================================
+ * MATCH TEAM LOGO
+ * =========================================================
+ */
 
-
-    for (
-      const t of teamObjects
-    ) {
-
-      if (!t.logo) {
-        continue;
-      }
+let homeLogo = "";
+let awayLogo = "";
 
 
-      const exists =
-        uniqueTeams.some(
-          x =>
-            x.logo === t.logo
-        );
+const homeLower =
+  home
+    .toLowerCase()
+    .trim();
 
 
-      if (!exists) {
+const awayLower =
+  away
+    .toLowerCase()
+    .trim();
 
-        uniqueTeams.push(t);
-      }
+
+/*
+ * Exact match terlebih dahulu.
+ */
+
+for (const t of uniqueTeams) {
+
+  const name =
+    rbCleanText(
+      t.name
+    );
+
+
+  if (!name) {
+    continue;
+  }
+
+
+  const nameLower =
+    name
+      .toLowerCase()
+      .trim();
+
+
+  if (
+    !homeLogo &&
+    nameLower === homeLower
+  ) {
+
+    homeLogo =
+      t.logo;
+
+  }
+
+
+  if (
+    !awayLogo &&
+    nameLower === awayLower
+  ) {
+
+    awayLogo =
+      t.logo;
+
+  }
+
+}
+
+
+/*
+ * Partial match sebagai fallback.
+ */
+
+if (!homeLogo) {
+
+  for (const t of uniqueTeams) {
+
+    const name =
+      rbCleanText(
+        t.name
+      );
+
+
+    if (!name) {
+      continue;
     }
 
 
-    let homeLogo = "";
-    let awayLogo = "";
+    const nameLower =
+      name
+        .toLowerCase()
+        .trim();
 
 
-    /*
-     * Cocokkan berdasarkan nama
-     */
-
-    for (
-      const t of uniqueTeams
+    if (
+      homeLower.includes(nameLower) ||
+      nameLower.includes(homeLower)
     ) {
 
-      const n =
-        rbCleanText(
-          t.name
-        );
+      homeLogo =
+        t.logo;
+
+      break;
+
+    }
+
+  }
+
+}
 
 
-      if (!n) {
-        continue;
-      }
+if (!awayLogo) {
+
+  for (const t of uniqueTeams) {
+
+    const name =
+      rbCleanText(
+        t.name
+      );
 
 
-      const nLower =
-        n.toLowerCase();
+    if (!name) {
+      continue;
+    }
 
 
-      const homeLower =
-        home.toLowerCase();
+    const nameLower =
+      name
+        .toLowerCase()
+        .trim();
 
 
-      const awayLower =
-        away.toLowerCase();
+    if (
+      awayLower.includes(nameLower) ||
+      nameLower.includes(awayLower)
+    ) {
 
+      /*
+       * Jangan gunakan logo yang sama
+       * kalau sebenarnya ada object team
+       * lain yang cocok.
+       */
 
       if (
-        !homeLogo &&
-        (
-          nLower === homeLower ||
-          homeLower.includes(nLower) ||
-          nLower.includes(homeLower)
-        )
-      ) {
-
-        homeLogo =
-          t.logo;
-      }
-
-
-      if (
-        !awayLogo &&
-        (
-          nLower === awayLower ||
-          awayLower.includes(nLower) ||
-          nLower.includes(awayLower)
-        )
+        t.logo !== homeLogo
       ) {
 
         awayLogo =
           t.logo;
+
+        break;
+
       }
+
     }
 
+  }
 
-    /*
-     * Fallback logo berdasarkan urutan
-     */
-
-    const logos =
-      uniqueTeams
-        .map(x => x.logo)
-        .filter(Boolean);
+}
 
 
-    if (
+/*
+ * Fallback berdasarkan urutan
+ * hanya kalau pencocokan nama gagal.
+ */
+
+const logos =
+  uniqueTeams
+    .map(x => x.logo)
+    .filter(Boolean);
+
+
+/*
+ * Home fallback.
+ */
+
+if (
   !homeLogo &&
   logos[0]
 ) {
 
   homeLogo =
     logos[0];
+
 }
+
 
 /*
- * Jangan duplikasi homeLogo menjadi awayLogo.
- * Away hanya boleh diisi jika memang ditemukan
- * logo team kedua.
+ * Away fallback.
+ *
+ * Jangan pernah sengaja membuat
+ * awayLogo = homeLogo.
  */
+
 if (
-  !awayLogo &&
-  logos.length >= 2 &&
-  logos[1] !== homeLogo
+  !awayLogo
 ) {
 
-  awayLogo =
-    logos[1];
+  const secondLogo =
+    logos.find(
+      logo =>
+        logo !== homeLogo
+    );
+
+
+  if (secondLogo) {
+
+    awayLogo =
+      secondLogo;
+
+  }
+
 }
+
+
+/*
+ * DEBUG TEAM OBJECTS
+ */
+
+console.log(
+  "%c[RBTV TEAM OBJECTS]",
+  "color:#00d979;font-weight:bold"
+);
+
+console.log({
+  home,
+  away,
+  teamObjects,
+  uniqueTeams,
+  homeLogo,
+  awayLogo
+});
 
 
     /*
