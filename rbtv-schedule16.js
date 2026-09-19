@@ -977,6 +977,22 @@ console.log(
   "color:#ff9800;font-weight:bold",
   teamObjects
 );
+    if (
+  /TGE Dieppe Bay Eagles/i.test(home) ||
+  /Old Road Jets/i.test(away)
+) {
+
+  console.log(
+    "%c[RBTV PROBLEM MATCH TEAM OBJECTS]",
+    "color:red;font-weight:bold",
+    {
+      home,
+      away,
+      teamObjects
+    }
+  );
+
+}
 
 
     /*
