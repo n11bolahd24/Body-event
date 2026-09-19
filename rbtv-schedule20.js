@@ -967,7 +967,7 @@
      * Team objects
      */
 
-   const teamObjects =
+const teamObjects =
   rbFindTeamObjects(
     recordBytes
   );
