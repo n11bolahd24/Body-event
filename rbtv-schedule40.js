@@ -3,7 +3,8 @@
  * RBTV+ Auto Schedule
  * N11BOLAHD
  * SCHEDULE / API DECODER + RENDER
- * LOGO FIX 31.2
+ * LOGO FIX 31.3
+ * LIVE MATCH FIX
  */
 
 (function () {
@@ -11,7 +12,7 @@
   "use strict";
 
   console.log(
-    "%c[RBTV SCHEDULE 31.2] START",
+    "%c[RBTV SCHEDULE 31.3] START",
     "color:#00d979;font-weight:bold"
   );
 
@@ -103,8 +104,6 @@
 
       try {
 
-        /* VARINT */
-
         if (wireType === 0) {
 
           const v =
@@ -124,9 +123,6 @@
             p;
 
         }
-
-
-        /* FIXED64 */
 
         else if (wireType === 1) {
 
@@ -149,9 +145,6 @@
             p;
 
         }
-
-
-        /* LENGTH DELIMITED */
 
         else if (wireType === 2) {
 
@@ -195,9 +188,6 @@
 
         }
 
-
-        /* FIXED32 */
-
         else if (wireType === 5) {
 
           if (
@@ -219,7 +209,6 @@
             p;
 
         }
-
 
         else {
 
@@ -335,14 +324,6 @@
 
   }
 
-
-  /*
-   * Logo dari API tidak selalu mempunyai
-   * /football/team/ pada URL.
-   *
-   * Karena itu kita gunakan beberapa pola
-   * sekaligus.
-   */
 
   function rbIsTeamLogo(str) {
 
@@ -476,7 +457,7 @@
 
   /* =========================================================
      FIND ALL POSSIBLE LOGO URLS
-     ========================================================= */
+  ========================================================= */
 
   function rbCollectLogoUrls(
     buf,
@@ -605,10 +586,6 @@
     }
 
 
-    /*
-     * Cari URL logo dari object ini.
-     */
-
     const directLogo =
       directStrings.find(
         x =>
@@ -686,14 +663,6 @@
         possibleNames.length
       ) {
 
-        /*
-         * Ambil nama yang paling masuk akal.
-         *
-         * Kita tetap mempertahankan
-         * nama terakhir sebagai fallback
-         * dari versi sebelumnya.
-         */
-
         result.push({
 
           name:
@@ -712,10 +681,6 @@
 
     }
 
-
-    /*
-     * Rekursif ke object berikutnya.
-     */
 
     for (
       const f of fields
@@ -1239,10 +1204,6 @@
     );
 
 
-    /* =====================================================
-       TEAM OBJECTS
-    ===================================================== */
-
     const teamObjects =
       rbFindTeamObjects(
         recordBytes
@@ -1255,10 +1216,6 @@
       teamObjects
     );
 
-
-    /* =====================================================
-       ALL POSSIBLE LOGOS
-    ===================================================== */
 
     const allLogoUrls =
       rbCollectLogoUrls(
@@ -1305,10 +1262,6 @@
     }
 
 
-    /* =====================================================
-       TEAM LOGOS
-    ===================================================== */
-
     let homeLogo = "";
     let awayLogo = "";
 
@@ -1324,10 +1277,6 @@
         .toLowerCase()
         .trim();
 
-
-    /* =====================================================
-       EXACT NAME
-    ===================================================== */
 
     for (
       const t of uniqueTeams
@@ -1368,10 +1317,6 @@
 
     }
 
-
-    /* =====================================================
-       PARTIAL NAME
-    ===================================================== */
 
     if (!homeLogo) {
 
@@ -1455,11 +1400,6 @@
     }
 
 
-    /* =====================================================
-       FALLBACK 1
-       TEAM OBJECT ORDER
-    ===================================================== */
-
     if (
       !homeLogo &&
       uniqueTeams[0]
@@ -1493,11 +1433,6 @@
     }
 
 
-    /* =====================================================
-       FALLBACK 2
-       ALL LOGO URLS
-    ===================================================== */
-
     if (
       !homeLogo &&
       allLogoUrls[0]
@@ -1509,9 +1444,7 @@
     }
 
 
-    if (
-      !awayLogo
-    ) {
+    if (!awayLogo) {
 
       const secondLogo =
         allLogoUrls.find(
@@ -1530,10 +1463,6 @@
     }
 
 
-    /* =====================================================
-       FINAL LOGO DEBUG
-    ===================================================== */
-
     console.log(
       "%c[RBTV LOGOS]",
       "color:#ff00ff;font-weight:bold",
@@ -1545,10 +1474,6 @@
       }
     );
 
-
-    /* =====================================================
-       COMPETITION
-    ===================================================== */
 
     const competitionData =
       rbFindCompetition(
@@ -1799,10 +1724,10 @@
     return {
 
       type:
-        "waiting",
+        "live",
 
       label:
-        "WAITING"
+        "LIVE"
 
     };
 
@@ -2183,8 +2108,8 @@
 
 
   /* =========================================================
-     UPDATE COUNTDOWN
-  ========================================================= */
+     UPDATE COUNTDOWN + LIVE STATUS
+     ========================================================= */
 
   function rbUpdateCountdowns() {
 
@@ -2211,6 +2136,62 @@
           return;
         }
 
+
+        const now =
+          Date.now();
+
+
+        const isLive =
+          timestamp <= now;
+
+
+        /* =====================================================
+           UPDATE STATUS
+        ===================================================== */
+
+        const statusElement =
+          item.querySelector(
+            ".rbtv-status"
+          );
+
+
+        if (statusElement) {
+
+          if (isLive) {
+
+            statusElement.classList.remove(
+              "upcoming"
+            );
+
+            statusElement.classList.add(
+              "live"
+            );
+
+            statusElement.textContent =
+              "LIVE";
+
+          }
+          else {
+
+            statusElement.classList.remove(
+              "live"
+            );
+
+            statusElement.classList.add(
+              "upcoming"
+            );
+
+            statusElement.textContent =
+              "UPCOMING";
+
+          }
+
+        }
+
+
+        /* =====================================================
+           UPDATE COUNTDOWN
+        ===================================================== */
 
         const countdown =
           rbCountdown(
@@ -2392,22 +2373,11 @@
 
 
         /*
-         * HANYA TAMPILKAN MATCH
-         * YANG BELUM DIMULAI.
+         * SEMUA MATCH TETAP DIMASUKKAN.
          *
-         * Match yang waktu kick-off
-         * sudah lewat tidak ditampilkan.
+         * Upcoming  = sebelum kick-off
+         * Live      = sudah masuk waktu kick-off
          */
-
-        if (
-          match.matchDate <=
-          Date.now()
-        ) {
-
-          continue;
-
-        }
-
 
         matches.push(
           match
