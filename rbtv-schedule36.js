@@ -336,12 +336,20 @@
 
   function rbIsTeamLogo(str) {
 
-    return (
-      rbLooksLikeUrl(str) &&
-      /\/football\/team\//i.test(str)
-    );
-
+  if (!rbLooksLikeUrl(str)) {
+    return false;
   }
+
+  return (
+    /\/football\/team\//i.test(str) ||
+    /\/team\//i.test(str) ||
+    /\/teams\//i.test(str) ||
+    /\/football\/.*\/image/i.test(str) ||
+    /\/team.*image/i.test(str) ||
+    /\.(png|jpg|jpeg|webp)(\?.*)?$/i.test(str)
+  );
+
+}
 
 
   function rbIsCompetitionLogo(str) {
