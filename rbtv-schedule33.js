@@ -1559,25 +1559,18 @@
   ========================================================= */
 
   function rbGetStatus(
-    matchDate
-  ) {
+  matchDate
+) {
 
-    if (
-      matchDate >
-      Date.now()
-    ) {
+  return {
+    type:
+      "upcoming",
 
-      return {
+    label:
+      "UPCOMING"
+  };
 
-        type:
-          "upcoming",
-
-        label:
-          "UPCOMING"
-
-      };
-
-    }
+}
 
 
     return {
@@ -2167,27 +2160,44 @@
 
 
       for (
-        const record of records
-      ) {
+  const record of records
+) {
 
-        const match =
-          rbBuildMatch(
-            record.payload,
-            record.start,
-            record.length
-          );
-
-
-        if (!match) {
-          continue;
-        }
+  const match =
+    rbBuildMatch(
+      record.payload,
+      record.start,
+      record.length
+    );
 
 
-        matches.push(
-          match
-        );
+  if (!match) {
+    continue;
+  }
 
-      }
+
+  /*
+   * HANYA TAMPILKAN MATCH
+   * YANG BELUM DIMULAI.
+   *
+   * Kalau waktu kick-off sudah lewat,
+   * match tidak dimasukkan ke schedule.
+   */
+
+  if (
+    match.matchDate <= Date.now()
+  ) {
+
+    continue;
+
+  }
+
+
+  matches.push(
+    match
+  );
+
+}
 
 
       /* SORT */
