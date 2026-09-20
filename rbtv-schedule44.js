@@ -3,8 +3,8 @@
  * RBTV+ Auto Schedule
  * N11BOLAHD
  * SCHEDULE / API DECODER + RENDER
- * LOGO FIX 31.4
- * API STATUS FIELD DEBUG
+ * LOGO FIX 31.5
+ * NESTED API STATUS FIELD DEBUG
  */
 
 (function () {
@@ -12,7 +12,7 @@
   "use strict";
 
   console.log(
-    "%c[RBTV SCHEDULE 31.4] START",
+    "%c[RBTV SCHEDULE 31.5] START",
     "color:#00d979;font-weight:bold"
   );
 
@@ -69,7 +69,6 @@
   function rbReadFields(buf) {
 
     const fields = [];
-
     let p = 0;
 
     while (p < buf.length) {
@@ -77,12 +76,9 @@
       const keyInfo =
         rbReadVarint(buf, p);
 
-      if (!keyInfo) {
-        break;
-      }
+      if (!keyInfo) break;
 
-      p =
-        keyInfo.next;
+      p = keyInfo.next;
 
       const key =
         Number(keyInfo.value);
@@ -93,12 +89,9 @@
       const wireType =
         key & 7;
 
-      if (!fieldNo) {
-        break;
-      }
+      if (!fieldNo) break;
 
       let value = null;
-
       const start = p;
       let end = p;
 
@@ -109,104 +102,63 @@
           const v =
             rbReadVarint(buf, p);
 
-          if (!v) {
-            break;
-          }
+          if (!v) break;
 
-          value =
-            v.value;
-
-          p =
-            v.next;
-
-          end =
-            p;
+          value = v.value;
+          p = v.next;
+          end = p;
 
         }
 
         else if (wireType === 1) {
 
-          if (
-            p + 8 >
-            buf.length
-          ) {
-            break;
-          }
+          if (p + 8 > buf.length) break;
 
           value =
-            buf.slice(
-              p,
-              p + 8
-            );
+            buf.slice(p, p + 8);
 
           p += 8;
-
-          end =
-            p;
+          end = p;
 
         }
 
         else if (wireType === 2) {
 
           const lenInfo =
-            rbReadVarint(
-              buf,
-              p
-            );
+            rbReadVarint(buf, p);
 
-          if (!lenInfo) {
-            break;
-          }
+          if (!lenInfo) break;
 
-          p =
-            lenInfo.next;
+          p = lenInfo.next;
 
           const len =
-            Number(
-              lenInfo.value
-            );
+            Number(lenInfo.value);
 
           if (
             !Number.isFinite(len) ||
             len < 0 ||
-            p + len >
-              buf.length
+            p + len > buf.length
           ) {
             break;
           }
 
           value =
-            buf.slice(
-              p,
-              p + len
-            );
+            buf.slice(p, p + len);
 
           p += len;
-
-          end =
-            p;
+          end = p;
 
         }
 
         else if (wireType === 5) {
 
-          if (
-            p + 4 >
-            buf.length
-          ) {
-            break;
-          }
+          if (p + 4 > buf.length) break;
 
           value =
-            buf.slice(
-              p,
-              p + 4
-            );
+            buf.slice(p, p + 4);
 
           p += 4;
-
-          end =
-            p;
+          end = p;
 
         }
 
@@ -216,15 +168,12 @@
 
         }
 
-
         fields.push({
-
           fieldNo,
           wireType,
           value,
           start,
           end
-
         });
 
       } catch (e) {
@@ -246,9 +195,7 @@
 
       return new TextDecoder(
         "utf-8",
-        {
-          fatal: false
-        }
+        { fatal: false }
       ).decode(bytes);
 
     } catch (e) {
@@ -266,26 +213,15 @@
 
   function rbCleanText(str) {
 
-    if (
-      typeof str !== "string"
-    ) {
+    if (typeof str !== "string") {
       return "";
     }
 
     let s =
       str
-        .replace(
-          /^\uFEFF/,
-          ""
-        )
-        .replace(
-          /[\u200B-\u200D\u2060]/g,
-          ""
-        )
-        .replace(
-          /[\x00-\x1F\x7F]/g,
-          ""
-        )
+        .replace(/^\uFEFF/, "")
+        .replace(/[\u200B-\u200D\u2060]/g, "")
+        .replace(/[\x00-\x1F\x7F]/g, "")
         .trim();
 
     s =
@@ -335,29 +271,17 @@
       str.toLowerCase();
 
     return (
-
       /\/football\/team\//i.test(s) ||
-
       /\/football\/teams\//i.test(s) ||
-
       /\/team\//i.test(s) ||
-
       /\/teams\//i.test(s) ||
-
       /\/team[^/]*\/image/i.test(s) ||
-
       /\/teams?\/[^/]+\/image/i.test(s) ||
-
       /\/football\/.*\/image/i.test(s) ||
-
       /team.*image/i.test(s) ||
-
       /team.*logo/i.test(s) ||
-
       /logo.*team/i.test(s) ||
-
       /\.(png|jpg|jpeg|webp|svg)(\?.*)?$/i.test(s)
-
     );
 
   }
@@ -388,33 +312,23 @@
     result = []
   ) {
 
-    if (
-      !buf ||
-      depth > 10
-    ) {
+    if (!buf || depth > 10) {
       return result;
     }
 
     const fields =
       rbReadFields(buf);
 
-    for (
-      const f of fields
-    ) {
+    for (const f of fields) {
 
-      if (
-        f.wireType !== 2
-      ) {
+      if (f.wireType !== 2) {
         continue;
       }
 
-      const bytes =
-        f.value;
+      const bytes = f.value;
 
       const str =
-        rbBytesToString(
-          bytes
-        );
+        rbBytesToString(bytes);
 
       if (str) {
 
@@ -427,15 +341,9 @@
         ) {
 
           result.push({
-
-            field:
-              f.fieldNo,
-
-            text:
-              clean,
-
+            field: f.fieldNo,
+            text: clean,
             bytes
-
           });
 
         }
@@ -465,45 +373,31 @@
     result = []
   ) {
 
-    if (
-      !buf ||
-      depth > 12
-    ) {
+    if (!buf || depth > 12) {
       return result;
     }
 
     const fields =
       rbReadFields(buf);
 
-    for (
-      const f of fields
-    ) {
+    for (const f of fields) {
 
-      if (
-        f.wireType !== 2
-      ) {
+      if (f.wireType !== 2) {
         continue;
       }
 
-      const bytes =
-        f.value;
+      const bytes = f.value;
 
       const str =
-        rbBytesToString(
-          bytes
-        ).trim();
+        rbBytesToString(bytes).trim();
 
       if (
         rbLooksLikeUrl(str) &&
         rbIsTeamLogo(str)
       ) {
 
-        if (
-          !result.includes(str)
-        ) {
-
+        if (!result.includes(str)) {
           result.push(str);
-
         }
 
       }
@@ -531,33 +425,23 @@
     result = []
   ) {
 
-    if (
-      !buf ||
-      depth > 10
-    ) {
+    if (!buf || depth > 10) {
       return result;
     }
 
     const fields =
       rbReadFields(buf);
 
-    const directStrings =
-      [];
+    const directStrings = [];
 
-    for (
-      const f of fields
-    ) {
+    for (const f of fields) {
 
-      if (
-        f.wireType !== 2
-      ) {
+      if (f.wireType !== 2) {
         continue;
       }
 
       const text =
-        rbBytesToString(
-          f.value
-        );
+        rbBytesToString(f.value);
 
       if (!text) {
         continue;
@@ -571,124 +455,58 @@
       }
 
       directStrings.push({
-
-        field:
-          f.fieldNo,
-
-        text:
-          clean,
-
-        bytes:
-          f.value
-
+        field: f.fieldNo,
+        text: clean,
+        bytes: f.value
       });
 
     }
 
-
     const directLogo =
       directStrings.find(
-        x =>
-          rbIsTeamLogo(
-            x.text
-          )
+        x => rbIsTeamLogo(x.text)
       );
-
 
     if (directLogo) {
 
-      const possibleNames =
-        [];
+      const possibleNames = [];
 
-      for (
-        const x of directStrings
-      ) {
+      for (const x of directStrings) {
 
         const clean =
-          rbCleanText(
-            x.text
-          );
+          rbCleanText(x.text);
 
-        if (!clean) {
-          continue;
-        }
+        if (!clean) continue;
+        if (rbLooksLikeUrl(clean)) continue;
+        if (/^\d+$/.test(clean)) continue;
+        if (/^\d{4}$/.test(clean)) continue;
+        if (clean.length < 2 || clean.length > 120) continue;
+        if (/\svs\s/i.test(clean) || /-vs-/i.test(clean)) continue;
+        if (clean === "SuccessR" || clean === "def") continue;
 
-        if (
-          rbLooksLikeUrl(clean)
-        ) {
-          continue;
-        }
-
-        if (
-          /^\d+$/.test(clean)
-        ) {
-          continue;
-        }
-
-        if (
-          /^\d{4}$/.test(clean)
-        ) {
-          continue;
-        }
-
-        if (
-          clean.length < 2 ||
-          clean.length > 120
-        ) {
-          continue;
-        }
-
-        if (
-          /\svs\s/i.test(clean) ||
-          /-vs-/i.test(clean)
-        ) {
-          continue;
-        }
-
-        if (
-          clean === "SuccessR" ||
-          clean === "def"
-        ) {
-          continue;
-        }
-
-        possibleNames.push(
-          clean
-        );
+        possibleNames.push(clean);
 
       }
 
-
-      if (
-        possibleNames.length
-      ) {
+      if (possibleNames.length) {
 
         result.push({
-
           name:
             possibleNames[
               possibleNames.length - 1
             ],
-
           logo:
             directLogo.text,
-
           depth
-
         });
 
       }
 
     }
 
+    for (const f of fields) {
 
-    for (
-      const f of fields
-    ) {
-
-      if (
-        f.wireType !== 2
-      ) {
+      if (f.wireType !== 2) {
         continue;
       }
 
@@ -700,7 +518,6 @@
 
     }
 
-
     return result;
 
   }
@@ -710,18 +527,12 @@
      FIND COMPETITION
   ========================================================= */
 
-  function rbFindCompetition(
-    buf
-  ) {
+  function rbFindCompetition(buf) {
 
     let competitionName = "";
     let competitionLogo = "";
 
-
-    function walk(
-      current,
-      depth
-    ) {
+    function walk(current, depth) {
 
       if (
         !current ||
@@ -732,139 +543,65 @@
       }
 
       const fields =
-        rbReadFields(
-          current
-        );
+        rbReadFields(current);
 
+      for (const f of fields) {
 
-      for (
-        const f of fields
-      ) {
-
-        if (
-          f.wireType !== 2
-        ) {
+        if (f.wireType !== 2) {
           continue;
         }
 
-        const nested =
-          f.value;
+        const nested = f.value;
 
         const localFields =
-          rbReadFields(
-            nested
-          );
+          rbReadFields(nested);
 
-        let localLogo =
-          "";
+        let localLogo = "";
+        const localStrings = [];
 
-        const localStrings =
-          [];
+        for (const nf of localFields) {
 
-
-        for (
-          const nf of localFields
-        ) {
-
-          if (
-            nf.wireType !== 2
-          ) {
+          if (nf.wireType !== 2) {
             continue;
           }
 
           const s =
-            rbBytesToString(
-              nf.value
-            );
+            rbBytesToString(nf.value);
 
           if (!s) {
             continue;
           }
 
           localStrings.push({
-
-            field:
-              nf.fieldNo,
-
-            text:
-              s.trim()
-
+            field: nf.fieldNo,
+            text: s.trim()
           });
 
-
           if (
-            rbIsCompetitionLogo(
-              s.trim()
-            )
+            rbIsCompetitionLogo(s.trim())
           ) {
-
-            localLogo =
-              s.trim();
-
+            localLogo = s.trim();
           }
 
         }
 
-
         if (localLogo) {
 
-          for (
-            const x of localStrings
-          ) {
+          for (const x of localStrings) {
 
             const clean =
-              rbCleanText(
-                x.text
-              );
+              rbCleanText(x.text);
 
-            if (!clean) {
-              continue;
-            }
+            if (!clean) continue;
+            if (rbLooksLikeUrl(clean)) continue;
+            if (/^\d+$/.test(clean)) continue;
+            if (/^\d{4}$/.test(clean)) continue;
+            if (clean.length < 2 || clean.length > 100) continue;
+            if (/\svs\s/i.test(clean) || /-vs-/i.test(clean)) continue;
+            if (clean === "SuccessR" || clean === "def") continue;
 
-            if (
-              rbLooksLikeUrl(clean)
-            ) {
-              continue;
-            }
-
-            if (
-              /^\d+$/.test(clean)
-            ) {
-              continue;
-            }
-
-            if (
-              /^\d{4}$/.test(clean)
-            ) {
-              continue;
-            }
-
-            if (
-              clean.length < 2 ||
-              clean.length > 100
-            ) {
-              continue;
-            }
-
-            if (
-              /\svs\s/i.test(clean) ||
-              /-vs-/i.test(clean)
-            ) {
-              continue;
-            }
-
-            if (
-              clean === "SuccessR" ||
-              clean === "def"
-            ) {
-              continue;
-            }
-
-            competitionName =
-              clean;
-
-            competitionLogo =
-              localLogo;
+            competitionName = clean;
+            competitionLogo = localLogo;
 
             break;
 
@@ -872,22 +609,11 @@
 
         }
 
-
-        if (
-          !competitionName
-        ) {
-
-          walk(
-            nested,
-            depth + 1
-          );
-
+        if (!competitionName) {
+          walk(nested, depth + 1);
         }
 
-
-        if (
-          competitionName
-        ) {
+        if (competitionName) {
           return;
         }
 
@@ -895,23 +621,13 @@
 
     }
 
-
-    walk(
-      buf,
-      0
-    );
-
+    walk(buf, 0);
 
     return {
-
       name:
-        rbCleanText(
-          competitionName
-        ),
-
+        rbCleanText(competitionName),
       logo:
         competitionLogo
-
     };
 
   }
@@ -921,38 +637,24 @@
      FIND TITLE
   ========================================================= */
 
-  function rbFindTitle(
-    strings
-  ) {
+  function rbFindTitle(strings) {
 
     let title = "";
 
-    for (
-      const x of strings
-    ) {
+    for (const x of strings) {
 
       const s =
-        rbCleanText(
-          x.text
-        );
+        rbCleanText(x.text);
 
-      if (!s) {
-        continue;
-      }
+      if (!s) continue;
 
-      if (
-        /\svs\s/i.test(s)
-      ) {
+      if (/\svs\s/i.test(s)) {
 
         if (
-          s.length >
-            title.length &&
+          s.length > title.length &&
           s.length < 250
         ) {
-
-          title =
-            s;
-
+          title = s;
         }
 
       }
@@ -968,13 +670,9 @@
      FIND SLUG
   ========================================================= */
 
-  function rbFindSlug(
-    strings
-  ) {
+  function rbFindSlug(strings) {
 
-    for (
-      const x of strings
-    ) {
+    for (const x of strings) {
 
       const s =
         x.text.trim();
@@ -982,9 +680,7 @@
       if (
         /^[a-z0-9-]+-vs-[a-z0-9-]+$/i.test(s)
       ) {
-
         return s;
-
       }
 
     }
@@ -998,18 +694,13 @@
      SPLIT TEAMS
   ========================================================= */
 
-  function rbSplitTeams(
-    title,
-    slug
-  ) {
+  function rbSplitTeams(title, slug) {
 
     let home = "";
     let away = "";
 
     const cleanTitle =
-      rbCleanText(
-        title
-      );
+      rbCleanText(title);
 
     const m =
       cleanTitle.match(
@@ -1018,63 +709,35 @@
 
     if (m) {
 
-      home =
-        rbCleanText(
-          m[1]
-        );
-
-      away =
-        rbCleanText(
-          m[2]
-        );
+      home = rbCleanText(m[1]);
+      away = rbCleanText(m[2]);
 
     }
 
-
-    if (
-      (!home || !away) &&
-      slug
-    ) {
+    if ((!home || !away) && slug) {
 
       const parts =
-        slug.split(
-          /-vs-/i
-        );
+        slug.split(/-vs-/i);
 
-      if (
-        parts.length === 2
-      ) {
+      if (parts.length === 2) {
 
         if (!home) {
-
           home =
             rbCleanText(
-              parts[0]
-                .replace(
-                  /-/g,
-                  " "
-                )
+              parts[0].replace(/-/g, " ")
             );
-
         }
 
         if (!away) {
-
           away =
             rbCleanText(
-              parts[1]
-                .replace(
-                  /-/g,
-                  " "
-                )
+              parts[1].replace(/-/g, " ")
             );
-
         }
 
       }
 
     }
-
 
     return {
       home,
@@ -1088,18 +751,12 @@
      MATCH DATE
   ========================================================= */
 
-  function rbGetMatchDate(
-    recordBytes
-  ) {
+  function rbGetMatchDate(recordBytes) {
 
     const fields =
-      rbReadFields(
-        recordBytes
-      );
+      rbReadFields(recordBytes);
 
-    for (
-      const f of fields
-    ) {
+    for (const f of fields) {
 
       if (
         f.fieldNo === 3 &&
@@ -1107,18 +764,14 @@
       ) {
 
         const n =
-          Number(
-            f.value
-          );
+          Number(f.value);
 
         if (
           Number.isFinite(n) &&
           n > 1000000000000 &&
           n < 3000000000000
         ) {
-
           return n;
-
         }
 
       }
@@ -1131,8 +784,8 @@
 
 
   /* =========================================================
-     STATUS FIELD DEBUG
-     ========================================================= */
+     NESTED STATUS FIELD DEBUG 31.5
+  ========================================================= */
 
   function rbDebugStatusFields(
     recordBytes,
@@ -1140,13 +793,10 @@
     matchDate
   ) {
 
-    const fields =
-      rbReadFields(
-        recordBytes
-      );
+    const result = [];
+    const candidates = [];
 
-    const result =
-      [];
+    const MAX_DEPTH = 8;
 
     console.group(
       "%c[RBTV STATUS FIELD] " + title,
@@ -1161,9 +811,7 @@
     console.log(
       "DATE ISO:",
       matchDate
-        ? new Date(
-            matchDate
-          ).toISOString()
+        ? new Date(matchDate).toISOString()
         : null
     );
 
@@ -1173,93 +821,476 @@
     );
 
     console.log(
-      "FIELDS:",
-      fields.length
+      "NOW ISO:",
+      new Date(Date.now()).toISOString()
     );
 
 
-    fields.forEach(
-      (
-        f,
-        index
-      ) => {
+    /* =====================================================
+       RECURSIVE WALK
+    ===================================================== */
 
-        let value = null;
+    function walk(
+      buffer,
+      parentPath,
+      depth
+    ) {
 
+      if (
+        !buffer ||
+        depth > MAX_DEPTH
+      ) {
+        return;
+      }
 
-        if (
-          f.wireType === 0
-        ) {
+      let fields;
 
-          value =
-            Number(
-              f.value
-            );
+      try {
 
-        }
+        fields =
+          rbReadFields(buffer);
 
-        else if (
-          f.wireType === 2
-        ) {
-
-          const text =
-            rbCleanText(
-              rbBytesToString(
-                f.value
-              )
-            );
-
-          value =
-            text ||
-            "[BYTES " +
-            f.value.length +
-            "]";
-
-        }
-
-        else {
-
-          value =
-            "[WIRE " +
-            f.wireType +
-            "]";
-
-        }
-
-
-        const item = {
-
-          index:
-            index,
-
-          field:
-            f.fieldNo,
-
-          wireType:
-            f.wireType,
-
-          value
-
-        };
-
-
-        result.push(
-          item
-        );
-
+      } catch (e) {
 
         console.log(
-          "FIELD " +
-          f.fieldNo +
-          " | WIRE " +
-          f.wireType +
-          " | VALUE:",
-          value
+          "%c[RBTV NESTED PARSE ERROR]",
+          "color:red",
+          parentPath,
+          e
         );
 
+        return;
+
       }
+
+      if (
+        !fields ||
+        !fields.length
+      ) {
+        return;
+      }
+
+
+      fields.forEach(
+        (f, index) => {
+
+          const fieldPath =
+            parentPath
+              ? parentPath +
+                "." +
+                f.fieldNo
+              : String(f.fieldNo);
+
+
+          /* =============================================
+             WIRE 0
+          ============================================= */
+
+          if (
+            f.wireType === 0
+          ) {
+
+            const numericValue =
+              Number(f.value);
+
+            const possibleTimestamp =
+              Number.isFinite(
+                numericValue
+              ) &&
+              numericValue >
+                1000000000000 &&
+              numericValue <
+                3000000000000;
+
+            const possibleSmallEnum =
+              Number.isFinite(
+                numericValue
+              ) &&
+              numericValue >= 0 &&
+              numericValue <= 20;
+
+
+            const item = {
+
+              index,
+
+              path:
+                fieldPath,
+
+              field:
+                f.fieldNo,
+
+              wireType:
+                0,
+
+              value:
+                numericValue,
+
+              raw:
+                String(f.value),
+
+              possibleTimestamp,
+
+              possibleSmallEnum
+
+            };
+
+
+            result.push(item);
+
+
+            let marker = "";
+
+            if (
+              possibleTimestamp
+            ) {
+
+              marker =
+                " ← POSSIBLE TIMESTAMP";
+
+            }
+            else if (
+              possibleSmallEnum
+            ) {
+
+              marker =
+                " ← SMALL ENUM / STATUS CANDIDATE";
+
+              candidates.push(
+                item
+              );
+
+            }
+
+
+            console.log(
+              "FIELD " +
+              fieldPath +
+              " | WIRE 0 | VALUE:",
+              numericValue,
+              marker
+            );
+
+
+            return;
+
+          }
+
+
+          /* =============================================
+             WIRE 2
+          ============================================= */
+
+          if (
+            f.wireType === 2
+          ) {
+
+            const bytes =
+              f.value;
+
+            let text = "";
+
+            try {
+
+              text =
+                rbCleanText(
+                  rbBytesToString(bytes)
+                );
+
+            } catch (e) {
+
+              text = "";
+
+            }
+
+
+            const item = {
+
+              index,
+
+              path:
+                fieldPath,
+
+              field:
+                f.fieldNo,
+
+              wireType:
+                2,
+
+              byteLength:
+                bytes.length,
+
+              value:
+                text &&
+                text.length <= 300
+                  ? text
+                  : "[BYTES " +
+                    bytes.length +
+                    "]"
+
+            };
+
+
+            result.push(item);
+
+
+            if (
+              text &&
+              text.length <= 300 &&
+              !text.includes("\u0000")
+            ) {
+
+              console.log(
+                "FIELD " +
+                fieldPath +
+                " | WIRE 2 | TEXT:",
+                text
+              );
+
+            }
+            else {
+
+              console.log(
+                "FIELD " +
+                fieldPath +
+                " | WIRE 2 | BYTES:",
+                bytes.length
+              );
+
+            }
+
+
+            /* =========================================
+               RECURSE INTO NESTED MESSAGE
+            ========================================= */
+
+            if (
+              bytes &&
+              bytes.length >= 2 &&
+              depth < MAX_DEPTH
+            ) {
+
+              let nestedFields = null;
+
+              try {
+
+                nestedFields =
+                  rbReadFields(bytes);
+
+              } catch (e) {
+
+                nestedFields = null;
+
+              }
+
+
+              if (
+                nestedFields &&
+                nestedFields.length
+              ) {
+
+                console.log(
+                  "%c[NESTED] " +
+                  fieldPath +
+                  " → " +
+                  nestedFields.length +
+                  " fields",
+                  "color:#00aaff"
+                );
+
+
+                walk(
+                  bytes,
+                  fieldPath,
+                  depth + 1
+                );
+
+              }
+
+            }
+
+            return;
+
+          }
+
+
+          /* =============================================
+             WIRE 1
+          ============================================= */
+
+          if (
+            f.wireType === 1
+          ) {
+
+            const byteLength =
+              f.value &&
+              f.value.length !== undefined
+                ? f.value.length
+                : 0;
+
+
+            const item = {
+
+              index,
+
+              path:
+                fieldPath,
+
+              field:
+                f.fieldNo,
+
+              wireType:
+                1,
+
+              value:
+                "[64-BIT " +
+                byteLength +
+                " BYTES]"
+
+            };
+
+
+            result.push(item);
+
+
+            console.log(
+              "FIELD " +
+              fieldPath +
+              " | WIRE 1 | BYTES:",
+              byteLength
+            );
+
+
+            return;
+
+          }
+
+
+          /* =============================================
+             WIRE 5
+          ============================================= */
+
+          if (
+            f.wireType === 5
+          ) {
+
+            const byteLength =
+              f.value &&
+              f.value.length !== undefined
+                ? f.value.length
+                : 0;
+
+
+            const item = {
+
+              index,
+
+              path:
+                fieldPath,
+
+              field:
+                f.fieldNo,
+
+              wireType:
+                5,
+
+              value:
+                "[32-BIT " +
+                byteLength +
+                " BYTES]"
+
+            };
+
+
+            result.push(item);
+
+
+            console.log(
+              "FIELD " +
+              fieldPath +
+              " | WIRE 5 | BYTES:",
+              byteLength
+            );
+
+
+            return;
+
+          }
+
+
+          /* =============================================
+             UNKNOWN WIRE
+          ============================================= */
+
+          const unknownItem = {
+
+            index,
+
+            path:
+              fieldPath,
+
+            field:
+              f.fieldNo,
+
+            wireType:
+              f.wireType,
+
+            value:
+              "[UNKNOWN WIRE]"
+
+          };
+
+
+          result.push(
+            unknownItem
+          );
+
+
+          console.log(
+            "FIELD " +
+            fieldPath +
+            " | WIRE " +
+            f.wireType +
+            " | UNKNOWN"
+          );
+
+        }
+      );
+
+    }
+
+
+    /* =====================================================
+       START SCAN
+    ===================================================== */
+
+    console.log(
+      "%c[RBTV NESTED STATUS SCAN START]",
+      "color:#00d979;font-weight:bold"
     );
 
+
+    walk(
+      recordBytes,
+      "",
+      0
+    );
+
+
+    /* =====================================================
+       POSSIBLE STATUS CANDIDATES
+    ===================================================== */
+
+    console.log(
+      "%c[RBTV POSSIBLE STATUS CANDIDATES]",
+      "color:#ffff00;font-weight:bold",
+      candidates
+    );
+
+
+    /* =====================================================
+       FINAL RESULT
+    ===================================================== */
 
     console.log(
       "%c[RBTV STATUS FIELD RESULT]",
@@ -1296,8 +1327,14 @@
             ).toISOString()
           : "",
 
+      scannedAt:
+        new Date().toISOString(),
+
       fields:
-        result
+        result,
+
+      candidates:
+        candidates
 
     });
 
@@ -1344,9 +1381,7 @@
     }
 
 
-    /* =====================================================
-       STATUS DEBUG
-    ===================================================== */
+    /* STATUS DEBUG */
 
     rbDebugStatusFields(
       recordBytes,
@@ -1419,8 +1454,7 @@
     );
 
 
-    const uniqueTeams =
-      [];
+    const uniqueTeams = [];
 
 
     for (
@@ -1456,15 +1490,10 @@
 
 
     const homeLower =
-      home
-        .toLowerCase()
-        .trim();
-
+      home.toLowerCase().trim();
 
     const awayLower =
-      away
-        .toLowerCase()
-        .trim();
+      away.toLowerCase().trim();
 
 
     for (
@@ -1472,15 +1501,10 @@
     ) {
 
       const name =
-        rbCleanText(
-          t.name
-        );
-
+        rbCleanText(t.name);
 
       const nameLower =
-        name
-          .toLowerCase()
-          .trim();
+        name.toLowerCase().trim();
 
 
       if (
@@ -1514,15 +1538,10 @@
       ) {
 
         const name =
-          rbCleanText(
-            t.name
-          );
-
+          rbCleanText(t.name);
 
         const nameLower =
-          name
-            .toLowerCase()
-            .trim();
+          name.toLowerCase().trim();
 
 
         if (
@@ -1552,15 +1571,10 @@
       ) {
 
         const name =
-          rbCleanText(
-            t.name
-          );
-
+          rbCleanText(t.name);
 
         const nameLower =
-          name
-            .toLowerCase()
-            .trim();
+          name.toLowerCase().trim();
 
 
         if (
@@ -1684,14 +1698,10 @@
         "",
 
       home:
-        rbCleanText(
-          home
-        ),
+        rbCleanText(home),
 
       away:
-        rbCleanText(
-          away
-        ),
+        rbCleanText(away),
 
       homeLogo,
 
@@ -1712,12 +1722,9 @@
      FIND RECORDS
   ========================================================= */
 
-  function rbFindRecords(
-    buffer
-  ) {
+  function rbFindRecords(buffer) {
 
-    const records =
-      [];
+    const records = [];
 
 
     for (
@@ -1726,10 +1733,7 @@
       i++
     ) {
 
-      if (
-        buffer[i] !==
-        0x0A
-      ) {
+      if (buffer[i] !== 0x0A) {
         continue;
       }
 
@@ -1747,25 +1751,20 @@
 
 
       const len =
-        Number(
-          lenInfo.value
-        );
+        Number(lenInfo.value);
 
 
       const payloadStart =
         lenInfo.next;
 
-
       const payloadEnd =
-        payloadStart +
-        len;
+        payloadStart + len;
 
 
       if (
         !Number.isFinite(len) ||
         len <= 100 ||
-        payloadEnd >
-          buffer.length
+        payloadEnd > buffer.length
       ) {
         continue;
       }
@@ -1787,9 +1786,7 @@
       const hasSlug =
         strings.some(
           x =>
-            /-vs-/i.test(
-              x.text
-            )
+            /-vs-/i.test(x.text)
         );
 
 
@@ -1800,11 +1797,9 @@
 
       records.push({
 
-        start:
-          i,
+        start: i,
 
-        length:
-          len,
+        length: len,
 
         payload
 
@@ -1826,27 +1821,16 @@
      DATE / TIME
   ========================================================= */
 
-  function rbDateKey(
-    timestamp
-  ) {
+  function rbDateKey(timestamp) {
 
     return new Intl.DateTimeFormat(
       "en-US",
       {
-        timeZone:
-          "Asia/Jakarta",
-
-        weekday:
-          "long",
-
-        year:
-          "numeric",
-
-        month:
-          "long",
-
-        day:
-          "2-digit"
+        timeZone: "Asia/Jakarta",
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "2-digit"
       }
     ).format(
       new Date(timestamp)
@@ -1855,24 +1839,15 @@
   }
 
 
-  function rbFormatTime(
-    timestamp
-  ) {
+  function rbFormatTime(timestamp) {
 
     return new Intl.DateTimeFormat(
       "en-GB",
       {
-        timeZone:
-          "Asia/Jakarta",
-
-        hour:
-          "2-digit",
-
-        minute:
-          "2-digit",
-
-        hour12:
-          false
+        timeZone: "Asia/Jakarta",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
       }
     ).format(
       new Date(timestamp)
@@ -1883,11 +1858,9 @@
 
   /* =========================================================
      STATUS
-  ========================================================= */
+     ========================================================= */
 
-  function rbGetStatus(
-    matchDate
-  ) {
+  function rbGetStatus(matchDate) {
 
     const now =
       Date.now();
@@ -1899,11 +1872,9 @@
 
       return {
 
-        type:
-          "upcoming",
+        type: "upcoming",
 
-        label:
-          "UPCOMING"
+        label: "UPCOMING"
 
       };
 
@@ -1912,11 +1883,9 @@
 
     return {
 
-      type:
-        "live",
+      type: "live",
 
-      label:
-        "LIVE"
+      label: "LIVE"
 
     };
 
@@ -1927,54 +1896,41 @@
      COUNTDOWN
   ========================================================= */
 
-  function rbCountdown(
-    timestamp
-  ) {
+  function rbCountdown(timestamp) {
 
     const diff =
-      timestamp -
-      Date.now();
+      timestamp - Date.now();
 
 
-    if (
-      diff <= 0
-    ) {
-
+    if (diff <= 0) {
       return "";
-
     }
 
 
     const totalSeconds =
-      Math.floor(
-        diff / 1000
-      );
+      Math.floor(diff / 1000);
 
 
     const days =
       Math.floor(
-        totalSeconds /
-        86400
+        totalSeconds / 86400
       );
 
 
     const hours =
       Math.floor(
-        (totalSeconds % 86400) /
-        3600
+        (totalSeconds % 86400) / 3600
       );
 
 
     const minutes =
       Math.floor(
-        (totalSeconds % 3600) /
-        60
+        (totalSeconds % 3600) / 60
       );
 
 
     const seconds =
-      totalSeconds %
-      60;
+      totalSeconds % 60;
 
 
     if (days > 0) {
@@ -1982,28 +1938,22 @@
       return (
         days +
         "d " +
-        String(hours)
-          .padStart(2, "0") +
+        String(hours).padStart(2, "0") +
         ":" +
-        String(minutes)
-          .padStart(2, "0") +
+        String(minutes).padStart(2, "0") +
         ":" +
-        String(seconds)
-          .padStart(2, "0")
+        String(seconds).padStart(2, "0")
       );
 
     }
 
 
     return (
-      String(hours)
-        .padStart(2, "0") +
+      String(hours).padStart(2, "0") +
       ":" +
-      String(minutes)
-        .padStart(2, "0") +
+      String(minutes).padStart(2, "0") +
       ":" +
-      String(seconds)
-        .padStart(2, "0")
+      String(seconds).padStart(2, "0")
     );
 
   }
@@ -2013,33 +1963,14 @@
      ESCAPE
   ========================================================= */
 
-  function rbEscape(
-    value
-  ) {
+  function rbEscape(value) {
 
-    return String(
-      value || ""
-    )
-      .replace(
-        /&/g,
-        "&amp;"
-      )
-      .replace(
-        /</g,
-        "&lt;"
-      )
-      .replace(
-        />/g,
-        "&gt;"
-      )
-      .replace(
-        /"/g,
-        "&quot;"
-      )
-      .replace(
-        /'/g,
-        "&#039;"
-      );
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
 
   }
 
@@ -2048,9 +1979,7 @@
      RENDER
   ========================================================= */
 
-  function rbRenderSchedule(
-    matches
-  ) {
+  function rbRenderSchedule(matches) {
 
     const container =
       document.querySelector(
@@ -2100,8 +2029,7 @@
 
 
         if (
-          dateKey !==
-          currentDate
+          dateKey !== currentDate
         ) {
 
           currentDate =
@@ -2316,9 +2244,7 @@
 
 
         if (
-          !Number.isFinite(
-            timestamp
-          )
+          !Number.isFinite(timestamp)
         ) {
           return;
         }
@@ -2373,9 +2299,7 @@
 
 
         const countdown =
-          rbCountdown(
-            timestamp
-          );
+          rbCountdown(timestamp);
 
 
         let countdownElement =
@@ -2386,19 +2310,15 @@
 
         if (countdown) {
 
-          if (
-            !countdownElement
-          ) {
+          if (!countdownElement) {
 
             countdownElement =
               document.createElement(
                 "div"
               );
 
-
             countdownElement.className =
               "rbtv-countdown";
-
 
             item.appendChild(
               countdownElement
@@ -2437,18 +2357,14 @@
         RBTV_API,
         {
 
-          method:
-            "GET",
+          method: "GET",
 
           headers: {
-
             "Accept":
               "application/json, text/plain, */*"
-
           },
 
-          cache:
-            "no-store"
+          cache: "no-store"
 
         }
       );
@@ -2535,8 +2451,7 @@
       );
 
 
-      const matches =
-        [];
+      const matches = [];
 
 
       for (
