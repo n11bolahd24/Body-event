@@ -1129,7 +1129,81 @@
 
   }
 
+  /* =========================================================
+     DEBUG STATUS FIELD
+  ========================================================= */
 
+  function rbDebugStatusFields(
+    recordBytes,
+    title
+  ) {
+
+    const fields =
+      rbReadFields(
+        recordBytes
+      );
+
+    const result = [];
+
+    for (
+      const f of fields
+    ) {
+
+      if (
+        f.wireType === 0
+      ) {
+
+        result.push({
+          field: f.fieldNo,
+          wireType: f.wireType,
+          value: Number(f.value),
+          bigint: String(f.value)
+        });
+
+      }
+
+      else if (
+        f.wireType === 2
+      ) {
+
+        const text =
+          rbCleanText(
+            rbBytesToString(
+              f.value
+            )
+          );
+
+        if (
+          text &&
+          text.length < 100 &&
+          !rbLooksLikeUrl(text)
+        ) {
+
+          result.push({
+            field: f.fieldNo,
+            wireType: f.wireType,
+            value: text
+          });
+
+        }
+
+      }
+
+    }
+
+
+    console.log(
+      "%c[RBTV STATUS DEBUG]",
+      "color:#ff6600;font-weight:bold",
+      title,
+      result
+    );
+
+
+    return result;
+
+  }
+  
   /* =========================================================
      BUILD MATCH
   ========================================================= */
