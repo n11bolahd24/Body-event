@@ -3,8 +3,8 @@
  * RBTV+ Auto Schedule
  * N11BOLAHD
  * SCHEDULE / API DECODER + RENDER
- * LOGO FIX 31.3
- * LIVE MATCH FIX
+ * LOGO FIX 31.4
+ * API STATUS DEBUG
  */
 
 (function () {
@@ -12,7 +12,7 @@
   "use strict";
 
   console.log(
-    "%c[RBTV SCHEDULE 31.3] START",
+    "%c[RBTV SCHEDULE 31.4] START",
     "color:#00d979;font-weight:bold"
   );
 
@@ -1129,13 +1129,15 @@
 
   }
 
+
   /* =========================================================
-     DEBUG STATUS FIELD
+     STATUS FIELD DEBUG
   ========================================================= */
 
   function rbDebugStatusFields(
     recordBytes,
-    title
+    title,
+    matchDate
   ) {
 
     const fields =
@@ -1143,7 +1145,8 @@
         recordBytes
       );
 
-    const result = [];
+    const result =
+      [];
 
     for (
       const f of fields
@@ -1153,11 +1156,33 @@
         f.wireType === 0
       ) {
 
+        const numeric =
+          Number(
+            f.value
+          );
+
         result.push({
-          field: f.fieldNo,
-          wireType: f.wireType,
-          value: Number(f.value),
-          bigint: String(f.value)
+
+          field:
+            f.fieldNo,
+
+          wireType:
+            f.wireType,
+
+          value:
+            numeric,
+
+          bigint:
+            String(
+              f.value
+            ),
+
+          possibleTimestamp:
+            (
+              numeric > 1000000000000 &&
+              numeric < 3000000000000
+            )
+
         });
 
       }
@@ -1175,14 +1200,21 @@
 
         if (
           text &&
-          text.length < 100 &&
+          text.length < 120 &&
           !rbLooksLikeUrl(text)
         ) {
 
           result.push({
-            field: f.fieldNo,
-            wireType: f.wireType,
-            value: text
+
+            field:
+              f.fieldNo,
+
+            wireType:
+              f.wireType,
+
+            value:
+              text
+
           });
 
         }
@@ -1192,18 +1224,54 @@
     }
 
 
+    const debugItem = {
+
+      title:
+        title || "",
+
+      matchDate:
+        matchDate || null,
+
+      matchDateISO:
+        matchDate
+          ? new Date(
+              matchDate
+            ).toISOString()
+          : "",
+
+      fields:
+        result
+
+    };
+
+
+    if (
+      !window.RBTV_STATUS_DEBUG
+    ) {
+
+      window.RBTV_STATUS_DEBUG =
+        [];
+
+    }
+
+
+    window.RBTV_STATUS_DEBUG.push(
+      debugItem
+    );
+
+
     console.log(
       "%c[RBTV STATUS DEBUG]",
       "color:#ff6600;font-weight:bold",
-      title,
-      result
+      debugItem
     );
 
 
     return result;
 
   }
-  
+
+
   /* =========================================================
      BUILD MATCH
   ========================================================= */
@@ -1235,9 +1303,21 @@
         strings
       );
 
+
     if (!title) {
       return null;
     }
+
+
+    /* =====================================================
+       STATUS DEBUG
+    ===================================================== */
+
+    rbDebugStatusFields(
+      recordBytes,
+      title,
+      matchDate
+    );
 
 
     const slug =
@@ -2061,7 +2141,6 @@
 
             <div class="rbtv-teams">
 
-
               <div class="rbtv-team">
 
                 ${
@@ -2138,7 +2217,6 @@
 
               </div>
 
-
             </div>
 
 
@@ -2183,7 +2261,7 @@
 
   /* =========================================================
      UPDATE COUNTDOWN + LIVE STATUS
-     ========================================================= */
+  ========================================================= */
 
   function rbUpdateCountdowns() {
 
@@ -2218,10 +2296,6 @@
         const isLive =
           timestamp <= now;
 
-
-        /* =====================================================
-           UPDATE STATUS
-        ===================================================== */
 
         const statusElement =
           item.querySelector(
@@ -2263,10 +2337,6 @@
         }
 
 
-        /* =====================================================
-           UPDATE COUNTDOWN
-        ===================================================== */
-
         const countdown =
           rbCountdown(
             timestamp
@@ -2306,6 +2376,7 @@
             countdown;
 
         }
+
         else if (
           countdownElement
         ) {
@@ -2408,6 +2479,10 @@
 
     try {
 
+      window.RBTV_STATUS_DEBUG =
+        [];
+
+
       const buffer =
         await rbFetch();
 
@@ -2446,13 +2521,6 @@
         }
 
 
-        /*
-         * SEMUA MATCH TETAP DIMASUKKAN.
-         *
-         * Upcoming  = sebelum kick-off
-         * Live      = sudah masuk waktu kick-off
-         */
-
         matches.push(
           match
         );
@@ -2460,20 +2528,12 @@
       }
 
 
-      /* =====================================================
-         SORT
-      ===================================================== */
-
       matches.sort(
         (a, b) =>
           a.matchDate -
           b.matchDate
       );
 
-
-      /* =====================================================
-         NUMBER
-      ===================================================== */
 
       matches.forEach(
         (
@@ -2487,10 +2547,6 @@
         }
       );
 
-
-      /* =====================================================
-         GLOBAL
-      ===================================================== */
 
       window.RBTV_MATCHES =
         matches;
@@ -2513,9 +2569,15 @@
       );
 
 
-      /* =====================================================
-         RENDER
-      ===================================================== */
+      console.log(
+        "%c[RBTV STATUS DEBUG READY]",
+        "color:#ff6600;font-weight:bold"
+      );
+
+      console.log(
+        "Gunakan: window.RBTV_STATUS_DEBUG"
+      );
+
 
       rbRenderSchedule(
         matches
@@ -2644,4 +2706,3 @@
 
 
 })();
-
