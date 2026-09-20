@@ -4,7 +4,7 @@
  * N11BOLAHD
  * SCHEDULE / API DECODER + RENDER
  * LOGO FIX 31.4
- * API STATUS DEBUG
+ * API STATUS FIELD DEBUG
  */
 
 (function () {
@@ -1132,7 +1132,7 @@
 
   /* =========================================================
      STATUS FIELD DEBUG
-  ========================================================= */
+     ========================================================= */
 
   function rbDebugStatusFields(
     recordBytes,
@@ -1148,20 +1148,89 @@
     const result =
       [];
 
-    for (
-      const f of fields
-    ) {
+    console.group(
+      "%c[RBTV STATUS FIELD] " + title,
+      "color:#ff6600;font-weight:bold"
+    );
 
-      if (
-        f.wireType === 0
-      ) {
+    console.log(
+      "MATCH DATE:",
+      matchDate
+    );
 
-        const numeric =
-          Number(
-            f.value
-          );
+    console.log(
+      "DATE ISO:",
+      matchDate
+        ? new Date(
+            matchDate
+          ).toISOString()
+        : null
+    );
 
-        result.push({
+    console.log(
+      "NOW:",
+      Date.now()
+    );
+
+    console.log(
+      "FIELDS:",
+      fields.length
+    );
+
+
+    fields.forEach(
+      (
+        f,
+        index
+      ) => {
+
+        let value = null;
+
+
+        if (
+          f.wireType === 0
+        ) {
+
+          value =
+            Number(
+              f.value
+            );
+
+        }
+
+        else if (
+          f.wireType === 2
+        ) {
+
+          const text =
+            rbCleanText(
+              rbBytesToString(
+                f.value
+              )
+            );
+
+          value =
+            text ||
+            "[BYTES " +
+            f.value.length +
+            "]";
+
+        }
+
+        else {
+
+          value =
+            "[WIRE " +
+            f.wireType +
+            "]";
+
+        }
+
+
+        const item = {
+
+          index:
+            index,
 
           field:
             f.fieldNo,
@@ -1169,62 +1238,50 @@
           wireType:
             f.wireType,
 
-          value:
-            numeric,
+          value
 
-          bigint:
-            String(
-              f.value
-            ),
+        };
 
-          possibleTimestamp:
-            (
-              numeric > 1000000000000 &&
-              numeric < 3000000000000
-            )
 
-        });
+        result.push(
+          item
+        );
 
-      }
 
-      else if (
-        f.wireType === 2
-      ) {
-
-        const text =
-          rbCleanText(
-            rbBytesToString(
-              f.value
-            )
-          );
-
-        if (
-          text &&
-          text.length < 120 &&
-          !rbLooksLikeUrl(text)
-        ) {
-
-          result.push({
-
-            field:
-              f.fieldNo,
-
-            wireType:
-              f.wireType,
-
-            value:
-              text
-
-          });
-
-        }
+        console.log(
+          "FIELD " +
+          f.fieldNo +
+          " | WIRE " +
+          f.wireType +
+          " | VALUE:",
+          value
+        );
 
       }
+    );
+
+
+    console.log(
+      "%c[RBTV STATUS FIELD RESULT]",
+      "color:#ff6600;font-weight:bold",
+      result
+    );
+
+
+    console.groupEnd();
+
+
+    if (
+      !window.RBTV_STATUS_DEBUG
+    ) {
+
+      window.RBTV_STATUS_DEBUG =
+        [];
 
     }
 
 
-    const debugItem = {
+    window.RBTV_STATUS_DEBUG.push({
 
       title:
         title || "",
@@ -1242,29 +1299,7 @@
       fields:
         result
 
-    };
-
-
-    if (
-      !window.RBTV_STATUS_DEBUG
-    ) {
-
-      window.RBTV_STATUS_DEBUG =
-        [];
-
-    }
-
-
-    window.RBTV_STATUS_DEBUG.push(
-      debugItem
-    );
-
-
-    console.log(
-      "%c[RBTV STATUS DEBUG]",
-      "color:#ff6600;font-weight:bold",
-      debugItem
-    );
+    });
 
 
     return result;
@@ -2574,6 +2609,7 @@
         "color:#ff6600;font-weight:bold"
       );
 
+
       console.log(
         "Gunakan: window.RBTV_STATUS_DEBUG"
       );
@@ -2706,3 +2742,4 @@
 
 
 })();
+
