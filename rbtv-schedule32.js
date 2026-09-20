@@ -1,4 +1,3 @@
-```javascript
 /*!
  * RBTV+ Auto Schedule
  * N11BOLAHD
@@ -10,7 +9,7 @@
   "use strict";
 
   console.log(
-    "%c[RBTV SCHEDULE 30] START",
+    "%c[RBTV SCHEDULE 31] START",
     "color:#00d979;font-weight:bold"
   );
 
@@ -21,7 +20,6 @@
 
   const RBTV_API =
     "https://apis-data10.tcllu137fien.ru/sfver915c76f70397a83f69a18051c6c8d037e40acf/api/match/live?sportType=1&language=34&stream=true";
-
 
   const SCHEDULE_SELECTOR =
     "#rbtvSchedule";
@@ -43,7 +41,6 @@
       value |=
         BigInt(b & 0x7F) << shift;
 
-
       if (!(b & 0x80)) {
 
         return {
@@ -53,16 +50,13 @@
 
       }
 
-
       shift += 7n;
-
 
       if (shift > 70n) {
         break;
       }
 
     }
-
 
     return null;
 
@@ -75,45 +69,35 @@
 
     let p = 0;
 
-
     while (p < buf.length) {
 
       const keyInfo =
         rbReadVarint(buf, p);
 
-
       if (!keyInfo) {
         break;
       }
 
-
       p =
         keyInfo.next;
-
 
       const key =
         Number(keyInfo.value);
 
-
       const fieldNo =
         key >>> 3;
 
-
       const wireType =
         key & 7;
-
 
       if (!fieldNo) {
         break;
       }
 
-
       let value = null;
 
       const start = p;
-
       let end = p;
-
 
       try {
 
@@ -124,19 +108,15 @@
           const v =
             rbReadVarint(buf, p);
 
-
           if (!v) {
             break;
           }
 
-
           value =
             v.value;
 
-
           p =
             v.next;
-
 
           end =
             p;
@@ -155,13 +135,11 @@
             break;
           }
 
-
           value =
             buf.slice(
               p,
               p + 8
             );
-
 
           p += 8;
 
@@ -181,21 +159,17 @@
               p
             );
 
-
           if (!lenInfo) {
             break;
           }
 
-
           p =
             lenInfo.next;
-
 
           const len =
             Number(
               lenInfo.value
             );
-
 
           if (
             !Number.isFinite(len) ||
@@ -206,13 +180,11 @@
             break;
           }
 
-
           value =
             buf.slice(
               p,
               p + len
             );
-
 
           p += len;
 
@@ -233,13 +205,11 @@
             break;
           }
 
-
           value =
             buf.slice(
               p,
               p + 4
             );
-
 
           p += 4;
 
@@ -259,17 +229,12 @@
         fields.push({
 
           fieldNo,
-
           wireType,
-
           value,
-
           start,
-
           end
 
         });
-
 
       } catch (e) {
 
@@ -278,7 +243,6 @@
       }
 
     }
-
 
     return fields;
 
@@ -312,40 +276,26 @@
   function rbCleanText(str) {
 
     if (
-      typeof str !==
-      "string"
+      typeof str !== "string"
     ) {
       return "";
     }
 
-
-    let s = str;
-
-
-    s =
-      s.replace(
-        /^\uFEFF/,
-        ""
-      );
-
-
-    s =
-      s.replace(
-        /[\u200B-\u200D\u2060]/g,
-        ""
-      );
-
-
-    s =
-      s.replace(
-        /[\x00-\x1F\x7F]/g,
-        ""
-      );
-
-
-    s =
-      s.trim();
-
+    let s =
+      str
+        .replace(
+          /^\uFEFF/,
+          ""
+        )
+        .replace(
+          /[\u200B-\u200D\u2060]/g,
+          ""
+        )
+        .replace(
+          /[\x00-\x1F\x7F]/g,
+          ""
+        )
+        .trim();
 
     s =
       s.replace(
@@ -353,20 +303,17 @@
         ""
       );
 
-
     s =
       s.replace(
         /^&+/,
         ""
       );
 
-
     s =
       s.replace(
         /^\d+(?=[A-Za-zÀ-ÿ])/,
         ""
       );
-
 
     return s.trim();
 
@@ -380,8 +327,7 @@
   function rbLooksLikeUrl(str) {
 
     return (
-      typeof str ===
-      "string" &&
+      typeof str === "string" &&
       /^https?:\/\//i.test(str)
     );
 
@@ -422,15 +368,11 @@
       !buf ||
       depth > 10
     ) {
-
       return result;
-
     }
-
 
     const fields =
       rbReadFields(buf);
-
 
     for (
       const f of fields
@@ -442,28 +384,22 @@
         continue;
       }
 
-
       const bytes =
         f.value;
-
 
       const str =
         rbBytesToString(
           bytes
         );
 
-
       if (str) {
 
         const clean =
           str.trim();
 
-
         if (
           clean &&
-          !clean.includes(
-            "\u0000"
-          )
+          !clean.includes("\u0000")
         ) {
 
           result.push({
@@ -482,7 +418,6 @@
 
       }
 
-
       rbCollectStrings(
         bytes,
         depth + 1,
@@ -491,7 +426,6 @@
 
     }
 
-
     return result;
 
   }
@@ -499,7 +433,7 @@
 
   /* =========================================================
      FIND TEAM OBJECTS
-  ========================================================= */
+     ========================================================= */
 
   function rbFindTeamObjects(
     buf,
@@ -511,19 +445,14 @@
       !buf ||
       depth > 8
     ) {
-
       return result;
-
     }
-
 
     const fields =
       rbReadFields(buf);
 
-
     const directStrings =
       [];
-
 
     for (
       const f of fields
@@ -535,28 +464,21 @@
         continue;
       }
 
-
       const text =
         rbBytesToString(
           f.value
         );
 
-
       if (!text) {
         continue;
       }
 
-
       const clean =
-        rbCleanText(
-          text
-        );
-
+        rbCleanText(text);
 
       if (!clean) {
         continue;
       }
-
 
       directStrings.push({
 
@@ -588,7 +510,6 @@
       const possibleNames =
         [];
 
-
       for (
         const x of directStrings
       ) {
@@ -598,11 +519,9 @@
             x.text
           );
 
-
         if (!clean) {
           continue;
         }
-
 
         if (
           rbLooksLikeUrl(
@@ -612,20 +531,17 @@
           continue;
         }
 
-
         if (
           /^\d+$/.test(clean)
         ) {
           continue;
         }
 
-
         if (
           /^\d{4}$/.test(clean)
         ) {
           continue;
         }
-
 
         if (
           clean.length < 2 ||
@@ -634,7 +550,6 @@
           continue;
         }
 
-
         if (
           /\svs\s/i.test(clean) ||
           /-vs-/i.test(clean)
@@ -642,14 +557,12 @@
           continue;
         }
 
-
         if (
           clean === "SuccessR" ||
           clean === "def"
         ) {
           continue;
         }
-
 
         possibleNames.push(
           clean
@@ -691,7 +604,6 @@
         continue;
       }
 
-
       rbFindTeamObjects(
         f.value,
         depth + 1,
@@ -715,7 +627,6 @@
   ) {
 
     let competitionName = "";
-
     let competitionLogo = "";
 
 
@@ -731,7 +642,6 @@
       ) {
         return;
       }
-
 
       const fields =
         rbReadFields(
@@ -749,20 +659,16 @@
           continue;
         }
 
-
         const nested =
           f.value;
-
 
         const localFields =
           rbReadFields(
             nested
           );
 
-
         let localLogo =
           "";
-
 
         const localStrings =
           [];
@@ -778,17 +684,14 @@
             continue;
           }
 
-
           const s =
             rbBytesToString(
               nf.value
             );
 
-
           if (!s) {
             continue;
           }
-
 
           localStrings.push({
 
@@ -826,11 +729,9 @@
                 x.text
               );
 
-
             if (!clean) {
               continue;
             }
-
 
             if (
               rbLooksLikeUrl(
@@ -840,20 +741,17 @@
               continue;
             }
 
-
             if (
               /^\d+$/.test(clean)
             ) {
               continue;
             }
 
-
             if (
               /^\d{4}$/.test(clean)
             ) {
               continue;
             }
-
 
             if (
               clean.length < 2 ||
@@ -862,14 +760,12 @@
               continue;
             }
 
-
             if (
               /\svs\s/i.test(clean) ||
               /-vs-/i.test(clean)
             ) {
               continue;
             }
-
 
             if (
               clean === "SuccessR" ||
@@ -878,14 +774,11 @@
               continue;
             }
 
-
             competitionName =
               clean;
 
-
             competitionLogo =
               localLogo;
-
 
             break;
 
@@ -948,7 +841,6 @@
 
     let title = "";
 
-
     for (
       const x of strings
     ) {
@@ -958,11 +850,9 @@
           x.text
         );
 
-
       if (!s) {
         continue;
       }
-
 
       if (
         /\svs\s/i.test(s)
@@ -982,7 +872,6 @@
       }
 
     }
-
 
     return title;
 
@@ -1004,7 +893,6 @@
       const s =
         x.text.trim();
 
-
       if (
         /^[a-z0-9-]+-vs-[a-z0-9-]+$/i.test(s)
       ) {
@@ -1014,7 +902,6 @@
       }
 
     }
-
 
     return "";
 
@@ -1031,21 +918,17 @@
   ) {
 
     let home = "";
-
     let away = "";
-
 
     const cleanTitle =
       rbCleanText(
         title
       );
 
-
     const m =
       cleanTitle.match(
         /^(.+?)\s+vs\s+(.+)$/i
       );
-
 
     if (m) {
 
@@ -1053,7 +936,6 @@
         rbCleanText(
           m[1]
         );
-
 
       away =
         rbCleanText(
@@ -1073,7 +955,6 @@
           /-vs-/i
         );
 
-
       if (
         parts.length === 2
       ) {
@@ -1090,7 +971,6 @@
             );
 
         }
-
 
         if (!away) {
 
@@ -1120,7 +1000,7 @@
 
   /* =========================================================
      MATCH DATE
-  ========================================================= */
+     ========================================================= */
 
   function rbGetMatchDate(
     recordBytes
@@ -1130,7 +1010,6 @@
       rbReadFields(
         recordBytes
       );
-
 
     for (
       const f of fields
@@ -1146,13 +1025,10 @@
             f.value
           );
 
-
         if (
           Number.isFinite(n) &&
-          n >
-            1000000000000 &&
-          n <
-            3000000000000
+          n > 1000000000000 &&
+          n < 3000000000000
         ) {
 
           return n;
@@ -1163,7 +1039,6 @@
 
     }
 
-
     return null;
 
   }
@@ -1171,7 +1046,7 @@
 
   /* =========================================================
      BUILD MATCH
-  ========================================================= */
+     ========================================================= */
 
   function rbBuildMatch(
     recordBytes,
@@ -1183,7 +1058,6 @@
       rbGetMatchDate(
         recordBytes
       );
-
 
     if (!matchDate) {
       return null;
@@ -1200,7 +1074,6 @@
       rbFindTitle(
         strings
       );
-
 
     if (!title) {
       return null;
@@ -1223,7 +1096,6 @@
     const home =
       teams.home;
 
-
     const away =
       teams.away;
 
@@ -1236,7 +1108,9 @@
     }
 
 
-    /* TEAM OBJECTS */
+    /* =====================================================
+       TEAM OBJECTS
+    ===================================================== */
 
     const teamObjects =
       rbFindTeamObjects(
@@ -1276,10 +1150,11 @@
     }
 
 
-    /* TEAM LOGOS */
+    /* =====================================================
+       TEAM LOGOS
+    ===================================================== */
 
     let homeLogo = "";
-
     let awayLogo = "";
 
 
@@ -1315,8 +1190,7 @@
 
       if (
         !homeLogo &&
-        nameLower ===
-          homeLower
+        nameLower === homeLower
       ) {
 
         homeLogo =
@@ -1327,8 +1201,7 @@
 
       if (
         !awayLogo &&
-        nameLower ===
-          awayLower
+        nameLower === awayLower
       ) {
 
         awayLogo =
@@ -1360,17 +1233,12 @@
 
 
         if (
-          homeLower.includes(
-            nameLower
-          ) ||
-          nameLower.includes(
-            homeLower
-          )
+          homeLower.includes(nameLower) ||
+          nameLower.includes(homeLower)
         ) {
 
           homeLogo =
             t.logo;
-
 
           break;
 
@@ -1402,22 +1270,16 @@
 
 
         if (
-          awayLower.includes(
-            nameLower
-          ) ||
-          nameLower.includes(
-            awayLower
-          )
+          awayLower.includes(nameLower) ||
+          nameLower.includes(awayLower)
         ) {
 
           if (
-            t.logo !==
-            homeLogo
+            t.logo !== homeLogo
           ) {
 
             awayLogo =
               t.logo;
-
 
             break;
 
@@ -1457,8 +1319,7 @@
       const secondLogo =
         logos.find(
           logo =>
-            logo !==
-            homeLogo
+            logo !== homeLogo
         );
 
 
@@ -1472,7 +1333,9 @@
     }
 
 
-    /* COMPETITION */
+    /* =====================================================
+       COMPETITION
+    ===================================================== */
 
     const competitionData =
       rbFindCompetition(
@@ -1633,18 +1496,12 @@
 
 
   /* =========================================================
-     FORMAT DATE
+     DATE / TIME
   ========================================================= */
 
   function rbDateKey(
     timestamp
   ) {
-
-    const d =
-      new Date(
-        timestamp
-      );
-
 
     return new Intl.DateTimeFormat(
       "en-US",
@@ -1664,24 +1521,16 @@
         day:
           "2-digit"
       }
-    ).format(d);
+    ).format(
+      new Date(timestamp)
+    );
 
   }
 
 
-  /* =========================================================
-     FORMAT TIME
-  ========================================================= */
-
   function rbFormatTime(
     timestamp
   ) {
-
-    const d =
-      new Date(
-        timestamp
-      );
-
 
     return new Intl.DateTimeFormat(
       "en-GB",
@@ -1698,7 +1547,9 @@
         hour12:
           false
       }
-    ).format(d);
+    ).format(
+      new Date(timestamp)
+    );
 
   }
 
@@ -1711,27 +1562,13 @@
     matchDate
   ) {
 
-    const now =
-      Date.now();
-
-
-    const diff =
-      matchDate -
-      now;
-
-
-    /*
-     * API ini adalah endpoint LIVE.
-     * Kalau sudah melewati waktu mulai,
-     * untuk sementara gunakan WAITING
-     * sampai data live/server tersedia.
-     */
-
     if (
-      diff > 0
+      matchDate >
+      Date.now()
     ) {
 
       return {
+
         type:
           "upcoming",
 
@@ -1742,11 +1579,6 @@
 
     }
 
-
-    /*
-     * Jangan tampilkan FINISHED hanya
-     * karena waktu kickoff sudah lewat.
-     */
 
     return {
 
@@ -1798,16 +1630,14 @@
 
     const hours =
       Math.floor(
-        (totalSeconds %
-          86400) /
+        (totalSeconds % 86400) /
         3600
       );
 
 
     const minutes =
       Math.floor(
-        (totalSeconds %
-          3600) /
+        (totalSeconds % 3600) /
         60
       );
 
@@ -1850,7 +1680,7 @@
 
 
   /* =========================================================
-     ESCAPE HTML
+     ESCAPE
   ========================================================= */
 
   function rbEscape(
@@ -1886,7 +1716,7 @@
 
   /* =========================================================
      RENDER
-  ========================================================= */
+     ========================================================= */
 
   function rbRenderSchedule(
     matches
@@ -1905,7 +1735,6 @@
         "color:red;font-weight:bold"
       );
 
-
       return;
 
     }
@@ -1922,22 +1751,17 @@
         </div>
       `;
 
-
       return;
 
     }
 
 
-    let html =
-      "";
-
-
-    let currentDate =
-      "";
+    let html = "";
+    let currentDate = "";
 
 
     matches.forEach(
-      (match, index) => {
+      match => {
 
         const dateKey =
           rbDateKey(
@@ -1955,15 +1779,9 @@
 
 
           html += `
-
             <div class="rbtv-date">
-
-              ${rbEscape(
-                dateKey
-              )}
-
+              ${rbEscape(dateKey)}
             </div>
-
           `;
 
         }
@@ -1998,22 +1816,18 @@
                         match.competitionLogo
                       )}"
                       alt=""
-                      style="
-                        width:18px;
-                        height:18px;
-                        object-fit:contain;
-                        vertical-align:middle;
-                        margin-right:5px;
-                      "
+                      loading="lazy"
                     >
                   `
                   : ""
               }
 
-              ${rbEscape(
-                match.competition ||
-                "Football"
-              )}
+              <span>
+                ${rbEscape(
+                  match.competition ||
+                  "Football"
+                )}
+              </span>
 
             </div>
 
@@ -2050,22 +1864,17 @@
                     : ""
                 }
 
-
                 <span>
-
                   ${rbEscape(
                     match.home
                   )}
-
                 </span>
 
               </div>
 
 
               <div class="rbtv-vs">
-
                 VS
-
               </div>
 
 
@@ -2087,13 +1896,10 @@
                     : ""
                 }
 
-
                 <span>
-
                   ${rbEscape(
                     match.away
                   )}
-
                 </span>
 
               </div>
@@ -2105,9 +1911,7 @@
             <div
               class="rbtv-status ${status.type}"
             >
-
               ${status.label}
-
             </div>
 
 
@@ -2239,7 +2043,6 @@
             countdown;
 
         }
-
         else if (
           countdownElement
         ) {
@@ -2411,27 +2214,25 @@
       );
 
 
+      /* GLOBAL */
+
+      window.RBTV_MATCHES =
+        matches;
+
+
       console.log(
         "%c[RBTV MATCHES]",
         "color:#00d979;font-weight:bold"
       );
-
 
       console.log(
         "TOTAL:",
         matches.length
       );
 
-
       console.log(
         matches
       );
-
-
-      /* GLOBAL */
-
-      window.RBTV_MATCHES =
-        matches;
 
 
       /* RENDER */
@@ -2442,7 +2243,7 @@
 
 
       console.log(
-        "%c[RBTV] window.RBTV_MATCHES READY",
+        "%c[RBTV] SCHEDULE RENDERED TO #rbtvSchedule",
         "color:#00d979;font-weight:bold"
       );
 
@@ -2491,11 +2292,6 @@
 
     }
 
-
-    /*
-     * Blogger kadang menjalankan script
-     * ketika tab belum selesai dibuat.
-     */
 
     let attempts = 0;
 
@@ -2550,6 +2346,10 @@
   }
 
 
+  /* =========================================================
+     START SCRIPT
+  ========================================================= */
+
   rbStart();
 
 
@@ -2564,4 +2364,3 @@
 
 
 })();
-```
