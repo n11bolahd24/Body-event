@@ -1,7 +1,9 @@
+```javascript
 /*!
  * RBTV+ Auto Schedule
  * N11BOLAHD
  * SCHEDULE / API DECODER + RENDER
+ * LOGO FIX 31.2
  */
 
 (function () {
@@ -9,7 +11,7 @@
   "use strict";
 
   console.log(
-    "%c[RBTV SCHEDULE 31.1] START",
+    "%c[RBTV SCHEDULE 31.2] START",
     "color:#00d979;font-weight:bold"
   );
 
@@ -334,29 +336,62 @@
   }
 
 
+  /*
+   * Logo dari API tidak selalu mempunyai
+   * /football/team/ pada URL.
+   *
+   * Karena itu kita gunakan beberapa pola
+   * sekaligus.
+   */
+
   function rbIsTeamLogo(str) {
 
-  if (!rbLooksLikeUrl(str)) {
-    return false;
+    if (!rbLooksLikeUrl(str)) {
+      return false;
+    }
+
+    const s =
+      str.toLowerCase();
+
+    return (
+
+      /\/football\/team\//i.test(s) ||
+
+      /\/football\/teams\//i.test(s) ||
+
+      /\/team\//i.test(s) ||
+
+      /\/teams\//i.test(s) ||
+
+      /\/team[^/]*\/image/i.test(s) ||
+
+      /\/teams?\/[^/]+\/image/i.test(s) ||
+
+      /\/football\/.*\/image/i.test(s) ||
+
+      /team.*image/i.test(s) ||
+
+      /team.*logo/i.test(s) ||
+
+      /logo.*team/i.test(s) ||
+
+      /\.(png|jpg|jpeg|webp|svg)(\?.*)?$/i.test(s)
+
+    );
+
   }
-
-  return (
-    /\/football\/team\//i.test(str) ||
-    /\/team\//i.test(str) ||
-    /\/teams\//i.test(str) ||
-    /\/football\/.*\/image/i.test(str) ||
-    /\/team.*image/i.test(str) ||
-    /\.(png|jpg|jpeg|webp)(\?.*)?$/i.test(str)
-  );
-
-}
 
 
   function rbIsCompetitionLogo(str) {
 
     return (
       rbLooksLikeUrl(str) &&
-      /\/football\/competition\//i.test(str)
+      (
+        /\/football\/competition\//i.test(str) ||
+        /\/football\/competitions\//i.test(str) ||
+        /competition.*logo/i.test(str) ||
+        /logo.*competition/i.test(str)
+      )
     );
 
   }
@@ -440,6 +475,72 @@
 
 
   /* =========================================================
+     FIND ALL POSSIBLE LOGO URLS
+     ========================================================= */
+
+  function rbCollectLogoUrls(
+    buf,
+    depth = 0,
+    result = []
+  ) {
+
+    if (
+      !buf ||
+      depth > 12
+    ) {
+      return result;
+    }
+
+    const fields =
+      rbReadFields(buf);
+
+    for (
+      const f of fields
+    ) {
+
+      if (
+        f.wireType !== 2
+      ) {
+        continue;
+      }
+
+      const bytes =
+        f.value;
+
+      const str =
+        rbBytesToString(
+          bytes
+        ).trim();
+
+      if (
+        rbLooksLikeUrl(str) &&
+        rbIsTeamLogo(str)
+      ) {
+
+        if (
+          !result.includes(str)
+        ) {
+
+          result.push(str);
+
+        }
+
+      }
+
+      rbCollectLogoUrls(
+        bytes,
+        depth + 1,
+        result
+      );
+
+    }
+
+    return result;
+
+  }
+
+
+  /* =========================================================
      FIND TEAM OBJECTS
   ========================================================= */
 
@@ -451,7 +552,7 @@
 
     if (
       !buf ||
-      depth > 8
+      depth > 10
     ) {
       return result;
     }
@@ -504,6 +605,10 @@
     }
 
 
+    /*
+     * Cari URL logo dari object ini.
+     */
+
     const directLogo =
       directStrings.find(
         x =>
@@ -532,9 +637,7 @@
         }
 
         if (
-          rbLooksLikeUrl(
-            clean
-          )
+          rbLooksLikeUrl(clean)
         ) {
           continue;
         }
@@ -583,6 +686,14 @@
         possibleNames.length
       ) {
 
+        /*
+         * Ambil nama yang paling masuk akal.
+         *
+         * Kita tetap mempertahankan
+         * nama terakhir sebagai fallback
+         * dari versi sebelumnya.
+         */
+
         result.push({
 
           name:
@@ -601,6 +712,10 @@
 
     }
 
+
+    /*
+     * Rekursif ke object berikutnya.
+     */
 
     for (
       const f of fields
@@ -742,9 +857,7 @@
             }
 
             if (
-              rbLooksLikeUrl(
-                clean
-              )
+              rbLooksLikeUrl(clean)
             ) {
               continue;
             }
@@ -1116,6 +1229,16 @@
     }
 
 
+    console.log(
+      "%c[RBTV TEAM NAMES]",
+      "color:#00d9ff;font-weight:bold",
+      {
+        home,
+        away
+      }
+    );
+
+
     /* =====================================================
        TEAM OBJECTS
     ===================================================== */
@@ -1124,6 +1247,30 @@
       rbFindTeamObjects(
         recordBytes
       );
+
+
+    console.log(
+      "%c[RBTV TEAM OBJECTS]",
+      "color:#ffcc00;font-weight:bold",
+      teamObjects
+    );
+
+
+    /* =====================================================
+       ALL POSSIBLE LOGOS
+    ===================================================== */
+
+    const allLogoUrls =
+      rbCollectLogoUrls(
+        recordBytes
+      );
+
+
+    console.log(
+      "%c[RBTV ALL LOGO URLS]",
+      "color:#ff9900;font-weight:bold",
+      allLogoUrls
+    );
 
 
     const uniqueTeams =
@@ -1178,7 +1325,9 @@
         .trim();
 
 
-    /* EXACT */
+    /* =====================================================
+       EXACT NAME
+    ===================================================== */
 
     for (
       const t of uniqueTeams
@@ -1220,7 +1369,9 @@
     }
 
 
-    /* PARTIAL HOME */
+    /* =====================================================
+       PARTIAL NAME
+    ===================================================== */
 
     if (!homeLogo) {
 
@@ -1241,8 +1392,11 @@
 
 
         if (
-          homeLower.includes(nameLower) ||
-          nameLower.includes(homeLower)
+          nameLower.length >= 3 &&
+          (
+            homeLower.includes(nameLower) ||
+            nameLower.includes(homeLower)
+          )
         ) {
 
           homeLogo =
@@ -1256,8 +1410,6 @@
 
     }
 
-
-    /* PARTIAL AWAY */
 
     if (!awayLogo) {
 
@@ -1278,8 +1430,11 @@
 
 
         if (
-          awayLower.includes(nameLower) ||
-          nameLower.includes(awayLower)
+          nameLower.length >= 3 &&
+          (
+            awayLower.includes(nameLower) ||
+            nameLower.includes(awayLower)
+          )
         ) {
 
           if (
@@ -1300,32 +1455,66 @@
     }
 
 
-    /* FALLBACK */
-
-    const logos =
-      uniqueTeams
-        .map(
-          x =>
-            x.logo
-        )
-        .filter(Boolean);
-
+    /* =====================================================
+       FALLBACK 1
+       TEAM OBJECT ORDER
+    ===================================================== */
 
     if (
       !homeLogo &&
-      logos[0]
+      uniqueTeams[0]
     ) {
 
       homeLogo =
-        logos[0];
+        uniqueTeams[0].logo;
 
     }
 
 
-    if (!awayLogo) {
+    if (
+      !awayLogo &&
+      uniqueTeams.length > 1
+    ) {
+
+      const fallbackAway =
+        uniqueTeams.find(
+          t =>
+            t.logo !== homeLogo
+        );
+
+
+      if (fallbackAway) {
+
+        awayLogo =
+          fallbackAway.logo;
+
+      }
+
+    }
+
+
+    /* =====================================================
+       FALLBACK 2
+       ALL LOGO URLS
+    ===================================================== */
+
+    if (
+      !homeLogo &&
+      allLogoUrls[0]
+    ) {
+
+      homeLogo =
+        allLogoUrls[0];
+
+    }
+
+
+    if (
+      !awayLogo
+    ) {
 
       const secondLogo =
-        logos.find(
+        allLogoUrls.find(
           logo =>
             logo !== homeLogo
         );
@@ -1339,6 +1528,22 @@
       }
 
     }
+
+
+    /* =====================================================
+       FINAL LOGO DEBUG
+    ===================================================== */
+
+    console.log(
+      "%c[RBTV LOGOS]",
+      "color:#ff00ff;font-weight:bold",
+      {
+        home,
+        away,
+        homeLogo,
+        awayLogo
+      }
+    );
 
 
     /* =====================================================
@@ -1828,6 +2033,7 @@
                       )}"
                       alt=""
                       loading="lazy"
+                      onerror="this.style.display='none'"
                     >
                   `
                   : ""
@@ -1863,11 +2069,23 @@
                   match.homeLogo
                     ? `
                       <img
-  src="${rbEscape(match.homeLogo)}"
-  alt="${rbEscape(match.home)}"
-  loading="lazy"
-  onerror="this.style.display='none'"
->
+                        src="${rbEscape(
+                          match.homeLogo
+                        )}"
+                        alt="${rbEscape(
+                          match.home
+                        )}"
+                        loading="eager"
+                        decoding="async"
+                        referrerpolicy="no-referrer"
+                        onerror="
+                          console.error(
+                            '[RBTV HOME LOGO ERROR]',
+                            this.src
+                          );
+                          this.style.display='none';
+                        "
+                      >
                     `
                     : ""
                 }
@@ -1898,7 +2116,16 @@
                         alt="${rbEscape(
                           match.away
                         )}"
-                        loading="lazy"
+                        loading="eager"
+                        decoding="async"
+                        referrerpolicy="no-referrer"
+                        onerror="
+                          console.error(
+                            '[RBTV AWAY LOGO ERROR]',
+                            this.src
+                          );
+                          this.style.display='none';
+                        "
                       >
                     `
                     : ""
@@ -2373,3 +2600,4 @@
 
 
 })();
+```
