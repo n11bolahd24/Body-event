@@ -9,7 +9,7 @@
   "use strict";
 
   console.log(
-    "%c[RBTV SCHEDULE 31] START",
+    "%c[RBTV SCHEDULE 31.1] START",
     "color:#00d979;font-weight:bold"
   );
 
@@ -433,7 +433,7 @@
 
   /* =========================================================
      FIND TEAM OBJECTS
-     ========================================================= */
+  ========================================================= */
 
   function rbFindTeamObjects(
     buf,
@@ -1000,7 +1000,7 @@
 
   /* =========================================================
      MATCH DATE
-     ========================================================= */
+  ========================================================= */
 
   function rbGetMatchDate(
     recordBytes
@@ -1046,7 +1046,7 @@
 
   /* =========================================================
      BUILD MATCH
-     ========================================================= */
+  ========================================================= */
 
   function rbBuildMatch(
     recordBytes,
@@ -1559,18 +1559,28 @@
   ========================================================= */
 
   function rbGetStatus(
-  matchDate
-) {
+    matchDate
+  ) {
 
-  return {
-    type:
-      "upcoming",
+    const now =
+      Date.now();
 
-    label:
-      "UPCOMING"
-  };
 
-}
+    if (
+      matchDate > now
+    ) {
+
+      return {
+
+        type:
+          "upcoming",
+
+        label:
+          "UPCOMING"
+
+      };
+
+    }
 
 
     return {
@@ -1709,7 +1719,7 @@
 
   /* =========================================================
      RENDER
-     ========================================================= */
+  ========================================================= */
 
   function rbRenderSchedule(
     matches
@@ -1970,42 +1980,15 @@
         }
 
 
-        const status =
-          rbGetStatus(
+        const countdown =
+          rbCountdown(
             timestamp
           );
-
-
-        const statusElement =
-          item.querySelector(
-            ".rbtv-status"
-          );
-
-
-        if (
-          statusElement
-        ) {
-
-          statusElement.className =
-            "rbtv-status " +
-            status.type;
-
-
-          statusElement.textContent =
-            status.label;
-
-        }
 
 
         let countdownElement =
           item.querySelector(
             ".rbtv-countdown"
-          );
-
-
-        const countdown =
-          rbCountdown(
-            timestamp
           );
 
 
@@ -2160,47 +2143,50 @@
 
 
       for (
-  const record of records
-) {
+        const record of records
+      ) {
 
-  const match =
-    rbBuildMatch(
-      record.payload,
-      record.start,
-      record.length
-    );
-
-
-  if (!match) {
-    continue;
-  }
+        const match =
+          rbBuildMatch(
+            record.payload,
+            record.start,
+            record.length
+          );
 
 
-  /*
-   * HANYA TAMPILKAN MATCH
-   * YANG BELUM DIMULAI.
-   *
-   * Kalau waktu kick-off sudah lewat,
-   * match tidak dimasukkan ke schedule.
-   */
-
-  if (
-    match.matchDate <= Date.now()
-  ) {
-
-    continue;
-
-  }
+        if (!match) {
+          continue;
+        }
 
 
-  matches.push(
-    match
-  );
+        /*
+         * HANYA TAMPILKAN MATCH
+         * YANG BELUM DIMULAI.
+         *
+         * Match yang waktu kick-off
+         * sudah lewat tidak ditampilkan.
+         */
 
-}
+        if (
+          match.matchDate <=
+          Date.now()
+        ) {
+
+          continue;
+
+        }
 
 
-      /* SORT */
+        matches.push(
+          match
+        );
+
+      }
+
+
+      /* =====================================================
+         SORT
+      ===================================================== */
 
       matches.sort(
         (a, b) =>
@@ -2209,7 +2195,9 @@
       );
 
 
-      /* NUMBER */
+      /* =====================================================
+         NUMBER
+      ===================================================== */
 
       matches.forEach(
         (
@@ -2224,7 +2212,9 @@
       );
 
 
-      /* GLOBAL */
+      /* =====================================================
+         GLOBAL
+      ===================================================== */
 
       window.RBTV_MATCHES =
         matches;
@@ -2235,17 +2225,21 @@
         "color:#00d979;font-weight:bold"
       );
 
+
       console.log(
         "TOTAL:",
         matches.length
       );
+
 
       console.log(
         matches
       );
 
 
-      /* RENDER */
+      /* =====================================================
+         RENDER
+      ===================================================== */
 
       rbRenderSchedule(
         matches
