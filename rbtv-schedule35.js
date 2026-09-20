@@ -1855,14 +1855,11 @@
                   match.homeLogo
                     ? `
                       <img
-                        src="${rbEscape(
-                          match.homeLogo
-                        )}"
-                        alt="${rbEscape(
-                          match.home
-                        )}"
-                        loading="lazy"
-                      >
+  src="${rbEscape(match.homeLogo)}"
+  alt="${rbEscape(match.home)}"
+  loading="lazy"
+  onerror="this.style.display='none'"
+>
                     `
                     : ""
                 }
