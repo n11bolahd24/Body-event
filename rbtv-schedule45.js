@@ -1,10 +1,9 @@
-
 /*!
  * RBTV+ Auto Schedule
  * N11BOLAHD
  * SCHEDULE / API DECODER + RENDER
  * LOGO FIX 31.5
- * NESTED API STATUS FIELD DEBUG
+ * STATUS DETECTOR SAFE
  */
 
 (function () {
@@ -12,7 +11,7 @@
   "use strict";
 
   console.log(
-    "%c[RBTV SCHEDULE 31.5] START",
+    "%c[RBTV SCHEDULE 32] START",
     "color:#00d979;font-weight:bold"
   );
 
@@ -69,6 +68,7 @@
   function rbReadFields(buf) {
 
     const fields = [];
+
     let p = 0;
 
     while (p < buf.length) {
@@ -92,7 +92,9 @@
       if (!fieldNo) break;
 
       let value = null;
+
       const start = p;
+
       let end = p;
 
       try {
@@ -104,9 +106,14 @@
 
           if (!v) break;
 
-          value = v.value;
-          p = v.next;
-          end = p;
+          value =
+            v.value;
+
+          p =
+            v.next;
+
+          end =
+            p;
 
         }
 
@@ -115,10 +122,15 @@
           if (p + 8 > buf.length) break;
 
           value =
-            buf.slice(p, p + 8);
+            buf.slice(
+              p,
+              p + 8
+            );
 
           p += 8;
-          end = p;
+
+          end =
+            p;
 
         }
 
@@ -129,10 +141,13 @@
 
           if (!lenInfo) break;
 
-          p = lenInfo.next;
+          p =
+            lenInfo.next;
 
           const len =
-            Number(lenInfo.value);
+            Number(
+              lenInfo.value
+            );
 
           if (
             !Number.isFinite(len) ||
@@ -143,10 +158,15 @@
           }
 
           value =
-            buf.slice(p, p + len);
+            buf.slice(
+              p,
+              p + len
+            );
 
           p += len;
-          end = p;
+
+          end =
+            p;
 
         }
 
@@ -155,10 +175,15 @@
           if (p + 4 > buf.length) break;
 
           value =
-            buf.slice(p, p + 4);
+            buf.slice(
+              p,
+              p + 4
+            );
 
           p += 4;
-          end = p;
+
+          end =
+            p;
 
         }
 
@@ -169,14 +194,18 @@
         }
 
         fields.push({
+
           fieldNo,
           wireType,
           value,
           start,
           end
+
         });
 
-      } catch (e) {
+      }
+
+      catch (e) {
 
         break;
 
@@ -195,10 +224,14 @@
 
       return new TextDecoder(
         "utf-8",
-        { fatal: false }
+        {
+          fatal: false
+        }
       ).decode(bytes);
 
-    } catch (e) {
+    }
+
+    catch (e) {
 
       return "";
 
@@ -213,15 +246,26 @@
 
   function rbCleanText(str) {
 
-    if (typeof str !== "string") {
+    if (
+      typeof str !== "string"
+    ) {
       return "";
     }
 
     let s =
       str
-        .replace(/^\uFEFF/, "")
-        .replace(/[\u200B-\u200D\u2060]/g, "")
-        .replace(/[\x00-\x1F\x7F]/g, "")
+        .replace(
+          /^\uFEFF/,
+          ""
+        )
+        .replace(
+          /[\u200B-\u200D\u2060]/g,
+          ""
+        )
+        .replace(
+          /[\x00-\x1F\x7F]/g,
+          ""
+        )
         .trim();
 
     s =
@@ -263,7 +307,9 @@
 
   function rbIsTeamLogo(str) {
 
-    if (!rbLooksLikeUrl(str)) {
+    if (
+      !rbLooksLikeUrl(str)
+    ) {
       return false;
     }
 
@@ -271,17 +317,29 @@
       str.toLowerCase();
 
     return (
+
       /\/football\/team\//i.test(s) ||
+
       /\/football\/teams\//i.test(s) ||
+
       /\/team\//i.test(s) ||
+
       /\/teams\//i.test(s) ||
+
       /\/team[^/]*\/image/i.test(s) ||
+
       /\/teams?\/[^/]+\/image/i.test(s) ||
+
       /\/football\/.*\/image/i.test(s) ||
+
       /team.*image/i.test(s) ||
+
       /team.*logo/i.test(s) ||
+
       /logo.*team/i.test(s) ||
+
       /\.(png|jpg|jpeg|webp|svg)(\?.*)?$/i.test(s)
+
     );
 
   }
@@ -290,13 +348,21 @@
   function rbIsCompetitionLogo(str) {
 
     return (
+
       rbLooksLikeUrl(str) &&
+
       (
+
         /\/football\/competition\//i.test(str) ||
+
         /\/football\/competitions\//i.test(str) ||
+
         /competition.*logo/i.test(str) ||
+
         /logo.*competition/i.test(str)
+
       )
+
     );
 
   }
@@ -312,23 +378,33 @@
     result = []
   ) {
 
-    if (!buf || depth > 10) {
+    if (
+      !buf ||
+      depth > 10
+    ) {
       return result;
     }
 
     const fields =
       rbReadFields(buf);
 
-    for (const f of fields) {
+    for (
+      const f of fields
+    ) {
 
-      if (f.wireType !== 2) {
+      if (
+        f.wireType !== 2
+      ) {
         continue;
       }
 
-      const bytes = f.value;
+      const bytes =
+        f.value;
 
       const str =
-        rbBytesToString(bytes);
+        rbBytesToString(
+          bytes
+        );
 
       if (str) {
 
@@ -337,13 +413,21 @@
 
         if (
           clean &&
-          !clean.includes("\u0000")
+          !clean.includes(
+            "\u0000"
+          )
         ) {
 
           result.push({
-            field: f.fieldNo,
-            text: clean,
+
+            field:
+              f.fieldNo,
+
+            text:
+              clean,
+
             bytes
+
           });
 
         }
@@ -373,31 +457,47 @@
     result = []
   ) {
 
-    if (!buf || depth > 12) {
+    if (
+      !buf ||
+      depth > 12
+    ) {
       return result;
     }
 
     const fields =
       rbReadFields(buf);
 
-    for (const f of fields) {
+    for (
+      const f of fields
+    ) {
 
-      if (f.wireType !== 2) {
+      if (
+        f.wireType !== 2
+      ) {
         continue;
       }
 
-      const bytes = f.value;
+      const bytes =
+        f.value;
 
       const str =
-        rbBytesToString(bytes).trim();
+        rbBytesToString(
+          bytes
+        ).trim();
 
       if (
         rbLooksLikeUrl(str) &&
         rbIsTeamLogo(str)
       ) {
 
-        if (!result.includes(str)) {
-          result.push(str);
+        if (
+          !result.includes(str)
+        ) {
+
+          result.push(
+            str
+          );
+
         }
 
       }
@@ -425,7 +525,10 @@
     result = []
   ) {
 
-    if (!buf || depth > 10) {
+    if (
+      !buf ||
+      depth > 10
+    ) {
       return result;
     }
 
@@ -434,14 +537,20 @@
 
     const directStrings = [];
 
-    for (const f of fields) {
+    for (
+      const f of fields
+    ) {
 
-      if (f.wireType !== 2) {
+      if (
+        f.wireType !== 2
+      ) {
         continue;
       }
 
       const text =
-        rbBytesToString(f.value);
+        rbBytesToString(
+          f.value
+        );
 
       if (!text) {
         continue;
@@ -455,58 +564,105 @@
       }
 
       directStrings.push({
-        field: f.fieldNo,
-        text: clean,
-        bytes: f.value
+
+        field:
+          f.fieldNo,
+
+        text:
+          clean,
+
+        bytes:
+          f.value
+
       });
 
     }
 
     const directLogo =
       directStrings.find(
-        x => rbIsTeamLogo(x.text)
+        x =>
+          rbIsTeamLogo(
+            x.text
+          )
       );
 
     if (directLogo) {
 
       const possibleNames = [];
 
-      for (const x of directStrings) {
+      for (
+        const x of directStrings
+      ) {
 
         const clean =
-          rbCleanText(x.text);
+          rbCleanText(
+            x.text
+          );
 
         if (!clean) continue;
-        if (rbLooksLikeUrl(clean)) continue;
-        if (/^\d+$/.test(clean)) continue;
-        if (/^\d{4}$/.test(clean)) continue;
-        if (clean.length < 2 || clean.length > 120) continue;
-        if (/\svs\s/i.test(clean) || /-vs-/i.test(clean)) continue;
-        if (clean === "SuccessR" || clean === "def") continue;
 
-        possibleNames.push(clean);
+        if (
+          rbLooksLikeUrl(clean)
+        ) continue;
+
+        if (
+          /^\d+$/.test(clean)
+        ) continue;
+
+        if (
+          /^\d{4}$/.test(clean)
+        ) continue;
+
+        if (
+          clean.length < 2 ||
+          clean.length > 120
+        ) continue;
+
+        if (
+          /\svs\s/i.test(clean) ||
+          /-vs-/i.test(clean)
+        ) continue;
+
+        if (
+          clean === "SuccessR" ||
+          clean === "def"
+        ) continue;
+
+        possibleNames.push(
+          clean
+        );
 
       }
 
-      if (possibleNames.length) {
+      if (
+        possibleNames.length
+      ) {
 
         result.push({
+
           name:
             possibleNames[
               possibleNames.length - 1
             ],
+
           logo:
             directLogo.text,
+
           depth
+
         });
 
       }
 
     }
 
-    for (const f of fields) {
+    for (
+      const f of fields
+    ) {
 
-      if (f.wireType !== 2) {
+      if (
+        f.wireType !== 2
+      ) {
         continue;
       }
 
@@ -527,12 +683,20 @@
      FIND COMPETITION
   ========================================================= */
 
-  function rbFindCompetition(buf) {
+  function rbFindCompetition(
+    buf
+  ) {
 
-    let competitionName = "";
-    let competitionLogo = "";
+    let competitionName =
+      "";
 
-    function walk(current, depth) {
+    let competitionLogo =
+      "";
+
+    function walk(
+      current,
+      depth
+    ) {
 
       if (
         !current ||
@@ -543,65 +707,123 @@
       }
 
       const fields =
-        rbReadFields(current);
+        rbReadFields(
+          current
+        );
 
-      for (const f of fields) {
+      for (
+        const f of fields
+      ) {
 
-        if (f.wireType !== 2) {
+        if (
+          f.wireType !== 2
+        ) {
           continue;
         }
 
-        const nested = f.value;
+        const nested =
+          f.value;
 
         const localFields =
-          rbReadFields(nested);
+          rbReadFields(
+            nested
+          );
 
-        let localLogo = "";
-        const localStrings = [];
+        let localLogo =
+          "";
 
-        for (const nf of localFields) {
+        const localStrings =
+          [];
 
-          if (nf.wireType !== 2) {
+        for (
+          const nf of localFields
+        ) {
+
+          if (
+            nf.wireType !== 2
+          ) {
             continue;
           }
 
           const s =
-            rbBytesToString(nf.value);
+            rbBytesToString(
+              nf.value
+            );
 
           if (!s) {
             continue;
           }
 
           localStrings.push({
-            field: nf.fieldNo,
-            text: s.trim()
+
+            field:
+              nf.fieldNo,
+
+            text:
+              s.trim()
+
           });
 
           if (
-            rbIsCompetitionLogo(s.trim())
+            rbIsCompetitionLogo(
+              s.trim()
+            )
           ) {
-            localLogo = s.trim();
+
+            localLogo =
+              s.trim();
+
           }
 
         }
 
         if (localLogo) {
 
-          for (const x of localStrings) {
+          for (
+            const x of localStrings
+          ) {
 
             const clean =
-              rbCleanText(x.text);
+              rbCleanText(
+                x.text
+              );
 
             if (!clean) continue;
-            if (rbLooksLikeUrl(clean)) continue;
-            if (/^\d+$/.test(clean)) continue;
-            if (/^\d{4}$/.test(clean)) continue;
-            if (clean.length < 2 || clean.length > 100) continue;
-            if (/\svs\s/i.test(clean) || /-vs-/i.test(clean)) continue;
-            if (clean === "SuccessR" || clean === "def") continue;
 
-            competitionName = clean;
-            competitionLogo = localLogo;
+            if (
+              rbLooksLikeUrl(
+                clean
+              )
+            ) continue;
+
+            if (
+              /^\d+$/.test(clean)
+            ) continue;
+
+            if (
+              /^\d{4}$/.test(clean)
+            ) continue;
+
+            if (
+              clean.length < 2 ||
+              clean.length > 100
+            ) continue;
+
+            if (
+              /\svs\s/i.test(clean) ||
+              /-vs-/i.test(clean)
+            ) continue;
+
+            if (
+              clean === "SuccessR" ||
+              clean === "def"
+            ) continue;
+
+            competitionName =
+              clean;
+
+            competitionLogo =
+              localLogo;
 
             break;
 
@@ -609,11 +831,20 @@
 
         }
 
-        if (!competitionName) {
-          walk(nested, depth + 1);
+        if (
+          !competitionName
+        ) {
+
+          walk(
+            nested,
+            depth + 1
+          );
+
         }
 
-        if (competitionName) {
+        if (
+          competitionName
+        ) {
           return;
         }
 
@@ -621,13 +852,21 @@
 
     }
 
-    walk(buf, 0);
+    walk(
+      buf,
+      0
+    );
 
     return {
+
       name:
-        rbCleanText(competitionName),
+        rbCleanText(
+          competitionName
+        ),
+
       logo:
         competitionLogo
+
     };
 
   }
@@ -637,24 +876,36 @@
      FIND TITLE
   ========================================================= */
 
-  function rbFindTitle(strings) {
+  function rbFindTitle(
+    strings
+  ) {
 
-    let title = "";
+    let title =
+      "";
 
-    for (const x of strings) {
+    for (
+      const x of strings
+    ) {
 
       const s =
-        rbCleanText(x.text);
+        rbCleanText(
+          x.text
+        );
 
       if (!s) continue;
 
-      if (/\svs\s/i.test(s)) {
+      if (
+        /\svs\s/i.test(s)
+      ) {
 
         if (
           s.length > title.length &&
           s.length < 250
         ) {
-          title = s;
+
+          title =
+            s;
+
         }
 
       }
@@ -670,9 +921,13 @@
      FIND SLUG
   ========================================================= */
 
-  function rbFindSlug(strings) {
+  function rbFindSlug(
+    strings
+  ) {
 
-    for (const x of strings) {
+    for (
+      const x of strings
+    ) {
 
       const s =
         x.text.trim();
@@ -680,7 +935,9 @@
       if (
         /^[a-z0-9-]+-vs-[a-z0-9-]+$/i.test(s)
       ) {
+
         return s;
+
       }
 
     }
@@ -694,13 +951,21 @@
      SPLIT TEAMS
   ========================================================= */
 
-  function rbSplitTeams(title, slug) {
+  function rbSplitTeams(
+    title,
+    slug
+  ) {
 
-    let home = "";
-    let away = "";
+    let home =
+      "";
+
+    let away =
+      "";
 
     const cleanTitle =
-      rbCleanText(title);
+      rbCleanText(
+        title
+      );
 
     const m =
       cleanTitle.match(
@@ -709,30 +974,56 @@
 
     if (m) {
 
-      home = rbCleanText(m[1]);
-      away = rbCleanText(m[2]);
+      home =
+        rbCleanText(
+          m[1]
+        );
+
+      away =
+        rbCleanText(
+          m[2]
+        );
 
     }
 
-    if ((!home || !away) && slug) {
+    if (
+      (!home || !away) &&
+      slug
+    ) {
 
       const parts =
-        slug.split(/-vs-/i);
+        slug.split(
+          /-vs-/i
+        );
 
-      if (parts.length === 2) {
+      if (
+        parts.length === 2
+      ) {
 
         if (!home) {
+
           home =
             rbCleanText(
-              parts[0].replace(/-/g, " ")
+              parts[0]
+                .replace(
+                  /-/g,
+                  " "
+                )
             );
+
         }
 
         if (!away) {
+
           away =
             rbCleanText(
-              parts[1].replace(/-/g, " ")
+              parts[1]
+                .replace(
+                  /-/g,
+                  " "
+                )
             );
+
         }
 
       }
@@ -740,8 +1031,10 @@
     }
 
     return {
+
       home,
       away
+
     };
 
   }
@@ -751,12 +1044,18 @@
      MATCH DATE
   ========================================================= */
 
-  function rbGetMatchDate(recordBytes) {
+  function rbGetMatchDate(
+    recordBytes
+  ) {
 
     const fields =
-      rbReadFields(recordBytes);
+      rbReadFields(
+        recordBytes
+      );
 
-    for (const f of fields) {
+    for (
+      const f of fields
+    ) {
 
       if (
         f.fieldNo === 3 &&
@@ -764,14 +1063,18 @@
       ) {
 
         const n =
-          Number(f.value);
+          Number(
+            f.value
+          );
 
         if (
           Number.isFinite(n) &&
           n > 1000000000000 &&
           n < 3000000000000
         ) {
+
           return n;
+
         }
 
       }
@@ -784,22 +1087,25 @@
 
 
   /* =========================================================
-     NESTED STATUS FIELD DEBUG 31.5
+     STATUS FIELD SCAN
+     SAFE VERSION
   ========================================================= */
 
-  function rbDebugStatusFields(
+  function rbScanStatusFields(
     recordBytes,
     title,
     matchDate
   ) {
 
     const result = [];
+
     const candidates = [];
 
     const MAX_DEPTH = 8;
 
     console.group(
-      "%c[RBTV STATUS FIELD] " + title,
+      "%c[RBTV STATUS FIELD] " +
+      title,
       "color:#ff6600;font-weight:bold"
     );
 
@@ -811,7 +1117,9 @@
     console.log(
       "DATE ISO:",
       matchDate
-        ? new Date(matchDate).toISOString()
+        ? new Date(
+            matchDate
+          ).toISOString()
         : null
     );
 
@@ -822,18 +1130,17 @@
 
     console.log(
       "NOW ISO:",
-      new Date(Date.now()).toISOString()
+      new Date(
+        Date.now()
+      ).toISOString()
     );
 
-
-    /* =====================================================
-       RECURSIVE WALK
-    ===================================================== */
 
     function walk(
       buffer,
       parentPath,
-      depth
+      depth,
+      context
     ) {
 
       if (
@@ -848,16 +1155,13 @@
       try {
 
         fields =
-          rbReadFields(buffer);
+          rbReadFields(
+            buffer
+          );
 
-      } catch (e) {
+      }
 
-        console.log(
-          "%c[RBTV NESTED PARSE ERROR]",
-          "color:red",
-          parentPath,
-          e
-        );
+      catch (e) {
 
         return;
 
@@ -872,14 +1176,19 @@
 
 
       fields.forEach(
-        (f, index) => {
+        (
+          f,
+          index
+        ) => {
 
           const fieldPath =
             parentPath
               ? parentPath +
                 "." +
                 f.fieldNo
-              : String(f.fieldNo);
+              : String(
+                  f.fieldNo
+                );
 
 
           /* =============================================
@@ -891,7 +1200,9 @@
           ) {
 
             const numericValue =
-              Number(f.value);
+              Number(
+                f.value
+              );
 
             const possibleTimestamp =
               Number.isFinite(
@@ -910,6 +1221,23 @@
               numericValue <= 20;
 
 
+            /*
+             * IMPORTANT
+             *
+             * Jangan menganggap semua
+             * nilai 1 sebagai STATUS.
+             *
+             * Field seperti:
+             *
+             * 10.2
+             * 30.1
+             * 30.10.2
+             * 150.30.13
+             *
+             * juga muncul pada metadata
+             * kompetisi / team / object.
+             */
+
             const item = {
 
               index,
@@ -927,19 +1255,30 @@
                 numericValue,
 
               raw:
-                String(f.value),
+                String(
+                  f.value
+                ),
 
               possibleTimestamp,
 
-              possibleSmallEnum
+              possibleSmallEnum,
+
+              depth,
+
+              context:
+                context || "unknown"
 
             };
 
 
-            result.push(item);
+            result.push(
+              item
+            );
 
 
-            let marker = "";
+            let marker =
+              "";
+
 
             if (
               possibleTimestamp
@@ -949,12 +1288,37 @@
                 " ← POSSIBLE TIMESTAMP";
 
             }
-            else if (
-              possibleSmallEnum
+
+
+            /*
+             * Candidate hanya dicatat
+             * untuk struktur yang masuk
+             * akal sebagai match-level.
+             *
+             * Kita sengaja tidak memakai
+             * field team 30.x sebagai
+             * status.
+             */
+
+            const isRoot =
+              depth === 0;
+
+            const isMatchMeta =
+              parentPath === "150" ||
+              parentPath === "22" ||
+              parentPath === "90";
+
+
+            if (
+              possibleSmallEnum &&
+              (
+                isRoot ||
+                isMatchMeta
+              )
             ) {
 
-              marker =
-                " ← SMALL ENUM / STATUS CANDIDATE";
+              marker +=
+                " ← SAFE STATUS CANDIDATE";
 
               candidates.push(
                 item
@@ -988,18 +1352,24 @@
             const bytes =
               f.value;
 
-            let text = "";
+            let text =
+              "";
 
             try {
 
               text =
                 rbCleanText(
-                  rbBytesToString(bytes)
+                  rbBytesToString(
+                    bytes
+                  )
                 );
 
-            } catch (e) {
+            }
 
-              text = "";
+            catch (e) {
+
+              text =
+                "";
 
             }
 
@@ -1031,13 +1401,17 @@
             };
 
 
-            result.push(item);
+            result.push(
+              item
+            );
 
 
             if (
               text &&
               text.length <= 300 &&
-              !text.includes("\u0000")
+              !text.includes(
+                "\u0000"
+              )
             ) {
 
               console.log(
@@ -1048,6 +1422,7 @@
               );
 
             }
+
             else {
 
               console.log(
@@ -1060,26 +1435,28 @@
             }
 
 
-            /* =========================================
-               RECURSE INTO NESTED MESSAGE
-            ========================================= */
-
             if (
               bytes &&
               bytes.length >= 2 &&
               depth < MAX_DEPTH
             ) {
 
-              let nestedFields = null;
+              let nestedFields =
+                null;
 
               try {
 
                 nestedFields =
-                  rbReadFields(bytes);
+                  rbReadFields(
+                    bytes
+                  );
 
-              } catch (e) {
+              }
 
-                nestedFields = null;
+              catch (e) {
+
+                nestedFields =
+                  null;
 
               }
 
@@ -1099,15 +1476,58 @@
                 );
 
 
+                /*
+                 * Context detection
+                 */
+
+                let nextContext =
+                  context ||
+                  "nested";
+
+
+                if (
+                  fieldPath === "10"
+                ) {
+
+                  nextContext =
+                    "competition";
+
+                }
+
+                else if (
+                  fieldPath.startsWith(
+                    "30"
+                  )
+                ) {
+
+                  nextContext =
+                    "team";
+
+                }
+
+                else if (
+                  fieldPath.startsWith(
+                    "150"
+                  )
+                ) {
+
+                  nextContext =
+                    "match-meta";
+
+                }
+
+
                 walk(
                   bytes,
                   fieldPath,
-                  depth + 1
+                  depth + 1,
+                  nextContext
                 );
 
               }
 
             }
+
 
             return;
 
@@ -1127,7 +1547,6 @@
               f.value.length !== undefined
                 ? f.value.length
                 : 0;
-
 
             const item = {
 
@@ -1150,7 +1569,9 @@
             };
 
 
-            result.push(item);
+            result.push(
+              item
+            );
 
 
             console.log(
@@ -1202,7 +1623,9 @@
             };
 
 
-            result.push(item);
+            result.push(
+              item
+            );
 
 
             console.log(
@@ -1217,52 +1640,12 @@
 
           }
 
-
-          /* =============================================
-             UNKNOWN WIRE
-          ============================================= */
-
-          const unknownItem = {
-
-            index,
-
-            path:
-              fieldPath,
-
-            field:
-              f.fieldNo,
-
-            wireType:
-              f.wireType,
-
-            value:
-              "[UNKNOWN WIRE]"
-
-          };
-
-
-          result.push(
-            unknownItem
-          );
-
-
-          console.log(
-            "FIELD " +
-            fieldPath +
-            " | WIRE " +
-            f.wireType +
-            " | UNKNOWN"
-          );
-
         }
+
       );
 
     }
 
-
-    /* =====================================================
-       START SCAN
-    ===================================================== */
 
     console.log(
       "%c[RBTV NESTED STATUS SCAN START]",
@@ -1273,24 +1656,17 @@
     walk(
       recordBytes,
       "",
-      0
+      0,
+      "root"
     );
 
 
-    /* =====================================================
-       POSSIBLE STATUS CANDIDATES
-    ===================================================== */
-
     console.log(
-      "%c[RBTV POSSIBLE STATUS CANDIDATES]",
+      "%c[RBTV SAFE STATUS CANDIDATES]",
       "color:#ffff00;font-weight:bold",
       candidates
     );
 
-
-    /* =====================================================
-       FINAL RESULT
-    ===================================================== */
 
     console.log(
       "%c[RBTV STATUS FIELD RESULT]",
@@ -1339,7 +1715,15 @@
     });
 
 
-    return result;
+    return {
+
+      fields:
+        result,
+
+      candidates:
+        candidates
+
+    };
 
   }
 
@@ -1381,13 +1765,16 @@
     }
 
 
-    /* STATUS DEBUG */
+    /*
+     * STATUS DEBUG
+     */
 
-    rbDebugStatusFields(
-      recordBytes,
-      title,
-      matchDate
-    );
+    const statusScan =
+      rbScanStatusFields(
+        recordBytes,
+        title,
+        matchDate
+      );
 
 
     const slug =
@@ -1414,7 +1801,9 @@
       !home ||
       !away
     ) {
+
       return null;
+
     }
 
 
@@ -1454,7 +1843,8 @@
     );
 
 
-    const uniqueTeams = [];
+    const uniqueTeams =
+      [];
 
 
     for (
@@ -1485,15 +1875,23 @@
     }
 
 
-    let homeLogo = "";
-    let awayLogo = "";
+    let homeLogo =
+      "";
+
+    let awayLogo =
+      "";
 
 
     const homeLower =
-      home.toLowerCase().trim();
+      home
+        .toLowerCase()
+        .trim();
+
 
     const awayLower =
-      away.toLowerCase().trim();
+      away
+        .toLowerCase()
+        .trim();
 
 
     for (
@@ -1501,10 +1899,15 @@
     ) {
 
       const name =
-        rbCleanText(t.name);
+        rbCleanText(
+          t.name
+        );
+
 
       const nameLower =
-        name.toLowerCase().trim();
+        name
+          .toLowerCase()
+          .trim();
 
 
       if (
@@ -1538,17 +1941,26 @@
       ) {
 
         const name =
-          rbCleanText(t.name);
+          rbCleanText(
+            t.name
+          );
+
 
         const nameLower =
-          name.toLowerCase().trim();
+          name
+            .toLowerCase()
+            .trim();
 
 
         if (
           nameLower.length >= 3 &&
           (
-            homeLower.includes(nameLower) ||
-            nameLower.includes(homeLower)
+            homeLower.includes(
+              nameLower
+            ) ||
+            nameLower.includes(
+              homeLower
+            )
           )
         ) {
 
@@ -1571,22 +1983,32 @@
       ) {
 
         const name =
-          rbCleanText(t.name);
+          rbCleanText(
+            t.name
+          );
+
 
         const nameLower =
-          name.toLowerCase().trim();
+          name
+            .toLowerCase()
+            .trim();
 
 
         if (
           nameLower.length >= 3 &&
           (
-            awayLower.includes(nameLower) ||
-            nameLower.includes(awayLower)
+            awayLower.includes(
+              nameLower
+            ) ||
+            nameLower.includes(
+              awayLower
+            )
           )
         ) {
 
           if (
-            t.logo !== homeLogo
+            t.logo !==
+            homeLogo
           ) {
 
             awayLogo =
@@ -1622,7 +2044,8 @@
       const fallbackAway =
         uniqueTeams.find(
           t =>
-            t.logo !== homeLogo
+            t.logo !==
+            homeLogo
         );
 
 
@@ -1652,7 +2075,8 @@
       const secondLogo =
         allLogoUrls.find(
           logo =>
-            logo !== homeLogo
+            logo !==
+            homeLogo
         );
 
 
@@ -1698,10 +2122,14 @@
         "",
 
       home:
-        rbCleanText(home),
+        rbCleanText(
+          home
+        ),
 
       away:
-        rbCleanText(away),
+        rbCleanText(
+          away
+        ),
 
       homeLogo,
 
@@ -1711,7 +2139,10 @@
 
       recordStart,
 
-      recordLength
+      recordLength,
+
+      statusCandidates:
+        statusScan.candidates
 
     };
 
@@ -1722,9 +2153,12 @@
      FIND RECORDS
   ========================================================= */
 
-  function rbFindRecords(buffer) {
+  function rbFindRecords(
+    buffer
+  ) {
 
-    const records = [];
+    const records =
+      [];
 
 
     for (
@@ -1733,7 +2167,10 @@
       i++
     ) {
 
-      if (buffer[i] !== 0x0A) {
+      if (
+        buffer[i] !==
+        0x0A
+      ) {
         continue;
       }
 
@@ -1751,20 +2188,25 @@
 
 
       const len =
-        Number(lenInfo.value);
+        Number(
+          lenInfo.value
+        );
 
 
       const payloadStart =
         lenInfo.next;
 
+
       const payloadEnd =
-        payloadStart + len;
+        payloadStart +
+        len;
 
 
       if (
         !Number.isFinite(len) ||
         len <= 100 ||
-        payloadEnd > buffer.length
+        payloadEnd >
+          buffer.length
       ) {
         continue;
       }
@@ -1786,7 +2228,9 @@
       const hasSlug =
         strings.some(
           x =>
-            /-vs-/i.test(x.text)
+            /-vs-/i.test(
+              x.text
+            )
         );
 
 
@@ -1797,9 +2241,11 @@
 
       records.push({
 
-        start: i,
+        start:
+          i,
 
-        length: len,
+        length:
+          len,
 
         payload
 
@@ -1821,36 +2267,64 @@
      DATE / TIME
   ========================================================= */
 
-  function rbDateKey(timestamp) {
+  function rbDateKey(
+    timestamp
+  ) {
 
     return new Intl.DateTimeFormat(
       "en-US",
       {
-        timeZone: "Asia/Jakarta",
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "2-digit"
+
+        timeZone:
+          "Asia/Jakarta",
+
+        weekday:
+          "long",
+
+        year:
+          "numeric",
+
+        month:
+          "long",
+
+        day:
+          "2-digit"
+
       }
     ).format(
-      new Date(timestamp)
+      new Date(
+        timestamp
+      )
     );
 
   }
 
 
-  function rbFormatTime(timestamp) {
+  function rbFormatTime(
+    timestamp
+  ) {
 
     return new Intl.DateTimeFormat(
       "en-GB",
       {
-        timeZone: "Asia/Jakarta",
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false
+
+        timeZone:
+          "Asia/Jakarta",
+
+        hour:
+          "2-digit",
+
+        minute:
+          "2-digit",
+
+        hour12:
+          false
+
       }
     ).format(
-      new Date(timestamp)
+      new Date(
+        timestamp
+      )
     );
 
   }
@@ -1858,23 +2332,61 @@
 
   /* =========================================================
      STATUS
-     ========================================================= */
+     
+     UNTUK SEKARANG:
+     - sebelum kickoff = UPCOMING
+     - tepat/sesudah kickoff = LIVE
+     
+     Field protobuf candidate BELUM dijadikan
+     sumber status utama karena dari scan:
+     30.1 / 30.10.2 / 150.30.xx
+     juga muncul pada metadata team/match.
+  ========================================================= */
 
-  function rbGetStatus(matchDate) {
+  function rbGetStatus(
+    match
+  ) {
+
+    const matchDate =
+      Number(
+        match.matchDate
+      );
 
     const now =
       Date.now();
 
 
     if (
-      matchDate > now
+      !Number.isFinite(
+        matchDate
+      )
     ) {
 
       return {
 
-        type: "upcoming",
+        type:
+          "upcoming",
 
-        label: "UPCOMING"
+        label:
+          "UPCOMING"
+
+      };
+
+    }
+
+
+    if (
+      matchDate >
+      now
+    ) {
+
+      return {
+
+        type:
+          "upcoming",
+
+        label:
+          "UPCOMING"
 
       };
 
@@ -1883,9 +2395,11 @@
 
     return {
 
-      type: "live",
+      type:
+        "live",
 
-      label: "LIVE"
+      label:
+        "LIVE"
 
     };
 
@@ -1896,64 +2410,126 @@
      COUNTDOWN
   ========================================================= */
 
-  function rbCountdown(timestamp) {
+  function rbCountdown(
+    timestamp
+  ) {
 
     const diff =
-      timestamp - Date.now();
+      timestamp -
+      Date.now();
 
 
-    if (diff <= 0) {
+    if (
+      diff <= 0
+    ) {
+
       return "";
+
     }
 
 
     const totalSeconds =
-      Math.floor(diff / 1000);
+      Math.floor(
+        diff / 1000
+      );
 
 
     const days =
       Math.floor(
-        totalSeconds / 86400
+        totalSeconds /
+        86400
       );
 
 
     const hours =
       Math.floor(
-        (totalSeconds % 86400) / 3600
+        (
+          totalSeconds %
+          86400
+        ) / 3600
       );
 
 
     const minutes =
       Math.floor(
-        (totalSeconds % 3600) / 60
+        (
+          totalSeconds %
+          3600
+        ) / 60
       );
 
 
     const seconds =
-      totalSeconds % 60;
+      totalSeconds %
+      60;
 
 
-    if (days > 0) {
+    if (
+      days > 0
+    ) {
 
       return (
+
         days +
         "d " +
-        String(hours).padStart(2, "0") +
+
+        String(
+          hours
+        ).padStart(
+          2,
+          "0"
+        ) +
+
         ":" +
-        String(minutes).padStart(2, "0") +
+
+        String(
+          minutes
+        ).padStart(
+          2,
+          "0"
+        ) +
+
         ":" +
-        String(seconds).padStart(2, "0")
+
+        String(
+          seconds
+        ).padStart(
+          2,
+          "0"
+        )
+
       );
 
     }
 
 
     return (
-      String(hours).padStart(2, "0") +
+
+      String(
+        hours
+      ).padStart(
+        2,
+        "0"
+      ) +
+
       ":" +
-      String(minutes).padStart(2, "0") +
+
+      String(
+        minutes
+      ).padStart(
+        2,
+        "0"
+      ) +
+
       ":" +
-      String(seconds).padStart(2, "0")
+
+      String(
+        seconds
+      ).padStart(
+        2,
+        "0"
+      )
+
     );
 
   }
@@ -1963,14 +2539,38 @@
      ESCAPE
   ========================================================= */
 
-  function rbEscape(value) {
+  function rbEscape(
+    value
+  ) {
 
-    return String(value || "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+    return String(
+      value || ""
+    )
+
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+
+      .replace(
+        /</g,
+        "&lt;"
+      )
+
+      .replace(
+        />/g,
+        "&gt;"
+      )
+
+      .replace(
+        /"/g,
+        "&quot;"
+      )
+
+      .replace(
+        /'/g,
+        "&#039;"
+      );
 
   }
 
@@ -1979,7 +2579,9 @@
      RENDER
   ========================================================= */
 
-  function rbRenderSchedule(matches) {
+  function rbRenderSchedule(
+    matches
+  ) {
 
     const container =
       document.querySelector(
@@ -2015,8 +2617,11 @@
     }
 
 
-    let html = "";
-    let currentDate = "";
+    let html =
+      "";
+
+    let currentDate =
+      "";
 
 
     matches.forEach(
@@ -2029,7 +2634,8 @@
 
 
         if (
-          dateKey !== currentDate
+          dateKey !==
+          currentDate
         ) {
 
           currentDate =
@@ -2038,7 +2644,9 @@
 
           html += `
             <div class="rbtv-date">
-              ${rbEscape(dateKey)}
+              ${rbEscape(
+                dateKey
+              )}
             </div>
           `;
 
@@ -2047,7 +2655,7 @@
 
         const status =
           rbGetStatus(
-            match.matchDate
+            match
           );
 
 
@@ -2104,6 +2712,7 @@
 
             <div class="rbtv-teams">
 
+
               <div class="rbtv-team">
 
                 ${
@@ -2130,6 +2739,7 @@
                     `
                     : ""
                 }
+
 
                 <span>
                   ${rbEscape(
@@ -2172,6 +2782,7 @@
                     : ""
                 }
 
+
                 <span>
                   ${rbEscape(
                     match.away
@@ -2179,6 +2790,7 @@
                 </span>
 
               </div>
+
 
             </div>
 
@@ -2244,9 +2856,13 @@
 
 
         if (
-          !Number.isFinite(timestamp)
+          !Number.isFinite(
+            timestamp
+          )
         ) {
+
           return;
+
         }
 
 
@@ -2264,7 +2880,9 @@
           );
 
 
-        if (statusElement) {
+        if (
+          statusElement
+        ) {
 
           if (isLive) {
 
@@ -2280,6 +2898,7 @@
               "LIVE";
 
           }
+
           else {
 
             statusElement.classList.remove(
@@ -2299,7 +2918,9 @@
 
 
         const countdown =
-          rbCountdown(timestamp);
+          rbCountdown(
+            timestamp
+          );
 
 
         let countdownElement =
@@ -2308,9 +2929,13 @@
           );
 
 
-        if (countdown) {
+        if (
+          countdown
+        ) {
 
-          if (!countdownElement) {
+          if (
+            !countdownElement
+          ) {
 
             countdownElement =
               document.createElement(
@@ -2357,14 +2982,18 @@
         RBTV_API,
         {
 
-          method: "GET",
+          method:
+            "GET",
 
           headers: {
+
             "Accept":
               "application/json, text/plain, */*"
+
           },
 
-          cache: "no-store"
+          cache:
+            "no-store"
 
         }
       );
@@ -2451,7 +3080,8 @@
       );
 
 
-      const matches = [];
+      const matches =
+        [];
 
 
       for (
@@ -2479,7 +3109,10 @@
 
 
       matches.sort(
-        (a, b) =>
+        (
+          a,
+          b
+        ) =>
           a.matchDate -
           b.matchDate
       );
@@ -2530,6 +3163,38 @@
       );
 
 
+      /*
+       * Tambahan untuk pengecekan
+       * kandidat status.
+       */
+
+      console.log(
+        "%c[RBTV STATUS CANDIDATE SUMMARY]",
+        "color:#ffff00;font-weight:bold"
+      );
+
+
+      matches.forEach(
+        match => {
+
+          if (
+            match.statusCandidates &&
+            match.statusCandidates.length
+          ) {
+
+            console.log(
+              match.home +
+              " vs " +
+              match.away,
+              match.statusCandidates
+            );
+
+          }
+
+        }
+      );
+
+
       rbRenderSchedule(
         matches
       );
@@ -2541,7 +3206,9 @@
       );
 
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
       console.error(
         "%c[RBTV ERROR]",
@@ -2586,7 +3253,8 @@
     }
 
 
-    let attempts = 0;
+    let attempts =
+      0;
 
 
     const timer =
@@ -2657,4 +3325,3 @@
 
 
 })();
-
