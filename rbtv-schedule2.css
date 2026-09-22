@@ -1,3 +1,4 @@
+```css
 /* =========================================================
    RBTV SCHEDULE - IKOTV STYLE
 ========================================================= */
@@ -38,6 +39,116 @@
     border-bottom: 1px solid #292929;
 
     border-radius: 6px 6px 0 0;
+
+    gap: 8px;
+}
+
+
+/* =========================================================
+   DATE HEADER ACTIONS
+========================================================= */
+
+.rbtv-date-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 5px;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   SEARCH MATCH
+========================================================= */
+
+.rbtv-search-input {
+    width: 130px;
+    height: 28px;
+
+    box-sizing: border-box;
+
+    padding: 0 8px;
+
+    background: #111;
+
+    border: 1px solid #333;
+    border-radius: 5px;
+
+    outline: none;
+
+    color: #fff;
+
+    font-family: "Courier New", monospace;
+    font-size: 8px;
+    font-weight: bold;
+
+    transition:
+        border-color .15s ease,
+        background .15s ease;
+}
+
+
+.rbtv-search-input::placeholder {
+    color: #777;
+}
+
+
+.rbtv-search-input:focus {
+    background: #0d0d0d;
+    border-color: #00d979;
+}
+
+
+/* =========================================================
+   UPDATE BUTTON
+========================================================= */
+
+.rbtv-update-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    height: 28px;
+
+    padding: 0 9px;
+
+    background: #202020;
+
+    border: 1px solid #333;
+    border-radius: 5px;
+
+    color: #fff;
+
+    font-family: "Courier New", monospace;
+    font-size: 9px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition:
+        background .15s ease,
+        border-color .15s ease,
+        color .15s ease;
+}
+
+
+/* UPDATE HOVER */
+
+.rbtv-update-btn:hover {
+    background: #00d979;
+    border-color: #00d979;
+    color: #000;
+}
+
+
+/* UPDATE ACTIVE */
+
+.rbtv-update-btn:active {
+    transform: scale(.97);
 }
 
 
@@ -476,26 +587,91 @@
         width: 95%;
     }
 
+
+    /* DATE HEADER MOBILE */
+
+    .rbtv-date {
+        padding: 8px;
+
+        gap: 5px;
+
+        font-size: 10px;
+    }
+
+
+    .rbtv-date-actions {
+        gap: 4px;
+    }
+
+
+    /* SEARCH MOBILE */
+
+    .rbtv-search-input {
+        width: 105px;
+        height: 27px;
+
+        padding: 0 6px;
+
+        font-size: 8px;
+    }
+
+
+    /* UPDATE MOBILE */
+
+    .rbtv-update-btn {
+        height: 27px;
+
+        padding: 0 7px;
+
+        font-size: 8px;
+    }
+
+
     .rbtv-match {
         padding: 11px;
     }
 
+
     .rbtv-time {
         font-size: 20px;
     }
+
 
     .rbtv-team {
         width: 43%;
         font-size: 13px;
     }
 
+
     .rbtv-team img {
         width: 29px;
         height: 29px;
     }
+
 
     .rbtv-vs {
         width: 20px;
         font-size: 9px;
     }
 }
+
+
+/* =========================================================
+   VERY SMALL SCREEN
+========================================================= */
+
+@media (max-width: 380px) {
+
+    .rbtv-date {
+        align-items: center;
+    }
+
+    .rbtv-search-input {
+        width: 90px;
+    }
+
+    .rbtv-update-btn {
+        padding: 0 6px;
+    }
+}
+```
