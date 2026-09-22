@@ -1,9 +1,9 @@
+
 /*!
  * RBTV+ Auto Schedule
  * N11BOLAHD
  * SCHEDULE / API DECODER + RENDER
- * LOGO FIX 31.5
- * STATUS DETECTOR SAFE
+ * API STATUS FILTER
  */
 
 (function () {
@@ -11,7 +11,7 @@
   "use strict";
 
   console.log(
-    "%c[RBTV SCHEDULE 32] START",
+    "%c[RBTV SCHEDULE STATUS FIX] START",
     "color:#00d979;font-weight:bold"
   );
 
@@ -26,9 +26,12 @@
   const SCHEDULE_SELECTOR =
     "#rbtvSchedule";
 
+  const STATUS_REFRESH_MS =
+    30000;
+
 
   /* =========================================================
-     BASIC HELPERS
+     BASIC PROTOBUF READER
   ========================================================= */
 
   function rbReadVarint(buf, pos) {
@@ -76,9 +79,12 @@
       const keyInfo =
         rbReadVarint(buf, p);
 
-      if (!keyInfo) break;
+      if (!keyInfo) {
+        break;
+      }
 
-      p = keyInfo.next;
+      p =
+        keyInfo.next;
 
       const key =
         Number(keyInfo.value);
@@ -89,22 +95,31 @@
       const wireType =
         key & 7;
 
-      if (!fieldNo) break;
+      if (!fieldNo) {
+        break;
+      }
 
       let value = null;
 
-      const start = p;
+      const start =
+        p;
 
-      let end = p;
+      let end =
+        p;
 
       try {
 
         if (wireType === 0) {
 
           const v =
-            rbReadVarint(buf, p);
+            rbReadVarint(
+              buf,
+              p
+            );
 
-          if (!v) break;
+          if (!v) {
+            break;
+          }
 
           value =
             v.value;
@@ -119,7 +134,12 @@
 
         else if (wireType === 1) {
 
-          if (p + 8 > buf.length) break;
+          if (
+            p + 8 >
+            buf.length
+          ) {
+            break;
+          }
 
           value =
             buf.slice(
@@ -137,9 +157,14 @@
         else if (wireType === 2) {
 
           const lenInfo =
-            rbReadVarint(buf, p);
+            rbReadVarint(
+              buf,
+              p
+            );
 
-          if (!lenInfo) break;
+          if (!lenInfo) {
+            break;
+          }
 
           p =
             lenInfo.next;
@@ -172,7 +197,12 @@
 
         else if (wireType === 5) {
 
-          if (p + 4 > buf.length) break;
+          if (
+            p + 4 >
+            buf.length
+          ) {
+            break;
+          }
 
           value =
             buf.slice(
@@ -194,13 +224,11 @@
         }
 
         fields.push({
-
           fieldNo,
           wireType,
           value,
           start,
           end
-
         });
 
       }
@@ -241,7 +269,7 @@
 
 
   /* =========================================================
-     CLEAN TEXT
+     TEXT CLEANER
   ========================================================= */
 
   function rbCleanText(str) {
@@ -380,7 +408,7 @@
 
     if (
       !buf ||
-      depth > 10
+      depth > 12
     ) {
       return result;
     }
@@ -409,7 +437,7 @@
       if (str) {
 
         const clean =
-          str.trim();
+          rbCleanText(str);
 
         if (
           clean &&
@@ -419,15 +447,11 @@
         ) {
 
           result.push({
-
             field:
               f.fieldNo,
-
             text:
               clean,
-
             bytes
-
           });
 
         }
@@ -448,7 +472,7 @@
 
 
   /* =========================================================
-     FIND ALL POSSIBLE LOGO URLS
+     LOGOS
   ========================================================= */
 
   function rbCollectLogoUrls(
@@ -516,7 +540,7 @@
 
 
   /* =========================================================
-     FIND TEAM OBJECTS
+     TEAM OBJECTS
   ========================================================= */
 
   function rbFindTeamObjects(
@@ -527,7 +551,7 @@
 
     if (
       !buf ||
-      depth > 10
+      depth > 12
     ) {
       return result;
     }
@@ -535,7 +559,8 @@
     const fields =
       rbReadFields(buf);
 
-    const directStrings = [];
+    const directStrings =
+      [];
 
     for (
       const f of fields
@@ -557,23 +582,21 @@
       }
 
       const clean =
-        rbCleanText(text);
+        rbCleanText(
+          text
+        );
 
       if (!clean) {
         continue;
       }
 
       directStrings.push({
-
         field:
           f.fieldNo,
-
         text:
           clean,
-
         bytes:
           f.value
-
       });
 
     }
@@ -588,7 +611,8 @@
 
     if (directLogo) {
 
-      const possibleNames = [];
+      const possibleNames =
+        [];
 
       for (
         const x of directStrings
@@ -599,34 +623,48 @@
             x.text
           );
 
-        if (!clean) continue;
+        if (!clean) {
+          continue;
+        }
 
         if (
           rbLooksLikeUrl(clean)
-        ) continue;
+        ) {
+          continue;
+        }
 
         if (
           /^\d+$/.test(clean)
-        ) continue;
+        ) {
+          continue;
+        }
 
         if (
           /^\d{4}$/.test(clean)
-        ) continue;
+        ) {
+          continue;
+        }
 
         if (
           clean.length < 2 ||
           clean.length > 120
-        ) continue;
+        ) {
+          continue;
+        }
 
         if (
           /\svs\s/i.test(clean) ||
           /-vs-/i.test(clean)
-        ) continue;
+        ) {
+          continue;
+        }
 
         if (
           clean === "SuccessR" ||
           clean === "def"
-        ) continue;
+        ) {
+          continue;
+        }
 
         possibleNames.push(
           clean
@@ -639,17 +677,13 @@
       ) {
 
         result.push({
-
           name:
             possibleNames[
               possibleNames.length - 1
             ],
-
           logo:
             directLogo.text,
-
           depth
-
         });
 
       }
@@ -680,7 +714,7 @@
 
 
   /* =========================================================
-     FIND COMPETITION
+     COMPETITION
   ========================================================= */
 
   function rbFindCompetition(
@@ -700,7 +734,7 @@
 
       if (
         !current ||
-        depth > 10 ||
+        depth > 12 ||
         competitionName
       ) {
         return;
@@ -745,33 +779,35 @@
             continue;
           }
 
-          const s =
+          const text =
             rbBytesToString(
               nf.value
             );
 
-          if (!s) {
+          if (!text) {
             continue;
           }
 
-          localStrings.push({
+          const clean =
+            rbCleanText(
+              text
+            );
 
+          localStrings.push({
             field:
               nf.fieldNo,
-
             text:
-              s.trim()
-
+              clean
           });
 
           if (
             rbIsCompetitionLogo(
-              s.trim()
+              clean
             )
           ) {
 
             localLogo =
-              s.trim();
+              clean;
 
           }
 
@@ -788,36 +824,48 @@
                 x.text
               );
 
-            if (!clean) continue;
+            if (!clean) {
+              continue;
+            }
 
             if (
-              rbLooksLikeUrl(
-                clean
-              )
-            ) continue;
+              rbLooksLikeUrl(clean)
+            ) {
+              continue;
+            }
 
             if (
               /^\d+$/.test(clean)
-            ) continue;
+            ) {
+              continue;
+            }
 
             if (
               /^\d{4}$/.test(clean)
-            ) continue;
+            ) {
+              continue;
+            }
 
             if (
               clean.length < 2 ||
               clean.length > 100
-            ) continue;
+            ) {
+              continue;
+            }
 
             if (
               /\svs\s/i.test(clean) ||
               /-vs-/i.test(clean)
-            ) continue;
+            ) {
+              continue;
+            }
 
             if (
               clean === "SuccessR" ||
               clean === "def"
-            ) continue;
+            ) {
+              continue;
+            }
 
             competitionName =
               clean;
@@ -858,22 +906,19 @@
     );
 
     return {
-
       name:
         rbCleanText(
           competitionName
         ),
-
       logo:
         competitionLogo
-
     };
 
   }
 
 
   /* =========================================================
-     FIND TITLE
+     TITLE
   ========================================================= */
 
   function rbFindTitle(
@@ -892,7 +937,9 @@
           x.text
         );
 
-      if (!s) continue;
+      if (!s) {
+        continue;
+      }
 
       if (
         /\svs\s/i.test(s)
@@ -918,7 +965,7 @@
 
 
   /* =========================================================
-     FIND SLUG
+     SLUG
   ========================================================= */
 
   function rbFindSlug(
@@ -1031,10 +1078,8 @@
     }
 
     return {
-
       home,
       away
-
     };
 
   }
@@ -1087,643 +1132,123 @@
 
 
   /* =========================================================
-     STATUS FIELD SCAN
-     SAFE VERSION
+     API STATUS
+     
+     ROOT:
+       field 1 = match id
+       field 2 = API status
+       field 3 = kickoff timestamp
+       field 4 = sport/type
+
+     Yang dipakai sebagai status HANYA root field 2.
   ========================================================= */
 
-  function rbScanStatusFields(
-    recordBytes,
-    title,
-    matchDate
+  function rbGetApiStatus(
+    recordBytes
   ) {
 
-    const result = [];
-
-    const candidates = [];
-
-    const MAX_DEPTH = 8;
-
-    console.group(
-      "%c[RBTV STATUS FIELD] " +
-      title,
-      "color:#ff6600;font-weight:bold"
-    );
-
-    console.log(
-      "MATCH DATE:",
-      matchDate
-    );
-
-    console.log(
-      "DATE ISO:",
-      matchDate
-        ? new Date(
-            matchDate
-          ).toISOString()
-        : null
-    );
-
-    console.log(
-      "NOW:",
-      Date.now()
-    );
-
-    console.log(
-      "NOW ISO:",
-      new Date(
-        Date.now()
-      ).toISOString()
-    );
-
-
-    function walk(
-      buffer,
-      parentPath,
-      depth,
-      context
-    ) {
-
-      if (
-        !buffer ||
-        depth > MAX_DEPTH
-      ) {
-        return;
-      }
-
-      let fields;
-
-      try {
-
-        fields =
-          rbReadFields(
-            buffer
-          );
-
-      }
-
-      catch (e) {
-
-        return;
-
-      }
-
-      if (
-        !fields ||
-        !fields.length
-      ) {
-        return;
-      }
-
-
-      fields.forEach(
-        (
-          f,
-          index
-        ) => {
-
-          const fieldPath =
-            parentPath
-              ? parentPath +
-                "." +
-                f.fieldNo
-              : String(
-                  f.fieldNo
-                );
-
-
-          /* =============================================
-             WIRE 0
-          ============================================= */
-
-          if (
-            f.wireType === 0
-          ) {
-
-            const numericValue =
-              Number(
-                f.value
-              );
-
-            const possibleTimestamp =
-              Number.isFinite(
-                numericValue
-              ) &&
-              numericValue >
-                1000000000000 &&
-              numericValue <
-                3000000000000;
-
-            const possibleSmallEnum =
-              Number.isFinite(
-                numericValue
-              ) &&
-              numericValue >= 0 &&
-              numericValue <= 20;
-
-
-            /*
-             * IMPORTANT
-             *
-             * Jangan menganggap semua
-             * nilai 1 sebagai STATUS.
-             *
-             * Field seperti:
-             *
-             * 10.2
-             * 30.1
-             * 30.10.2
-             * 150.30.13
-             *
-             * juga muncul pada metadata
-             * kompetisi / team / object.
-             */
-
-            const item = {
-
-              index,
-
-              path:
-                fieldPath,
-
-              field:
-                f.fieldNo,
-
-              wireType:
-                0,
-
-              value:
-                numericValue,
-
-              raw:
-                String(
-                  f.value
-                ),
-
-              possibleTimestamp,
-
-              possibleSmallEnum,
-
-              depth,
-
-              context:
-                context || "unknown"
-
-            };
-
-
-            result.push(
-              item
-            );
-
-
-            let marker =
-              "";
-
-
-            if (
-              possibleTimestamp
-            ) {
-
-              marker =
-                " ← POSSIBLE TIMESTAMP";
-
-            }
-
-
-            /*
-             * Candidate hanya dicatat
-             * untuk struktur yang masuk
-             * akal sebagai match-level.
-             *
-             * Kita sengaja tidak memakai
-             * field team 30.x sebagai
-             * status.
-             */
-
-            const isRoot =
-              depth === 0;
-
-            const isMatchMeta =
-              parentPath === "150" ||
-              parentPath === "22" ||
-              parentPath === "90";
-
-
-            if (
-              possibleSmallEnum &&
-              (
-                isRoot ||
-                isMatchMeta
-              )
-            ) {
-
-              marker +=
-                " ← SAFE STATUS CANDIDATE";
-
-              candidates.push(
-                item
-              );
-
-            }
-
-
-            console.log(
-              "FIELD " +
-              fieldPath +
-              " | WIRE 0 | VALUE:",
-              numericValue,
-              marker
-            );
-
-
-            return;
-
-          }
-
-
-          /* =============================================
-             WIRE 2
-          ============================================= */
-
-          if (
-            f.wireType === 2
-          ) {
-
-            const bytes =
-              f.value;
-
-            let text =
-              "";
-
-            try {
-
-              text =
-                rbCleanText(
-                  rbBytesToString(
-                    bytes
-                  )
-                );
-
-            }
-
-            catch (e) {
-
-              text =
-                "";
-
-            }
-
-
-            const item = {
-
-              index,
-
-              path:
-                fieldPath,
-
-              field:
-                f.fieldNo,
-
-              wireType:
-                2,
-
-              byteLength:
-                bytes.length,
-
-              value:
-                text &&
-                text.length <= 300
-                  ? text
-                  : "[BYTES " +
-                    bytes.length +
-                    "]"
-
-            };
-
-
-            result.push(
-              item
-            );
-
-
-            if (
-              text &&
-              text.length <= 300 &&
-              !text.includes(
-                "\u0000"
-              )
-            ) {
-
-              console.log(
-                "FIELD " +
-                fieldPath +
-                " | WIRE 2 | TEXT:",
-                text
-              );
-
-            }
-
-            else {
-
-              console.log(
-                "FIELD " +
-                fieldPath +
-                " | WIRE 2 | BYTES:",
-                bytes.length
-              );
-
-            }
-
-
-            if (
-              bytes &&
-              bytes.length >= 2 &&
-              depth < MAX_DEPTH
-            ) {
-
-              let nestedFields =
-                null;
-
-              try {
-
-                nestedFields =
-                  rbReadFields(
-                    bytes
-                  );
-
-              }
-
-              catch (e) {
-
-                nestedFields =
-                  null;
-
-              }
-
-
-              if (
-                nestedFields &&
-                nestedFields.length
-              ) {
-
-                console.log(
-                  "%c[NESTED] " +
-                  fieldPath +
-                  " → " +
-                  nestedFields.length +
-                  " fields",
-                  "color:#00aaff"
-                );
-
-
-                /*
-                 * Context detection
-                 */
-
-                let nextContext =
-                  context ||
-                  "nested";
-
-
-                if (
-                  fieldPath === "10"
-                ) {
-
-                  nextContext =
-                    "competition";
-
-                }
-
-                else if (
-                  fieldPath.startsWith(
-                    "30"
-                  )
-                ) {
-
-                  nextContext =
-                    "team";
-
-                }
-
-                else if (
-                  fieldPath.startsWith(
-                    "150"
-                  )
-                ) {
-
-                  nextContext =
-                    "match-meta";
-
-                }
-
-
-                walk(
-                  bytes,
-                  fieldPath,
-                  depth + 1,
-                  nextContext
-                );
-
-              }
-
-            }
-
-
-            return;
-
-          }
-
-
-          /* =============================================
-             WIRE 1
-          ============================================= */
-
-          if (
-            f.wireType === 1
-          ) {
-
-            const byteLength =
-              f.value &&
-              f.value.length !== undefined
-                ? f.value.length
-                : 0;
-
-            const item = {
-
-              index,
-
-              path:
-                fieldPath,
-
-              field:
-                f.fieldNo,
-
-              wireType:
-                1,
-
-              value:
-                "[64-BIT " +
-                byteLength +
-                " BYTES]"
-
-            };
-
-
-            result.push(
-              item
-            );
-
-
-            console.log(
-              "FIELD " +
-              fieldPath +
-              " | WIRE 1 | BYTES:",
-              byteLength
-            );
-
-
-            return;
-
-          }
-
-
-          /* =============================================
-             WIRE 5
-          ============================================= */
-
-          if (
-            f.wireType === 5
-          ) {
-
-            const byteLength =
-              f.value &&
-              f.value.length !== undefined
-                ? f.value.length
-                : 0;
-
-
-            const item = {
-
-              index,
-
-              path:
-                fieldPath,
-
-              field:
-                f.fieldNo,
-
-              wireType:
-                5,
-
-              value:
-                "[32-BIT " +
-                byteLength +
-                " BYTES]"
-
-            };
-
-
-            result.push(
-              item
-            );
-
-
-            console.log(
-              "FIELD " +
-              fieldPath +
-              " | WIRE 5 | BYTES:",
-              byteLength
-            );
-
-
-            return;
-
-          }
-
-        }
-
+    const fields =
+      rbReadFields(
+        recordBytes
       );
 
-    }
-
-
-    console.log(
-      "%c[RBTV NESTED STATUS SCAN START]",
-      "color:#00d979;font-weight:bold"
-    );
-
-
-    walk(
-      recordBytes,
-      "",
-      0,
-      "root"
-    );
-
-
-    console.log(
-      "%c[RBTV SAFE STATUS CANDIDATES]",
-      "color:#ffff00;font-weight:bold",
-      candidates
-    );
-
-
-    console.log(
-      "%c[RBTV STATUS FIELD RESULT]",
-      "color:#ff6600;font-weight:bold",
-      result
-    );
-
-
-    console.groupEnd();
-
-
-    if (
-      !window.RBTV_STATUS_DEBUG
+    for (
+      const f of fields
     ) {
 
-      window.RBTV_STATUS_DEBUG =
-        [];
+      if (
+        f.fieldNo !== 2 ||
+        f.wireType !== 0
+      ) {
+        continue;
+      }
+
+      const value =
+        Number(
+          f.value
+        );
+
+      if (
+        Number.isFinite(value)
+      ) {
+
+        return value;
+
+      }
 
     }
 
+    return null;
 
-    window.RBTV_STATUS_DEBUG.push({
+  }
 
-      title:
-        title || "",
 
-      matchDate:
-        matchDate || null,
+  /* =========================================================
+     STATUS
+     
+     1 = UPCOMING
+     2 = LIVE
+     selain itu = FINISHED / NON ACTIVE
+  ========================================================= */
 
-      matchDateISO:
-        matchDate
-          ? new Date(
-              matchDate
-            ).toISOString()
-          : "",
+  function rbGetStatus(
+    match
+  ) {
 
-      scannedAt:
-        new Date().toISOString(),
+    const apiStatus =
+      Number(
+        match.apiStatus
+      );
 
-      fields:
-        result,
+    if (
+      apiStatus === 2
+    ) {
 
-      candidates:
-        candidates
+      return {
+        type:
+          "live",
+        label:
+          "LIVE"
+      };
 
-    });
+    }
 
+    if (
+      apiStatus === 1
+    ) {
+
+      return {
+        type:
+          "upcoming",
+        label:
+          "UPCOMING"
+      };
+
+    }
 
     return {
-
-      fields:
-        result,
-
-      candidates:
-        candidates
-
+      type:
+        "finished",
+      label:
+        "FINISHED"
     };
+
+  }
+
+
+  function rbIsActiveMatch(
+    match
+  ) {
+
+    const status =
+      rbGetStatus(
+        match
+      );
+
+    return (
+      status.type === "upcoming" ||
+      status.type === "live"
+    );
 
   }
 
@@ -1747,41 +1272,24 @@
       return null;
     }
 
-
     const strings =
       rbCollectStrings(
         recordBytes
       );
-
 
     const title =
       rbFindTitle(
         strings
       );
 
-
     if (!title) {
       return null;
     }
-
-
-    /*
-     * STATUS DEBUG
-     */
-
-    const statusScan =
-      rbScanStatusFields(
-        recordBytes,
-        title,
-        matchDate
-      );
-
 
     const slug =
       rbFindSlug(
         strings
       );
-
 
     const teams =
       rbSplitTeams(
@@ -1789,63 +1297,54 @@
         slug
       );
 
-
     const home =
       teams.home;
 
     const away =
       teams.away;
 
-
     if (
       !home ||
       !away
     ) {
-
       return null;
-
     }
 
+    const apiStatus =
+      rbGetApiStatus(
+        recordBytes
+      );
 
     console.log(
-      "%c[RBTV TEAM NAMES]",
-      "color:#00d9ff;font-weight:bold",
+      "%c[RBTV API STATUS]",
+      "color:#ffff00;font-weight:bold",
+      home + " vs " + away,
       {
-        home,
-        away
+        apiStatus,
+        date:
+          new Date(
+            matchDate
+          ).toISOString()
       }
     );
 
+
+    /* =====================================================
+       TEAM LOGOS
+    ===================================================== */
 
     const teamObjects =
       rbFindTeamObjects(
         recordBytes
       );
 
-
-    console.log(
-      "%c[RBTV TEAM OBJECTS]",
-      "color:#ffcc00;font-weight:bold",
-      teamObjects
-    );
-
-
     const allLogoUrls =
       rbCollectLogoUrls(
         recordBytes
       );
 
-
-    console.log(
-      "%c[RBTV ALL LOGO URLS]",
-      "color:#ff9900;font-weight:bold",
-      allLogoUrls
-    );
-
-
     const uniqueTeams =
       [];
-
 
     for (
       const t of teamObjects
@@ -1855,14 +1354,12 @@
         continue;
       }
 
-
       const exists =
         uniqueTeams.some(
           x =>
             x.name === t.name &&
             x.logo === t.logo
         );
-
 
       if (!exists) {
 
@@ -1887,7 +1384,6 @@
         .toLowerCase()
         .trim();
 
-
     const awayLower =
       away
         .toLowerCase()
@@ -1903,12 +1399,10 @@
           t.name
         );
 
-
       const nameLower =
         name
           .toLowerCase()
           .trim();
-
 
       if (
         !homeLogo &&
@@ -1919,7 +1413,6 @@
           t.logo;
 
       }
-
 
       if (
         !awayLogo &&
@@ -1945,12 +1438,10 @@
             t.name
           );
 
-
         const nameLower =
           name
             .toLowerCase()
             .trim();
-
 
         if (
           nameLower.length >= 3 &&
@@ -1987,12 +1478,10 @@
             t.name
           );
 
-
         const nameLower =
           name
             .toLowerCase()
             .trim();
-
 
         if (
           nameLower.length >= 3 &&
@@ -2048,7 +1537,6 @@
             homeLogo
         );
 
-
       if (fallbackAway) {
 
         awayLogo =
@@ -2079,7 +1567,6 @@
             homeLogo
         );
 
-
       if (secondLogo) {
 
         awayLogo =
@@ -2090,17 +1577,9 @@
     }
 
 
-    console.log(
-      "%c[RBTV LOGOS]",
-      "color:#ff00ff;font-weight:bold",
-      {
-        home,
-        away,
-        homeLogo,
-        awayLogo
-      }
-    );
-
+    /* =====================================================
+       COMPETITION
+    ===================================================== */
 
     const competitionData =
       rbFindCompetition(
@@ -2111,6 +1590,8 @@
     return {
 
       matchDate,
+
+      apiStatus,
 
       competition:
         rbCleanText(
@@ -2139,10 +1620,7 @@
 
       recordStart,
 
-      recordLength,
-
-      statusCandidates:
-        statusScan.candidates
+      recordLength
 
     };
 
@@ -2150,7 +1628,7 @@
 
 
   /* =========================================================
-     FIND RECORDS
+     FIND MATCH RECORDS
   ========================================================= */
 
   function rbFindRecords(
@@ -2159,7 +1637,6 @@
 
     const records =
       [];
-
 
     for (
       let i = 0;
@@ -2174,33 +1651,27 @@
         continue;
       }
 
-
       const lenInfo =
         rbReadVarint(
           buffer,
           i + 1
         );
 
-
       if (!lenInfo) {
         continue;
       }
-
 
       const len =
         Number(
           lenInfo.value
         );
 
-
       const payloadStart =
         lenInfo.next;
-
 
       const payloadEnd =
         payloadStart +
         len;
-
 
       if (
         !Number.isFinite(len) ||
@@ -2211,19 +1682,16 @@
         continue;
       }
 
-
       const payload =
         buffer.slice(
           payloadStart,
           payloadEnd
         );
 
-
       const strings =
         rbCollectStrings(
           payload
         );
-
 
       const hasSlug =
         strings.some(
@@ -2233,30 +1701,22 @@
             )
         );
 
-
       if (!hasSlug) {
         continue;
       }
 
-
       records.push({
-
         start:
           i,
-
         length:
           len,
-
         payload
-
       });
-
 
       i =
         payloadEnd - 1;
 
     }
-
 
     return records;
 
@@ -2274,22 +1734,16 @@
     return new Intl.DateTimeFormat(
       "en-US",
       {
-
         timeZone:
           "Asia/Jakarta",
-
         weekday:
           "long",
-
         year:
           "numeric",
-
         month:
           "long",
-
         day:
           "2-digit"
-
       }
     ).format(
       new Date(
@@ -2307,101 +1761,20 @@
     return new Intl.DateTimeFormat(
       "en-GB",
       {
-
         timeZone:
           "Asia/Jakarta",
-
         hour:
           "2-digit",
-
         minute:
           "2-digit",
-
         hour12:
           false
-
       }
     ).format(
       new Date(
         timestamp
       )
     );
-
-  }
-
-
-  /* =========================================================
-     STATUS
-     
-     UNTUK SEKARANG:
-     - sebelum kickoff = UPCOMING
-     - tepat/sesudah kickoff = LIVE
-     
-     Field protobuf candidate BELUM dijadikan
-     sumber status utama karena dari scan:
-     30.1 / 30.10.2 / 150.30.xx
-     juga muncul pada metadata team/match.
-  ========================================================= */
-
-  function rbGetStatus(
-    match
-  ) {
-
-    const matchDate =
-      Number(
-        match.matchDate
-      );
-
-    const now =
-      Date.now();
-
-
-    if (
-      !Number.isFinite(
-        matchDate
-      )
-    ) {
-
-      return {
-
-        type:
-          "upcoming",
-
-        label:
-          "UPCOMING"
-
-      };
-
-    }
-
-
-    if (
-      matchDate >
-      now
-    ) {
-
-      return {
-
-        type:
-          "upcoming",
-
-        label:
-          "UPCOMING"
-
-      };
-
-    }
-
-
-    return {
-
-      type:
-        "live",
-
-      label:
-        "LIVE"
-
-    };
 
   }
 
@@ -2418,28 +1791,22 @@
       timestamp -
       Date.now();
 
-
     if (
       diff <= 0
     ) {
-
       return "";
-
     }
-
 
     const totalSeconds =
       Math.floor(
         diff / 1000
       );
 
-
     const days =
       Math.floor(
         totalSeconds /
         86400
       );
-
 
     const hours =
       Math.floor(
@@ -2449,7 +1816,6 @@
         ) / 3600
       );
 
-
     const minutes =
       Math.floor(
         (
@@ -2458,78 +1824,50 @@
         ) / 60
       );
 
-
     const seconds =
       totalSeconds %
       60;
-
 
     if (
       days > 0
     ) {
 
       return (
-
         days +
         "d " +
-
-        String(
-          hours
-        ).padStart(
+        String(hours).padStart(
           2,
           "0"
         ) +
-
         ":" +
-
-        String(
-          minutes
-        ).padStart(
+        String(minutes).padStart(
           2,
           "0"
         ) +
-
         ":" +
-
-        String(
-          seconds
-        ).padStart(
+        String(seconds).padStart(
           2,
           "0"
         )
-
       );
 
     }
 
-
     return (
-
-      String(
-        hours
-      ).padStart(
+      String(hours).padStart(
         2,
         "0"
       ) +
-
       ":" +
-
-      String(
-        minutes
-      ).padStart(
+      String(minutes).padStart(
         2,
         "0"
       ) +
-
       ":" +
-
-      String(
-        seconds
-      ).padStart(
+      String(seconds).padStart(
         2,
         "0"
       )
-
     );
 
   }
@@ -2546,27 +1884,22 @@
     return String(
       value || ""
     )
-
       .replace(
         /&/g,
         "&amp;"
       )
-
       .replace(
         /</g,
         "&lt;"
       )
-
       .replace(
         />/g,
         "&gt;"
       )
-
       .replace(
         /"/g,
         "&quot;"
       )
-
       .replace(
         /'/g,
         "&#039;"
@@ -2587,7 +1920,6 @@
       document.querySelector(
         SCHEDULE_SELECTOR
       );
-
 
     if (!container) {
 
@@ -2641,7 +1973,6 @@
           currentDate =
             dateKey;
 
-
           html += `
             <div class="rbtv-date">
               ${rbEscape(
@@ -2670,6 +2001,7 @@
           <div
             class="rbtv-match"
             data-match-time="${match.matchDate}"
+            data-api-status="${match.apiStatus ?? ""}"
           >
 
             <div class="rbtv-competition">
@@ -2712,7 +2044,6 @@
 
             <div class="rbtv-teams">
 
-
               <div class="rbtv-team">
 
                 ${
@@ -2739,7 +2070,6 @@
                     `
                     : ""
                 }
-
 
                 <span>
                   ${rbEscape(
@@ -2782,7 +2112,6 @@
                     : ""
                 }
 
-
                 <span>
                   ${rbEscape(
                     match.away
@@ -2790,7 +2119,6 @@
                 </span>
 
               </div>
-
 
             </div>
 
@@ -2811,7 +2139,6 @@
                 `
                 : ""
             }
-
 
           </div>
 
@@ -2835,7 +2162,11 @@
 
 
   /* =========================================================
-     UPDATE COUNTDOWN + LIVE STATUS
+     UPDATE COUNTDOWN
+     
+     PENTING:
+     Jangan lagi menentukan LIVE hanya dari waktu.
+     Status LIVE harus berasal dari API.
   ========================================================= */
 
   function rbUpdateCountdowns() {
@@ -2854,24 +2185,23 @@
             item.dataset.matchTime
           );
 
-
         if (
           !Number.isFinite(
             timestamp
           )
         ) {
-
           return;
-
         }
 
 
-        const now =
-          Date.now();
+        const apiStatus =
+          Number(
+            item.dataset.apiStatus
+          );
 
 
         const isLive =
-          timestamp <= now;
+          apiStatus === 2;
 
 
         const statusElement =
@@ -2951,7 +2281,6 @@
 
           }
 
-
           countdownElement.textContent =
             countdown;
 
@@ -2972,7 +2301,7 @@
 
 
   /* =========================================================
-     FETCH API
+     FETCH RBTV API
   ========================================================= */
 
   async function rbFetch() {
@@ -2981,20 +2310,16 @@
       await fetch(
         RBTV_API,
         {
-
           method:
             "GET",
 
           headers: {
-
             "Accept":
               "application/json, text/plain, */*"
-
           },
 
           cache:
             "no-store"
-
         }
       );
 
@@ -3035,7 +2360,144 @@
 
 
   /* =========================================================
-     MAIN
+     BUILD ACTIVE MATCHES FROM API
+  ========================================================= */
+
+  async function rbLoadMatches() {
+
+    const buffer =
+      await rbFetch();
+
+
+    const records =
+      rbFindRecords(
+        buffer
+      );
+
+
+    console.log(
+      "%c[RBTV] RECORDS FOUND:",
+      "color:#00d979;font-weight:bold",
+      records.length
+    );
+
+
+    const allMatches =
+      [];
+
+
+    for (
+      const record of records
+    ) {
+
+      const match =
+        rbBuildMatch(
+          record.payload,
+          record.start,
+          record.length
+        );
+
+
+      if (!match) {
+        continue;
+      }
+
+
+      allMatches.push(
+        match
+      );
+
+    }
+
+
+    console.log(
+      "%c[RBTV API STATUS FILTER]",
+      "color:#ffff00;font-weight:bold"
+    );
+
+
+    const activeMatches =
+      allMatches.filter(
+        match => {
+
+          const status =
+            rbGetStatus(
+              match
+            );
+
+          console.log(
+            "[RBTV MATCH STATUS]",
+            match.home +
+            " vs " +
+            match.away,
+            {
+              apiStatus:
+                match.apiStatus,
+              status:
+                status.label
+            }
+          );
+
+
+          return rbIsActiveMatch(
+            match
+          );
+
+        }
+      );
+
+
+    activeMatches.sort(
+      (
+        a,
+        b
+      ) =>
+        a.matchDate -
+        b.matchDate
+    );
+
+
+    activeMatches.forEach(
+      (
+        match,
+        index
+      ) => {
+
+        match.no =
+          index + 1;
+
+      }
+    );
+
+
+    console.log(
+      "%c[RBTV FILTER RESULT]",
+      "color:#00d979;font-weight:bold",
+      {
+        total:
+          allMatches.length,
+
+        active:
+          activeMatches.length,
+
+        removed:
+          allMatches.length -
+          activeMatches.length
+      }
+    );
+
+
+    window.RBTV_MATCHES =
+      activeMatches;
+
+
+    return activeMatches;
+
+  }
+
+
+  /* =========================================================
+     INITIAL LOAD
   ========================================================= */
 
   async function init() {
@@ -3059,140 +2521,8 @@
 
     try {
 
-      window.RBTV_STATUS_DEBUG =
-        [];
-
-
-      const buffer =
-        await rbFetch();
-
-
-      const records =
-        rbFindRecords(
-          buffer
-        );
-
-
-      console.log(
-        "%c[RBTV] RECORDS FOUND:",
-        "color:#00d979;font-weight:bold",
-        records.length
-      );
-
-
       const matches =
-        [];
-
-
-      for (
-        const record of records
-      ) {
-
-        const match =
-          rbBuildMatch(
-            record.payload,
-            record.start,
-            record.length
-          );
-
-
-        if (!match) {
-          continue;
-        }
-
-
-        matches.push(
-          match
-        );
-
-      }
-
-
-      matches.sort(
-        (
-          a,
-          b
-        ) =>
-          a.matchDate -
-          b.matchDate
-      );
-
-
-      matches.forEach(
-        (
-          match,
-          index
-        ) => {
-
-          match.no =
-            index + 1;
-
-        }
-      );
-
-
-      window.RBTV_MATCHES =
-        matches;
-
-
-      console.log(
-        "%c[RBTV MATCHES]",
-        "color:#00d979;font-weight:bold"
-      );
-
-
-      console.log(
-        "TOTAL:",
-        matches.length
-      );
-
-
-      console.log(
-        matches
-      );
-
-
-      console.log(
-        "%c[RBTV STATUS DEBUG READY]",
-        "color:#ff6600;font-weight:bold"
-      );
-
-
-      console.log(
-        "Gunakan: window.RBTV_STATUS_DEBUG"
-      );
-
-
-      /*
-       * Tambahan untuk pengecekan
-       * kandidat status.
-       */
-
-      console.log(
-        "%c[RBTV STATUS CANDIDATE SUMMARY]",
-        "color:#ffff00;font-weight:bold"
-      );
-
-
-      matches.forEach(
-        match => {
-
-          if (
-            match.statusCandidates &&
-            match.statusCandidates.length
-          ) {
-
-            console.log(
-              match.home +
-              " vs " +
-              match.away,
-              match.statusCandidates
-            );
-
-          }
-
-        }
-      );
+        await rbLoadMatches();
 
 
       rbRenderSchedule(
@@ -3201,10 +2531,10 @@
 
 
       console.log(
-        "%c[RBTV] SCHEDULE RENDERED TO #rbtvSchedule",
-        "color:#00d979;font-weight:bold"
+        "%c[RBTV] SCHEDULE READY",
+        "color:#00d979;font-weight:bold",
+        matches.length
       );
-
 
     }
 
@@ -3226,6 +2556,72 @@
         `;
 
       }
+
+    }
+
+  }
+
+
+  /* =========================================================
+     PERIODIC API STATUS CHECK
+     
+     30 detik:
+       UPCOMING -> LIVE
+       LIVE -> FINISHED
+       
+     Match finished akan hilang dari schedule.
+  ========================================================= */
+
+  let rbRefreshBusy =
+    false;
+
+
+  async function rbRefreshStatus() {
+
+    if (
+      rbRefreshBusy
+    ) {
+      return;
+    }
+
+
+    rbRefreshBusy =
+      true;
+
+
+    try {
+
+      const matches =
+        await rbLoadMatches();
+
+
+      rbRenderSchedule(
+        matches
+      );
+
+
+      console.log(
+        "%c[RBTV STATUS REFRESH] UPDATED",
+        "color:#00d979;font-weight:bold",
+        matches.length
+      );
+
+    }
+
+    catch (error) {
+
+      console.warn(
+        "%c[RBTV STATUS REFRESH] FAILED - KEEP CURRENT SCHEDULE",
+        "color:#ff9900;font-weight:bold",
+        error
+      );
+
+    }
+
+    finally {
+
+      rbRefreshBusy =
+        false;
 
     }
 
@@ -3276,7 +2672,6 @@
               timer
             );
 
-
             init();
 
             return;
@@ -3291,7 +2686,6 @@
             clearInterval(
               timer
             );
-
 
             console.error(
               "%c[RBTV] #rbtvSchedule TIDAK DITEMUKAN",
@@ -3321,6 +2715,16 @@
   setInterval(
     rbUpdateCountdowns,
     1000
+  );
+
+
+  /* =========================================================
+     API STATUS LOOP
+  ========================================================= */
+
+  setInterval(
+    rbRefreshStatus,
+    STATUS_REFRESH_MS
   );
 
 
