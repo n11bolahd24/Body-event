@@ -155,7 +155,7 @@
 
     box-sizing: border-box;
 
-    border: 1px solid #333;
+    border: 1px solid #00d979;
     border-radius: 2px;
 
     outline: none;
@@ -168,7 +168,8 @@
 
     transition:
         border-color .2s ease,
-        background .2s ease;
+        background .2s ease,
+        box-shadow .2s ease;
 }
 
 .rbtv-search-input::placeholder {
@@ -178,6 +179,7 @@
 .rbtv-search-input:focus {
     border-color: #00d979;
     background: #151515;
+    box-shadow: 0 0 4px rgba(0,217,121,.25);
 }
 
 
@@ -192,7 +194,7 @@
 
     box-sizing: border-box;
 
-    border: 1px solid #333;
+    border: 1px solid #00d979;
     border-radius: 2px;
 
     outline: none;
@@ -211,24 +213,40 @@
     transition:
         background .2s ease,
         border-color .2s ease,
-        color .2s ease;
+        color .2s ease,
+        box-shadow .2s ease;
 }
 
+
+/* =========================================================
+   UPDATE HOVER
+========================================================= */
+
 .rbtv-update-btn:hover {
-    background: #181818;
+    background: #00d979;
     border-color: #00d979;
+    color: #111;
+    box-shadow: 0 0 5px rgba(0,217,121,.25);
 }
+
+
+/* =========================================================
+   UPDATE ACTIVE
+========================================================= */
 
 .rbtv-update-btn:active {
     transform: translateY(1px);
 }
 
+
+/* =========================================================
+   UPDATE LOADING
+========================================================= */
+
 .rbtv-update-btn.loading {
     opacity: .65;
     pointer-events: none;
 }
-
-
 /* =========================================================
    MATCH
 ========================================================= */
