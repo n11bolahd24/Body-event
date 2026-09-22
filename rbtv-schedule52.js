@@ -254,17 +254,40 @@
 .rbtv-match {
     width: 100%;
 
-    padding: 10px 8px 12px;
+    margin: 6px 0;
+    padding: 12px 10px 14px;
 
     box-sizing: border-box;
 
-    background: #111;
+    background: #151515;
 
-    border-bottom: 1px solid #222;
+    border: 1px solid #242424;
+    border-radius: 5px;
 
     text-align: center;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease,
+        transform .2s ease;
 }
 
+
+/* =========================================================
+   MATCH HOVER
+========================================================= */
+
+.rbtv-match:hover {
+    background: #191919;
+
+    border-color: #00d979;
+
+    box-shadow:
+        0 0 6px rgba(0,217,121,.12);
+
+    transform: translateY(-1px);
+}
 
 /* =========================================================
    COMPETITION
