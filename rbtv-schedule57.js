@@ -565,6 +565,122 @@
         gap: 5px;
     }
 }
+
+
+
+
+.rbtv-status.upcoming,
+.rbtv-status.waiting {
+  background: #2a2a2a !important;
+  color: #aaa !important;
+  box-shadow: none !important;
+}
+
+.rbtv-status.live {
+  background: #e50914 !important;
+  color: #fff !important;
+  animation: rbtvLivePulse 1s infinite !important;
+  box-shadow: none !important;
+}
+
+@keyframes rbtvLivePulse {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: .5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.rbtv-watch {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 3px;
+  background: #00d979;
+  color: #000;
+  font-family: "Courier New", monospace;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+}
+
+.rbtv-watch:hover {
+  background: #00f58a;
+}
+
+.rbtv-watch.disabled {
+  background: #292929;
+  color: #777;
+  cursor: default;
+}
+
+.rbtv-server-panel {
+  display: none;
+  margin-top: 8px;
+  padding: 8px;
+  background: #151515;
+  border: 1px solid #252525;
+  border-radius: 3px;
+}
+
+.rbtv-server-panel.open {
+  display: block;
+}
+
+.rbtv-server-title {
+  margin-bottom: 7px;
+  color: #fff;
+  font-family: "Courier New", monospace;
+  font-size: 10px;
+}
+
+.rbtv-server-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.rbtv-live-server {
+  padding: 6px 9px;
+  border: 1px solid #333;
+  border-radius: 3px;
+  background: #202020;
+  color: #fff;
+  font-family: "Courier New", monospace;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.rbtv-live-server:hover,
+.rbtv-live-server.active {
+  background: #00d979;
+  border-color: #00d979;
+  color: #000;
+}
+
+@media (max-width: 600px) {
+
+  .rbtv-watch {
+    font-size: 9px;
+    padding: 7px;
+  }
+
+  .rbtv-live-server {
+    font-size: 9px;
+    padding: 6px 8px;
+  }
+
+}
+
 `;
 
     (
@@ -2764,88 +2880,45 @@
      GET STATUS
   ========================================================= */
 
-  function rbGetStatus(
-    match
+  function rbGetStatus(match) {
+
+  const matchDate = Number(match?.matchDate);
+  const apiStatus = Number(match?.apiStatus);
+  const apiText = String(
+    match?.apiStatusObject?.matchStatusText || ""
+  ).toLowerCase();
+
+  // API sudah menyatakan LIVE
+  if (
+    apiStatus === 2 ||
+    apiText === "live" ||
+    apiText === "in_play" ||
+    apiText === "playing"
   ) {
-
-    const matchDate =
-      Number(
-        match?.matchDate
-      );
-
-    const apiStatus =
-      Number(
-        match?.apiStatus
-      );
-
-    const apiText =
-      String(
-        match?.apiStatusObject
-          ?.matchStatusText ||
-        ""
-      ).toLowerCase();
-
-    if (
-      apiStatus === 2 ||
-      apiText === "live" ||
-      apiText === "in_play" ||
-      apiText === "playing"
-    ) {
-
-      return {
-        type:
-          "live",
-
-        label:
-          "LIVE"
-      };
-
-    }
-
-    if (
-      apiStatus === 1 ||
-      apiText === "scheduled" ||
-      apiText === "upcoming" ||
-      apiText === "not_started"
-    ) {
-
-      return {
-        type:
-          "upcoming",
-
-        label:
-          "UPCOMING"
-      };
-
-    }
-
-    if (
-      Number.isFinite(
-        matchDate
-      ) &&
-      matchDate >
-        Date.now()
-    ) {
-
-      return {
-        type:
-          "upcoming",
-
-        label:
-          "UPCOMING"
-      };
-
-    }
-
     return {
-      type:
-        "finished",
-
-      label:
-        "FINISHED"
+      type: "live",
+      label: "LIVE"
     };
   }
 
+  // Pertandingan belum mulai
+  if (
+    Number.isFinite(matchDate) &&
+    Date.now() < matchDate
+  ) {
+    return {
+      type: "upcoming",
+      label: "UPCOMING"
+    };
+  }
+
+  // Sudah melewati waktu kickoff,
+  // tetapi API belum menyatakan LIVE
+  return {
+    type: "waiting",
+    label: "WAITING"
+  };
+}
 
   /* =========================================================
      COUNTDOWN
@@ -3634,82 +3707,77 @@
 
   function rbUpdateCountdowns() {
 
-    const items =
-      document.querySelectorAll(
-        "#rbtvSchedule .rbtv-match"
-      );
+  const allMatches =
+    window.RBTV_ALL_MATCHES ||
+    window.RBTV_MATCHES ||
+    [];
 
+  if (!allMatches.length) return;
 
-    items.forEach(
-      item => {
+  let needRender = false;
 
-        const timestamp =
-          Number(
-            item.dataset.matchTime
-          );
+  allMatches.forEach(match => {
 
-
-        if (
-          !Number.isFinite(
-            timestamp
-          )
-        ) {
-
-          return;
-
-        }
-
-
-        const countdown =
-          rbCountdown(
-            timestamp
-          );
-
-
-        let countdownElement =
-          item.querySelector(
-            ".rbtv-countdown"
-          );
-
-
-        if (countdown) {
-
-          if (
-            !countdownElement
-          ) {
-
-            countdownElement =
-              document.createElement(
-                "div"
-              );
-
-            countdownElement.className =
-              "rbtv-countdown";
-
-            item.appendChild(
-              countdownElement
-            );
-
-          }
-
-          countdownElement.textContent =
-            countdown;
-
-        }
-
-        else if (
-          countdownElement
-        ) {
-
-          countdownElement.remove();
-
-        }
-
-      }
+    const card = document.querySelector(
+      `.rbtv-match[data-match-time="${match.matchDate}"]`
     );
 
-  }
+    if (!card) return;
 
+    const status = rbGetStatus(match);
+
+    const statusEl =
+      card.querySelector(".rbtv-status");
+
+    if (!statusEl) return;
+
+    const displayedType =
+      Array.from(statusEl.classList).find(c =>
+        c === "upcoming" ||
+        c === "waiting" ||
+        c === "live" ||
+        c === "finished"
+      );
+
+    // Status berubah
+    if (displayedType !== status.type) {
+      needRender = true;
+      return;
+    }
+
+    // Countdown hanya untuk UPCOMING
+    if (status.type === "upcoming") {
+
+      const countdown =
+        rbCountdown(
+          match.matchDate,
+          status
+        );
+
+      const countdownEl =
+        card.querySelector(".rbtv-countdown");
+
+      if (countdownEl) {
+
+        if (countdown) {
+          countdownEl.textContent = countdown;
+        } else {
+          needRender = true;
+        }
+
+      } else if (countdown) {
+
+        needRender = true;
+      }
+    }
+
+  });
+
+  // Render ulang hanya jika status berubah
+  if (needRender) {
+    rbRenderSchedule(allMatches);
+  }
+}
 
   /* =========================================================
      STATUS SIGNATURE
