@@ -390,7 +390,7 @@
     color: #fff;
 
     font-family: "Courier New", monospace;
-    font-size: 9px;
+    font-size: 12px;
     font-weight: bold;
 
     white-space: nowrap;
@@ -452,7 +452,7 @@
     color: #00d979;
 
     font-family: "Courier New", monospace;
-    font-size: 10px;
+    font-size: 15px;
 
     line-height: 1.2;
 }
@@ -537,7 +537,7 @@
     }
 
     .rbtv-vs {
-        font-size: 8px;
+        font-size: 12px;
     }
 }
 
