@@ -281,7 +281,7 @@
 
     margin-bottom: 5px;
 
-    color: #aaa;
+    color: #fff;
 
     font-family: "Courier New", monospace;
     font-size: 10px;
@@ -387,7 +387,7 @@
 ========================================================= */
 
 .rbtv-vs {
-    color: #777;
+    color: #fff;
 
     font-family: "Courier New", monospace;
     font-size: 9px;
@@ -418,9 +418,9 @@
 }
 
 .rbtv-status.upcoming {
-    color: #aaa;
+    color: #fff;
 
-    background: #222;
+    background: #696969;
 
     border: 1px solid #333;
 }
