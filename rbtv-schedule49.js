@@ -1,552 +1,23 @@
+/*!
+ * RBTV+ Auto Schedule
+ * N11BOLAHD
+ * CSS + JAVASCRIPT
+ * SEARCH MATCH + UPDATE
+ */
+
 (function () {
+
   "use strict";
 
+
   /* =========================================================
-     RBTV+ AUTO SCHEDULE
-     N11BOLAHD
-     CSS + JAVASCRIPT DALAM 1 FILE
+     START
   ========================================================= */
 
   console.log(
-    "%c[RBTV SCHEDULE 48] START",
+    "%c[RBTV SCHEDULE 49] START",
     "color:#00d979;font-weight:bold"
   );
-
-
-  /* =========================================================
-     RBTV CSS
-     SEMUA CSS OTOMATIS MASUK DARI JAVASCRIPT
-  ========================================================= */
-
-  const RBTV_STYLE_ID =
-    "rbtv-auto-schedule-style";
-
-  function rbInjectCSS() {
-
-    if (
-      document.getElementById(
-        RBTV_STYLE_ID
-      )
-    ) {
-      return;
-    }
-
-    const style =
-      document.createElement(
-        "style"
-      );
-
-    style.id =
-      RBTV_STYLE_ID;
-
-    style.textContent = `
-
-      /* =====================================================
-         RBTV SCHEDULE CONTAINER
-      ===================================================== */
-
-      #rbtvSchedule {
-        width: 95%;
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 0;
-        box-sizing: border-box;
-
-        font-family:
-          "Courier New",
-          monospace;
-
-        color: #fff;
-        background: #111;
-      }
-
-
-      /* =====================================================
-         DATE HEADER
-      ===================================================== */
-
-      .rbtv-date {
-        position: sticky;
-        top: 0;
-        z-index: 5;
-
-        display: flex;
-        align-items: center;
-
-        min-height: 38px;
-        padding: 8px 10px;
-
-        box-sizing: border-box;
-
-        background: #181818;
-        color: #00d979;
-
-        font-family:
-          "Courier New",
-          monospace;
-
-        font-size: 13px;
-        font-weight: bold;
-
-        border-bottom:
-          1px solid #292929;
-
-        box-shadow:
-          0 2px 8px
-          rgba(0,0,0,.35);
-      }
-
-
-      /* =====================================================
-         MATCH BOX
-      ===================================================== */
-
-      .rbtv-match {
-        position: relative;
-
-        width: 100%;
-
-        margin: 0;
-        padding: 10px 10px 12px;
-
-        box-sizing: border-box;
-
-        background: #111;
-
-        border-bottom:
-          1px solid #242424;
-
-        text-align: center;
-
-        transition:
-          background .2s ease;
-      }
-
-      .rbtv-match:hover {
-        background: #151515;
-      }
-
-
-      /* =====================================================
-         COMPETITION
-      ===================================================== */
-
-      .rbtv-competition {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        gap: 6px;
-
-        min-height: 18px;
-        margin-bottom: 4px;
-
-        color: #bdbdbd;
-
-        font-family:
-          "Courier New",
-          monospace;
-
-        font-size: 10px;
-        line-height: 1.3;
-
-        text-align: center;
-      }
-
-      .rbtv-competition img {
-        width: 16px;
-        height: 16px;
-
-        object-fit: contain;
-
-        flex-shrink: 0;
-      }
-
-
-      /* =====================================================
-         KICKOFF TIME
-      ===================================================== */
-
-      .rbtv-time {
-        margin-top: 2px;
-        margin-bottom: 7px;
-
-        color: #fff;
-
-        font-family:
-          "Courier New",
-          monospace;
-
-        font-size: 15px;
-        font-weight: bold;
-
-        line-height: 1.2;
-      }
-
-
-      /* =====================================================
-         TEAMS
-      ===================================================== */
-
-      .rbtv-teams {
-        display: grid;
-
-        grid-template-columns:
-          minmax(0, 1fr)
-          auto
-          minmax(0, 1fr);
-
-        align-items: center;
-
-        width: 100%;
-        max-width: 700px;
-
-        margin: 0 auto;
-
-        gap: 8px;
-      }
-
-
-      /* =====================================================
-         TEAM
-      ===================================================== */
-
-      .rbtv-team {
-        display: flex;
-
-        align-items: center;
-        justify-content: center;
-
-        gap: 7px;
-
-        min-width: 0;
-
-        color: #fff;
-
-        font-family:
-          "Courier New",
-          monospace;
-
-        font-size: 12px;
-        font-weight: bold;
-
-        line-height: 1.25;
-
-        text-align: center;
-      }
-
-      .rbtv-team img {
-        width: 30px;
-        height: 30px;
-
-        object-fit: contain;
-
-        flex: 0 0 30px;
-
-        background:
-          transparent;
-      }
-
-      .rbtv-team span {
-        min-width: 0;
-
-        overflow-wrap:
-          anywhere;
-      }
-
-
-      /* =====================================================
-         VS
-      ===================================================== */
-
-      .rbtv-vs {
-        min-width: 25px;
-
-        color: #777;
-
-        font-family:
-          "Courier New",
-          monospace;
-
-        font-size: 10px;
-        font-weight: bold;
-
-        text-align: center;
-      }
-
-
-      /* =====================================================
-         STATUS
-      ===================================================== */
-
-      .rbtv-status {
-        display: inline-block;
-
-        margin-top: 8px;
-        padding: 2px 7px;
-
-        font-family:
-          "Courier New",
-          monospace;
-
-        font-size: 9px;
-        font-weight: bold;
-
-        line-height: 1.2;
-
-        border-radius: 2px;
-
-        letter-spacing:
-          .3px;
-      }
-
-
-      /* UPCOMING */
-
-      .rbtv-status.upcoming {
-        color: #aaa;
-
-        background: #222;
-
-        border:
-          1px solid #333;
-      }
-
-
-      /* LIVE */
-
-      .rbtv-status.live {
-        color: #00d979;
-
-        background:
-          rgba(0,217,121,.08);
-
-        border:
-          1px solid
-          rgba(0,217,121,.35);
-
-        animation:
-          rbtvLivePulse 1.5s
-          infinite;
-      }
-
-      @keyframes rbtvLivePulse {
-
-        0% {
-          opacity: 1;
-        }
-
-        50% {
-          opacity: .65;
-        }
-
-        100% {
-          opacity: 1;
-        }
-
-      }
-
-
-      /* FINISHED */
-
-      .rbtv-status.finished {
-        color: #666;
-
-        background: #181818;
-
-        border:
-          1px solid #242424;
-      }
-
-
-      /* =====================================================
-         COUNTDOWN
-      ===================================================== */
-
-      .rbtv-countdown {
-        margin-top: 5px;
-
-        color: #888;
-
-        font-family:
-          "Courier New",
-          monospace;
-
-        font-size: 10px;
-        font-weight: normal;
-
-        line-height: 1.2;
-
-        text-align: center;
-      }
-
-
-      /* =====================================================
-         LOADING
-      ===================================================== */
-
-      .rbtv-loading {
-        padding: 25px 10px;
-
-        color: #888;
-
-        font-family:
-          "Courier New",
-          monospace;
-
-        font-size: 11px;
-
-        text-align: center;
-      }
-
-
-      /* =====================================================
-         EMPTY
-      ===================================================== */
-
-      .rbtv-empty {
-        padding: 25px 10px;
-
-        color: #777;
-
-        font-family:
-          "Courier New",
-          monospace;
-
-        font-size: 11px;
-
-        text-align: center;
-      }
-
-
-      /* =====================================================
-         ERROR
-      ===================================================== */
-
-      .rbtv-error {
-        padding: 25px 10px;
-
-        color: #ff5555;
-
-        font-family:
-          "Courier New",
-          monospace;
-
-        font-size: 11px;
-
-        text-align: center;
-      }
-
-
-      /* =====================================================
-         MOBILE
-      ===================================================== */
-
-      @media (max-width: 600px) {
-
-        #rbtvSchedule {
-          width: 96%;
-        }
-
-        .rbtv-date {
-          min-height: 36px;
-
-          padding:
-            8px 8px;
-
-          font-size: 12px;
-        }
-
-        .rbtv-match {
-          padding:
-            9px 6px 11px;
-        }
-
-        .rbtv-competition {
-          font-size: 9px;
-        }
-
-        .rbtv-time {
-          font-size: 14px;
-        }
-
-        .rbtv-teams {
-          gap: 5px;
-        }
-
-        .rbtv-team {
-          gap: 5px;
-
-          font-size: 10px;
-        }
-
-        .rbtv-team img {
-          width: 26px;
-          height: 26px;
-
-          flex-basis: 26px;
-        }
-
-        .rbtv-vs {
-          min-width: 20px;
-
-          font-size: 9px;
-        }
-
-        .rbtv-status {
-          font-size: 8px;
-        }
-
-        .rbtv-countdown {
-          font-size: 9px;
-        }
-
-      }
-
-
-      /* =====================================================
-         VERY SMALL SCREEN
-      ===================================================== */
-
-      @media (max-width: 380px) {
-
-        #rbtvSchedule {
-          width: 98%;
-        }
-
-        .rbtv-team {
-          font-size: 9px;
-        }
-
-        .rbtv-team img {
-          width: 23px;
-          height: 23px;
-
-          flex-basis: 23px;
-        }
-
-        .rbtv-vs {
-          min-width: 17px;
-        }
-
-      }
-
-    `;
-
-    document.head.appendChild(
-      style
-    );
-
-    console.log(
-      "%c[RBTV CSS] INJECTED",
-      "color:#00d979;font-weight:bold"
-    );
-  }
-
-
-  /* Jalankan CSS */
-
-  rbInjectCSS();
 
 
   /* =========================================================
@@ -578,6 +49,580 @@
   let rbStatusMonitorStarted =
     false;
 
+  let rbCurrentSearch =
+    "";
+
+
+  /* =========================================================
+     CSS
+  ========================================================= */
+
+  function rbInjectCSS() {
+
+    if (
+      document.getElementById(
+        "rbtvScheduleStyle"
+      )
+    ) {
+      return;
+    }
+
+    const style =
+      document.createElement(
+        "style"
+      );
+
+    style.id =
+      "rbtvScheduleStyle";
+
+    style.textContent = `
+
+/* =========================================================
+   RBTV SCHEDULE
+========================================================= */
+
+#rbtvSchedule {
+    width: 95%;
+    margin: 0 auto;
+    font-family: "Courier New", monospace;
+    color: #fff;
+    background: #111;
+}
+
+
+/* =========================================================
+   DATE HEADER
+========================================================= */
+
+.rbtv-date {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+
+    padding: 10px;
+
+    background: #181818;
+    color: #00d979;
+
+    font-size: 13px;
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+
+    border-bottom: 1px solid #292929;
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   DATE TITLE
+========================================================= */
+
+.rbtv-date-title {
+    flex: 1;
+    min-width: 0;
+}
+
+
+/* =========================================================
+   DATE ACTIONS
+========================================================= */
+
+.rbtv-date-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 5px;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   SEARCH INPUT
+========================================================= */
+
+.rbtv-search-input {
+    width: 130px;
+    height: 28px;
+
+    padding: 4px 7px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #333;
+    border-radius: 2px;
+
+    outline: none;
+
+    background: #101010;
+    color: #fff;
+
+    font-family: "Courier New", monospace;
+    font-size: 8px;
+
+    transition:
+        border-color .2s ease,
+        background .2s ease;
+}
+
+.rbtv-search-input::placeholder {
+    color: #777;
+}
+
+.rbtv-search-input:focus {
+    border-color: #00d979;
+    background: #151515;
+}
+
+
+/* =========================================================
+   UPDATE BUTTON
+========================================================= */
+
+.rbtv-update-btn {
+    height: 28px;
+
+    padding: 0 8px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #333;
+    border-radius: 2px;
+
+    outline: none;
+
+    background: #101010;
+    color: #00d979;
+
+    font-family: "Courier New", monospace;
+    font-size: 9px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition:
+        background .2s ease,
+        border-color .2s ease,
+        color .2s ease;
+}
+
+.rbtv-update-btn:hover {
+    background: #181818;
+    border-color: #00d979;
+}
+
+.rbtv-update-btn:active {
+    transform: translateY(1px);
+}
+
+.rbtv-update-btn.loading {
+    opacity: .65;
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   MATCH
+========================================================= */
+
+.rbtv-match {
+    width: 100%;
+
+    padding: 10px 8px 12px;
+
+    box-sizing: border-box;
+
+    background: #111;
+
+    border-bottom: 1px solid #222;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   COMPETITION
+========================================================= */
+
+.rbtv-competition {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+
+    margin-bottom: 5px;
+
+    color: #aaa;
+
+    font-family: "Courier New", monospace;
+    font-size: 10px;
+    font-weight: normal;
+
+    line-height: 1.2;
+}
+
+.rbtv-competition img {
+    width: 16px;
+    height: 16px;
+
+    object-fit: contain;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   TIME
+========================================================= */
+
+.rbtv-time {
+    margin-bottom: 7px;
+
+    color: #fff;
+
+    font-family: "Courier New", monospace;
+    font-size: 14px;
+    font-weight: bold;
+
+    line-height: 1.2;
+}
+
+
+/* =========================================================
+   TEAMS
+========================================================= */
+
+.rbtv-teams {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto
+        minmax(0, 1fr);
+
+    align-items: center;
+
+    width: 100%;
+    max-width: 650px;
+
+    margin: 0 auto;
+
+    gap: 8px;
+}
+
+
+/* =========================================================
+   TEAM
+========================================================= */
+
+.rbtv-team {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 6px;
+
+    min-width: 0;
+
+    color: #fff;
+
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+    font-weight: bold;
+
+    line-height: 1.25;
+
+    text-align: center;
+}
+
+.rbtv-team img {
+    width: 30px;
+    height: 30px;
+
+    object-fit: contain;
+
+    flex-shrink: 0;
+}
+
+.rbtv-team span {
+    min-width: 0;
+
+    overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   VS
+========================================================= */
+
+.rbtv-vs {
+    color: #777;
+
+    font-family: "Courier New", monospace;
+    font-size: 9px;
+    font-weight: bold;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.rbtv-status {
+    display: inline-block;
+
+    margin-top: 7px;
+    padding: 2px 7px;
+
+    font-family: "Courier New", monospace;
+    font-size: 9px;
+    font-weight: bold;
+
+    line-height: 1.2;
+
+    border-radius: 2px;
+}
+
+
+/* =========================================================
+   UPCOMING
+========================================================= */
+
+.rbtv-status.upcoming {
+    color: #aaa;
+
+    background: #222;
+
+    border: 1px solid #333;
+}
+
+
+/* =========================================================
+   LIVE
+========================================================= */
+
+.rbtv-status.live {
+    color: #00d979;
+
+    background: rgba(0,217,121,.08);
+
+    border: 1px solid rgba(0,217,121,.30);
+}
+
+
+/* =========================================================
+   FINISHED
+========================================================= */
+
+.rbtv-status.finished {
+    color: #666;
+
+    background: #181818;
+
+    border: 1px solid #222;
+}
+
+
+/* =========================================================
+   COUNTDOWN
+========================================================= */
+
+.rbtv-countdown {
+    margin-top: 5px;
+
+    color: #888;
+
+    font-family: "Courier New", monospace;
+    font-size: 10px;
+
+    line-height: 1.2;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.rbtv-loading {
+    padding: 20px 10px;
+
+    color: #888;
+
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.rbtv-empty {
+    padding: 20px 10px;
+
+    color: #777;
+
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.rbtv-error {
+    padding: 20px 10px;
+
+    color: #ff5555;
+
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   SEARCH EMPTY
+========================================================= */
+
+.rbtv-search-empty {
+    padding: 20px 10px;
+
+    color: #777;
+
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    #rbtvSchedule {
+        width: 95%;
+    }
+
+    .rbtv-date {
+        padding: 8px;
+
+        font-size: 12px;
+
+        flex-wrap: wrap;
+    }
+
+    .rbtv-date-title {
+        width: 100%;
+        flex: 1 1 100%;
+    }
+
+    .rbtv-date-actions {
+        width: 100%;
+
+        justify-content: flex-end;
+    }
+
+    .rbtv-search-input {
+        flex: 1;
+
+        width: auto;
+        min-width: 0;
+    }
+
+    .rbtv-update-btn {
+        flex-shrink: 0;
+    }
+
+    .rbtv-match {
+        padding:
+            9px 5px 11px;
+    }
+
+    .rbtv-team {
+        font-size: 10px;
+    }
+
+    .rbtv-team img {
+        width: 27px;
+        height: 27px;
+    }
+
+    .rbtv-vs {
+        font-size: 8px;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 380px) {
+
+    #rbtvSchedule {
+        width: 98%;
+    }
+
+    .rbtv-team {
+        font-size: 9px;
+    }
+
+    .rbtv-team img {
+        width: 24px;
+        height: 24px;
+    }
+
+    .rbtv-teams {
+        gap: 5px;
+    }
+
+}
+
+`;
+
+    (
+      document.head ||
+      document.documentElement
+    ).appendChild(
+      style
+    );
+
+    console.log(
+      "%c[RBTV CSS] INJECTED",
+      "color:#00d979;font-weight:bold"
+    );
+  }
+
+
+  /* =========================================================
+     INJECT CSS
+  ========================================================= */
+
+  rbInjectCSS();
+
 
   /* =========================================================
      VARINT
@@ -589,7 +634,6 @@
   ) {
 
     let value = 0n;
-
     let shift = 0n;
 
     while (
@@ -602,8 +646,7 @@
       value |=
         BigInt(
           b & 0x7F
-        ) <<
-        shift;
+        ) << shift;
 
       if (
         !(b & 0x80)
@@ -704,6 +747,7 @@
 
           end =
             p;
+
         }
 
         else if (
@@ -727,6 +771,7 @@
 
           end =
             p;
+
         }
 
         else if (
@@ -772,6 +817,7 @@
 
           end =
             p;
+
         }
 
         else if (
@@ -795,10 +841,13 @@
 
           end =
             p;
+
         }
 
         else {
+
           break;
+
         }
 
         fields.push({
@@ -812,7 +861,9 @@
       }
 
       catch (e) {
+
         break;
+
       }
 
     }
@@ -822,7 +873,7 @@
 
 
   /* =========================================================
-     BYTES -> STRING
+     BYTES TO STRING
   ========================================================= */
 
   function rbBytesToString(
@@ -843,7 +894,9 @@
     }
 
     catch (e) {
+
       return "";
+
     }
 
   }
@@ -861,7 +914,9 @@
       typeof str !==
       "string"
     ) {
+
       return "";
+
     }
 
     let s =
@@ -903,7 +958,7 @@
 
 
   /* =========================================================
-     URL CHECK
+     URL
   ========================================================= */
 
   function rbLooksLikeUrl(
@@ -922,7 +977,7 @@
 
 
   /* =========================================================
-     TEAM LOGO CHECK
+     TEAM LOGO
   ========================================================= */
 
   function rbIsTeamLogo(
@@ -934,7 +989,9 @@
         str
       )
     ) {
+
       return false;
+
     }
 
     const s =
@@ -958,7 +1015,7 @@
 
 
   /* =========================================================
-     COMPETITION LOGO CHECK
+     COMPETITION LOGO
   ========================================================= */
 
   function rbIsCompetitionLogo(
@@ -994,7 +1051,9 @@
       !buf ||
       depth > 10
     ) {
+
       return result;
+
     }
 
     const fields =
@@ -1009,7 +1068,9 @@
       if (
         f.wireType !== 2
       ) {
+
         continue;
+
       }
 
       const bytes =
@@ -1057,7 +1118,7 @@
 
 
   /* =========================================================
-     COLLECT LOGO URLS
+     COLLECT LOGOS
   ========================================================= */
 
   function rbCollectLogoUrls(
@@ -1070,7 +1131,9 @@
       !buf ||
       depth > 12
     ) {
+
       return result;
+
     }
 
     const fields =
@@ -1085,7 +1148,9 @@
       if (
         f.wireType !== 2
       ) {
+
         continue;
+
       }
 
       const bytes =
@@ -1145,7 +1210,9 @@
       !buf ||
       depth > 10
     ) {
+
       return result;
+
     }
 
     const fields =
@@ -1163,7 +1230,9 @@
       if (
         f.wireType !== 2
       ) {
+
         continue;
+
       }
 
       const text =
@@ -1287,7 +1356,9 @@
       if (
         f.wireType !== 2
       ) {
+
         continue;
+
       }
 
       rbFindTeamObjects(
@@ -1326,7 +1397,9 @@
         depth > 10 ||
         competitionName
       ) {
+
         return;
+
       }
 
       const fields =
@@ -1341,7 +1414,9 @@
         if (
           f.wireType !== 2
         ) {
+
           continue;
+
         }
 
         const nested =
@@ -1365,7 +1440,9 @@
           if (
             nf.wireType !== 2
           ) {
+
             continue;
+
           }
 
           const s =
@@ -1472,7 +1549,9 @@
         if (
           competitionName
         ) {
+
           return;
+
         }
 
       }
@@ -1489,6 +1568,7 @@
         rbCleanText(
           competitionName
         ),
+
       logo:
         competitionLogo
     };
@@ -1496,7 +1576,7 @@
 
 
   /* =========================================================
-     FIND TITLE
+     TITLE
   ========================================================= */
 
   function rbFindTitle(
@@ -1543,7 +1623,7 @@
 
 
   /* =========================================================
-     FIND SLUG
+     SLUG
   ========================================================= */
 
   function rbFindSlug(
@@ -1664,7 +1744,7 @@
 
 
   /* =========================================================
-     GET MATCH DATE
+     MATCH DATE
   ========================================================= */
 
   function rbGetMatchDate(
@@ -1764,7 +1844,9 @@
       !home ||
       !away
     ) {
+
       return null;
+
     }
 
     const teamObjects =
@@ -1889,6 +1971,7 @@
             t.logo;
 
           break;
+
         }
 
       }
@@ -1932,6 +2015,7 @@
               t.logo;
 
             break;
+
           }
 
         }
@@ -2005,6 +2089,7 @@
       );
 
     return {
+
       matchDate,
 
       competition:
@@ -2041,6 +2126,7 @@
 
       apiStatusObject:
         null
+
     };
   }
 
@@ -2099,7 +2185,9 @@
         payloadEnd >
           buffer.length
       ) {
+
         continue;
+
       }
 
       const payload =
@@ -2128,8 +2216,10 @@
       records.push({
         start:
           i,
+
         length:
           len,
+
         payload
       });
 
@@ -2143,7 +2233,7 @@
 
 
   /* =========================================================
-     DATE
+     DATE KEY
   ========================================================= */
 
   function rbDateKey(
@@ -2173,12 +2263,11 @@
         timestamp
       )
     );
-
   }
 
 
   /* =========================================================
-     TIME
+     FORMAT TIME
   ========================================================= */
 
   function rbFormatTime(
@@ -2205,7 +2294,6 @@
         timestamp
       )
     );
-
   }
 
 
@@ -2265,7 +2353,10 @@
         b
       );
 
-    if (!x || !y) {
+    if (
+      !x ||
+      !y
+    ) {
       return 0;
     }
 
@@ -2326,7 +2417,7 @@
 
 
   /* =========================================================
-     STATUS ITEMS
+     EXTRACT STATUS
   ========================================================= */
 
   function rbExtractStatusItems(
@@ -2398,10 +2489,13 @@
             matchStatus
           )
         ) {
+
           return;
+
         }
 
         result.push({
+
           key,
 
           matchId:
@@ -2426,6 +2520,7 @@
 
           raw:
             item
+
         });
 
       }
@@ -2436,7 +2531,7 @@
 
 
   /* =========================================================
-     FETCH STATUS API
+     FETCH STATUS
   ========================================================= */
 
   async function rbFetchStatusAPI() {
@@ -2540,7 +2635,9 @@
       !rbStatusItems.length ||
       !match
     ) {
+
       return null;
+
     }
 
     const targetTime =
@@ -2553,7 +2650,9 @@
         targetTime
       )
     ) {
+
       return null;
+
     }
 
     let best = null;
@@ -2578,7 +2677,9 @@
         ) ||
         timeDiff > 300
       ) {
+
         continue;
+
       }
 
       const homeScore =
@@ -2597,7 +2698,9 @@
         !homeScore ||
         !awayScore
       ) {
+
         continue;
+
       }
 
       const timeScore =
@@ -2640,7 +2743,7 @@
 
 
   /* =========================================================
-     APPLY API STATUS
+     APPLY STATUS
   ========================================================= */
 
   function rbApplyApiStatuses(
@@ -2652,7 +2755,9 @@
         matches
       )
     ) {
+
       return;
+
     }
 
     matches.forEach(
@@ -2793,7 +2898,9 @@
     if (
       diff <= 0
     ) {
+
       return "";
+
     }
 
     const totalSeconds =
@@ -2918,6 +3025,95 @@
 
 
   /* =========================================================
+     SEARCH
+  ========================================================= */
+
+  function rbSearchMatches(
+    matches,
+    keyword
+  ) {
+
+    const q =
+      String(
+        keyword || ""
+      )
+      .trim()
+      .toLowerCase();
+
+    if (!q) {
+
+      return matches;
+
+    }
+
+    return matches.filter(
+      match => {
+
+        const text =
+          [
+            match.home,
+            match.away,
+            match.competition,
+            match.slug
+          ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        return text.includes(
+          q
+        );
+
+      }
+    );
+  }
+
+
+  /* =========================================================
+     RENDER DATE HEADER
+  ========================================================= */
+
+  function rbDateHeader(
+    dateKey
+  ) {
+
+    return `
+      <div class="rbtv-date">
+
+        <div class="rbtv-date-title">
+          ${rbEscape(
+            dateKey
+          )}
+        </div>
+
+        <div class="rbtv-date-actions">
+
+          <input
+            type="search"
+            class="rbtv-search-input"
+            placeholder="Search match..."
+            value="${rbEscape(
+              rbCurrentSearch
+            )}"
+            autocomplete="off"
+            spellcheck="false"
+          >
+
+          <button
+            type="button"
+            class="rbtv-update-btn"
+          >
+            ↻ UPDATE
+          </button>
+
+        </div>
+
+      </div>
+    `;
+  }
+
+
+  /* =========================================================
      RENDER SCHEDULE
   ========================================================= */
 
@@ -2938,6 +3134,7 @@
       );
 
       return;
+
     }
 
     if (
@@ -2946,13 +3143,46 @@
     ) {
 
       container.innerHTML = `
+        <div class="rbtv-date">
+
+          <div class="rbtv-date-title">
+            RBTV SCHEDULE
+          </div>
+
+          <div class="rbtv-date-actions">
+
+            <input
+              type="search"
+              class="rbtv-search-input"
+              placeholder="Search match..."
+              value="${rbEscape(
+                rbCurrentSearch
+              )}"
+              autocomplete="off"
+              spellcheck="false"
+            >
+
+            <button
+              type="button"
+              class="rbtv-update-btn"
+            >
+              ↻ UPDATE
+            </button>
+
+          </div>
+
+        </div>
+
         <div class="rbtv-empty">
           Match not found
         </div>
       `;
 
+      rbBindControls();
+
       return;
     }
+
 
     const visibleMatches =
       matches.filter(
@@ -2963,18 +3193,61 @@
           "finished"
       );
 
+
+    const filteredMatches =
+      rbSearchMatches(
+        visibleMatches,
+        rbCurrentSearch
+      );
+
+
     if (
-      !visibleMatches.length
+      !filteredMatches.length
     ) {
 
       container.innerHTML = `
-        <div class="rbtv-empty">
+
+        <div class="rbtv-date">
+
+          <div class="rbtv-date-title">
+            RBTV SCHEDULE
+          </div>
+
+          <div class="rbtv-date-actions">
+
+            <input
+              type="search"
+              class="rbtv-search-input"
+              placeholder="Search match..."
+              value="${rbEscape(
+                rbCurrentSearch
+              )}"
+              autocomplete="off"
+              spellcheck="false"
+            >
+
+            <button
+              type="button"
+              class="rbtv-update-btn"
+            >
+              ↻ UPDATE
+            </button>
+
+          </div>
+
+        </div>
+
+        <div class="rbtv-search-empty">
           Match not found
         </div>
+
       `;
+
+      rbBindControls();
 
       return;
     }
+
 
     let html =
       "";
@@ -2982,13 +3255,15 @@
     let currentDate =
       "";
 
-    visibleMatches.forEach(
+
+    filteredMatches.forEach(
       match => {
 
         const dateKey =
           rbDateKey(
             match.matchDate
           );
+
 
         if (
           dateKey !==
@@ -2998,27 +3273,28 @@
           currentDate =
             dateKey;
 
-          html += `
-            <div class="rbtv-date">
-              ${rbEscape(
-                dateKey
-              )}
-            </div>
-          `;
+          html +=
+            rbDateHeader(
+              dateKey
+            );
 
         }
+
 
         const status =
           rbGetStatus(
             match
           );
 
+
         const countdown =
           rbCountdown(
             match.matchDate
           );
 
+
         html += `
+
           <div
             class="rbtv-match"
             data-match-time="${match.matchDate}"
@@ -3054,15 +3330,18 @@
 
 
             <div class="rbtv-time">
+
               ${rbEscape(
                 rbFormatTime(
                   match.matchDate
                 )
               )}
+
             </div>
 
 
             <div class="rbtv-teams">
+
 
               <div class="rbtv-team">
 
@@ -3140,6 +3419,7 @@
 
               </div>
 
+
             </div>
 
 
@@ -3160,25 +3440,232 @@
                 : ""
             }
 
+
           </div>
+
         `;
 
       }
     );
 
+
     container.innerHTML =
       html;
+
+
+    rbBindControls();
+
 
     console.log(
       "%c[RBTV] SCHEDULE RENDERED:",
       "color:#00d979;font-weight:bold",
-      matches.length
+      filteredMatches.length
     );
+
   }
 
 
   /* =========================================================
-     UPDATE COUNTDOWN
+     BIND SEARCH + UPDATE
+  ========================================================= */
+
+  function rbBindControls() {
+
+    const container =
+      document.querySelector(
+        SCHEDULE_SELECTOR
+      );
+
+    if (!container) {
+      return;
+    }
+
+
+    const searchInputs =
+      container.querySelectorAll(
+        ".rbtv-search-input"
+      );
+
+
+    searchInputs.forEach(
+      input => {
+
+        input.oninput =
+          function () {
+
+            rbCurrentSearch =
+              this.value || "";
+
+
+            const allMatches =
+              window.RBTV_ALL_MATCHES ||
+              [];
+
+
+            rbRenderSchedule(
+              allMatches
+            );
+
+
+            const newInput =
+              container.querySelector(
+                ".rbtv-search-input"
+              );
+
+
+            if (newInput) {
+
+              newInput.focus();
+
+              try {
+
+                newInput.setSelectionRange(
+                  rbCurrentSearch.length,
+                  rbCurrentSearch.length
+                );
+
+              }
+
+              catch (e) {}
+
+            }
+
+          };
+
+
+        input.onkeydown =
+          function (event) {
+
+            if (
+              event.key ===
+              "Escape"
+            ) {
+
+              rbCurrentSearch =
+                "";
+
+              rbRenderSchedule(
+                window.RBTV_ALL_MATCHES ||
+                []
+              );
+
+            }
+
+          };
+
+      }
+    );
+
+
+    const updateButtons =
+      container.querySelectorAll(
+        ".rbtv-update-btn"
+      );
+
+
+    updateButtons.forEach(
+      button => {
+
+        button.onclick =
+          async function () {
+
+            await rbManualUpdate(
+              this
+            );
+
+          };
+
+      }
+    );
+
+  }
+
+
+  /* =========================================================
+     MANUAL UPDATE
+  ========================================================= */
+
+  async function rbManualUpdate(
+    button
+  ) {
+
+    if (
+      rbStatusLoading
+    ) {
+      return;
+    }
+
+
+    console.log(
+      "%c[RBTV] MANUAL UPDATE",
+      "color:#00d979;font-weight:bold"
+    );
+
+
+    if (button) {
+
+      button.classList.add(
+        "loading"
+      );
+
+      button.textContent =
+        "↻ LOADING";
+
+    }
+
+
+    rbCurrentSearch =
+      "";
+
+
+    const container =
+      document.querySelector(
+        SCHEDULE_SELECTOR
+      );
+
+
+    if (container) {
+
+      container.innerHTML = `
+        <div class="rbtv-loading">
+          Updating schedule...
+        </div>
+      `;
+
+    }
+
+
+    try {
+
+      await rbLoadSchedule();
+
+    }
+
+    catch (error) {
+
+      console.error(
+        "%c[RBTV UPDATE ERROR]",
+        "color:red;font-weight:bold",
+        error
+      );
+
+      if (container) {
+
+        container.innerHTML = `
+          <div class="rbtv-error">
+            Failed to update RBTV schedule
+          </div>
+        `;
+
+      }
+
+    }
+
+  }
+
+
+  /* =========================================================
+     UPDATE COUNTDOWNS
   ========================================================= */
 
   function rbUpdateCountdowns() {
@@ -3188,6 +3675,7 @@
         "#rbtvSchedule .rbtv-match"
       );
 
+
     items.forEach(
       item => {
 
@@ -3196,23 +3684,29 @@
             item.dataset.matchTime
           );
 
+
         if (
           !Number.isFinite(
             timestamp
           )
         ) {
+
           return;
+
         }
+
 
         const countdown =
           rbCountdown(
             timestamp
           );
 
+
         let countdownElement =
           item.querySelector(
             ".rbtv-countdown"
           );
+
 
         if (countdown) {
 
@@ -3249,6 +3743,7 @@
 
       }
     );
+
   }
 
 
@@ -3287,6 +3782,7 @@
       .join(
         "||"
       );
+
   }
 
 
@@ -3299,11 +3795,15 @@
     if (
       rbStatusMonitorStarted
     ) {
+
       return;
+
     }
+
 
     rbStatusMonitorStarted =
       true;
+
 
     setInterval(
       async () => {
@@ -3311,8 +3811,11 @@
         if (
           rbStatusLoading
         ) {
+
           return;
+
         }
+
 
         try {
 
@@ -3321,21 +3824,26 @@
             window.RBTV_MATCHES ||
             [];
 
+
           const before =
             rbStatusSignature(
               allMatches
             );
 
+
           await rbFetchStatusAPI();
+
 
           rbApplyApiStatuses(
             allMatches
           );
 
+
           const after =
             rbStatusSignature(
               allMatches
             );
+
 
           if (
             before !==
@@ -3347,9 +3855,11 @@
               "color:#00d979;font-weight:bold"
             );
 
+
             rbRenderSchedule(
               allMatches
             );
+
 
             window.RBTV_MATCHES =
               allMatches.filter(
@@ -3378,11 +3888,12 @@
 
       RBTV_STATUS_CHECK_MS
     );
+
   }
 
 
   /* =========================================================
-     FETCH RBTV
+     FETCH RBTV API
   ========================================================= */
 
   async function rbFetch() {
@@ -3404,11 +3915,13 @@
         }
       );
 
+
     console.log(
       "%c[RBTV] HTTP:",
       "color:#00d979;font-weight:bold",
       response.status
     );
+
 
     if (
       !response.ok
@@ -3421,10 +3934,12 @@
 
     }
 
+
     const buffer =
       new Uint8Array(
         await response.arrayBuffer()
       );
+
 
     console.log(
       "%c[RBTV] SIZE:",
@@ -3432,20 +3947,23 @@
       buffer.length
     );
 
+
     return buffer;
+
   }
 
 
   /* =========================================================
-     INIT
+     LOAD SCHEDULE
   ========================================================= */
 
-  async function init() {
+  async function rbLoadSchedule() {
 
     const container =
       document.querySelector(
         SCHEDULE_SELECTOR
       );
+
 
     if (container) {
 
@@ -3457,110 +3975,140 @@
 
     }
 
-    try {
 
-      window.RBTV_STATUS_DEBUG =
-        [];
+    window.RBTV_STATUS_DEBUG =
+      [];
 
-      const buffer =
-        await rbFetch();
 
-      const records =
-        rbFindRecords(
-          buffer
-        );
+    const buffer =
+      await rbFetch();
 
-      console.log(
-        "%c[RBTV] RECORDS FOUND:",
-        "color:#00d979;font-weight:bold",
-        records.length
+
+    const records =
+      rbFindRecords(
+        buffer
       );
 
-      await rbFetchStatusAPI();
 
-      const matches =
-        [];
+    console.log(
+      "%c[RBTV] RECORDS FOUND:",
+      "color:#00d979;font-weight:bold",
+      records.length
+    );
 
-      for (
-        const record of records
-      ) {
 
-        const match =
-          rbBuildMatch(
-            record.payload,
-            record.start,
-            record.length
-          );
+    await rbFetchStatusAPI();
 
-        if (!match) {
-          continue;
-        }
 
-        matches.push(
-          match
+    const matches =
+      [];
+
+
+    for (
+      const record of records
+    ) {
+
+      const match =
+        rbBuildMatch(
+          record.payload,
+          record.start,
+          record.length
         );
 
+
+      if (!match) {
+        continue;
       }
 
-      rbApplyApiStatuses(
-        matches
+
+      matches.push(
+        match
       );
 
-      matches.sort(
-        (
-          a,
-          b
-        ) =>
-          a.matchDate -
-          b.matchDate
+    }
+
+
+    rbApplyApiStatuses(
+      matches
+    );
+
+
+    matches.sort(
+      (
+        a,
+        b
+      ) =>
+        a.matchDate -
+        b.matchDate
+    );
+
+
+    matches.forEach(
+      (
+        match,
+        index
+      ) => {
+
+        match.no =
+          index + 1;
+
+      }
+    );
+
+
+    window.RBTV_ALL_MATCHES =
+      matches;
+
+
+    window.RBTV_MATCHES =
+      matches.filter(
+        match =>
+          rbGetStatus(
+            match
+          ).type !==
+          "finished"
       );
 
-      matches.forEach(
-        (
-          match,
-          index
-        ) => {
 
-          match.no =
-            index + 1;
+    console.log(
+      "%c[RBTV MATCHES]",
+      "color:#00d979;font-weight:bold"
+    );
 
-        }
-      );
 
-      window.RBTV_ALL_MATCHES =
-        matches;
+    console.log(
+      "TOTAL:",
+      matches.length
+    );
 
-      window.RBTV_MATCHES =
-        matches.filter(
-          match =>
-            rbGetStatus(
-              match
-            ).type !==
-            "finished"
-        );
 
-      console.log(
-        "%c[RBTV MATCHES]",
-        "color:#00d979;font-weight:bold"
-      );
+    console.log(
+      matches
+    );
 
-      console.log(
-        "TOTAL:",
-        matches.length
-      );
 
-      console.log(
-        matches
-      );
+    rbRenderSchedule(
+      matches
+    );
 
-      rbRenderSchedule(
-        matches
-      );
 
-      console.log(
-        "%c[RBTV] SCHEDULE RENDERED TO #rbtvSchedule",
-        "color:#00d979;font-weight:bold"
-      );
+    console.log(
+      "%c[RBTV] SCHEDULE RENDERED TO #rbtvSchedule",
+      "color:#00d979;font-weight:bold"
+    );
+
+  }
+
+
+  /* =========================================================
+     INIT
+  ========================================================= */
+
+  async function init() {
+
+    try {
+
+      await rbLoadSchedule();
 
     }
 
@@ -3571,6 +4119,13 @@
         "color:red;font-weight:bold",
         error
       );
+
+
+      const container =
+        document.querySelector(
+          SCHEDULE_SELECTOR
+        );
+
 
       if (container) {
 
@@ -3598,15 +4153,19 @@
         SCHEDULE_SELECTOR
       );
 
+
     if (container) {
 
       init();
 
       return;
+
     }
+
 
     let attempts =
       0;
+
 
     const timer =
       setInterval(
@@ -3614,10 +4173,12 @@
 
           attempts++;
 
+
           const target =
             document.querySelector(
               SCHEDULE_SELECTOR
             );
+
 
           if (target) {
 
@@ -3625,10 +4186,13 @@
               timer
             );
 
+
             init();
 
             return;
+
           }
+
 
           if (
             attempts >= 50
@@ -3637,6 +4201,7 @@
             clearInterval(
               timer
             );
+
 
             console.error(
               "%c[RBTV] #rbtvSchedule TIDAK DITEMUKAN",
@@ -3649,6 +4214,7 @@
 
         200
       );
+
   }
 
 
@@ -3658,11 +4224,14 @@
 
   rbStart();
 
+
   startRBTVStatusMonitor();
+
 
   setInterval(
     rbUpdateCountdowns,
     1000
   );
+
 
 })();
