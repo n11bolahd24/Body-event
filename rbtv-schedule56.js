@@ -104,7 +104,7 @@
     padding: 10px;
 
     background: #181818;
-    color: #00d979;
+    color: #fff;
 
     font-size: 13px;
     font-family: "Courier New", monospace;
@@ -414,7 +414,7 @@
 
     line-height: 1.2;
 
-    border-radius: 2px;
+    border-radius: 5px;
 }
 
 .rbtv-status.upcoming {
