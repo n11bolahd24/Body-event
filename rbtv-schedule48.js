@@ -1,10 +1,557 @@
 (function () {
   "use strict";
 
+  /* =========================================================
+     RBTV+ AUTO SCHEDULE
+     N11BOLAHD
+     CSS + JAVASCRIPT DALAM 1 FILE
+  ========================================================= */
+
   console.log(
-    "%c[RBTV SCHEDULE 47] START",
+    "%c[RBTV SCHEDULE 48] START",
     "color:#00d979;font-weight:bold"
   );
+
+
+  /* =========================================================
+     RBTV CSS
+     SEMUA CSS OTOMATIS MASUK DARI JAVASCRIPT
+  ========================================================= */
+
+  const RBTV_STYLE_ID =
+    "rbtv-auto-schedule-style";
+
+  function rbInjectCSS() {
+
+    if (
+      document.getElementById(
+        RBTV_STYLE_ID
+      )
+    ) {
+      return;
+    }
+
+    const style =
+      document.createElement(
+        "style"
+      );
+
+    style.id =
+      RBTV_STYLE_ID;
+
+    style.textContent = `
+
+      /* =====================================================
+         RBTV SCHEDULE CONTAINER
+      ===================================================== */
+
+      #rbtvSchedule {
+        width: 95%;
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0;
+        box-sizing: border-box;
+
+        font-family:
+          "Courier New",
+          monospace;
+
+        color: #fff;
+        background: #111;
+      }
+
+
+      /* =====================================================
+         DATE HEADER
+      ===================================================== */
+
+      .rbtv-date {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+
+        display: flex;
+        align-items: center;
+
+        min-height: 38px;
+        padding: 8px 10px;
+
+        box-sizing: border-box;
+
+        background: #181818;
+        color: #00d979;
+
+        font-family:
+          "Courier New",
+          monospace;
+
+        font-size: 13px;
+        font-weight: bold;
+
+        border-bottom:
+          1px solid #292929;
+
+        box-shadow:
+          0 2px 8px
+          rgba(0,0,0,.35);
+      }
+
+
+      /* =====================================================
+         MATCH BOX
+      ===================================================== */
+
+      .rbtv-match {
+        position: relative;
+
+        width: 100%;
+
+        margin: 0;
+        padding: 10px 10px 12px;
+
+        box-sizing: border-box;
+
+        background: #111;
+
+        border-bottom:
+          1px solid #242424;
+
+        text-align: center;
+
+        transition:
+          background .2s ease;
+      }
+
+      .rbtv-match:hover {
+        background: #151515;
+      }
+
+
+      /* =====================================================
+         COMPETITION
+      ===================================================== */
+
+      .rbtv-competition {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 6px;
+
+        min-height: 18px;
+        margin-bottom: 4px;
+
+        color: #bdbdbd;
+
+        font-family:
+          "Courier New",
+          monospace;
+
+        font-size: 10px;
+        line-height: 1.3;
+
+        text-align: center;
+      }
+
+      .rbtv-competition img {
+        width: 16px;
+        height: 16px;
+
+        object-fit: contain;
+
+        flex-shrink: 0;
+      }
+
+
+      /* =====================================================
+         KICKOFF TIME
+      ===================================================== */
+
+      .rbtv-time {
+        margin-top: 2px;
+        margin-bottom: 7px;
+
+        color: #fff;
+
+        font-family:
+          "Courier New",
+          monospace;
+
+        font-size: 15px;
+        font-weight: bold;
+
+        line-height: 1.2;
+      }
+
+
+      /* =====================================================
+         TEAMS
+      ===================================================== */
+
+      .rbtv-teams {
+        display: grid;
+
+        grid-template-columns:
+          minmax(0, 1fr)
+          auto
+          minmax(0, 1fr);
+
+        align-items: center;
+
+        width: 100%;
+        max-width: 700px;
+
+        margin: 0 auto;
+
+        gap: 8px;
+      }
+
+
+      /* =====================================================
+         TEAM
+      ===================================================== */
+
+      .rbtv-team {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 7px;
+
+        min-width: 0;
+
+        color: #fff;
+
+        font-family:
+          "Courier New",
+          monospace;
+
+        font-size: 12px;
+        font-weight: bold;
+
+        line-height: 1.25;
+
+        text-align: center;
+      }
+
+      .rbtv-team img {
+        width: 30px;
+        height: 30px;
+
+        object-fit: contain;
+
+        flex: 0 0 30px;
+
+        background:
+          transparent;
+      }
+
+      .rbtv-team span {
+        min-width: 0;
+
+        overflow-wrap:
+          anywhere;
+      }
+
+
+      /* =====================================================
+         VS
+      ===================================================== */
+
+      .rbtv-vs {
+        min-width: 25px;
+
+        color: #777;
+
+        font-family:
+          "Courier New",
+          monospace;
+
+        font-size: 10px;
+        font-weight: bold;
+
+        text-align: center;
+      }
+
+
+      /* =====================================================
+         STATUS
+      ===================================================== */
+
+      .rbtv-status {
+        display: inline-block;
+
+        margin-top: 8px;
+        padding: 2px 7px;
+
+        font-family:
+          "Courier New",
+          monospace;
+
+        font-size: 9px;
+        font-weight: bold;
+
+        line-height: 1.2;
+
+        border-radius: 2px;
+
+        letter-spacing:
+          .3px;
+      }
+
+
+      /* UPCOMING */
+
+      .rbtv-status.upcoming {
+        color: #aaa;
+
+        background: #222;
+
+        border:
+          1px solid #333;
+      }
+
+
+      /* LIVE */
+
+      .rbtv-status.live {
+        color: #00d979;
+
+        background:
+          rgba(0,217,121,.08);
+
+        border:
+          1px solid
+          rgba(0,217,121,.35);
+
+        animation:
+          rbtvLivePulse 1.5s
+          infinite;
+      }
+
+      @keyframes rbtvLivePulse {
+
+        0% {
+          opacity: 1;
+        }
+
+        50% {
+          opacity: .65;
+        }
+
+        100% {
+          opacity: 1;
+        }
+
+      }
+
+
+      /* FINISHED */
+
+      .rbtv-status.finished {
+        color: #666;
+
+        background: #181818;
+
+        border:
+          1px solid #242424;
+      }
+
+
+      /* =====================================================
+         COUNTDOWN
+      ===================================================== */
+
+      .rbtv-countdown {
+        margin-top: 5px;
+
+        color: #888;
+
+        font-family:
+          "Courier New",
+          monospace;
+
+        font-size: 10px;
+        font-weight: normal;
+
+        line-height: 1.2;
+
+        text-align: center;
+      }
+
+
+      /* =====================================================
+         LOADING
+      ===================================================== */
+
+      .rbtv-loading {
+        padding: 25px 10px;
+
+        color: #888;
+
+        font-family:
+          "Courier New",
+          monospace;
+
+        font-size: 11px;
+
+        text-align: center;
+      }
+
+
+      /* =====================================================
+         EMPTY
+      ===================================================== */
+
+      .rbtv-empty {
+        padding: 25px 10px;
+
+        color: #777;
+
+        font-family:
+          "Courier New",
+          monospace;
+
+        font-size: 11px;
+
+        text-align: center;
+      }
+
+
+      /* =====================================================
+         ERROR
+      ===================================================== */
+
+      .rbtv-error {
+        padding: 25px 10px;
+
+        color: #ff5555;
+
+        font-family:
+          "Courier New",
+          monospace;
+
+        font-size: 11px;
+
+        text-align: center;
+      }
+
+
+      /* =====================================================
+         MOBILE
+      ===================================================== */
+
+      @media (max-width: 600px) {
+
+        #rbtvSchedule {
+          width: 96%;
+        }
+
+        .rbtv-date {
+          min-height: 36px;
+
+          padding:
+            8px 8px;
+
+          font-size: 12px;
+        }
+
+        .rbtv-match {
+          padding:
+            9px 6px 11px;
+        }
+
+        .rbtv-competition {
+          font-size: 9px;
+        }
+
+        .rbtv-time {
+          font-size: 14px;
+        }
+
+        .rbtv-teams {
+          gap: 5px;
+        }
+
+        .rbtv-team {
+          gap: 5px;
+
+          font-size: 10px;
+        }
+
+        .rbtv-team img {
+          width: 26px;
+          height: 26px;
+
+          flex-basis: 26px;
+        }
+
+        .rbtv-vs {
+          min-width: 20px;
+
+          font-size: 9px;
+        }
+
+        .rbtv-status {
+          font-size: 8px;
+        }
+
+        .rbtv-countdown {
+          font-size: 9px;
+        }
+
+      }
+
+
+      /* =====================================================
+         VERY SMALL SCREEN
+      ===================================================== */
+
+      @media (max-width: 380px) {
+
+        #rbtvSchedule {
+          width: 98%;
+        }
+
+        .rbtv-team {
+          font-size: 9px;
+        }
+
+        .rbtv-team img {
+          width: 23px;
+          height: 23px;
+
+          flex-basis: 23px;
+        }
+
+        .rbtv-vs {
+          min-width: 17px;
+        }
+
+      }
+
+    `;
+
+    document.head.appendChild(
+      style
+    );
+
+    console.log(
+      "%c[RBTV CSS] INJECTED",
+      "color:#00d979;font-weight:bold"
+    );
+  }
+
+
+  /* Jalankan CSS */
+
+  rbInjectCSS();
+
+
+  /* =========================================================
+     CONFIG
+  ========================================================= */
 
   const RBTV_API =
     "https://apis-data10.tcllu137fien.ru/sfver915c76f70397a83f69a18051c6c8d037e40acf/api/match/live?sportType=1&language=34&stream=true";
@@ -18,51 +565,104 @@
   const RBTV_STATUS_CHECK_MS =
     30000;
 
-  let rbStatusItems = [];
-  let rbStatusLoading = false;
-  let rbStatusMonitorStarted = false;
 
-  function rbReadVarint(buf, pos) {
+  /* =========================================================
+     STATE
+  ========================================================= */
+
+  let rbStatusItems = [];
+
+  let rbStatusLoading =
+    false;
+
+  let rbStatusMonitorStarted =
+    false;
+
+
+  /* =========================================================
+     VARINT
+  ========================================================= */
+
+  function rbReadVarint(
+    buf,
+    pos
+  ) {
+
     let value = 0n;
+
     let shift = 0n;
 
-    while (pos < buf.length) {
-      const b = buf[pos++];
+    while (
+      pos < buf.length
+    ) {
+
+      const b =
+        buf[pos++];
 
       value |=
-        BigInt(b & 0x7F) << shift;
+        BigInt(
+          b & 0x7F
+        ) <<
+        shift;
 
-      if (!(b & 0x80)) {
+      if (
+        !(b & 0x80)
+      ) {
+
         return {
           value,
           next: pos
         };
+
       }
 
       shift += 7n;
 
-      if (shift > 70n) {
+      if (
+        shift > 70n
+      ) {
         break;
       }
+
     }
 
     return null;
   }
 
-  function rbReadFields(buf) {
+
+  /* =========================================================
+     READ FIELDS
+  ========================================================= */
+
+  function rbReadFields(
+    buf
+  ) {
+
     const fields = [];
+
     let p = 0;
 
-    while (p < buf.length) {
+    while (
+      p < buf.length
+    ) {
+
       const keyInfo =
-        rbReadVarint(buf, p);
+        rbReadVarint(
+          buf,
+          p
+        );
 
-      if (!keyInfo) break;
+      if (!keyInfo) {
+        break;
+      }
 
-      p = keyInfo.next;
+      p =
+        keyInfo.next;
 
       const key =
-        Number(keyInfo.value);
+        Number(
+          keyInfo.value
+        );
 
       const fieldNo =
         key >>> 3;
@@ -70,19 +670,31 @@
       const wireType =
         key & 7;
 
-      if (!fieldNo) break;
+      if (!fieldNo) {
+        break;
+      }
 
       let value = null;
 
       const start = p;
+
       let end = p;
 
       try {
-        if (wireType === 0) {
-          const v =
-            rbReadVarint(buf, p);
 
-          if (!v) break;
+        if (
+          wireType === 0
+        ) {
+
+          const v =
+            rbReadVarint(
+              buf,
+              p
+            );
+
+          if (!v) {
+            break;
+          }
 
           value =
             v.value;
@@ -94,8 +706,16 @@
             p;
         }
 
-        else if (wireType === 1) {
-          if (p + 8 > buf.length) break;
+        else if (
+          wireType === 1
+        ) {
+
+          if (
+            p + 8 >
+            buf.length
+          ) {
+            break;
+          }
 
           value =
             buf.slice(
@@ -109,11 +729,19 @@
             p;
         }
 
-        else if (wireType === 2) {
-          const lenInfo =
-            rbReadVarint(buf, p);
+        else if (
+          wireType === 2
+        ) {
 
-          if (!lenInfo) break;
+          const lenInfo =
+            rbReadVarint(
+              buf,
+              p
+            );
+
+          if (!lenInfo) {
+            break;
+          }
 
           p =
             lenInfo.next;
@@ -124,9 +752,12 @@
             );
 
           if (
-            !Number.isFinite(len) ||
+            !Number.isFinite(
+              len
+            ) ||
             len < 0 ||
-            p + len > buf.length
+            p + len >
+              buf.length
           ) {
             break;
           }
@@ -143,8 +774,16 @@
             p;
         }
 
-        else if (wireType === 5) {
-          if (p + 4 > buf.length) break;
+        else if (
+          wireType === 5
+        ) {
+
+          if (
+            p + 4 >
+            buf.length
+          ) {
+            break;
+          }
 
           value =
             buf.slice(
@@ -169,34 +808,58 @@
           start,
           end
         });
+
       }
 
       catch (e) {
         break;
       }
+
     }
 
     return fields;
   }
 
-  function rbBytesToString(bytes) {
+
+  /* =========================================================
+     BYTES -> STRING
+  ========================================================= */
+
+  function rbBytesToString(
+    bytes
+  ) {
+
     try {
+
       return new TextDecoder(
         "utf-8",
         {
           fatal: false
         }
-      ).decode(bytes);
+      ).decode(
+        bytes
+      );
+
     }
 
     catch (e) {
       return "";
     }
+
   }
 
-  function rbCleanText(str) {
+
+  /* =========================================================
+     CLEAN TEXT
+  ========================================================= */
+
+  function rbCleanText(
+    str
+  ) {
+
     if (
-      typeof str !== "string"
+      typeof str !==
+      "string"
     ) {
       return "";
     }
@@ -238,16 +901,38 @@
     return s.trim();
   }
 
-  function rbLooksLikeUrl(str) {
+
+  /* =========================================================
+     URL CHECK
+  ========================================================= */
+
+  function rbLooksLikeUrl(
+    str
+  ) {
+
     return (
-      typeof str === "string" &&
-      /^https?:\/\//i.test(str)
+      typeof str ===
+      "string" &&
+      /^https?:\/\//i.test(
+        str
+      )
     );
+
   }
 
-  function rbIsTeamLogo(str) {
+
+  /* =========================================================
+     TEAM LOGO CHECK
+  ========================================================= */
+
+  function rbIsTeamLogo(
+    str
+  ) {
+
     if (
-      !rbLooksLikeUrl(str)
+      !rbLooksLikeUrl(
+        str
+      )
     ) {
       return false;
     }
@@ -268,11 +953,22 @@
       /logo.*team/i.test(s) ||
       /\.(png|jpg|jpeg|webp|svg)(\?.*)?$/i.test(s)
     );
+
   }
 
-  function rbIsCompetitionLogo(str) {
+
+  /* =========================================================
+     COMPETITION LOGO CHECK
+  ========================================================= */
+
+  function rbIsCompetitionLogo(
+    str
+  ) {
+
     return (
-      rbLooksLikeUrl(str) &&
+      rbLooksLikeUrl(
+        str
+      ) &&
       (
         /\/football\/competition\//i.test(str) ||
         /\/football\/competitions\//i.test(str) ||
@@ -280,13 +976,20 @@
         /logo.*competition/i.test(str)
       )
     );
+
   }
+
+
+  /* =========================================================
+     COLLECT STRINGS
+  ========================================================= */
 
   function rbCollectStrings(
     buf,
     depth = 0,
     result = []
   ) {
+
     if (
       !buf ||
       depth > 10
@@ -295,11 +998,14 @@
     }
 
     const fields =
-      rbReadFields(buf);
+      rbReadFields(
+        buf
+      );
 
     for (
       const f of fields
     ) {
+
       if (
         f.wireType !== 2
       ) {
@@ -315,6 +1021,7 @@
         );
 
       if (str) {
+
         const clean =
           str.trim();
 
@@ -324,6 +1031,7 @@
             "\u0000"
           )
         ) {
+
           result.push({
             field:
               f.fieldNo,
@@ -331,7 +1039,9 @@
               clean,
             bytes
           });
+
         }
+
       }
 
       rbCollectStrings(
@@ -339,16 +1049,23 @@
         depth + 1,
         result
       );
+
     }
 
     return result;
   }
+
+
+  /* =========================================================
+     COLLECT LOGO URLS
+  ========================================================= */
 
   function rbCollectLogoUrls(
     buf,
     depth = 0,
     result = []
   ) {
+
     if (
       !buf ||
       depth > 12
@@ -357,11 +1074,14 @@
     }
 
     const fields =
-      rbReadFields(buf);
+      rbReadFields(
+        buf
+      );
 
     for (
       const f of fields
     ) {
+
       if (
         f.wireType !== 2
       ) {
@@ -377,16 +1097,26 @@
         ).trim();
 
       if (
-        rbLooksLikeUrl(str) &&
-        rbIsTeamLogo(str)
+        rbLooksLikeUrl(
+          str
+        ) &&
+        rbIsTeamLogo(
+          str
+        )
       ) {
+
         if (
-          !result.includes(str)
+          !result.includes(
+            str
+          )
         ) {
+
           result.push(
             str
           );
+
         }
+
       }
 
       rbCollectLogoUrls(
@@ -394,16 +1124,23 @@
         depth + 1,
         result
       );
+
     }
 
     return result;
   }
+
+
+  /* =========================================================
+     FIND TEAM OBJECTS
+  ========================================================= */
 
   function rbFindTeamObjects(
     buf,
     depth = 0,
     result = []
   ) {
+
     if (
       !buf ||
       depth > 10
@@ -412,13 +1149,17 @@
     }
 
     const fields =
-      rbReadFields(buf);
+      rbReadFields(
+        buf
+      );
 
-    const directStrings = [];
+    const directStrings =
+      [];
 
     for (
       const f of fields
     ) {
+
       if (
         f.wireType !== 2
       ) {
@@ -435,7 +1176,9 @@
       }
 
       const clean =
-        rbCleanText(text);
+        rbCleanText(
+          text
+        );
 
       if (!clean) {
         continue;
@@ -449,6 +1192,7 @@
         bytes:
           f.value
       });
+
     }
 
     const directLogo =
@@ -460,11 +1204,14 @@
       );
 
     if (directLogo) {
-      const possibleNames = [];
+
+      const possibleNames =
+        [];
 
       for (
         const x of directStrings
       ) {
+
         const clean =
           rbCleanText(
             x.text
@@ -473,15 +1220,21 @@
         if (!clean) continue;
 
         if (
-          rbLooksLikeUrl(clean)
+          rbLooksLikeUrl(
+            clean
+          )
         ) continue;
 
         if (
-          /^\d+$/.test(clean)
+          /^\d+$/.test(
+            clean
+          )
         ) continue;
 
         if (
-          /^\d{4}$/.test(clean)
+          /^\d{4}$/.test(
+            clean
+          )
         ) continue;
 
         if (
@@ -490,8 +1243,12 @@
         ) continue;
 
         if (
-          /\svs\s/i.test(clean) ||
-          /-vs-/i.test(clean)
+          /\svs\s/i.test(
+            clean
+          ) ||
+          /-vs-/i.test(
+            clean
+          )
         ) continue;
 
         if (
@@ -502,11 +1259,13 @@
         possibleNames.push(
           clean
         );
+
       }
 
       if (
         possibleNames.length
       ) {
+
         result.push({
           name:
             possibleNames[
@@ -516,12 +1275,15 @@
             directLogo.text,
           depth
         });
+
       }
+
     }
 
     for (
       const f of fields
     ) {
+
       if (
         f.wireType !== 2
       ) {
@@ -533,14 +1295,21 @@
         depth + 1,
         result
       );
+
     }
 
     return result;
   }
 
+
+  /* =========================================================
+     FIND COMPETITION
+  ========================================================= */
+
   function rbFindCompetition(
     buf
   ) {
+
     let competitionName =
       "";
 
@@ -551,6 +1320,7 @@
       current,
       depth
     ) {
+
       if (
         !current ||
         depth > 10 ||
@@ -567,6 +1337,7 @@
       for (
         const f of fields
       ) {
+
         if (
           f.wireType !== 2
         ) {
@@ -590,6 +1361,7 @@
         for (
           const nf of localFields
         ) {
+
           if (
             nf.wireType !== 2
           ) {
@@ -617,15 +1389,20 @@
               s.trim()
             )
           ) {
+
             localLogo =
               s.trim();
+
           }
+
         }
 
         if (localLogo) {
+
           for (
             const x of localStrings
           ) {
+
             const clean =
               rbCleanText(
                 x.text
@@ -640,11 +1417,15 @@
             ) continue;
 
             if (
-              /^\d+$/.test(clean)
+              /^\d+$/.test(
+                clean
+              )
             ) continue;
 
             if (
-              /^\d{4}$/.test(clean)
+              /^\d{4}$/.test(
+                clean
+              )
             ) continue;
 
             if (
@@ -653,8 +1434,12 @@
             ) continue;
 
             if (
-              /\svs\s/i.test(clean) ||
-              /-vs-/i.test(clean)
+              /\svs\s/i.test(
+                clean
+              ) ||
+              /-vs-/i.test(
+                clean
+              )
             ) continue;
 
             if (
@@ -670,15 +1455,18 @@
 
             break;
           }
+
         }
 
         if (
           !competitionName
         ) {
+
           walk(
             nested,
             depth + 1
           );
+
         }
 
         if (
@@ -686,7 +1474,9 @@
         ) {
           return;
         }
+
       }
+
     }
 
     walk(
@@ -704,15 +1494,22 @@
     };
   }
 
+
+  /* =========================================================
+     FIND TITLE
+  ========================================================= */
+
   function rbFindTitle(
     strings
   ) {
+
     let title =
       "";
 
     for (
       const x of strings
     ) {
+
       const s =
         rbCleanText(
           x.text
@@ -721,44 +1518,70 @@
       if (!s) continue;
 
       if (
-        /\svs\s/i.test(s)
+        /\svs\s/i.test(
+          s
+        )
       ) {
+
         if (
-          s.length > title.length &&
+          s.length >
+            title.length &&
           s.length < 250
         ) {
+
           title =
             s;
+
         }
+
       }
+
     }
 
     return title;
   }
 
+
+  /* =========================================================
+     FIND SLUG
+  ========================================================= */
+
   function rbFindSlug(
     strings
   ) {
+
     for (
       const x of strings
     ) {
+
       const s =
         x.text.trim();
 
       if (
-        /^[a-z0-9-]+-vs-[a-z0-9-]+$/i.test(s)
+        /^[a-z0-9-]+-vs-[a-z0-9-]+$/i.test(
+          s
+        )
       ) {
+
         return s;
+
       }
+
     }
 
     return "";
   }
 
+
+  /* =========================================================
+     SPLIT TEAMS
+  ========================================================= */
+
   function rbSplitTeams(
     title,
     slug
   ) {
+
     let home =
       "";
 
@@ -776,6 +1599,7 @@
       );
 
     if (m) {
+
       home =
         rbCleanText(
           m[1]
@@ -785,12 +1609,14 @@
         rbCleanText(
           m[2]
         );
+
     }
 
     if (
       (!home || !away) &&
       slug
     ) {
+
       const parts =
         slug.split(
           /-vs-/i
@@ -799,7 +1625,9 @@
       if (
         parts.length === 2
       ) {
+
         if (!home) {
+
           home =
             rbCleanText(
               parts[0]
@@ -808,9 +1636,11 @@
                   " "
                 )
             );
+
         }
 
         if (!away) {
+
           away =
             rbCleanText(
               parts[1]
@@ -819,8 +1649,11 @@
                   " "
                 )
             );
+
         }
+
       }
+
     }
 
     return {
@@ -829,9 +1662,15 @@
     };
   }
 
+
+  /* =========================================================
+     GET MATCH DATE
+  ========================================================= */
+
   function rbGetMatchDate(
     recordBytes
   ) {
+
     const fields =
       rbReadFields(
         recordBytes
@@ -840,33 +1679,47 @@
     for (
       const f of fields
     ) {
+
       if (
         f.fieldNo === 3 &&
         f.wireType === 0
       ) {
+
         const n =
           Number(
             f.value
           );
 
         if (
-          Number.isFinite(n) &&
+          Number.isFinite(
+            n
+          ) &&
           n > 1000000000000 &&
           n < 3000000000000
         ) {
+
           return n;
+
         }
+
       }
+
     }
 
     return null;
   }
+
+
+  /* =========================================================
+     BUILD MATCH
+  ========================================================= */
 
   function rbBuildMatch(
     recordBytes,
     recordStart,
     recordLength
   ) {
+
     const matchDate =
       rbGetMatchDate(
         recordBytes
@@ -930,6 +1783,7 @@
     for (
       const t of teamObjects
     ) {
+
       if (!t.logo) {
         continue;
       }
@@ -942,10 +1796,13 @@
         );
 
       if (!exists) {
+
         uniqueTeams.push(
           t
         );
+
       }
+
     }
 
     let homeLogo =
@@ -967,6 +1824,7 @@
     for (
       const t of uniqueTeams
     ) {
+
       const name =
         rbCleanText(
           t.name
@@ -981,23 +1839,30 @@
         !homeLogo &&
         nameLower === homeLower
       ) {
+
         homeLogo =
           t.logo;
+
       }
 
       if (
         !awayLogo &&
         nameLower === awayLower
       ) {
+
         awayLogo =
           t.logo;
+
       }
+
     }
 
     if (!homeLogo) {
+
       for (
         const t of uniqueTeams
       ) {
+
         const name =
           rbCleanText(
             t.name
@@ -1019,18 +1884,23 @@
             )
           )
         ) {
+
           homeLogo =
             t.logo;
 
           break;
         }
+
       }
+
     }
 
     if (!awayLogo) {
+
       for (
         const t of uniqueTeams
       ) {
+
         const name =
           rbCleanText(
             t.name
@@ -1052,31 +1922,39 @@
             )
           )
         ) {
+
           if (
             t.logo !==
             homeLogo
           ) {
+
             awayLogo =
               t.logo;
 
             break;
           }
+
         }
+
       }
+
     }
 
     if (
       !homeLogo &&
       uniqueTeams[0]
     ) {
+
       homeLogo =
         uniqueTeams[0].logo;
+
     }
 
     if (
       !awayLogo &&
       uniqueTeams.length > 1
     ) {
+
       const fallbackAway =
         uniqueTeams.find(
           t =>
@@ -1085,20 +1963,26 @@
         );
 
       if (fallbackAway) {
+
         awayLogo =
           fallbackAway.logo;
+
       }
+
     }
 
     if (
       !homeLogo &&
       allLogoUrls[0]
     ) {
+
       homeLogo =
         allLogoUrls[0];
+
     }
 
     if (!awayLogo) {
+
       const secondLogo =
         allLogoUrls.find(
           logo =>
@@ -1107,9 +1991,12 @@
         );
 
       if (secondLogo) {
+
         awayLogo =
           secondLogo;
+
       }
+
     }
 
     const competitionData =
@@ -1119,36 +2006,53 @@
 
     return {
       matchDate,
+
       competition:
         rbCleanText(
           competitionData.name
         ),
+
       competitionLogo:
         competitionData.logo ||
         "",
+
       home:
         rbCleanText(
           home
         ),
+
       away:
         rbCleanText(
           away
         ),
+
       homeLogo,
+
       awayLogo,
+
       slug,
+
       recordStart,
+
       recordLength,
+
       apiStatus:
         null,
+
       apiStatusObject:
         null
     };
   }
 
+
+  /* =========================================================
+     FIND RECORDS
+  ========================================================= */
+
   function rbFindRecords(
     buffer
   ) {
+
     const records =
       [];
 
@@ -1157,6 +2061,7 @@
       i < buffer.length;
       i++
     ) {
+
       if (
         buffer[i] !==
         0x0A
@@ -1187,7 +2092,9 @@
         len;
 
       if (
-        !Number.isFinite(len) ||
+        !Number.isFinite(
+          len
+        ) ||
         len <= 100 ||
         payloadEnd >
           buffer.length
@@ -1228,25 +2135,36 @@
 
       i =
         payloadEnd - 1;
+
     }
 
     return records;
   }
 
+
+  /* =========================================================
+     DATE
+  ========================================================= */
+
   function rbDateKey(
     timestamp
   ) {
+
     return new Intl.DateTimeFormat(
       "en-US",
       {
         timeZone:
           "Asia/Jakarta",
+
         weekday:
           "long",
+
         year:
           "numeric",
+
         month:
           "long",
+
         day:
           "2-digit"
       }
@@ -1255,20 +2173,30 @@
         timestamp
       )
     );
+
   }
+
+
+  /* =========================================================
+     TIME
+  ========================================================= */
 
   function rbFormatTime(
     timestamp
   ) {
+
     return new Intl.DateTimeFormat(
       "en-GB",
       {
         timeZone:
           "Asia/Jakarta",
+
         hour:
           "2-digit",
+
         minute:
           "2-digit",
+
         hour12:
           false
       }
@@ -1277,30 +2205,75 @@
         timestamp
       )
     );
+
   }
 
-  function rbNormalizeName(value) {
-    return String(value || "")
+
+  /* =========================================================
+     NORMALIZE NAME
+  ========================================================= */
+
+  function rbNormalizeName(
+    value
+  ) {
+
+    return String(
+      value || ""
+    )
       .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
+      .replace(
+        /[\u0300-\u036f]/g,
+        ""
+      )
       .toLowerCase()
-      .replace(/\([^)]*\)/g, " ")
-      .replace(/\b(fc|cf|sc|ac|afc|women|woman|w|u\d+)\b/g, " ")
-      .replace(/[^a-z0-9]+/g, " ")
-      .replace(/\s+/g, " ")
+      .replace(
+        /\([^)]*\)/g,
+        " "
+      )
+      .replace(
+        /\b(fc|cf|sc|ac|afc|women|woman|w|u\d+)\b/g,
+        " "
+      )
+      .replace(
+        /[^a-z0-9]+/g,
+        " "
+      )
+      .replace(
+        /\s+/g,
+        " "
+      )
       .trim();
   }
 
-  function rbTeamNameScore(a, b) {
+
+  /* =========================================================
+     TEAM SCORE
+  ========================================================= */
+
+  function rbTeamNameScore(
+    a,
+    b
+  ) {
+
     const x =
-      rbNormalizeName(a);
+      rbNormalizeName(
+        a
+      );
 
     const y =
-      rbNormalizeName(b);
+      rbNormalizeName(
+        b
+      );
 
-    if (!x || !y) return 0;
+    if (!x || !y) {
+      return 0;
+    }
 
-    if (x === y) return 100;
+    if (
+      x === y
+    ) {
+      return 100;
+    }
 
     if (
       x.includes(y) ||
@@ -1323,44 +2296,66 @@
 
     xt.forEach(
       token => {
+
         if (
           token.length >= 3 &&
           yt.has(token)
         ) {
+
           common++;
+
         }
+
       }
     );
 
-    if (common >= 2) return 60;
+    if (
+      common >= 2
+    ) {
+      return 60;
+    }
 
-    if (common === 1) return 30;
+    if (
+      common === 1
+    ) {
+      return 30;
+    }
 
     return 0;
   }
 
+
+  /* =========================================================
+     STATUS ITEMS
+  ========================================================= */
+
   function rbExtractStatusItems(
     json
   ) {
+
     const data =
       json &&
       json.data &&
-      typeof json.data === "object"
+      typeof json.data ===
+        "object"
         ? json.data
         : {};
 
-    const result = [];
+    const result =
+      [];
 
     Object.keys(
       data
     ).forEach(
       key => {
+
         const item =
           data[key];
 
         if (
           !item ||
-          typeof item !== "object"
+          typeof item !==
+            "object"
         ) {
           return;
         }
@@ -1396,55 +2391,81 @@
         if (
           !home ||
           !away ||
-          !Number.isFinite(matchTime) ||
-          !Number.isFinite(matchStatus)
+          !Number.isFinite(
+            matchTime
+          ) ||
+          !Number.isFinite(
+            matchStatus
+          )
         ) {
           return;
         }
 
         result.push({
           key,
+
           matchId:
             item.matchId ||
             item.match_id ||
             "",
+
           home,
+
           away,
+
           matchTime,
+
           matchStatus,
+
           matchStatusText:
             String(
               item.match_status ||
               item.status_name ||
               ""
             ).toLowerCase(),
+
           raw:
             item
         });
+
       }
     );
 
     return result;
   }
 
+
+  /* =========================================================
+     FETCH STATUS API
+  ========================================================= */
+
   async function rbFetchStatusAPI() {
-    if (rbStatusLoading) {
+
+    if (
+      rbStatusLoading
+    ) {
+
       return rbStatusItems;
+
     }
 
-    rbStatusLoading = true;
+    rbStatusLoading =
+      true;
 
     try {
+
       const response =
         await fetch(
           RBTV_STATUS_API,
           {
             method:
               "GET",
+
             headers: {
               "Accept":
                 "application/json"
             },
+
             cache:
               "no-store"
           }
@@ -1456,11 +2477,15 @@
         response.status
       );
 
-      if (!response.ok) {
+      if (
+        !response.ok
+      ) {
+
         throw new Error(
           "RBTV STATUS API HTTP " +
           response.status
         );
+
       }
 
       const json =
@@ -1478,9 +2503,11 @@
       );
 
       return rbStatusItems;
+
     }
 
     catch (error) {
+
       console.warn(
         "%c[RBTV STATUS API] GAGAL:",
         "color:#ff6600;font-weight:bold",
@@ -1488,16 +2515,27 @@
       );
 
       return rbStatusItems;
+
     }
 
     finally {
-      rbStatusLoading = false;
+
+      rbStatusLoading =
+        false;
+
     }
+
   }
+
+
+  /* =========================================================
+     FIND API STATUS
+  ========================================================= */
 
   function rbFindApiStatus(
     match
   ) {
+
     if (
       !rbStatusItems.length ||
       !match
@@ -1519,11 +2557,13 @@
     }
 
     let best = null;
+
     let bestScore = 0;
 
     for (
       const item of rbStatusItems
     ) {
+
       const timeDiff =
         Math.abs(
           Number(
@@ -1579,12 +2619,15 @@
         totalScore >
         bestScore
       ) {
+
         bestScore =
           totalScore;
 
         best =
           item;
+
       }
+
     }
 
     return (
@@ -1595,17 +2638,26 @@
       : null;
   }
 
+
+  /* =========================================================
+     APPLY API STATUS
+  ========================================================= */
+
   function rbApplyApiStatuses(
     matches
   ) {
+
     if (
-      !Array.isArray(matches)
+      !Array.isArray(
+        matches
+      )
     ) {
       return;
     }
 
     matches.forEach(
       match => {
+
         const apiStatus =
           rbFindApiStatus(
             match
@@ -1620,22 +2672,33 @@
             : null;
 
         if (apiStatus) {
+
           console.log(
             "%c[RBTV API STATUS] " +
             match.home +
             " vs " +
             match.away,
+
             "color:#00d9ff;font-weight:bold",
+
             apiStatus.raw
           );
+
         }
+
       }
     );
   }
 
+
+  /* =========================================================
+     GET STATUS
+  ========================================================= */
+
   function rbGetStatus(
     match
   ) {
+
     const matchDate =
       Number(
         match?.matchDate
@@ -1659,12 +2722,15 @@
       apiText === "in_play" ||
       apiText === "playing"
     ) {
+
       return {
         type:
           "live",
+
         label:
           "LIVE"
       };
+
     }
 
     if (
@@ -1673,12 +2739,15 @@
       apiText === "upcoming" ||
       apiText === "not_started"
     ) {
+
       return {
         type:
           "upcoming",
+
         label:
           "UPCOMING"
       };
+
     }
 
     if (
@@ -1688,25 +2757,35 @@
       matchDate >
         Date.now()
     ) {
+
       return {
         type:
           "upcoming",
+
         label:
           "UPCOMING"
       };
+
     }
 
     return {
       type:
         "finished",
+
       label:
         "FINISHED"
     };
   }
 
+
+  /* =========================================================
+     COUNTDOWN
+  ========================================================= */
+
   function rbCountdown(
     timestamp
   ) {
+
     const diff =
       timestamp -
       Date.now();
@@ -1751,6 +2830,7 @@
     if (
       days > 0
     ) {
+
       return (
         days +
         "d " +
@@ -1775,6 +2855,7 @@
           "0"
         )
       );
+
     }
 
     return (
@@ -1801,9 +2882,15 @@
     );
   }
 
+
+  /* =========================================================
+     ESCAPE
+  ========================================================= */
+
   function rbEscape(
     value
   ) {
+
     return String(
       value || ""
     )
@@ -1829,19 +2916,27 @@
       );
   }
 
+
+  /* =========================================================
+     RENDER SCHEDULE
+  ========================================================= */
+
   function rbRenderSchedule(
     matches
   ) {
+
     const container =
       document.querySelector(
         SCHEDULE_SELECTOR
       );
 
     if (!container) {
+
       console.error(
         "%c[RBTV] #rbtvSchedule TIDAK DITEMUKAN",
         "color:red;font-weight:bold"
       );
+
       return;
     }
 
@@ -1849,6 +2944,7 @@
       !matches ||
       !matches.length
     ) {
+
       container.innerHTML = `
         <div class="rbtv-empty">
           Match not found
@@ -1870,6 +2966,7 @@
     if (
       !visibleMatches.length
     ) {
+
       container.innerHTML = `
         <div class="rbtv-empty">
           Match not found
@@ -1887,6 +2984,7 @@
 
     visibleMatches.forEach(
       match => {
+
         const dateKey =
           rbDateKey(
             match.matchDate
@@ -1896,6 +2994,7 @@
           dateKey !==
           currentDate
         ) {
+
           currentDate =
             dateKey;
 
@@ -1906,6 +3005,7 @@
               )}
             </div>
           `;
+
         }
 
         const status =
@@ -1935,7 +3035,9 @@
                       )}"
                       alt=""
                       loading="lazy"
-                      onerror="this.style.display='none'"
+                      onerror="
+                        this.style.display='none'
+                      "
                     >
                   `
                   : ""
@@ -1950,6 +3052,7 @@
 
             </div>
 
+
             <div class="rbtv-time">
               ${rbEscape(
                 rbFormatTime(
@@ -1957,6 +3060,7 @@
                 )
               )}
             </div>
+
 
             <div class="rbtv-teams">
 
@@ -1995,9 +3099,11 @@
 
               </div>
 
+
               <div class="rbtv-vs">
                 VS
               </div>
+
 
               <div class="rbtv-team">
 
@@ -2036,11 +3142,13 @@
 
             </div>
 
+
             <div
               class="rbtv-status ${status.type}"
             >
               ${status.label}
             </div>
+
 
             ${
               countdown
@@ -2054,6 +3162,7 @@
 
           </div>
         `;
+
       }
     );
 
@@ -2067,7 +3176,13 @@
     );
   }
 
+
+  /* =========================================================
+     UPDATE COUNTDOWN
+  ========================================================= */
+
   function rbUpdateCountdowns() {
+
     const items =
       document.querySelectorAll(
         "#rbtvSchedule .rbtv-match"
@@ -2075,6 +3190,7 @@
 
     items.forEach(
       item => {
+
         const timestamp =
           Number(
             item.dataset.matchTime
@@ -2103,6 +3219,7 @@
           if (
             !countdownElement
           ) {
+
             countdownElement =
               document.createElement(
                 "div"
@@ -2114,6 +3231,7 @@
             item.appendChild(
               countdownElement
             );
+
           }
 
           countdownElement.textContent =
@@ -2124,18 +3242,28 @@
         else if (
           countdownElement
         ) {
+
           countdownElement.remove();
+
         }
+
       }
     );
   }
 
+
+  /* =========================================================
+     STATUS SIGNATURE
+  ========================================================= */
+
   function rbStatusSignature(
     matches
   ) {
+
     return matches
       .map(
         match => {
+
           const status =
             rbGetStatus(
               match
@@ -2152,13 +3280,22 @@
             "|" +
             status
           );
+
         }
       )
       .sort()
-      .join("||");
+      .join(
+        "||"
+      );
   }
 
+
+  /* =========================================================
+     STATUS MONITOR
+  ========================================================= */
+
   function startRBTVStatusMonitor() {
+
     if (
       rbStatusMonitorStarted
     ) {
@@ -2222,6 +3359,7 @@
                   ).type !==
                   "finished"
               );
+
           }
 
         }
@@ -2237,21 +3375,30 @@
         }
 
       },
+
       RBTV_STATUS_CHECK_MS
     );
   }
 
+
+  /* =========================================================
+     FETCH RBTV
+  ========================================================= */
+
   async function rbFetch() {
+
     const response =
       await fetch(
         RBTV_API,
         {
           method:
             "GET",
+
           headers: {
             "Accept":
               "application/json"
           },
+
           cache:
             "no-store"
         }
@@ -2266,10 +3413,12 @@
     if (
       !response.ok
     ) {
+
       throw new Error(
         "RBTV API HTTP " +
         response.status
       );
+
     }
 
     const buffer =
@@ -2286,18 +3435,26 @@
     return buffer;
   }
 
+
+  /* =========================================================
+     INIT
+  ========================================================= */
+
   async function init() {
+
     const container =
       document.querySelector(
         SCHEDULE_SELECTOR
       );
 
     if (container) {
+
       container.innerHTML = `
         <div class="rbtv-loading">
           Loading schedule...
         </div>
       `;
+
     }
 
     try {
@@ -2342,6 +3499,7 @@
         matches.push(
           match
         );
+
       }
 
       rbApplyApiStatuses(
@@ -2362,8 +3520,10 @@
           match,
           index
         ) => {
+
           match.no =
             index + 1;
+
         }
       );
 
@@ -2421,17 +3581,27 @@
         `;
 
       }
+
     }
+
   }
 
+
+  /* =========================================================
+     START
+  ========================================================= */
+
   function rbStart() {
+
     const container =
       document.querySelector(
         SCHEDULE_SELECTOR
       );
 
     if (container) {
+
       init();
+
       return;
     }
 
@@ -2472,12 +3642,19 @@
               "%c[RBTV] #rbtvSchedule TIDAK DITEMUKAN",
               "color:red;font-weight:bold"
             );
+
           }
 
         },
+
         200
       );
   }
+
+
+  /* =========================================================
+     RUN
+  ========================================================= */
 
   rbStart();
 
