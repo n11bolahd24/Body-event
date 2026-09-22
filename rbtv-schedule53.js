@@ -84,7 +84,9 @@
 #rbtvSchedule {
     width: 95%;
     margin: 0 auto;
+
     font-family: "Courier New", monospace;
+
     color: #fff;
     background: #111;
 }
@@ -112,15 +114,11 @@
 
     display: flex;
     align-items: center;
+
     gap: 6px;
 
     box-sizing: border-box;
 }
-
-
-/* =========================================================
-   DATE TITLE
-========================================================= */
 
 .rbtv-date-title {
     flex: 1;
@@ -129,7 +127,7 @@
 
 
 /* =========================================================
-   DATE ACTIONS
+   SEARCH + UPDATE
 ========================================================= */
 
 .rbtv-date-actions {
@@ -141,11 +139,6 @@
 
     flex-shrink: 0;
 }
-
-
-/* =========================================================
-   SEARCH INPUT
-========================================================= */
 
 .rbtv-search-input {
     width: 130px;
@@ -178,14 +171,13 @@
 
 .rbtv-search-input:focus {
     border-color: #00d979;
+
     background: #151515;
-    box-shadow: 0 0 4px rgba(0,217,121,.25);
+
+    box-shadow:
+        0 0 4px rgba(0,217,121,.25);
 }
 
-
-/* =========================================================
-   UPDATE BUTTON
-========================================================= */
 
 .rbtv-update-btn {
     height: 28px;
@@ -217,60 +209,48 @@
         box-shadow .2s ease;
 }
 
-
-/* =========================================================
-   UPDATE HOVER
-========================================================= */
-
 .rbtv-update-btn:hover {
     background: #00d979;
     border-color: #00d979;
     color: #111;
-    box-shadow: 0 0 5px rgba(0,217,121,.25);
+
+    box-shadow:
+        0 0 5px rgba(0,217,121,.25);
 }
-
-
-/* =========================================================
-   UPDATE ACTIVE
-========================================================= */
 
 .rbtv-update-btn:active {
     transform: translateY(1px);
 }
 
-
-/* =========================================================
-   UPDATE LOADING
-========================================================= */
-
 .rbtv-update-btn.loading {
     opacity: .65;
     pointer-events: none;
 }
+
+
 /* =========================================================
-   MATCH
+   MATCH BOX
 ========================================================= */
 
 .rbtv-match {
     width: 100%;
 
-    margin: 6px 0;
-    padding: 12px 10px 14px;
+    margin: 5px 0;
+    padding: 10px 10px 12px;
 
     box-sizing: border-box;
 
     background: #151515;
 
     border: 1px solid #242424;
-    border-radius: 5px;
+    border-radius: 4px;
 
     text-align: center;
 
     transition:
         background .2s ease,
         border-color .2s ease,
-        box-shadow .2s ease,
-        transform .2s ease;
+        box-shadow .2s ease;
 }
 
 
@@ -285,9 +265,8 @@
 
     box-shadow:
         0 0 6px rgba(0,217,121,.12);
-
-    transform: translateY(-1px);
 }
+
 
 /* =========================================================
    COMPETITION
@@ -346,9 +325,9 @@
     display: grid;
 
     grid-template-columns:
-        minmax(0, 1fr)
+        minmax(0,1fr)
         auto
-        minmax(0, 1fr);
+        minmax(0,1fr);
 
     align-items: center;
 
@@ -377,9 +356,10 @@
 
     color: #fff;
 
-    font-family: "Courier New", monospace;
-    font-size: 11px;
-    font-weight: bold;
+    /* FONT STANDAR */
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    font-weight: 600;
 
     line-height: 1.25;
 
@@ -425,6 +405,7 @@
     display: inline-block;
 
     margin-top: 7px;
+
     padding: 2px 7px;
 
     font-family: "Courier New", monospace;
@@ -436,11 +417,6 @@
     border-radius: 2px;
 }
 
-
-/* =========================================================
-   UPCOMING
-========================================================= */
-
 .rbtv-status.upcoming {
     color: #aaa;
 
@@ -449,11 +425,6 @@
     border: 1px solid #333;
 }
 
-
-/* =========================================================
-   LIVE
-========================================================= */
-
 .rbtv-status.live {
     color: #00d979;
 
@@ -461,11 +432,6 @@
 
     border: 1px solid rgba(0,217,121,.30);
 }
-
-
-/* =========================================================
-   FINISHED
-========================================================= */
 
 .rbtv-status.finished {
     color: #666;
@@ -493,64 +459,19 @@
 
 
 /* =========================================================
-   LOADING
+   LOADING / EMPTY / ERROR
 ========================================================= */
 
-.rbtv-loading {
-    padding: 20px 10px;
+.rbtv-loading,
+.rbtv-empty,
+.rbtv-search-empty,
+.rbtv-error {
+    padding: 15px 10px;
 
     color: #888;
 
     font-family: "Courier New", monospace;
-    font-size: 11px;
-
-    text-align: center;
-}
-
-
-/* =========================================================
-   EMPTY
-========================================================= */
-
-.rbtv-empty {
-    padding: 20px 10px;
-
-    color: #777;
-
-    font-family: "Courier New", monospace;
-    font-size: 11px;
-
-    text-align: center;
-}
-
-
-/* =========================================================
-   ERROR
-========================================================= */
-
-.rbtv-error {
-    padding: 20px 10px;
-
-    color: #ff5555;
-
-    font-family: "Courier New", monospace;
-    font-size: 11px;
-
-    text-align: center;
-}
-
-
-/* =========================================================
-   SEARCH EMPTY
-========================================================= */
-
-.rbtv-search-empty {
-    padding: 20px 10px;
-
-    color: #777;
-
-    font-family: "Courier New", monospace;
-    font-size: 11px;
+    font-size: 10px;
 
     text-align: center;
 }
@@ -576,6 +497,7 @@
 
     .rbtv-date-title {
         width: 100%;
+
         flex: 1 1 100%;
     }
 
@@ -589,6 +511,7 @@
         flex: 1;
 
         width: auto;
+
         min-width: 0;
     }
 
@@ -597,12 +520,15 @@
     }
 
     .rbtv-match {
-        padding:
-            9px 5px 11px;
+        margin: 4px 0;
+
+        padding: 9px 5px 11px;
     }
 
     .rbtv-team {
-        font-size: 10px;
+        font-family: Arial, Helvetica, sans-serif;
+
+        font-size: 11px;
     }
 
     .rbtv-team img {
@@ -613,7 +539,6 @@
     .rbtv-vs {
         font-size: 8px;
     }
-
 }
 
 
@@ -628,7 +553,7 @@
     }
 
     .rbtv-team {
-        font-size: 9px;
+        font-size: 10px;
     }
 
     .rbtv-team img {
@@ -639,9 +564,7 @@
     .rbtv-teams {
         gap: 5px;
     }
-
 }
-
 `;
 
     (
