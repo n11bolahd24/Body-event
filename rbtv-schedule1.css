@@ -1,0 +1,501 @@
+/* =========================================================
+   RBTV SCHEDULE - IKOTV STYLE
+========================================================= */
+
+#rbtvSchedule {
+    width: 95%;
+    max-width: 900px;
+    margin: 0 auto;
+    font-family: "Courier New", monospace;
+    color: #fff;
+    background: #111;
+}
+
+
+/* =========================================================
+   DATE HEADER
+========================================================= */
+
+.rbtv-date {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 9px 10px;
+
+    background: #181818;
+    color: #00d979;
+
+    font-family: "Courier New", monospace;
+    font-size: 12px;
+    font-weight: bold;
+
+    border-left: 3px solid #00d979;
+    border-bottom: 1px solid #292929;
+
+    border-radius: 6px 6px 0 0;
+}
+
+
+/* =========================================================
+   MATCH CARD
+========================================================= */
+
+.rbtv-match {
+    position: relative;
+
+    margin: 8px 0;
+    padding: 12px;
+
+    background: #111;
+
+    border: 1px solid #202020;
+    border-radius: 9px;
+
+    text-align: center;
+
+    overflow: hidden;
+}
+
+
+/* =========================================================
+   COMPETITION
+========================================================= */
+
+.rbtv-competition {
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+
+    border-bottom: 1px solid #292929;
+
+    font-family: "Courier New", monospace;
+    font-size: 10px;
+    font-weight: bold;
+
+    color: #aaa;
+
+    text-align: left;
+}
+
+
+/* =========================================================
+   TIME
+========================================================= */
+
+.rbtv-time {
+    margin-top: 2px;
+
+    font-family: "Courier New", monospace;
+    font-size: 20px;
+    font-weight: bold;
+
+    color: #fff;
+
+    line-height: 1.1;
+}
+
+
+/* =========================================================
+   TEAMS
+========================================================= */
+
+.rbtv-teams {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+
+    margin: 7px 0 8px;
+
+    gap: 8px;
+}
+
+
+/* =========================================================
+   TEAM
+========================================================= */
+
+.rbtv-team {
+    width: 42%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+
+    line-height: 1.15;
+
+    color: #fff;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   TEAM LOGO
+========================================================= */
+
+.rbtv-team img {
+    width: 30px;
+    height: 30px;
+
+    object-fit: contain;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   VS
+========================================================= */
+
+.rbtv-vs {
+    width: 25px;
+
+    flex-shrink: 0;
+
+    color: #aaa;
+
+    font-family: "Courier New", monospace;
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.rbtv-status {
+    display: inline-block;
+
+    margin-top: 2px;
+    padding: 4px 9px;
+
+    border-radius: 4px;
+
+    font-family: "Courier New", monospace;
+    font-size: 10px;
+    font-weight: bold;
+
+    line-height: 1;
+}
+
+
+/* UPCOMING */
+
+.rbtv-status.upcoming {
+    color: #fff;
+    background: #555;
+}
+
+
+/* WAITING */
+
+.rbtv-status.waiting {
+    color: #fff;
+    background: #555;
+}
+
+
+/* LIVE */
+
+.rbtv-status.live {
+    color: #fff;
+    background: #d40012;
+}
+
+
+/* FINISHED */
+
+.rbtv-status.finished {
+    color: #777;
+    background: #222;
+}
+
+
+/* =========================================================
+   COUNTDOWN
+========================================================= */
+
+.rbtv-countdown {
+    margin-top: 7px;
+
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+    font-weight: bold;
+
+    color: #00d979;
+
+    line-height: 1.2;
+}
+
+
+/* =========================================================
+   WAITING FOR KICKOFF
+========================================================= */
+
+.rbtv-waiting,
+.rbtv-waiting-kickoff {
+    display: inline-block;
+
+    margin-top: 8px;
+    padding: 5px 9px;
+
+    border-radius: 5px;
+
+    background: #555;
+    color: #fff;
+
+    font-family: "Courier New", monospace;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   SERVER PANEL
+========================================================= */
+
+.rbtv-server-panel {
+    margin-top: 9px;
+    padding: 8px;
+
+    background: #0d0d0d;
+
+    border: 1px solid #073b28;
+    border-radius: 7px;
+
+    text-align: left;
+}
+
+
+/* SERVER TITLE */
+
+.rbtv-server-title {
+    margin-bottom: 7px;
+
+    color: #fff;
+
+    font-family: "Courier New", monospace;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+
+/* SERVER BUTTON AREA */
+
+.rbtv-servers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+
+/* SERVER BUTTON */
+
+.rbtv-server,
+.rbtv-server-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 43px;
+
+    padding: 7px 9px;
+
+    background: #202020;
+
+    border: 1px solid #333;
+    border-radius: 5px;
+
+    color: #fff;
+
+    font-family: "Courier New", monospace;
+    font-size: 10px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition:
+        background .15s ease,
+        border-color .15s ease,
+        color .15s ease;
+}
+
+
+/* HOVER */
+
+.rbtv-server:hover,
+.rbtv-server-btn:hover {
+    background: #00d979;
+    border-color: #00d979;
+    color: #000;
+}
+
+
+/* ACTIVE SERVER */
+
+.rbtv-server.active,
+.rbtv-server-btn.active {
+    background: #00d979;
+    border-color: #00d979;
+    color: #000;
+}
+
+
+/* =========================================================
+   WATCH LIVE BUTTON
+========================================================= */
+
+.rbtv-watch-live {
+    display: inline-block;
+
+    margin-top: 8px;
+    padding: 7px 12px;
+
+    background: #00d979;
+
+    border: 0;
+    border-radius: 5px;
+
+    color: #000;
+
+    font-family: "Courier New", monospace;
+    font-size: 10px;
+    font-weight: bold;
+
+    text-decoration: none;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   LOADING / EMPTY / ERROR
+========================================================= */
+
+.rbtv-loading,
+.rbtv-empty,
+.rbtv-error {
+    padding: 20px;
+
+    text-align: center;
+
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.rbtv-loading {
+    color: #00d979;
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.rbtv-empty {
+    color: #777;
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.rbtv-error {
+    color: #ff5555;
+}
+
+
+/* =========================================================
+   API DEBUG
+========================================================= */
+
+.rbtv-api-debug {
+    padding: 15px;
+}
+
+
+.rbtv-debug-title {
+    margin-bottom: 8px;
+
+    color: #00d979;
+
+    font-family: "Courier New", monospace;
+    font-weight: bold;
+}
+
+
+.rbtv-debug-info {
+    margin-bottom: 5px;
+
+    color: #aaa;
+
+    font-family: "Courier New", monospace;
+    font-size: 11px;
+}
+
+
+.rbtv-debug-list {
+    margin-top: 10px;
+
+    color: #ccc;
+
+    font-family: "Courier New", monospace;
+    font-size: 10px;
+
+    line-height: 1.6;
+
+    word-break: break-word;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    #rbtvSchedule {
+        width: 95%;
+    }
+
+    .rbtv-match {
+        padding: 11px;
+    }
+
+    .rbtv-time {
+        font-size: 20px;
+    }
+
+    .rbtv-team {
+        width: 43%;
+        font-size: 13px;
+    }
+
+    .rbtv-team img {
+        width: 29px;
+        height: 29px;
+    }
+
+    .rbtv-vs {
+        width: 20px;
+        font-size: 9px;
+    }
+}
