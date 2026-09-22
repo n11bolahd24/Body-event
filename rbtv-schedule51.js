@@ -156,7 +156,7 @@
     box-sizing: border-box;
 
     border: 1px solid #00d979;
-    border-radius: 2px;
+    border-radius: 5px;
 
     outline: none;
 
@@ -195,7 +195,7 @@
     box-sizing: border-box;
 
     border: 1px solid #00d979;
-    border-radius: 2px;
+    border-radius: 5px;
 
     outline: none;
 
@@ -460,7 +460,7 @@
 .rbtv-countdown {
     margin-top: 5px;
 
-    color: #888;
+    color: #00d979;
 
     font-family: "Courier New", monospace;
     font-size: 10px;
