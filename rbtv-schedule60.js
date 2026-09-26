@@ -2498,6 +2498,10 @@
      FETCH STATUS
   ========================================================= */
 
+    /* =========================================================
+     FETCH STATUS - PROTOBUF + JSON
+  ========================================================= */
+
   async function rbFetchStatusAPI() {
 
     if (
@@ -2522,7 +2526,7 @@
 
             headers: {
               "Accept":
-                "application/json"
+                "application/json, application/octet-stream, application/x-protobuf"
             },
 
             cache:
@@ -2530,11 +2534,13 @@
           }
         );
 
+
       console.log(
         "%c[RBTV STATUS API] HTTP:",
         "color:#00d979;font-weight:bold",
         response.status
       );
+
 
       if (
         !response.ok
@@ -2547,19 +2553,122 @@
 
       }
 
-      const json =
-        await response.json();
+
+      /*
+       * Endpoint ini bisa mengembalikan
+       * protobuf, bukan JSON.
+       *
+       * Jadi kita baca sebagai bytes terlebih dahulu.
+       */
+
+      const buffer =
+        new Uint8Array(
+          await response.arrayBuffer()
+        );
+
+
+      console.log(
+        "%c[RBTV STATUS API] BYTES:",
+        "color:#00d979;font-weight:bold",
+        buffer.length
+      );
+
+
+      /*
+       * Coba JSON terlebih dahulu.
+       * Kalau bukan JSON, lanjut protobuf.
+       */
+
+      let json = null;
+
+
+      try {
+
+        const text =
+          new TextDecoder(
+            "utf-8",
+            {
+              fatal: false
+            }
+          ).decode(
+            buffer
+          ).trim();
+
+
+        if (
+          text.startsWith("{") ||
+          text.startsWith("[")
+        ) {
+
+          json =
+            JSON.parse(
+              text
+            );
+
+        }
+
+      }
+
+      catch (e) {
+
+        json =
+          null;
+
+      }
+
+
+      /*
+       * MODE JSON
+       */
+
+      if (json) {
+
+        rbStatusItems =
+          rbExtractStatusItems(
+            json
+          );
+
+
+        console.log(
+          "%c[RBTV STATUS API] MODE: JSON",
+          "color:#00d979;font-weight:bold"
+        );
+
+
+        console.log(
+          "%c[RBTV STATUS API] MATCHES:",
+          "color:#00d979;font-weight:bold",
+          rbStatusItems.length
+        );
+
+
+        return rbStatusItems;
+
+      }
+
+
+      /*
+       * MODE PROTOBUF
+       */
 
       rbStatusItems =
-        rbExtractStatusItems(
-          json
+        rbDecodeStatusProtobuf(
+          buffer
         );
+
+
+      console.log(
+        "%c[RBTV STATUS API] MODE: PROTOBUF",
+        "color:#00d979;font-weight:bold"
+      );
+
 
       console.log(
         "%c[RBTV STATUS API] MATCHES:",
         "color:#00d979;font-weight:bold",
         rbStatusItems.length
       );
+
 
       return rbStatusItems;
 
@@ -2572,6 +2681,7 @@
         "color:#ff6600;font-weight:bold",
         error
       );
+
 
       return rbStatusItems;
 
@@ -2587,6 +2697,434 @@
   }
 
 
+  /* =========================================================
+     STATUS PROTOBUF DECODER
+  ========================================================= */
+
+  function rbDecodeStatusProtobuf(
+    buffer
+  ) {
+
+    const result =
+      [];
+
+
+    /*
+     * Cari semua kemungkinan message protobuf
+     * di dalam response.
+     */
+
+    function walk(
+      bytes,
+      depth = 0
+    ) {
+
+      if (
+        !bytes ||
+        !bytes.length ||
+        depth > 12
+      ) {
+
+        return;
+
+      }
+
+
+      const fields =
+        rbReadFields(
+          bytes
+        );
+
+
+      if (
+        !fields.length
+      ) {
+
+        return;
+
+      }
+
+
+      const strings =
+        [];
+
+
+      const numbers =
+        [];
+
+
+      fields.forEach(
+        field => {
+
+          if (
+            field.wireType === 0
+          ) {
+
+            const n =
+              Number(
+                field.value
+              );
+
+
+            if (
+              Number.isFinite(
+                n
+              )
+            ) {
+
+              numbers.push({
+                field:
+                  field.fieldNo,
+
+                value:
+                  n
+              });
+
+            }
+
+          }
+
+
+          else if (
+            field.wireType === 2
+          ) {
+
+            const text =
+              rbBytesToString(
+                field.value
+              ).trim();
+
+
+            if (
+              text &&
+              !text.includes(
+                "\u0000"
+              )
+            ) {
+
+              strings.push({
+                field:
+                  field.fieldNo,
+
+                text
+              });
+
+            }
+
+          }
+
+        }
+      );
+
+
+      /*
+       * Ambil nama-nama yang terlihat seperti
+       * nama tim.
+       */
+
+      const teamStrings =
+        strings
+          .map(
+            x =>
+              rbCleanText(
+                x.text
+              )
+          )
+          .filter(
+            x =>
+              x &&
+              x.length >= 2 &&
+              x.length <= 120 &&
+              !rbLooksLikeUrl(x) &&
+              !/^\d+$/.test(x) &&
+              !/SuccessR/i.test(x) &&
+              !/^def$/i.test(x) &&
+              !/-vs-/i.test(x) &&
+              !/\svs\s/i.test(x)
+          );
+
+
+      /*
+       * Cari timestamp yang masuk akal.
+       *
+       * matchTime pada endpoint ini biasanya
+       * berupa Unix timestamp dalam detik.
+       */
+
+      const timestamps =
+        numbers
+          .map(
+            x => {
+
+              const n =
+                x.value;
+
+
+              if (
+                n > 1000000000 &&
+                n < 3000000000
+              ) {
+
+                return n;
+
+              }
+
+
+              if (
+                n > 1000000000000 &&
+                n < 3000000000000
+              ) {
+
+                return n / 1000;
+
+              }
+
+
+              return null;
+
+            }
+          )
+          .filter(
+            Number.isFinite
+          );
+
+
+      /*
+       * Status umum yang kita perlukan:
+       *
+       * 1 = UPCOMING
+       * 2 = LIVE
+       *
+       * Jangan mengambil angka lain sebagai status
+       * kecuali memang 1 atau 2.
+       */
+
+      const statusCandidates =
+        numbers
+          .filter(
+            x =>
+              x.value === 1 ||
+              x.value === 2
+          )
+          .map(
+            x =>
+              x.value
+          );
+
+
+      /*
+       * Kalau message memiliki minimal:
+       * - 2 string
+       * - timestamp
+       * - status 1/2
+       *
+       * simpan sebagai kandidat.
+       */
+
+      if (
+        teamStrings.length >= 2 &&
+        timestamps.length &&
+        statusCandidates.length
+      ) {
+
+        const uniqueStrings =
+          [];
+
+
+        teamStrings.forEach(
+          name => {
+
+            if (
+              !uniqueStrings.includes(
+                name
+              )
+            ) {
+
+              uniqueStrings.push(
+                name
+              );
+
+            }
+
+          }
+        );
+
+
+        /*
+         * Buat pasangan kemungkinan home/away.
+         */
+
+        for (
+          let i = 0;
+          i < uniqueStrings.length;
+          i++
+        ) {
+
+          for (
+            let j = i + 1;
+            j < uniqueStrings.length;
+            j++
+          ) {
+
+            const home =
+              uniqueStrings[i];
+
+            const away =
+              uniqueStrings[j];
+
+
+            if (
+              !home ||
+              !away ||
+              home === away
+            ) {
+
+              continue;
+
+            }
+
+
+            const matchTime =
+              timestamps[0];
+
+
+            const matchStatus =
+              statusCandidates[
+                0
+              ];
+
+
+            result.push({
+
+              key:
+                "protobuf-" +
+                result.length,
+
+              matchId:
+                "",
+
+              home,
+
+              away,
+
+              matchTime,
+
+              matchStatus,
+
+              matchStatusText:
+                matchStatus === 2
+                  ? "live"
+                  : "scheduled",
+
+              raw:
+                {
+                  protobuf:
+                    true
+                }
+
+            });
+
+          }
+
+        }
+
+      }
+
+
+      /*
+       * Terus turun ke nested protobuf.
+       */
+
+      fields.forEach(
+        field => {
+
+          if (
+            field.wireType !== 2
+          ) {
+
+            return;
+
+          }
+
+
+          walk(
+            field.value,
+            depth + 1
+          );
+
+        }
+      );
+
+    }
+
+
+    walk(
+      buffer,
+      0
+    );
+
+
+    /*
+     * Hilangkan duplikat.
+     */
+
+    const unique =
+      [];
+
+
+    result.forEach(
+      item => {
+
+        const exists =
+          unique.some(
+            x =>
+              rbNormalizeName(
+                x.home
+              ) ===
+              rbNormalizeName(
+                item.home
+              ) &&
+
+              rbNormalizeName(
+                x.away
+              ) ===
+              rbNormalizeName(
+                item.away
+              ) &&
+
+              Math.abs(
+                Number(
+                  x.matchTime
+                ) -
+                Number(
+                  item.matchTime
+                )
+              ) < 10
+          );
+
+
+        if (!exists) {
+
+          unique.push(
+            item
+          );
+
+        }
+
+      }
+    );
+
+
+    console.log(
+      "%c[RBTV STATUS PROTOBUF] CANDIDATES:",
+      "color:#00d979;font-weight:bold",
+      unique.length
+    );
+
+
+    return unique;
+
+  }
   /* =========================================================
      FIND API STATUS
   ========================================================= */
@@ -2760,7 +3298,7 @@
   }
 
 
-  /* =========================================================
+   /* =========================================================
      GET STATUS
   ========================================================= */
 
@@ -2773,10 +3311,12 @@
         match?.matchDate
       );
 
+
     const apiStatus =
       Number(
         match?.apiStatus
       );
+
 
     const apiText =
       String(
@@ -2784,6 +3324,12 @@
           ?.matchStatusText ||
         ""
       ).toLowerCase();
+
+
+    /*
+     * API STATUS 2
+     * = LIVE
+     */
 
     if (
       apiStatus === 2 ||
@@ -2793,14 +3339,22 @@
     ) {
 
       return {
+
         type:
           "live",
 
         label:
           "LIVE"
+
       };
 
     }
+
+
+    /*
+     * API STATUS 1
+     * = UPCOMING
+     */
 
     if (
       apiStatus === 1 ||
@@ -2810,14 +3364,23 @@
     ) {
 
       return {
+
         type:
           "upcoming",
 
         label:
           "UPCOMING"
+
       };
 
     }
+
+
+    /*
+     * Kalau waktu pertandingan belum lewat,
+     * tetap UPCOMING meskipun API status belum
+     * berhasil terbaca.
+     */
 
     if (
       Number.isFinite(
@@ -2828,24 +3391,34 @@
     ) {
 
       return {
+
         type:
           "upcoming",
 
         label:
           "UPCOMING"
+
       };
 
     }
 
+
+    /*
+     * Kalau sudah lewat dan API tidak mengatakan LIVE,
+     * anggap FINISHED.
+     */
+
     return {
+
       type:
         "finished",
 
       label:
         "FINISHED"
-    };
-  }
 
+    };
+
+  }
 
   /* =========================================================
      COUNTDOWN
