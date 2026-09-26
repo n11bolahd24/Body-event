@@ -2494,9 +2494,6 @@
   }
 
 
-  /* =========================================================
-     FETCH STATUS
-  ========================================================= */
 
     /* =========================================================
      FETCH STATUS - PROTOBUF + JSON
@@ -2565,6 +2562,23 @@
         new Uint8Array(
           await response.arrayBuffer()
         );
+
+      console.log(
+  "%c[RBTV STATUS RAW HEX]",
+  "color:#ff00ff;font-weight:bold",
+  Array.from(buffer)
+    .map(
+      b =>
+        b.toString(16).padStart(2, "0")
+    )
+    .join(" ")
+);
+
+console.log(
+  "%c[RBTV STATUS RAW DECIMAL]",
+  "color:#ff00ff;font-weight:bold",
+  Array.from(buffer)
+);
 
 
       console.log(
