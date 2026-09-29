@@ -1,3 +1,4 @@
+```javascript
 /*!
  * RBTV+ Auto Schedule
  * N11BOLAHD
@@ -356,7 +357,6 @@
 
     color: #fff;
 
-    /* FONT STANDAR */
     font-family: Arial, Helvetica, sans-serif;
     font-size: 12px;
     font-weight: 600;
@@ -1753,104 +1753,106 @@
     return null;
   }
 
-/* =========================================================
-   COLLECT STREAM URLS
-========================================================= */
 
-function rbCollectStreamUrls(
-  buf,
-  depth = 0,
-  result = []
-) {
+  /* =========================================================
+     COLLECT STREAM URLS
+  ========================================================= */
 
-  if (
-    !buf ||
-    depth > 12
-  ) {
-
-    return result;
-
-  }
-
-
-  const fields =
-    rbReadFields(
-      buf
-    );
-
-
-  for (
-    const f of fields
+  function rbCollectStreamUrls(
+    buf,
+    depth = 0,
+    result = []
   ) {
 
     if (
-      f.wireType !== 2
+      !buf ||
+      depth > 12
     ) {
 
-      continue;
+      return result;
 
     }
 
 
-    const bytes =
-      f.value;
+    const fields =
+      rbReadFields(
+        buf
+      );
 
 
-    const str =
-      rbBytesToString(
-        bytes
-      ).trim();
-
-
-    if (
-      /^https?:\/\//i.test(
-        str
-      )
+    for (
+      const f of fields
     ) {
 
-      const lower =
-        str.toLowerCase();
+      if (
+        f.wireType !== 2
+      ) {
+
+        continue;
+
+      }
 
 
-      const isStream =
-        lower.includes(".m3u8") ||
-        lower.includes(".mpd") ||
-        lower.includes("stream") ||
-        lower.includes("playurl") ||
-        lower.includes("play_url") ||
-        lower.includes("play-url") ||
-        lower.includes("playlist") ||
-        lower.includes("channel");
+      const bytes =
+        f.value;
+
+
+      const str =
+        rbBytesToString(
+          bytes
+        ).trim();
 
 
       if (
-        isStream &&
-        !result.includes(
+        /^https?:\/\//i.test(
           str
         )
       ) {
 
-        result.push(
-          str
-        );
+        const lower =
+          str.toLowerCase();
+
+
+        const isStream =
+          lower.includes(".m3u8") ||
+          lower.includes(".mpd") ||
+          lower.includes("stream") ||
+          lower.includes("playurl") ||
+          lower.includes("play_url") ||
+          lower.includes("play-url") ||
+          lower.includes("playlist") ||
+          lower.includes("channel");
+
+
+        if (
+          isStream &&
+          !result.includes(
+            str
+          )
+        ) {
+
+          result.push(
+            str
+          );
+
+        }
 
       }
+
+
+      rbCollectStreamUrls(
+        bytes,
+        depth + 1,
+        result
+      );
 
     }
 
 
-    rbCollectStreamUrls(
-      bytes,
-      depth + 1,
-      result
-    );
-
+    return result;
   }
 
 
-  return result;
-}
-  
   /* =========================================================
      BUILD MATCH
   ========================================================= */
@@ -1861,132 +1863,149 @@ function rbCollectStreamUrls(
     recordLength
   ) {
 
-   const debugFields =
-  rbReadFields(
-    recordBytes
-  );
-
-console.log(
-  "%c[RBTV RECORD DEBUG]",
-  "color:#ffaa00;font-weight:bold"
-);
-
-debugFields.forEach(
-  (f, index) => {
-
-    if (
-      f.wireType === 2
-    ) {
-
-      console.log(
-        "FIELD",
-        index,
-        "NO:",
-        f.fieldNo,
-        "WIRE:",
-        f.wireType,
-        "SIZE:",
-        f.value.length,
-        "TEXT:",
-        rbBytesToString(
-          f.value
-        )
+    const debugFields =
+      rbReadFields(
+        recordBytes
       );
 
-      const nested =
-        rbReadFields(
-          f.value
-        );
+    console.log(
+      "%c[RBTV RECORD DEBUG]",
+      "color:#ffaa00;font-weight:bold"
+    );
 
-      if (
-        nested.length
-      ) {
+    debugFields.forEach(
+      (f, index) => {
 
-        console.log(
-          "  └─ NESTED:",
-          nested.map(
-            nf => ({
-              fieldNo:
-                nf.fieldNo,
+        if (
+          f.wireType === 2
+        ) {
 
-              wireType:
-                nf.wireType,
+          console.log(
+            "FIELD",
+            index,
+            "NO:",
+            f.fieldNo,
+            "WIRE:",
+            f.wireType,
+            "SIZE:",
+            f.value.length,
+            "TEXT:",
+            rbBytesToString(
+              f.value
+            )
+          );
 
-              size:
-                nf.wireType === 2
-                  ? nf.value.length
-                  : "",
+          const nested =
+            rbReadFields(
+              f.value
+            );
 
-              text:
-                nf.wireType === 2
-                  ? rbBytesToString(
-                      nf.value
-                    )
-                  : String(
-                      nf.value
-                    )
-            })
-          )
-        );
+          if (
+            nested.length
+          ) {
+
+            console.log(
+              "  └─ NESTED:",
+              nested.map(
+                nf => ({
+                  fieldNo:
+                    nf.fieldNo,
+
+                  wireType:
+                    nf.wireType,
+
+                  size:
+                    nf.wireType === 2
+                      ? nf.value.length
+                      : "",
+
+                  text:
+                    nf.wireType === 2
+                      ? rbBytesToString(
+                          nf.value
+                        )
+                      : String(
+                          nf.value
+                        )
+                })
+              )
+            );
+
+          }
+
+        }
+
+        else {
+
+          console.log(
+            "FIELD",
+            index,
+            "NO:",
+            f.fieldNo,
+            "WIRE:",
+            f.wireType,
+            "VALUE:",
+            String(
+              f.value
+            )
+          );
+
+        }
 
       }
+    );
 
-    }
 
-    else {
+    /* =======================================================
+       FIX:
+       MATCH DATE HARUS DIAMBIL SEBELUM DIPERIKSA
+    ======================================================= */
 
-      console.log(
-        "FIELD",
-        index,
-        "NO:",
-        f.fieldNo,
-        "WIRE:",
-        f.wireType,
-        "VALUE:",
-        String(
-          f.value
-        )
+    const matchDate =
+      rbGetMatchDate(
+        recordBytes
       );
-
-    }
-
-  }
-);
 
     if (!matchDate) {
       return null;
     }
+
 
     const strings =
       rbCollectStrings(
         recordBytes
       );
 
+
     const streamUrls =
-  rbCollectStreamUrls(
-    recordBytes
-  );
+      rbCollectStreamUrls(
+        recordBytes
+      );
 
 
-console.log(
-  "%c[RBTV STREAM CANDIDATES]",
-  "color:#00d9ff;font-weight:bold",
-  streamUrls
-);
+    console.log(
+      "%c[RBTV STREAM CANDIDATES]",
+      "color:#00d9ff;font-weight:bold",
+      streamUrls
+    );
+
 
     const title =
       rbFindTitle(
         strings
       );
 
+
     if (!title) {
       return null;
     }
+
 
     const slug =
       rbFindSlug(
         strings
       );
+
 
     const teams =
       rbSplitTeams(
@@ -1994,11 +2013,13 @@ console.log(
         slug
       );
 
+
     const home =
       teams.home;
 
     const away =
       teams.away;
+
 
     if (
       !home ||
@@ -2009,18 +2030,22 @@ console.log(
 
     }
 
+
     const teamObjects =
       rbFindTeamObjects(
         recordBytes
       );
+
 
     const allLogoUrls =
       rbCollectLogoUrls(
         recordBytes
       );
 
+
     const uniqueTeams =
       [];
+
 
     for (
       const t of teamObjects
@@ -2030,12 +2055,14 @@ console.log(
         continue;
       }
 
+
       const exists =
         uniqueTeams.some(
           x =>
             x.name === t.name &&
             x.logo === t.logo
         );
+
 
       if (!exists) {
 
@@ -2047,21 +2074,25 @@ console.log(
 
     }
 
+
     let homeLogo =
       "";
 
     let awayLogo =
       "";
 
+
     const homeLower =
       home
         .toLowerCase()
         .trim();
 
+
     const awayLower =
       away
         .toLowerCase()
         .trim();
+
 
     for (
       const t of uniqueTeams
@@ -2072,10 +2103,12 @@ console.log(
           t.name
         );
 
+
       const nameLower =
         name
           .toLowerCase()
           .trim();
+
 
       if (
         !homeLogo &&
@@ -2086,6 +2119,7 @@ console.log(
           t.logo;
 
       }
+
 
       if (
         !awayLogo &&
@@ -2099,6 +2133,7 @@ console.log(
 
     }
 
+
     if (!homeLogo) {
 
       for (
@@ -2110,10 +2145,12 @@ console.log(
             t.name
           );
 
+
         const nameLower =
           name
             .toLowerCase()
             .trim();
+
 
         if (
           nameLower.length >= 3 &&
@@ -2138,6 +2175,7 @@ console.log(
 
     }
 
+
     if (!awayLogo) {
 
       for (
@@ -2149,10 +2187,12 @@ console.log(
             t.name
           );
 
+
         const nameLower =
           name
             .toLowerCase()
             .trim();
+
 
         if (
           nameLower.length >= 3 &&
@@ -2184,6 +2224,7 @@ console.log(
 
     }
 
+
     if (
       !homeLogo &&
       uniqueTeams[0]
@@ -2193,6 +2234,7 @@ console.log(
         uniqueTeams[0].logo;
 
     }
+
 
     if (
       !awayLogo &&
@@ -2206,6 +2248,7 @@ console.log(
             homeLogo
         );
 
+
       if (fallbackAway) {
 
         awayLogo =
@@ -2214,6 +2257,7 @@ console.log(
       }
 
     }
+
 
     if (
       !homeLogo &&
@@ -2225,6 +2269,7 @@ console.log(
 
     }
 
+
     if (!awayLogo) {
 
       const secondLogo =
@@ -2233,6 +2278,7 @@ console.log(
             logo !==
             homeLogo
         );
+
 
       if (secondLogo) {
 
@@ -2243,10 +2289,12 @@ console.log(
 
     }
 
+
     const competitionData =
       rbFindCompetition(
         recordBytes
       );
+
 
     return {
 
@@ -2304,6 +2352,7 @@ console.log(
     const records =
       [];
 
+
     for (
       let i = 0;
       i < buffer.length;
@@ -2317,27 +2366,33 @@ console.log(
         continue;
       }
 
+
       const lenInfo =
         rbReadVarint(
           buffer,
           i + 1
         );
 
+
       if (!lenInfo) {
         continue;
       }
+
 
       const len =
         Number(
           lenInfo.value
         );
 
+
       const payloadStart =
         lenInfo.next;
+
 
       const payloadEnd =
         payloadStart +
         len;
+
 
       if (
         !Number.isFinite(
@@ -2352,16 +2407,19 @@ console.log(
 
       }
 
+
       const payload =
         buffer.slice(
           payloadStart,
           payloadEnd
         );
 
+
       const strings =
         rbCollectStrings(
           payload
         );
+
 
       const hasSlug =
         strings.some(
@@ -2371,9 +2429,11 @@ console.log(
             )
         );
 
+
       if (!hasSlug) {
         continue;
       }
+
 
       records.push({
         start:
@@ -2385,10 +2445,12 @@ console.log(
         payload
       });
 
+
       i =
         payloadEnd - 1;
 
     }
+
 
     return records;
   }
@@ -2510,10 +2572,12 @@ console.log(
         a
       );
 
+
     const y =
       rbNormalizeName(
         b
       );
+
 
     if (
       !x ||
@@ -2522,11 +2586,13 @@ console.log(
       return 0;
     }
 
+
     if (
       x === y
     ) {
       return 100;
     }
+
 
     if (
       x.includes(y) ||
@@ -2535,17 +2601,21 @@ console.log(
       return 80;
     }
 
+
     const xt =
       new Set(
         x.split(" ")
       );
+
 
     const yt =
       new Set(
         y.split(" ")
       );
 
+
     let common = 0;
+
 
     xt.forEach(
       token => {
@@ -2562,17 +2632,20 @@ console.log(
       }
     );
 
+
     if (
       common >= 2
     ) {
       return 60;
     }
 
+
     if (
       common === 1
     ) {
       return 30;
     }
+
 
     return 0;
   }
@@ -2594,8 +2667,10 @@ console.log(
         ? json.data
         : {};
 
+
     const result =
       [];
+
 
     Object.keys(
       data
@@ -2605,6 +2680,7 @@ console.log(
         const item =
           data[key];
 
+
         if (
           !item ||
           typeof item !==
@@ -2613,12 +2689,14 @@ console.log(
           return;
         }
 
+
         const home =
           item.homeTeamName ||
           item.home_team?.name ||
           item.home?.name ||
           item.raw?.home_team?.name ||
           "";
+
 
         const away =
           item.awayTeamName ||
@@ -2627,6 +2705,7 @@ console.log(
           item.raw?.away_team?.name ||
           "";
 
+
         const matchTime =
           Number(
             item.matchTime ??
@@ -2634,12 +2713,14 @@ console.log(
             item.raw?.match_time
           );
 
+
         const matchStatus =
           Number(
             item.matchStatus ??
             item.status_id ??
             item.raw?.status_id
           );
+
 
         if (
           !home ||
@@ -2655,6 +2736,7 @@ console.log(
           return;
 
         }
+
 
         result.push({
 
@@ -2688,12 +2770,12 @@ console.log(
       }
     );
 
+
     return result;
   }
 
 
-
-    /* =========================================================
+  /* =========================================================
      FETCH STATUS - PROTOBUF + JSON
   ========================================================= */
 
@@ -2707,8 +2789,10 @@ console.log(
 
     }
 
+
     rbStatusLoading =
       true;
+
 
     try {
 
@@ -2749,34 +2833,32 @@ console.log(
       }
 
 
-      /*
-       * Endpoint ini bisa mengembalikan
-       * protobuf, bukan JSON.
-       *
-       * Jadi kita baca sebagai bytes terlebih dahulu.
-       */
-
       const buffer =
         new Uint8Array(
           await response.arrayBuffer()
         );
 
-      console.log(
-  "%c[RBTV STATUS RAW HEX]",
-  "color:#ff00ff;font-weight:bold",
-  Array.from(buffer)
-    .map(
-      b =>
-        b.toString(16).padStart(2, "0")
-    )
-    .join(" ")
-);
 
-console.log(
-  "%c[RBTV STATUS RAW DECIMAL]",
-  "color:#ff00ff;font-weight:bold",
-  Array.from(buffer)
-);
+      console.log(
+        "%c[RBTV STATUS RAW HEX]",
+        "color:#ff00ff;font-weight:bold",
+        Array.from(buffer)
+          .map(
+            b =>
+              b.toString(16).padStart(
+                2,
+                "0"
+              )
+          )
+          .join(" ")
+      );
+
+
+      console.log(
+        "%c[RBTV STATUS RAW DECIMAL]",
+        "color:#ff00ff;font-weight:bold",
+        Array.from(buffer)
+      );
 
 
       console.log(
@@ -2785,11 +2867,6 @@ console.log(
         buffer.length
       );
 
-
-      /*
-       * Coba JSON terlebih dahulu.
-       * Kalau bukan JSON, lanjut protobuf.
-       */
 
       let json = null;
 
@@ -2829,10 +2906,6 @@ console.log(
       }
 
 
-      /*
-       * MODE JSON
-       */
-
       if (json) {
 
         rbStatusItems =
@@ -2858,10 +2931,6 @@ console.log(
 
       }
 
-
-      /*
-       * MODE PROTOBUF
-       */
 
       rbStatusItems =
         rbDecodeStatusProtobuf(
@@ -2920,11 +2989,6 @@ console.log(
     const result =
       [];
 
-
-    /*
-     * Cari semua kemungkinan message protobuf
-     * di dalam response.
-     */
 
     function walk(
       bytes,
@@ -3029,11 +3093,6 @@ console.log(
       );
 
 
-      /*
-       * Ambil nama-nama yang terlihat seperti
-       * nama tim.
-       */
-
       const teamStrings =
         strings
           .map(
@@ -3055,13 +3114,6 @@ console.log(
               !/\svs\s/i.test(x)
           );
 
-
-      /*
-       * Cari timestamp yang masuk akal.
-       *
-       * matchTime pada endpoint ini biasanya
-       * berupa Unix timestamp dalam detik.
-       */
 
       const timestamps =
         numbers
@@ -3101,16 +3153,6 @@ console.log(
           );
 
 
-      /*
-       * Status umum yang kita perlukan:
-       *
-       * 1 = UPCOMING
-       * 2 = LIVE
-       *
-       * Jangan mengambil angka lain sebagai status
-       * kecuali memang 1 atau 2.
-       */
-
       const statusCandidates =
         numbers
           .filter(
@@ -3123,15 +3165,6 @@ console.log(
               x.value
           );
 
-
-      /*
-       * Kalau message memiliki minimal:
-       * - 2 string
-       * - timestamp
-       * - status 1/2
-       *
-       * simpan sebagai kandidat.
-       */
 
       if (
         teamStrings.length >= 2 &&
@@ -3161,10 +3194,6 @@ console.log(
           }
         );
 
-
-        /*
-         * Buat pasangan kemungkinan home/away.
-         */
 
         for (
           let i = 0;
@@ -3201,9 +3230,7 @@ console.log(
 
 
             const matchStatus =
-              statusCandidates[
-                0
-              ];
+              statusCandidates[0];
 
 
             result.push({
@@ -3243,10 +3270,6 @@ console.log(
       }
 
 
-      /*
-       * Terus turun ke nested protobuf.
-       */
-
       fields.forEach(
         field => {
 
@@ -3275,10 +3298,6 @@ console.log(
       0
     );
 
-
-    /*
-     * Hilangkan duplikat.
-     */
 
     const unique =
       [];
@@ -3337,6 +3356,8 @@ console.log(
     return unique;
 
   }
+
+
   /* =========================================================
      FIND API STATUS
   ========================================================= */
@@ -3354,10 +3375,12 @@ console.log(
 
     }
 
+
     const targetTime =
       Number(
         match.matchDate
       ) / 1000;
+
 
     if (
       !Number.isFinite(
@@ -3369,9 +3392,11 @@ console.log(
 
     }
 
+
     let best = null;
 
     let bestScore = 0;
+
 
     for (
       const item of rbStatusItems
@@ -3385,6 +3410,7 @@ console.log(
           targetTime
         );
 
+
       if (
         !Number.isFinite(
           timeDiff
@@ -3396,17 +3422,20 @@ console.log(
 
       }
 
+
       const homeScore =
         rbTeamNameScore(
           match.home,
           item.home
         );
 
+
       const awayScore =
         rbTeamNameScore(
           match.away,
           item.away
         );
+
 
       if (
         !homeScore ||
@@ -3416,6 +3445,7 @@ console.log(
         continue;
 
       }
+
 
       const timeScore =
         Math.max(
@@ -3427,10 +3457,12 @@ console.log(
           )
         );
 
+
       const totalScore =
         homeScore +
         awayScore +
         timeScore;
+
 
       if (
         totalScore >
@@ -3447,12 +3479,14 @@ console.log(
 
     }
 
+
     return (
       best &&
       bestScore >= 90
     )
       ? best
       : null;
+
   }
 
 
@@ -3474,6 +3508,7 @@ console.log(
 
     }
 
+
     matches.forEach(
       match => {
 
@@ -3482,13 +3517,16 @@ console.log(
             match
           );
 
+
         match.apiStatusObject =
           apiStatus;
+
 
         match.apiStatus =
           apiStatus
             ? apiStatus.matchStatus
             : null;
+
 
         if (apiStatus) {
 
@@ -3507,10 +3545,11 @@ console.log(
 
       }
     );
+
   }
 
 
-   /* =========================================================
+  /* =========================================================
      GET STATUS
   ========================================================= */
 
@@ -3538,11 +3577,6 @@ console.log(
       ).toLowerCase();
 
 
-    /*
-     * API STATUS 2
-     * = LIVE
-     */
-
     if (
       apiStatus === 2 ||
       apiText === "live" ||
@@ -3563,11 +3597,6 @@ console.log(
     }
 
 
-    /*
-     * API STATUS 1
-     * = UPCOMING
-     */
-
     if (
       apiStatus === 1 ||
       apiText === "scheduled" ||
@@ -3587,12 +3616,6 @@ console.log(
 
     }
 
-
-    /*
-     * Kalau waktu pertandingan belum lewat,
-     * tetap UPCOMING meskipun API status belum
-     * berhasil terbaca.
-     */
 
     if (
       Number.isFinite(
@@ -3615,11 +3638,6 @@ console.log(
     }
 
 
-    /*
-     * Kalau sudah lewat dan API tidak mengatakan LIVE,
-     * anggap FINISHED.
-     */
-
     return {
 
       type:
@@ -3631,6 +3649,7 @@ console.log(
     };
 
   }
+
 
   /* =========================================================
      COUNTDOWN
@@ -3644,6 +3663,7 @@ console.log(
       timestamp -
       Date.now();
 
+
     if (
       diff <= 0
     ) {
@@ -3652,16 +3672,19 @@ console.log(
 
     }
 
+
     const totalSeconds =
       Math.floor(
         diff / 1000
       );
+
 
     const days =
       Math.floor(
         totalSeconds /
         86400
       );
+
 
     const hours =
       Math.floor(
@@ -3671,6 +3694,7 @@ console.log(
         ) / 3600
       );
 
+
     const minutes =
       Math.floor(
         (
@@ -3679,9 +3703,11 @@ console.log(
         ) / 60
       );
 
+
     const seconds =
       totalSeconds %
       60;
+
 
     if (
       days > 0
@@ -3714,6 +3740,7 @@ console.log(
 
     }
 
+
     return (
       String(
         hours
@@ -3736,6 +3763,7 @@ console.log(
         "0"
       )
     );
+
   }
 
 
@@ -3770,6 +3798,7 @@ console.log(
         /'/g,
         "&#039;"
       );
+
   }
 
 
@@ -3789,11 +3818,13 @@ console.log(
       .trim()
       .toLowerCase();
 
+
     if (!q) {
 
       return matches;
 
     }
+
 
     return matches.filter(
       match => {
@@ -3809,12 +3840,14 @@ console.log(
           .join(" ")
           .toLowerCase();
 
+
         return text.includes(
           q
         );
 
       }
     );
+
   }
 
 
@@ -3859,6 +3892,7 @@ console.log(
 
       </div>
     `;
+
   }
 
 
@@ -3875,6 +3909,7 @@ console.log(
         SCHEDULE_SELECTOR
       );
 
+
     if (!container) {
 
       console.error(
@@ -3882,9 +3917,11 @@ console.log(
         "color:red;font-weight:bold"
       );
 
+
       return;
 
     }
+
 
     if (
       !matches ||
@@ -3927,9 +3964,12 @@ console.log(
         </div>
       `;
 
+
       rbBindControls();
 
+
       return;
+
     }
 
 
@@ -3992,14 +4032,18 @@ console.log(
 
       `;
 
+
       rbBindControls();
 
+
       return;
+
     }
 
 
     let html =
       "";
+
 
     let currentDate =
       "";
@@ -4021,6 +4065,7 @@ console.log(
 
           currentDate =
             dateKey;
+
 
           html +=
             rbDateHeader(
@@ -4225,6 +4270,7 @@ console.log(
         SCHEDULE_SELECTOR
       );
 
+
     if (!container) {
       return;
     }
@@ -4266,6 +4312,7 @@ console.log(
 
               newInput.focus();
 
+
               try {
 
                 newInput.setSelectionRange(
@@ -4292,6 +4339,7 @@ console.log(
 
               rbCurrentSearch =
                 "";
+
 
               rbRenderSchedule(
                 window.RBTV_ALL_MATCHES ||
@@ -4357,6 +4405,7 @@ console.log(
         "loading"
       );
 
+
       button.textContent =
         "↻ LOADING";
 
@@ -4397,6 +4446,7 @@ console.log(
         "color:red;font-weight:bold",
         error
       );
+
 
       if (container) {
 
@@ -4468,14 +4518,17 @@ console.log(
                 "div"
               );
 
+
             countdownElement.className =
               "rbtv-countdown";
+
 
             item.appendChild(
               countdownElement
             );
 
           }
+
 
           countdownElement.textContent =
             countdown;
@@ -4512,6 +4565,7 @@ console.log(
             rbGetStatus(
               match
             ).type;
+
 
           return (
             String(
@@ -4984,3 +5038,4 @@ console.log(
 
 
 })();
+```
