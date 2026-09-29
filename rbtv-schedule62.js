@@ -1753,7 +1753,104 @@
     return null;
   }
 
+/* =========================================================
+   COLLECT STREAM URLS
+========================================================= */
 
+function rbCollectStreamUrls(
+  buf,
+  depth = 0,
+  result = []
+) {
+
+  if (
+    !buf ||
+    depth > 12
+  ) {
+
+    return result;
+
+  }
+
+
+  const fields =
+    rbReadFields(
+      buf
+    );
+
+
+  for (
+    const f of fields
+  ) {
+
+    if (
+      f.wireType !== 2
+    ) {
+
+      continue;
+
+    }
+
+
+    const bytes =
+      f.value;
+
+
+    const str =
+      rbBytesToString(
+        bytes
+      ).trim();
+
+
+    if (
+      /^https?:\/\//i.test(
+        str
+      )
+    ) {
+
+      const lower =
+        str.toLowerCase();
+
+
+      const isStream =
+        lower.includes(".m3u8") ||
+        lower.includes(".mpd") ||
+        lower.includes("stream") ||
+        lower.includes("playurl") ||
+        lower.includes("play_url") ||
+        lower.includes("play-url") ||
+        lower.includes("playlist") ||
+        lower.includes("channel");
+
+
+      if (
+        isStream &&
+        !result.includes(
+          str
+        )
+      ) {
+
+        result.push(
+          str
+        );
+
+      }
+
+    }
+
+
+    rbCollectStreamUrls(
+      bytes,
+      depth + 1,
+      result
+    );
+
+  }
+
+
+  return result;
+}
+  
   /* =========================================================
      BUILD MATCH
   ========================================================= */
@@ -1777,6 +1874,18 @@
       rbCollectStrings(
         recordBytes
       );
+
+    const streamUrls =
+  rbCollectStreamUrls(
+    recordBytes
+  );
+
+
+console.log(
+  "%c[RBTV STREAM CANDIDATES]",
+  "color:#00d9ff;font-weight:bold",
+  streamUrls
+);
 
     const title =
       rbFindTitle(
@@ -2055,6 +2164,8 @@
     return {
 
       matchDate,
+
+      streamUrls,
 
       competition:
         rbCleanText(
