@@ -1866,6 +1866,12 @@ function rbCollectStreamUrls(
         recordBytes
       );
 
+    console.log(
+  "%c[RBTV RECORD FIELDS]",
+  "color:#ffaa00;font-weight:bold",
+  rbReadFields(recordBytes)
+);
+
     if (!matchDate) {
       return null;
     }
