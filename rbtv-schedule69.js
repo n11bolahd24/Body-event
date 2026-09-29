@@ -2937,7 +2937,6 @@ if (field10) {
 
   }
 
-
   /* =========================================================
      STATUS PROTOBUF DECODER
   ========================================================= */
@@ -2949,6 +2948,117 @@ if (field10) {
     const result =
       [];
 
+
+    /* =======================================================
+       DEEP DEBUG STATUS PROTOBUF
+    ======================================================= */
+
+    console.log(
+      "%c[RBTV STATUS DEEP DEBUG]",
+      "color:#ff00ff;font-weight:bold"
+    );
+
+
+    function debugStatusNested(
+      bytes,
+      depth = 0
+    ) {
+
+      if (
+        !bytes ||
+        !bytes.length ||
+        depth > 8
+      ) {
+
+        return;
+
+      }
+
+
+      const fields =
+        rbReadFields(
+          bytes
+        );
+
+
+      if (
+        !fields.length
+      ) {
+
+        return;
+
+      }
+
+
+      const indent =
+        "  ".repeat(
+          depth
+        );
+
+
+      fields.forEach(
+        field => {
+
+          if (
+            field.wireType === 2
+          ) {
+
+            const text =
+              rbBytesToString(
+                field.value
+              );
+
+
+            console.log(
+              indent +
+              "FIELD " +
+              field.fieldNo +
+              " WIRE 2 SIZE " +
+              field.value.length +
+              " TEXT:",
+              text
+            );
+
+
+            debugStatusNested(
+              field.value,
+              depth + 1
+            );
+
+          }
+
+          else {
+
+            console.log(
+              indent +
+              "FIELD " +
+              field.fieldNo +
+              " WIRE " +
+              field.wireType +
+              " VALUE:",
+              String(
+                field.value
+              )
+            );
+
+          }
+
+        }
+      );
+
+    }
+
+
+    debugStatusNested(
+      buffer,
+      0
+    );
+
+
+    /* =======================================================
+       OLD STATUS PARSER
+       SEMENTARA TETAP DIPERTAHANKAN
+    ======================================================= */
 
     function walk(
       bytes,
@@ -3316,8 +3426,6 @@ if (field10) {
     return unique;
 
   }
-
-
   /* =========================================================
      FIND API STATUS
   ========================================================= */
