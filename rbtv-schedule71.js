@@ -1,4 +1,3 @@
-
 /*!
  * RBTV+ Auto Schedule
  * N11BOLAHD
@@ -16,7 +15,7 @@
   ========================================================= */
 
   console.log(
-    "%c[RBTV SCHEDULE 49] START",
+    "%c[RBTV SCHEDULE 70] START",
     "color:#00d979;font-weight:bold"
   );
 
@@ -1343,97 +1342,98 @@
 
   function rbFindCompetition(recordBytes) {
 
-  const fields =
-    rbReadFields(recordBytes);
+    const fields =
+      rbReadFields(recordBytes);
 
-  const field10 =
-    fields.find(
-      f =>
-        f.fieldNo === 10 &&
-        f.wireType === 2
-    );
-
-  if (!field10) {
-    return {
-      name: "",
-      logo: ""
-    };
-  }
-
-  const competitionFields =
-    rbReadFields(
-      field10.value
-    );
-
-  let name = "";
-  let logo = "";
-
-  /*
-   * FIELD 3
-   *   FIELD 2 = competition name
-   */
-  const field3 =
-    competitionFields.find(
-      f =>
-        f.fieldNo === 3 &&
-        f.wireType === 2
-    );
-
-  if (field3) {
-
-    const nested =
-      rbReadFields(
-        field3.value
-      );
-
-    const nameField =
-      nested.find(
+    const field10 =
+      fields.find(
         f =>
-          f.fieldNo === 2 &&
+          f.fieldNo === 10 &&
           f.wireType === 2
       );
 
-    if (nameField) {
+    if (!field10) {
+      return {
+        name: "",
+        logo: ""
+      };
+    }
 
-      name =
+    const competitionFields =
+      rbReadFields(
+        field10.value
+      );
+
+    let name = "";
+    let logo = "";
+
+    /*
+     * FIELD 3
+     *   FIELD 2 = competition name
+     */
+    const field3 =
+      competitionFields.find(
+        f =>
+          f.fieldNo === 3 &&
+          f.wireType === 2
+      );
+
+    if (field3) {
+
+      const nested =
+        rbReadFields(
+          field3.value
+        );
+
+      const nameField =
+        nested.find(
+          f =>
+            f.fieldNo === 2 &&
+            f.wireType === 2
+        );
+
+      if (nameField) {
+
+        name =
+          rbCleanText(
+            rbBytesToString(
+              nameField.value
+            )
+          );
+
+      }
+
+    }
+
+    /*
+     * FIELD 4
+     *   competition logo URL
+     */
+    const field4 =
+      competitionFields.find(
+        f =>
+          f.fieldNo === 4 &&
+          f.wireType === 2
+      );
+
+    if (field4) {
+
+      logo =
         rbCleanText(
           rbBytesToString(
-            nameField.value
+            field4.value
           )
         );
 
     }
 
-  }
-
-  /*
-   * FIELD 4
-   *   competition logo URL
-   */
-  const field4 =
-    competitionFields.find(
-      f =>
-        f.fieldNo === 4 &&
-        f.wireType === 2
-    );
-
-  if (field4) {
-
-    logo =
-      rbCleanText(
-        rbBytesToString(
-          field4.value
-        )
-      );
+    return {
+      name,
+      logo
+    };
 
   }
 
-  return {
-    name,
-    logo
-  };
-
-}
 
   /* =========================================================
      TITLE
@@ -1759,80 +1759,154 @@
     recordLength
   ) {
 
-    const debugFields = rbReadFields(recordBytes);
+    const debugFields =
+      rbReadFields(
+        recordBytes
+      );
 
-console.log(
-  "%c[RBTV FIELD 10 DEEP DEBUG]",
-  "color:#ff00ff;font-weight:bold"
-);
 
-const field10 =
-  debugFields.find(
-    f =>
-      f.fieldNo === 10 &&
-      f.wireType === 2
-  );
+    /* =======================================================
+       NEW DEBUG:
+       SEMUA TOP LEVEL FIELD DALAM RECORD
+    ======================================================= */
 
-if (field10) {
+    console.log(
+      "%c[RBTV ALL TOP LEVEL FIELDS]",
+      "color:#00ffff;font-weight:bold"
+    );
 
-  function debugNested(bytes, depth = 0) {
 
-    if (!bytes || depth > 8) {
-      return;
-    }
-
-    const fields =
-      rbReadFields(bytes);
-
-    const indent =
-      "  ".repeat(depth);
-
-    fields.forEach((f) => {
-
-      if (f.wireType === 2) {
-
-        const text =
-          rbBytesToString(f.value);
+    debugFields.forEach(
+      (f, index) => {
 
         console.log(
-          indent +
-          "FIELD " +
-          f.fieldNo +
-          " WIRE 2 SIZE " +
-          f.value.length +
-          " TEXT:",
-          text
+          "FIELD",
+          index,
+          "NO:",
+          f.fieldNo,
+          "WIRE:",
+          f.wireType,
+          "SIZE:",
+          f.wireType === 2
+            ? f.value.length
+            : "-",
+          "VALUE:",
+          f.wireType === 2
+            ? rbBytesToString(
+                f.value
+              )
+            : String(
+                f.value
+              )
         );
 
-        debugNested(
-          f.value,
-          depth + 1
-        );
+      }
+    );
 
-      } else {
 
-        console.log(
-          indent +
-          "FIELD " +
-          f.fieldNo +
-          " WIRE " +
-          f.wireType +
-          " VALUE:",
-          String(f.value)
+    /* =======================================================
+       FIELD 10 DEEP DEBUG
+    ======================================================= */
+
+    console.log(
+      "%c[RBTV FIELD 10 DEEP DEBUG]",
+      "color:#ff00ff;font-weight:bold"
+    );
+
+
+    const field10 =
+      debugFields.find(
+        f =>
+          f.fieldNo === 10 &&
+          f.wireType === 2
+      );
+
+
+    if (field10) {
+
+      function debugNested(
+        bytes,
+        depth = 0
+      ) {
+
+        if (
+          !bytes ||
+          depth > 8
+        ) {
+
+          return;
+
+        }
+
+        const fields =
+          rbReadFields(
+            bytes
+          );
+
+        const indent =
+          "  ".repeat(
+            depth
+          );
+
+        fields.forEach(
+          (f) => {
+
+            if (
+              f.wireType === 2
+            ) {
+
+              const text =
+                rbBytesToString(
+                  f.value
+                );
+
+              console.log(
+                indent +
+                "FIELD " +
+                f.fieldNo +
+                " WIRE 2 SIZE " +
+                f.value.length +
+                " TEXT:",
+                text
+              );
+
+              debugNested(
+                f.value,
+                depth + 1
+              );
+
+            }
+
+            else {
+
+              console.log(
+                indent +
+                "FIELD " +
+                f.fieldNo +
+                " WIRE " +
+                f.wireType +
+                " VALUE:",
+                String(
+                  f.value
+                )
+              );
+
+            }
+
+          }
         );
 
       }
 
-    });
 
-  }
+      debugNested(
+        field10.value,
+        0
+      );
 
-  debugNested(
-    field10.value,
-    0
-  );
+    }
 
-}
+
     debugFields.forEach(
       (f, index) => {
 
@@ -2937,6 +3011,7 @@ if (field10) {
 
   }
 
+
   /* =========================================================
      STATUS PROTOBUF DECODER
   ========================================================= */
@@ -3426,6 +3501,8 @@ if (field10) {
     return unique;
 
   }
+
+
   /* =========================================================
      FIND API STATUS
   ========================================================= */
@@ -5106,4 +5183,3 @@ if (field10) {
 
 
 })();
-
