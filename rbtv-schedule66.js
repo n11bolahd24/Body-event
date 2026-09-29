@@ -1,4 +1,4 @@
-```javascript
+
 /*!
  * RBTV+ Auto Schedule
  * N11BOLAHD
@@ -5038,4 +5038,4 @@
 
 
 })();
-```
+
