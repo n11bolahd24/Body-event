@@ -1341,203 +1341,99 @@
      FIND COMPETITION
   ========================================================= */
 
-  function rbFindCompetition(
-    buf
-  ) {
+  function rbFindCompetition(recordBytes) {
 
-    let competitionName =
-      "";
+  const fields =
+    rbReadFields(recordBytes);
 
-    let competitionLogo =
-      "";
-
-    function walk(
-      current,
-      depth
-    ) {
-
-      if (
-        !current ||
-        depth > 10 ||
-        competitionName
-      ) {
-
-        return;
-
-      }
-
-      const fields =
-        rbReadFields(
-          current
-        );
-
-      for (
-        const f of fields
-      ) {
-
-        if (
-          f.wireType !== 2
-        ) {
-
-          continue;
-
-        }
-
-        const nested =
-          f.value;
-
-        const localFields =
-          rbReadFields(
-            nested
-          );
-
-        let localLogo =
-          "";
-
-        const localStrings =
-          [];
-
-        for (
-          const nf of localFields
-        ) {
-
-          if (
-            nf.wireType !== 2
-          ) {
-
-            continue;
-
-          }
-
-          const s =
-            rbBytesToString(
-              nf.value
-            );
-
-          if (!s) {
-            continue;
-          }
-
-          localStrings.push({
-            field:
-              nf.fieldNo,
-            text:
-              s.trim()
-          });
-
-          if (
-            rbIsCompetitionLogo(
-              s.trim()
-            )
-          ) {
-
-            localLogo =
-              s.trim();
-
-          }
-
-        }
-
-        if (localLogo) {
-
-          for (
-            const x of localStrings
-          ) {
-
-            const clean =
-              rbCleanText(
-                x.text
-              );
-
-            if (!clean) continue;
-
-            if (
-              rbLooksLikeUrl(
-                clean
-              )
-            ) continue;
-
-            if (
-              /^\d+$/.test(
-                clean
-              )
-            ) continue;
-
-            if (
-              /^\d{4}$/.test(
-                clean
-              )
-            ) continue;
-
-            if (
-              clean.length < 2 ||
-              clean.length > 100
-            ) continue;
-
-            if (
-              /\svs\s/i.test(
-                clean
-              ) ||
-              /-vs-/i.test(
-                clean
-              )
-            ) continue;
-
-            if (
-              clean === "SuccessR" ||
-              clean === "def"
-            ) continue;
-
-            competitionName =
-              clean;
-
-            competitionLogo =
-              localLogo;
-
-            break;
-          }
-
-        }
-
-        if (
-          !competitionName
-        ) {
-
-          walk(
-            nested,
-            depth + 1
-          );
-
-        }
-
-        if (
-          competitionName
-        ) {
-
-          return;
-
-        }
-
-      }
-
-    }
-
-    walk(
-      buf,
-      0
+  const field10 =
+    fields.find(
+      f =>
+        f.fieldNo === 10 &&
+        f.wireType === 2
     );
 
+  if (!field10) {
     return {
-      name:
-        rbCleanText(
-          competitionName
-        ),
-
-      logo:
-        competitionLogo
+      name: "",
+      logo: ""
     };
   }
 
+  const competitionFields =
+    rbReadFields(
+      field10.value
+    );
+
+  let name = "";
+  let logo = "";
+
+  /*
+   * FIELD 3
+   *   FIELD 2 = competition name
+   */
+  const field3 =
+    competitionFields.find(
+      f =>
+        f.fieldNo === 3 &&
+        f.wireType === 2
+    );
+
+  if (field3) {
+
+    const nested =
+      rbReadFields(
+        field3.value
+      );
+
+    const nameField =
+      nested.find(
+        f =>
+          f.fieldNo === 2 &&
+          f.wireType === 2
+      );
+
+    if (nameField) {
+
+      name =
+        rbCleanText(
+          rbBytesToString(
+            nameField.value
+          )
+        );
+
+    }
+
+  }
+
+  /*
+   * FIELD 4
+   *   competition logo URL
+   */
+  const field4 =
+    competitionFields.find(
+      f =>
+        f.fieldNo === 4 &&
+        f.wireType === 2
+    );
+
+  if (field4) {
+
+    logo =
+      rbCleanText(
+        rbBytesToString(
+          field4.value
+        )
+      );
+
+  }
+
+  return {
+    name,
+    logo
+  };
+
+}
 
   /* =========================================================
      TITLE
