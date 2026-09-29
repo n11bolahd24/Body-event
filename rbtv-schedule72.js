@@ -1654,101 +1654,88 @@
      COLLECT STREAM URLS
   ========================================================= */
 
-  function rbCollectStreamUrls(
-    buf,
-    depth = 0,
-    result = []
+ function rbCollectStreamUrls(
+  buf,
+  depth = 0,
+  result = []
+) {
+
+  if (
+    !buf ||
+    depth > 15
+  ) {
+    return result;
+  }
+
+  const fields =
+    rbReadFields(
+      buf
+    );
+
+  for (
+    const f of fields
   ) {
 
     if (
-      !buf ||
-      depth > 12
+      f.wireType !== 2
     ) {
-
-      return result;
-
+      continue;
     }
 
+    const bytes =
+      f.value;
 
-    const fields =
-      rbReadFields(
-        buf
-      );
+    const str =
+      rbBytesToString(
+        bytes
+      ).trim();
 
-
-    for (
-      const f of fields
+    /*
+     * DEBUG SEMUA URL
+     */
+    if (
+      /^https?:\/\//i.test(
+        str
+      )
     ) {
 
-      if (
-        f.wireType !== 2
-      ) {
-
-        continue;
-
-      }
-
-
-      const bytes =
-        f.value;
-
-
-      const str =
-        rbBytesToString(
-          bytes
-        ).trim();
-
+      console.log(
+        "%c[RBTV URL FOUND]",
+        "color:#00ffff;font-weight:bold",
+        "DEPTH:",
+        depth,
+        "FIELD:",
+        f.fieldNo,
+        str
+      );
 
       if (
-        /^https?:\/\//i.test(
+        !result.includes(
           str
         )
       ) {
 
-        const lower =
-          str.toLowerCase();
-
-
-        const isStream =
-          lower.includes(".m3u8") ||
-          lower.includes(".mpd") ||
-          lower.includes("stream") ||
-          lower.includes("playurl") ||
-          lower.includes("play_url") ||
-          lower.includes("play-url") ||
-          lower.includes("playlist") ||
-          lower.includes("channel");
-
-
-        if (
-          isStream &&
-          !result.includes(
-            str
-          )
-        ) {
-
-          result.push(
-            str
-          );
-
-        }
+        result.push(
+          str
+        );
 
       }
 
-
-      rbCollectStreamUrls(
-        bytes,
-        depth + 1,
-        result
-      );
-
     }
 
+    /*
+     * RECURSIVE
+     */
+    rbCollectStreamUrls(
+      bytes,
+      depth + 1,
+      result
+    );
 
-    return result;
   }
 
-
+  return result;
+}
   /* =========================================================
      BUILD MATCH
   ========================================================= */
