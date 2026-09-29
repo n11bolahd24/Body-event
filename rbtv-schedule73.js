@@ -1690,42 +1690,43 @@
         bytes
       ).trim();
 
-    /*
-     * DEBUG SEMUA URL
-     */
     if (
-      /^https?:\/\//i.test(
-        str
-      )
+      /^https?:\/\//i.test(str)
     ) {
 
-      console.log(
-        "%c[RBTV URL FOUND]",
-        "color:#00ffff;font-weight:bold",
-        "DEPTH:",
-        depth,
-        "FIELD:",
-        f.fieldNo,
-        str
-      );
+      const lower =
+        str.toLowerCase();
 
-      if (
-        !result.includes(
-          str
-        )
-      ) {
+      const isStream =
+        lower.includes(".m3u8") ||
+        lower.includes(".mpd") ||
+        lower.includes("playurl") ||
+        lower.includes("play_url") ||
+        lower.includes("play-url") ||
+        lower.includes("/stream/") ||
+        lower.includes("/stream?") ||
+        lower.includes("playlist");
 
-        result.push(
+      if (isStream) {
+
+        console.log(
+          "%c[RBTV REAL STREAM FOUND]",
+          "color:#00ff00;font-size:16px;font-weight:bold",
           str
         );
+
+        if (
+          !result.includes(str)
+        ) {
+
+          result.push(str);
+
+        }
 
       }
 
     }
 
-    /*
-     * RECURSIVE
-     */
     rbCollectStreamUrls(
       bytes,
       depth + 1,
