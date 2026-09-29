@@ -1861,15 +1861,96 @@ function rbCollectStreamUrls(
     recordLength
   ) {
 
-    const matchDate =
-      rbGetMatchDate(
-        recordBytes
+   const debugFields =
+  rbReadFields(
+    recordBytes
+  );
+
+console.log(
+  "%c[RBTV RECORD DEBUG]",
+  "color:#ffaa00;font-weight:bold"
+);
+
+debugFields.forEach(
+  (f, index) => {
+
+    if (
+      f.wireType === 2
+    ) {
+
+      console.log(
+        "FIELD",
+        index,
+        "NO:",
+        f.fieldNo,
+        "WIRE:",
+        f.wireType,
+        "SIZE:",
+        f.value.length,
+        "TEXT:",
+        rbBytesToString(
+          f.value
+        )
       );
 
-    console.log(
-  "%c[RBTV RECORD FIELDS]",
-  "color:#ffaa00;font-weight:bold",
-  rbReadFields(recordBytes)
+      const nested =
+        rbReadFields(
+          f.value
+        );
+
+      if (
+        nested.length
+      ) {
+
+        console.log(
+          "  └─ NESTED:",
+          nested.map(
+            nf => ({
+              fieldNo:
+                nf.fieldNo,
+
+              wireType:
+                nf.wireType,
+
+              size:
+                nf.wireType === 2
+                  ? nf.value.length
+                  : "",
+
+              text:
+                nf.wireType === 2
+                  ? rbBytesToString(
+                      nf.value
+                    )
+                  : String(
+                      nf.value
+                    )
+            })
+          )
+        );
+
+      }
+
+    }
+
+    else {
+
+      console.log(
+        "FIELD",
+        index,
+        "NO:",
+        f.fieldNo,
+        "WIRE:",
+        f.wireType,
+        "VALUE:",
+        String(
+          f.value
+        )
+      );
+
+    }
+
+  }
 );
 
     if (!matchDate) {
