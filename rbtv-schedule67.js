@@ -1863,16 +1863,80 @@
     recordLength
   ) {
 
-    const debugFields =
-      rbReadFields(
-        recordBytes
-      );
+    const debugFields = rbReadFields(recordBytes);
 
-    console.log(
-      "%c[RBTV RECORD DEBUG]",
-      "color:#ffaa00;font-weight:bold"
-    );
+console.log(
+  "%c[RBTV FIELD 10 DEEP DEBUG]",
+  "color:#ff00ff;font-weight:bold"
+);
 
+const field10 =
+  debugFields.find(
+    f =>
+      f.fieldNo === 10 &&
+      f.wireType === 2
+  );
+
+if (field10) {
+
+  function debugNested(bytes, depth = 0) {
+
+    if (!bytes || depth > 8) {
+      return;
+    }
+
+    const fields =
+      rbReadFields(bytes);
+
+    const indent =
+      "  ".repeat(depth);
+
+    fields.forEach((f) => {
+
+      if (f.wireType === 2) {
+
+        const text =
+          rbBytesToString(f.value);
+
+        console.log(
+          indent +
+          "FIELD " +
+          f.fieldNo +
+          " WIRE 2 SIZE " +
+          f.value.length +
+          " TEXT:",
+          text
+        );
+
+        debugNested(
+          f.value,
+          depth + 1
+        );
+
+      } else {
+
+        console.log(
+          indent +
+          "FIELD " +
+          f.fieldNo +
+          " WIRE " +
+          f.wireType +
+          " VALUE:",
+          String(f.value)
+        );
+
+      }
+
+    });
+
+  }
+
+  debugNested(
+    field10.value,
+    0
+  );
+
+}
     debugFields.forEach(
       (f, index) => {
 
