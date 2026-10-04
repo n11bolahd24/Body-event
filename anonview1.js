@@ -1,5 +1,5 @@
 
-  //<![CDATA[
+
 
   const API_BASE =
     "https://anonview.novendibagus5.workers.dev";
@@ -1323,4 +1323,3 @@
       }
     );
 
-  //]]>
