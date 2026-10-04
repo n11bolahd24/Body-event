@@ -959,213 +959,165 @@
        PROFILE RENDER
     ========================================================= */
 
-    function renderProfile(profile) {
+   function renderProfile(profile) {
+  const profileBox = document.getElementById("avProfile");
+  const card = document.getElementById("avProfileCard");
 
-        const container =
-            el("avProfile");
+  if (!profileBox || !card) {
+    console.error("[ANONVIEW] Profile container not found");
+    return;
+  }
 
-        if (!container) return;
+  currentProfile = profile;
 
-        showProfileArea();
+  const username =
+    profile.username ||
+    profile.userName ||
+    profile.handle ||
+    currentUsername;
 
-        const avatar =
-            profile?.avatar ||
-            profile?.avatar_url ||
-            profile?.profile_pic ||
-            profile?.profile_pic_url ||
-            profile?.hd_profile_pic_url ||
-            profile?.hd_avatar ||
-            "";
+  const displayName =
+    profile.fullName ||
+    profile.full_name ||
+    profile.displayName ||
+    profile.name ||
+    username;
 
-        const username =
-            profile?.username ||
-            profile?.unique_id ||
-            profile?.uniqueId ||
-            currentUsername;
+  const bio =
+    profile.biography ||
+    profile.bio ||
+    profile.description ||
+    "";
 
-        const displayName =
-            profile?.display_name ||
-            profile?.nickname ||
-            profile?.full_name ||
-            profile?.name ||
-            "";
+  const avatar =
+    profile.profilePicUrl ||
+    profile.profile_pic_url ||
+    profile.avatar ||
+    profile.avatarUrl ||
+    profile.profilePicture ||
+    "";
 
-        const bio =
-            profile?.bio ||
-            profile?.biography ||
-            profile?.signature ||
-            "";
+  /* =========================================================
+     STATS
+  ========================================================= */
 
-        const followers =
-            profile?.followers ??
-            profile?.follower_count ??
-            profile?.followers_count ??
-            profile?.followerCount ??
-            0;
+  const followers =
+    profile.followers ??
+    profile.followerCount ??
+    profile.followersCount ??
+    profile.edge_followed_by ??
+    profile.stats?.followers ??
+    profile.statistics?.followers ??
+    0;
 
-        const following =
-            profile?.following ??
-            profile?.following_count ??
-            profile?.followingCount ??
-            0;
+  const following =
+    profile.following ??
+    profile.followingCount ??
+    profile.followingsCount ??
+    profile.edge_follow ??
+    profile.stats?.following ??
+    profile.statistics?.following ??
+    0;
 
-        const posts =
-            profile?.posts ??
-            profile?.post_count ??
-            profile?.posts_count ??
-            profile?.video_count ??
-            0;
+  const posts =
+    profile.posts ??
+    profile.postCount ??
+    profile.postsCount ??
+    profile.mediaCount ??
+    profile.edge_owner_to_timeline_media ??
+    profile.stats?.posts ??
+    profile.statistics?.posts ??
+    0;
 
-        const likes =
-            profile?.likes ??
-            profile?.like_count ??
-            profile?.likes_count ??
-            profile?.heart_count ??
-            0;
+  const likes =
+    profile.likes ??
+    profile.likeCount ??
+    profile.likesCount ??
+    profile.stats?.likes ??
+    profile.statistics?.likes ??
+    0;
 
+  /* =========================================================
+     PROFILE CARD
+  ========================================================= */
 
-        /* AVATAR */
+  card.innerHTML = `
+    <div class="av-profile-top">
 
-        const avatarEl =
-            el("avAvatar");
+      <img
+        class="av-profile-avatar"
+        src="${escapeAttr(avatar)}"
+        alt="${escapeAttr(username)}"
+        onerror="this.style.display='none'"
+      />
 
-        if (avatarEl) {
+      <div class="av-profile-info">
 
-            if (avatar) {
+        <div class="av-profile-username">
+          @${escapeHtml(username)}
+        </div>
 
-                avatarEl.src =
-                    avatar;
+        <div class="av-profile-name">
+          ${escapeHtml(displayName)}
+        </div>
 
-                avatarEl.style.display =
-                    "block";
-
-            } else {
-
-                avatarEl.removeAttribute(
-                    "src"
-                );
-
-                avatarEl.style.display =
-                    "block";
-
-            }
-
+        ${
+          bio
+            ? `<div class="av-profile-bio">${escapeHtml(bio)}</div>`
+            : ""
         }
 
+      </div>
 
-        /* USERNAME */
+    </div>
 
-        const usernameEl =
-            el("avUsername");
+    <div class="av-stats">
 
-        if (usernameEl) {
+      <div class="av-stat">
+        <strong>${formatNumber(posts)}</strong>
+        <span>Posts</span>
+      </div>
 
-            usernameEl.textContent =
-                username
-                ? "@" + username
-                : "";
+      <div class="av-stat">
+        <strong>${formatNumber(followers)}</strong>
+        <span>Followers</span>
+      </div>
 
-        }
+      <div class="av-stat">
+        <strong>${formatNumber(following)}</strong>
+        <span>Following</span>
+      </div>
 
+      ${
+        currentPlatform === "tiktok"
+          ? `
+            <div class="av-stat">
+              <strong>${formatNumber(likes)}</strong>
+              <span>Likes</span>
+            </div>
+          `
+          : ""
+      }
 
-        /* DISPLAY NAME */
+    </div>
+  `;
 
-        const displayEl =
-            el("avDisplay");
+  profileBox.style.display = "block";
 
-        if (displayEl) {
+  /* =========================================================
+     NAVIGATION
+  ========================================================= */
 
-            displayEl.textContent =
-                displayName || "";
+  renderNavigation();
 
-            displayEl.style.display =
-                displayName
-                ? "block"
-                : "none";
-
-        }
-
-
-        /* BIO */
-
-        const bioEl =
-            el("avBio");
-
-        if (bioEl) {
-
-            bioEl.textContent =
-                bio || "";
-
-            bioEl.style.display =
-                bio
-                ? "block"
-                : "none";
-
-        }
-
-
-        /* STATS */
-
-        const statsEl =
-            el("avStats");
-
-        if (statsEl) {
-
-            statsEl.innerHTML =
-                "";
-
-            statsEl.appendChild(
-                createStat(
-                    followers,
-                    "Followers",
-                    false
-                )
-            );
-
-            statsEl.appendChild(
-                createStat(
-                    following,
-                    "Following",
-                    currentPlatform === "tiktok",
-                    "following"
-                )
-            );
-
-            if (
-                Number(posts) > 0
-            ) {
-
-                statsEl.appendChild(
-                    createStat(
-                        posts,
-                        "Posts",
-                        false
-                    )
-                );
-
-            }
-
-            if (
-                Number(likes) > 0
-            ) {
-
-                statsEl.appendChild(
-                    createStat(
-                        likes,
-                        "Likes",
-                        false
-                    )
-                );
-
-            }
-
-        }
-
-
-        renderNavigation();
-
-    }
-
+  console.log("[ANONVIEW] PROFILE:", profile);
+  console.log("[ANONVIEW] STATS:", {
+    posts,
+    followers,
+    following,
+    likes
+  });
+}
 
     /* =========================================================
        CREATE STAT
