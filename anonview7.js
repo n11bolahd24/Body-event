@@ -1,6 +1,5 @@
 /*!
  * Anonymous TikTok + Instagram Viewer
- * N11BOLAHD
  * JS + CSS SINGLE FILE
  * API: Cloudflare Worker
  */
