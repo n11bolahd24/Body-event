@@ -30,11 +30,13 @@
   ============================== */
   hls:
     "https://cdn.jsdelivr.net/npm/hls.js@1.6.2/dist/hls.min.js",
+  mpegts:
+    "https://cdn.jsdelivr.net/npm/mpegts.js@1.7.3/dist/mpegts.min.js",  
   shaka:
     "https://cdn.jsdelivr.net/npm/shaka-player@4.16.12/dist/shaka-player.compiled.min.js",
   shakaCSS:
     "https://cdn.jsdelivr.net/npm/shaka-player@4.16.12/dist/controls.min.css"
-};
+ };
 
   let matches = [];
   let currentMatchId = null;
@@ -1709,7 +1711,14 @@
     () => typeof window.Hls !== "undefined"
   );
 
+/* ==============================
+   MPEG-TS / FLV PLAYER
+============================== */
 
+await loadScript(
+  CONFIG.mpegts,
+  () => typeof window.mpegts !== "undefined"
+);
   /* ==============================
      SHAKA PLAYER
   ============================== */
@@ -2070,6 +2079,7 @@ const result =
 
 let ikotvHls = null;
 let ikotvShaka = null;
+let ikotvMpegts = null;
 let ikotvVideo = null;
 
 /* =========================================================
@@ -2100,7 +2110,21 @@ async function destroyIKOTVPlayer() {
     ikotvHls = null;
   }
 
+/* ==============================
+   DESTROY FLV / MPEG-TS
+============================== */
 
+if (ikotvMpegts) {
+
+  try {
+    ikotvMpegts.pause();
+    ikotvMpegts.unload();
+    ikotvMpegts.detachMediaElement();
+    ikotvMpegts.destroy();
+  } catch (_) {}
+
+  ikotvMpegts = null;
+}
   /* ==============================
      DESTROY SHAKA
   ============================== */
@@ -2150,7 +2174,17 @@ if (type === "iframe") {
   return "iframe";
 }
 
+/* ==========================================
+   EXPLICIT FLV
+========================================== */
 
+if (
+  type === "flv" ||
+  type.includes("flv") ||
+  /\.flv(?:[?#]|$)/i.test(lower)
+) {
+  return "flv";
+}
   /*
    * ==========================================
    * EXPLICIT DASH
@@ -2834,7 +2868,86 @@ async function playIKOTVDASH(
 
 }
 
+/* =========================================================
+   PLAY FLV
+   Menggunakan MPEG-TS.js
+========================================================= */
 
+function playIKOTVFLV(url, video) {
+
+  return new Promise((resolve, reject) => {
+
+    console.log("[IKOTV] PLAYER: MPEG-TS.js / FLV");
+
+    if (typeof window.mpegts === "undefined") {
+      reject(new Error("MPEG-TS.js belum tersedia."));
+      return;
+    }
+
+    if (!window.mpegts.isSupported()) {
+      reject(new Error(
+        "Browser tidak mendukung pemutaran FLV melalui MediaSource."
+      ));
+      return;
+    }
+
+    try {
+
+      ikotvMpegts = window.mpegts.createPlayer(
+        {
+          type: "flv",
+          isLive: true,
+          url: url
+        },
+        {
+          enableWorker: true,
+          enableStashBuffer: false,
+          stashInitialSize: 128
+        }
+      );
+
+      ikotvMpegts.on(
+        window.mpegts.Events.ERROR,
+        (errorType, errorDetail, errorInfo) => {
+
+          console.error(
+            "[IKOTV] FLV error:",
+            errorType,
+            errorDetail,
+            errorInfo
+          );
+
+        }
+      );
+
+      ikotvMpegts.attachMediaElement(video);
+      ikotvMpegts.load();
+
+      video.play()
+        .then(() => {
+          console.log("[IKOTV] FLV berhasil diputar.");
+          resolve();
+        })
+        .catch(error => {
+
+          console.warn(
+            "[IKOTV] Autoplay FLV gagal:",
+            error
+          );
+
+          // Player tetap terpasang; pengguna bisa menekan Play.
+          resolve();
+
+        });
+
+    } catch (error) {
+
+      reject(error);
+
+    }
+
+  });
+}
 /* =========================================================
    UNIVERSAL PLAY
 ========================================================= */
@@ -2982,6 +3095,19 @@ if (type === "dash") {
 
   try {
 
+  /* ==========================
+   FLV
+========================== */
+
+if (type === "flv") {
+
+  await playIKOTVFLV(
+    url,
+    ikotvVideo
+  );
+
+  return;
+}  
     /*
  * ==========================
  * HLS
