@@ -2210,6 +2210,26 @@ const result =
 
   console.log("[IKOTV] SERVER DATA DARI MATCH-INFO:", result);
 
+  if (
+    result &&
+    result.data &&
+    Array.isArray(result.data.videos)
+  ) {
+
+    console.log(
+      "[IKOTV] VIDEO SERVER COUNT:",
+      result.data.videos.length
+    );
+
+    console.log(
+      "[IKOTV] VIDEO SERVERS:",
+      result.data.videos
+    );
+
+    return result.data;
+
+  }
+
   return result;
 }
 
