@@ -1,3 +1,4 @@
+
 /*!
  * IKOTV Auto Schedule
  * N11BOLAHD
@@ -9,8 +10,8 @@
 
   const CONFIG = {
     api: {
-      matches: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/api/matches",
-      matchInfo: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/match-info",
+      matches: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/",
+      matchInfo: "https://ikotv.cc/api/match-info",
       streamUrl: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/stream-url"
     },
 
@@ -1913,8 +1914,7 @@
       .map(normalizeMatch)
       .filter(
         match =>
-          match.id &&
-          match.time > 0
+          match.id
       );
 
   console.log(
@@ -1925,6 +1925,11 @@
   console.log(
     "[IKOTV] LIVE COUNT:",
     liveMatches.length
+  );
+
+  console.log(
+    "[IKOTV] LIVE IDS:",
+    liveMatches.map(match => String(match.id))
   );
 
   // ==========================
@@ -1959,8 +1964,8 @@
       merged.get(id);
 
     merged.set(id, {
-      ...old,
       ...match,
+      ...old,
       isLive: true
     });
 
@@ -3623,6 +3628,19 @@ async function openIKOMatch(matchId) {
     console.warn(
       "[IKOTV] Match tidak ditemukan:",
       id
+    );
+    return;
+  }
+
+  /* ==========================================
+     WATCH LIVE HANYA UNTUK MATCH YANG BENAR-BENAR LIVE
+  ========================================== */
+
+  if (getStatus(match) !== "live") {
+    console.warn(
+      "[IKOTV] WATCH LIVE diblokir karena match belum LIVE:",
+      id,
+      match
     );
     return;
   }
