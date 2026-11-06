@@ -9,10 +9,10 @@
 
   const CONFIG = {
     api: {
-      matches: "https://ikotv.cc/api/matches?date=YYYY-MM-DD&filter=all&sport=football",
-      matchInfo: "https://ikotv.cc/api/match-info",
-      streamUrl: "https://ikotv.cc/api/matches?date=YYYY-MM-DD&filter=live&sport=football"
-    },
+  matches: "https://ikotv.cc/api/matches",
+  matchInfo: "https://ikotv.cc/api/match-info",
+  streamUrl: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/stream-url"
+},
 
     // Change these only if you want another placement.
     scheduleSelector: "#ikotvSchedule",
