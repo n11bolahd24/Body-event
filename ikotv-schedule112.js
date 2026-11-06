@@ -9,8 +9,8 @@
 
   const CONFIG = {
     api: {
-      matches: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/api/matches",
-      matchInfo: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/match-info",
+      matches: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/",
+      matchInfo: "https://ikotv.cc/api/match-info",
       streamUrl: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/stream-url"
     },
 
@@ -30,13 +30,11 @@
   ============================== */
   hls:
     "https://cdn.jsdelivr.net/npm/hls.js@1.6.2/dist/hls.min.js",
-  mpegts:
-    "https://cdn.jsdelivr.net/npm/mpegts.js@1.7.3/dist/mpegts.min.js",  
   shaka:
     "https://cdn.jsdelivr.net/npm/shaka-player@4.16.12/dist/shaka-player.compiled.min.js",
   shakaCSS:
     "https://cdn.jsdelivr.net/npm/shaka-player@4.16.12/dist/controls.min.css"
- };
+};
 
   let matches = [];
   let currentMatchId = null;
@@ -1711,14 +1709,7 @@
     () => typeof window.Hls !== "undefined"
   );
 
-/* ==============================
-   MPEG-TS / FLV PLAYER
-============================== */
 
-await loadScript(
-  CONFIG.mpegts,
-  () => typeof window.mpegts !== "undefined"
-);
   /* ==============================
      SHAKA PLAYER
   ============================== */
@@ -1857,143 +1848,6 @@ await loadScript(
   }
 }
 
-
-/* =========================================================
-   GET API MATCHES
-   /api/matches IKOTV menggunakan GET
-========================================================= */
-
-async function getMatchesAPI(filter) {
-
-  const url =
-    CONFIG.api.matches +
-    "?date=" +
-    encodeURIComponent("") +
-    "&filter=" +
-    encodeURIComponent(filter) +
-    "&sport=football" +
-    "&_=" +
-    Date.now();
-
-  console.log(
-    "[IKOTV] GET REQUEST:",
-    url
-  );
-
-  const controller =
-    new AbortController();
-
-  const timeout =
-    setTimeout(() => {
-      controller.abort();
-    }, 30000);
-
-  try {
-
-    const response =
-      await fetch(
-        url,
-        {
-          method: "GET",
-
-          headers: {
-            "Accept":
-              "application/json"
-          },
-
-          mode: "cors",
-
-          cache: "no-store",
-
-          signal:
-            controller.signal
-        }
-      );
-
-    console.log(
-      "[IKOTV] GET STATUS:",
-      response.status
-    );
-
-    const text =
-      await response.text();
-
-    console.log(
-      "[IKOTV] GET RESPONSE:",
-      text
-    );
-
-    if (!response.ok) {
-
-      throw new Error(
-        "HTTP " +
-        response.status +
-        " - " +
-        text.substring(
-          0,
-          200
-        )
-      );
-
-    }
-
-    if (!text) {
-
-      throw new Error(
-        "Response API kosong"
-      );
-
-    }
-
-    try {
-
-      return JSON.parse(
-        text
-      );
-
-    } catch (error) {
-
-      throw new Error(
-        "Response API bukan JSON: " +
-        text.substring(
-          0,
-          200
-        )
-      );
-
-    }
-
-  } catch (error) {
-
-    if (
-      error.name ===
-      "AbortError"
-    ) {
-
-      throw new Error(
-        "Request timeout 30s"
-      );
-
-    }
-
-    console.error(
-      "[IKOTV] GET FETCH ERROR:",
-      error
-    );
-
-    throw error;
-
-  } finally {
-
-    clearTimeout(
-      timeout
-    );
-
-  }
-
-}
-
-
   async function fetchMatches() {
 
   console.log("[IKOTV] Mengambil ALL + LIVE...");
@@ -2004,12 +1858,26 @@ async function getMatchesAPI(filter) {
       // ==========================
       // SEMUA JADWAL
       // ==========================
-      getMatchesAPI("all"),
+      postJSON(
+        CONFIG.api.matches,
+        {
+          date: null,
+          filter: "all",
+          sport: "football"
+        }
+      ),
 
       // ==========================
       // MATCH YANG SEDANG LIVE
       // ==========================
-      getMatchesAPI("live")
+      postJSON(
+        CONFIG.api.matches,
+        {
+          date: null,
+          filter: "live",
+          sport: "football"
+        }
+      )
 
     ]);
 
@@ -2160,78 +2028,38 @@ const result =
 }
 
   async function fetchMatchInfo(matchId) {
-  const url =
-    CONFIG.api.matchInfo +
-    "?matchid=" +
-    encodeURIComponent(String(matchId)) +
-    "&sport=football&_=" +
-    Date.now();
-
-  console.log("[IKOTV] MATCH INFO REQUEST:", url);
-
-  const response = await fetch(url, {
-    method: "GET",
-    headers: {
-      "Accept": "application/json"
-    },
-    mode: "cors",
-    cache: "no-store"
-  });
-
-  const text = await response.text();
-
-  console.log("[IKOTV] MATCH INFO STATUS:", response.status);
-  console.log("[IKOTV] MATCH INFO RESPONSE:", text);
-
-  if (!response.ok) {
-    throw new Error(
-      "HTTP " +
-      response.status +
-      " - " +
-      text.substring(0, 300)
+    const result = await postJSON(
+      CONFIG.api.matchInfo,
+      {
+        matchid: String(matchId),
+        sport: "football"
+      }
     );
+
+    console.log(
+      "[IKOTV] match-info:",
+      result
+    );
+
+    return result;
   }
-
-  if (!text) {
-    throw new Error("Response match-info kosong");
-  }
-
-  const result = JSON.parse(text);
-
-  console.log("[IKOTV] match-info:", result);
-
-  return result;
-}
 
   async function fetchStreamURL(matchId) {
-  console.log("[IKOTV] Mengambil server dari match-info:", matchId);
-
-  const result = await fetchMatchInfo(matchId);
-
-  console.log("[IKOTV] SERVER DATA DARI MATCH-INFO:", result);
-
-  if (
-    result &&
-    result.data &&
-    Array.isArray(result.data.videos)
-  ) {
-
-    console.log(
-      "[IKOTV] VIDEO SERVER COUNT:",
-      result.data.videos.length
+    const result = await postJSON(
+      CONFIG.api.streamUrl,
+      {
+        matchid: String(matchId),
+        sport: "football"
+      }
     );
 
     console.log(
-      "[IKOTV] VIDEO SERVERS:",
-      result.data.videos
+      "[IKOTV] stream-url:",
+      result
     );
 
-    return result.data;
-
+    return result;
   }
-
-  return result;
-}
 
 
 /* =========================================================
@@ -2242,7 +2070,6 @@ const result =
 
 let ikotvHls = null;
 let ikotvShaka = null;
-let ikotvMpegts = null;
 let ikotvVideo = null;
 
 /* =========================================================
@@ -2273,21 +2100,7 @@ async function destroyIKOTVPlayer() {
     ikotvHls = null;
   }
 
-/* ==============================
-   DESTROY FLV / MPEG-TS
-============================== */
 
-if (ikotvMpegts) {
-
-  try {
-    ikotvMpegts.pause();
-    ikotvMpegts.unload();
-    ikotvMpegts.detachMediaElement();
-    ikotvMpegts.destroy();
-  } catch (_) {}
-
-  ikotvMpegts = null;
-}
   /* ==============================
      DESTROY SHAKA
   ============================== */
@@ -2337,17 +2150,7 @@ if (type === "iframe") {
   return "iframe";
 }
 
-/* ==========================================
-   EXPLICIT FLV
-========================================== */
 
-if (
-  type === "flv" ||
-  type.includes("flv") ||
-  /\.flv(?:[?#]|$)/i.test(lower)
-) {
-  return "flv";
-}
   /*
    * ==========================================
    * EXPLICIT DASH
@@ -3031,86 +2834,7 @@ async function playIKOTVDASH(
 
 }
 
-/* =========================================================
-   PLAY FLV
-   Menggunakan MPEG-TS.js
-========================================================= */
 
-function playIKOTVFLV(url, video) {
-
-  return new Promise((resolve, reject) => {
-
-    console.log("[IKOTV] PLAYER: MPEG-TS.js / FLV");
-
-    if (typeof window.mpegts === "undefined") {
-      reject(new Error("MPEG-TS.js belum tersedia."));
-      return;
-    }
-
-    if (!window.mpegts.isSupported()) {
-      reject(new Error(
-        "Browser tidak mendukung pemutaran FLV melalui MediaSource."
-      ));
-      return;
-    }
-
-    try {
-
-      ikotvMpegts = window.mpegts.createPlayer(
-        {
-          type: "flv",
-          isLive: true,
-          url: url
-        },
-        {
-          enableWorker: true,
-          enableStashBuffer: false,
-          stashInitialSize: 128
-        }
-      );
-
-      ikotvMpegts.on(
-        window.mpegts.Events.ERROR,
-        (errorType, errorDetail, errorInfo) => {
-
-          console.error(
-            "[IKOTV] FLV error:",
-            errorType,
-            errorDetail,
-            errorInfo
-          );
-
-        }
-      );
-
-      ikotvMpegts.attachMediaElement(video);
-      ikotvMpegts.load();
-
-      video.play()
-        .then(() => {
-          console.log("[IKOTV] FLV berhasil diputar.");
-          resolve();
-        })
-        .catch(error => {
-
-          console.warn(
-            "[IKOTV] Autoplay FLV gagal:",
-            error
-          );
-
-          // Player tetap terpasang; pengguna bisa menekan Play.
-          resolve();
-
-        });
-
-    } catch (error) {
-
-      reject(error);
-
-    }
-
-  });
-}
 /* =========================================================
    UNIVERSAL PLAY
 ========================================================= */
@@ -3258,19 +2982,6 @@ if (type === "dash") {
 
   try {
 
-  /* ==========================
-   FLV
-========================== */
-
-if (type === "flv") {
-
-  await playIKOTVFLV(
-    url,
-    ikotvVideo
-  );
-
-  return;
-}  
     /*
  * ==========================
  * HLS
@@ -3978,9 +3689,9 @@ async function openIKOMatch(matchId) {
     );
 
     console.log(
-  "[IKOTV] STREAM-URL RAW RESULT:",
-  JSON.stringify(result, null, 2)
-);
+      "[IKOTV] STREAM-URL RAW JSON:",
+      JSON.stringify(result, null, 2)
+    );
 
     /* ==========================================
        PARSE SERVER
@@ -3988,31 +3699,37 @@ async function openIKOMatch(matchId) {
 
     const videos = extractVideos(result);
 
-console.log("========== IKOTV ALL STREAM URL ==========");
+    console.log(
+      "[IKOTV] EXTRACTED VIDEOS:",
+      videos
+    );
 
-videos.forEach((video, index) => {
+    videos.forEach((video, index) => {
 
-  console.log(
-    `[IKOTV STREAM ${index + 1}]`,
-    video.display_name ||
-    video.name ||
-    video.type_name ||
-    `LIVE ${index + 1}`
-  );
+      console.log(
+        `[IKOTV STREAM ${index + 1}]`,
+        video.display_name ||
+        video.name ||
+        video.type_name ||
+        `LIVE ${index + 1}`
+      );
 
-  console.log(
-    `[IKOTV URL ${index + 1}]`,
-    video.url
-  );
+      console.log(
+        `[IKOTV TYPE ${index + 1}]`,
+        video.type
+      );
 
-});
+      console.log(
+        `[IKOTV URL ${index + 1}]`,
+        video.url
+      );
 
-console.log(
-  "[IKOTV TOTAL STREAM]:",
-  videos.length
-);
+    });
 
-console.log("==========================================");
+    console.log(
+      "[IKOTV TOTAL STREAM]:",
+      videos.length
+    );
 
     /* ==========================================
        SERVER TIDAK DITEMUKAN
@@ -4047,16 +3764,11 @@ console.log("==========================================");
 
         ${videos.map((video, index) => {
 
-  const originalLabel =
-  video.display_name ||
-  video.name ||
-  video.type_name ||
-  `LIVE ${index + 1}`;
-
-const label =
-  /^SC\d+$/i.test(String(originalLabel).trim())
-    ? String(originalLabel).trim().replace(/^SC/i, "CH")
-    : originalLabel;
+          const label =
+            video.display_name ||
+            video.name ||
+            video.type_name ||
+            `LIVE ${index + 1}`;
 
           return `
             <button
@@ -4178,43 +3890,29 @@ function extractVideos(result) {
 
   const videos = [];
 
-
-  function addVideo(
-    item,
-    fallbackName = ""
-  ) {
+  function addVideo(item, fallbackName = "") {
 
     if (!item) return;
 
+    /* STRING URL */
+    if (typeof item === "string") {
 
-    /*
-     * ==========================
-     * STRING URL
-     * ==========================
-     */
-
-    if (
-      typeof item === "string"
-    ) {
-
-      const url =
-        safeURL(item);
-
+      const url = safeURL(item);
 
       if (url) {
 
         videos.push({
-
           url: url,
-
-          name:
-            fallbackName,
-
-          display_name:
-            fallbackName,
-
-          type_name: ""
-
+          type:
+            /\.flv(?:[?#]|$)/i.test(url)
+              ? "flv"
+              : /\.mpd(?:[?#]|$)/i.test(url)
+                ? "dash"
+                : "hls",
+          name: fallbackName,
+          display_name: fallbackName,
+          type_name: "",
+          type_name_nth: ""
         });
 
       }
@@ -4222,20 +3920,9 @@ function extractVideos(result) {
       return;
     }
 
+    if (typeof item !== "object") return;
 
-    if (
-      typeof item !== "object"
-    ) {
-      return;
-    }
-
-
-    /*
-     * ==========================
-     * URL
-     * ==========================
-     */
-
+    /* URL */
     const url =
       item.url ||
       item.play_url ||
@@ -4247,70 +3934,35 @@ function extractVideos(result) {
       item.manifest ||
       item.manifest_url ||
       item.manifestUrl ||
+      item.pull_url ||
+      item.pullUrl ||
       item.src ||
       item.file ||
       item.link ||
       "";
 
+    const validURL = safeURL(url);
 
-    const validURL =
-      safeURL(url);
+    if (!validURL) return;
 
-
-    if (!validURL) {
-      return;
-    }
-
-
-    /*
-     * ==========================
-     * TYPE
-     * ==========================
-     */
-
+    /* TYPE */
     let type =
       item.type ||
       item.format ||
       item.protocol ||
       "";
 
+    type = String(type).toLowerCase();
 
-    /*
-     * MPD otomatis DASH
-     */
-
-    if (
-      /\.mpd(?:[?#]|$)/i.test(
-        validURL
-      )
-    ) {
-
+    if (/\.flv(?:[?#]|$)/i.test(validURL)) {
+      type = "flv";
+    } else if (/\.mpd(?:[?#]|$)/i.test(validURL)) {
       type = "dash";
-
-    }
-
-
-    /*
-     * M3U8 otomatis HLS
-     */
-
-    else if (
-      /\.m3u8(?:[?#]|$)/i.test(
-        validURL
-      )
-    ) {
-
+    } else if (/\.m3u8(?:[?#]|$)/i.test(validURL)) {
       type = "hls";
-
     }
 
-
-    /*
-     * ==========================
-     * KID / KEY
-     * ==========================
-     */
-
+    /* KID / KEY */
     const kid =
       item.kid ||
       item.KID ||
@@ -4320,7 +3972,6 @@ function extractVideos(result) {
       item.defaultKID ||
       "";
 
-
     const key =
       item.key ||
       item.KEY ||
@@ -4328,262 +3979,251 @@ function extractVideos(result) {
       item.keyHex ||
       "";
 
-
-    /*
-     * ==========================
-     * CLEARKEY OBJECT
-     * ==========================
-     */
-
     let clearKeys =
       item.clearKeys ||
       item.clear_keys ||
       item.clearkeys ||
       null;
 
-
-    /*
-     * Kalau API memberi kid/key
-     * ubah menjadi clearKeys
-     */
-
-    if (
-      !clearKeys &&
-      kid &&
-      key
-    ) {
+    if (!clearKeys && kid && key) {
 
       clearKeys = {
-
-        [
-          String(kid)
-            .replace(/-/g, "")
-            .toLowerCase()
-        ]:
-
+        [String(kid)
+          .replace(/-/g, "")
+          .toLowerCase()]:
           String(key)
             .replace(/-/g, "")
             .toLowerCase()
-
       };
 
     }
 
+    /* SERVER NAME */
+    const typeNameNth =
+      item.type_name_nth ||
+      item.typeNameNth ||
+      "";
 
-    /*
-     * ==========================
-     * VIDEO OBJECT
-     * ==========================
-     */
+    const typeName =
+      item.type_name ||
+      item.typeName ||
+      "";
+
+    const displayName =
+      item.display_name ||
+      item.displayName ||
+      item.server_name ||
+      item.serverName ||
+      item.name ||
+      typeNameNth ||
+      typeName ||
+      fallbackName ||
+      "";
 
     videos.push({
-
-      url:
-        validURL,
-
-      type:
-        type,
-
-      kid:
-        kid,
-
-      key:
-        key,
-
-      clearKeys:
-        clearKeys,
-
+      url: validURL,
+      type: type,
+      kid: kid,
+      key: key,
+      clearKeys: clearKeys,
       name:
         item.name ||
         item.server_name ||
         item.serverName ||
+        typeNameNth ||
+        typeName ||
         fallbackName,
+      display_name: displayName,
+      type_name: typeName || item.type || "",
+      type_name_nth: typeNameNth,
+      source: item.source || "",
+      default: item.default || 0
+    });
 
-      display_name:
-        item.display_name ||
-        item.displayName ||
-        item.server_name ||
-        item.serverName ||
-        item.name ||
-        fallbackName,
+  }
 
-      type_name:
-        item.type_name ||
-        item.typeName ||
-        item.type ||
-        ""
+  /* =====================================================
+     1. IKOTV NORMAL VIDEOS
+        data.videos -> SD1, SD2, SD3, SD4, dst.
+  ===================================================== */
+
+  const normalVideos =
+    result?.data?.videos ||
+    result?.videos ||
+    null;
+
+  if (Array.isArray(normalVideos)) {
+
+    normalVideos.forEach((item, index) => {
+
+      addVideo(
+        item,
+        item?.type_name_nth ||
+        item?.type_name ||
+        `SD ${index + 1}`
+      );
 
     });
 
   }
 
+  /* =====================================================
+     2. LIVE PUSH URL
 
-  /*
-   * ==========================
-   * CANDIDATES
-   * ==========================
-   */
+        Hanya dimasukkan kalau URL memang tersedia.
 
-  const candidates = [
+        pushurl1 -> SD
+        pushurl2 -> SD 2
+        pushurl3 -> HD
 
-    result?.data?.videos,
-    result?.data?.streams,
-    result?.data?.servers,
-    result?.data?.list,
+        Untuk match yang pushurl3 kosong,
+        JANGAN membuat tombol HD palsu.
+  ===================================================== */
 
-    result?.videos,
-    result?.streams,
-    result?.servers,
-    result?.list,
+  const live =
+    result?.data?.live ||
+    result?.live ||
+    null;
 
-    result?.data
-
-  ];
-
-
-  for (
-    const candidate of candidates
-  ) {
+  if (live && typeof live === "object") {
 
     if (
-      Array.isArray(candidate)
+      typeof live.pushurl1 === "string" &&
+      live.pushurl1.trim()
     ) {
 
-      candidate.forEach(
-        item =>
-          addVideo(item)
-      );
+      addVideo({
+        url: live.pushurl1,
+        type: "hls",
+        name: "SD",
+        display_name: "SD",
+        type_name: "SD"
+      });
 
+    }
 
-      if (
-        videos.length
-      ) {
-        break;
-      }
+    if (
+      typeof live.pushurl2 === "string" &&
+      live.pushurl2.trim()
+    ) {
+
+      addVideo({
+        url: live.pushurl2,
+        type: "hls",
+        name: "SD 2",
+        display_name: "SD 2",
+        type_name: "SD"
+      });
+
+    }
+
+    if (
+      typeof live.pushurl3 === "string" &&
+      live.pushurl3.trim()
+    ) {
+
+      addVideo({
+        url: live.pushurl3,
+        type: "hls",
+        name: "HD",
+        display_name: "HD",
+        type_name: "HD"
+      });
 
     }
 
   }
 
+  /* =====================================================
+     3. RECURSIVE FALLBACK
 
-  /*
-   * ==========================
-   * RECURSIVE FALLBACK
-   * ==========================
-   */
+        Dipakai hanya kalau belum ada sumber utama.
+        Tidak mengambil anchor.pull_url sebagai
+        "动画" karena mapping tersebut belum terbukti.
+  ===================================================== */
 
-  if (
-    !videos.length
-  ) {
+  if (!videos.length) {
 
-    const recursiveScan =
-      value => {
+    const recursiveScan = value => {
 
-        if (
-          !value ||
-          typeof value !== "object"
-        ) {
-          return;
-        }
+      if (!value || typeof value !== "object") {
+        return;
+      }
 
+      if (Array.isArray(value)) {
 
-        if (
-          Array.isArray(value)
-        ) {
+        value.forEach(item =>
+          recursiveScan(item)
+        );
 
-          value.forEach(
-            item =>
-              recursiveScan(item)
-          );
+        return;
+      }
 
-          return;
-        }
+      const possibleURL =
+        value.url ||
+        value.play_url ||
+        value.playUrl ||
+        value.stream_url ||
+        value.streamUrl ||
+        value.m3u8 ||
+        value.mpd ||
+        value.manifest ||
+        value.manifest_url ||
+        value.manifestUrl ||
+        value.pull_url ||
+        value.pullUrl ||
+        value.src ||
+        value.file ||
+        value.link;
 
+      if (
+        typeof possibleURL === "string" &&
+        safeURL(possibleURL)
+      ) {
 
-        const possibleURL =
-          value.url ||
-          value.play_url ||
-          value.playUrl ||
-          value.stream_url ||
-          value.streamUrl ||
-          value.m3u8 ||
-          value.mpd ||
-          value.manifest ||
-          value.manifest_url ||
-          value.manifestUrl ||
-          value.src ||
-          value.file ||
-          value.link;
+        addVideo(value);
 
+      }
 
-        if (
-          typeof possibleURL ===
-          "string" &&
-          safeURL(possibleURL)
-        ) {
+      Object.values(value).forEach(child =>
+        recursiveScan(child)
+      );
 
-          addVideo(value);
-
-        }
-
-
-        Object.values(value)
-          .forEach(
-            child =>
-              recursiveScan(child)
-          );
-
-      };
-
+    };
 
     recursiveScan(result);
 
   }
 
-
-  /*
-   * ==========================
-   * UNIQUE URL
-   * ==========================
-   */
+  /* =====================================================
+     4. UNIQUE URL
+  ===================================================== */
 
   const unique = [];
+  const seen = new Set();
 
-  const seen =
-    new Set();
+  videos.forEach(video => {
 
+    const key = String(video.url || "").trim();
 
-  videos.forEach(
-    video => {
-
-      if (
-        !seen.has(video.url)
-      ) {
-
-        seen.add(
-          video.url
-        );
-
-        unique.push(
-          video
-        );
-
-      }
-
+    if (!key || seen.has(key)) {
+      return;
     }
-  );
 
+    seen.add(key);
+    unique.push(video);
+
+  });
 
   console.log(
     "[IKOTV] PARSED VIDEOS:",
     unique
   );
 
-
   return unique;
 }
   
-    /* =========================================================
+  /* =========================================================
      REFRESH / COUNTDOWN
   ========================================================= */
 
