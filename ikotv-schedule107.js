@@ -2160,36 +2160,55 @@ const result =
 }
 
   async function fetchMatchInfo(matchId) {
-    const result = await postJSON(
-      CONFIG.api.matchInfo,
-      {
-        matchid: String(matchId),
-        sport: "football"
-      }
-    );
+  const url =
+    CONFIG.api.matchInfo +
+    "?matchid=" +
+    encodeURIComponent(String(matchId)) +
+    "&sport=football&_=" +
+    Date.now();
 
-    console.log(
-      "[IKOTV] match-info:",
-      result
-    );
+  console.log("[IKOTV] MATCH INFO REQUEST:", url);
 
-    return result;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Accept": "application/json"
+    },
+    mode: "cors",
+    cache: "no-store"
+  });
+
+  const text = await response.text();
+
+  console.log("[IKOTV] MATCH INFO STATUS:", response.status);
+  console.log("[IKOTV] MATCH INFO RESPONSE:", text);
+
+  if (!response.ok) {
+    throw new Error(
+      "HTTP " +
+      response.status +
+      " - " +
+      text.substring(0, 300)
+    );
   }
 
+  if (!text) {
+    throw new Error("Response match-info kosong");
+  }
+
+  const result = JSON.parse(text);
+
+  console.log("[IKOTV] match-info:", result);
+
+  return result;
+}
+
   async function fetchStreamURL(matchId) {
+  console.log("[IKOTV] Mengambil server dari match-info:", matchId);
 
-  console.log(
-    "[IKOTV] Mengambil server dari match-info:",
-    matchId
-  );
+  const result = await fetchMatchInfo(matchId);
 
-  const result =
-    await fetchMatchInfo(matchId);
-
-  console.log(
-    "[IKOTV] SERVER DATA DARI MATCH-INFO:",
-    result
-  );
+  console.log("[IKOTV] SERVER DATA DARI MATCH-INFO:", result);
 
   return result;
 }
