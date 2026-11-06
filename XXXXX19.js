@@ -4179,8 +4179,7 @@ function extractVideos(result) {
   const videos = [];
 
   /* =========================================================
-     CEK URL VIDEO / STREAM
-     HANYA TERIMA SOURCE PLAYER
+     CEK URL GAMBAR
   ========================================================= */
 
   function isImageURL(url) {
@@ -4190,60 +4189,52 @@ function extractVideos(result) {
 
   }
 
-  function isVideoURL(url) {
 
-    if (!url || typeof url !== "string") {
-      return false;
-    }
+  /* =========================================================
+     NORMALIZE URL
+  ========================================================= */
 
-    const value = url.trim();
+  function normalizeURL(value) {
 
-    if (!/^https?:\/\//i.test(value)) {
-      return false;
-    }
-
-    /* JANGAN MASUKKAN GAMBAR */
-    if (isImageURL(value)) {
-      return false;
-    }
-
-    /*
-     * FORMAT VIDEO / STREAM LANGSUNG
-     */
     if (
-      /\.(m3u8|flv|mpd|mp4)(?:[?#]|$)/i
-        .test(value)
+      typeof value !== "string"
     ) {
-      return true;
+      return "";
     }
 
-    /*
-     * IFRAME / PLAYER
-     */
-    if (
-      /\/(iframe|embed|player|stream)\b/i
-        .test(value)
-    ) {
-      return true;
+    const valueTrimmed =
+      value.trim();
+
+    if (!valueTrimmed) {
+      return "";
     }
 
-    /*
-     * URL yang mengandung parameter
-     * stream/video/player
-     */
-    if (
-      /[?&](m3u8|mpd|stream|video|player|url)=/i
-        .test(value)
-    ) {
-      return true;
+    const url =
+      safeURL(valueTrimmed);
+
+    if (!url) {
+      return "";
     }
 
-    return false;
+    if (isImageURL(url)) {
+      return "";
+    }
+
+    return url;
+
   }
 
 
   /* =========================================================
-     AMBIL URL DARI 1 ITEM SERVER
+     AMBIL URL DARI ITEM SERVER
+     
+     TIDAK LAGI MEMBATASI URL HARUS:
+     .m3u8
+     .mpd
+     .flv
+     /iframe
+     /player
+     dll.
   ========================================================= */
 
   function getVideoURL(item) {
@@ -4252,31 +4243,27 @@ function extractVideos(result) {
       return "";
     }
 
-    /*
-     * Kalau item langsung berupa string
-     */
-    if (typeof item === "string") {
 
-      const url =
-        safeURL(item);
+    /* STRING LANGSUNG */
 
-      return isVideoURL(url)
-        ? url
-        : "";
+    if (
+      typeof item === "string"
+    ) {
+
+      return normalizeURL(item);
 
     }
 
-    if (typeof item !== "object") {
+
+    if (
+      typeof item !== "object"
+    ) {
       return "";
     }
 
+
     /*
-     * Field yang memang berhubungan
-     * dengan source player.
-     *
-     * JANGAN scan Object.values()
-     * secara bebas karena bisa mengambil
-     * logo / gambar / URL metadata.
+     * Field URL yang umum digunakan
      */
 
     const fields = [
@@ -4312,9 +4299,18 @@ function extractVideos(result) {
       "player_url",
       "playerUrl",
 
-      "link"
+      "link",
+
+      "source_url",
+      "sourceUrl",
+
+      "video_url",
+      "videoUrl",
+
+      "file"
 
     ];
+
 
     for (
       const field of fields
@@ -4323,40 +4319,30 @@ function extractVideos(result) {
       const value =
         item[field];
 
-      if (
-        typeof value !== "string"
-      ) {
-        continue;
-      }
-
       const url =
-        safeURL(value);
+        normalizeURL(value);
 
-      if (
-        isVideoURL(url)
-      ) {
-
+      if (url) {
         return url;
-
       }
 
     }
 
+
     /*
-     * Beberapa API kadang menaruh
-     * source di dalam object khusus.
-     *
-     * Hanya cek object yang memang
-     * bernama source / stream / video.
+     * Nested object
      */
 
     const nestedFields = [
 
       "source",
       "stream",
-      "video"
+      "video",
+      "data",
+      "player"
 
     ];
+
 
     for (
       const field of nestedFields
@@ -4380,6 +4366,7 @@ function extractVideos(result) {
       }
 
     }
+
 
     return "";
 
@@ -4405,10 +4392,14 @@ function extractVideos(result) {
         item.displayName ||
         item.server_name ||
         item.serverName ||
+        item.server ||
         item.name ||
         item.title ||
         item.label ||
         item.channel ||
+        item.text ||
+        item.type_name ||
+        item.typeName ||
         "";
 
       if (
@@ -4427,34 +4418,12 @@ function extractVideos(result) {
 
 
   /* =========================================================
-     AMBIL DATA VIDEO
+     AMBIL TYPE
   ========================================================= */
 
-  function addVideo(
-    item,
-    index
-  ) {
-
-    const url =
-      getVideoURL(item);
-
-    if (!url) {
-      return;
-    }
+  function getVideoType(item, url) {
 
     let type = "";
-
-    let kid = "";
-    let key = "";
-
-    let clearKeys = null;
-
-
-    /*
-     * ==========================
-     * TYPE
-     * ==========================
-     */
 
     if (
       item &&
@@ -4472,45 +4441,68 @@ function extractVideos(result) {
     }
 
 
+    const lower =
+      String(url || "")
+        .toLowerCase();
+
+
     /*
-     * ==========================
-     * AUTO TYPE DARI URL
-     * ==========================
+     * Jangan menimpa iframe yang sudah
+     * diberikan API secara eksplisit.
      */
 
     if (
-      /\.mpd(?:[?#]|$)/i
-        .test(url)
+      String(type).toLowerCase()
+        === "iframe"
     ) {
 
-      type = "dash";
-
-    }
-
-    else if (
-      /\.m3u8(?:[?#]|$)/i
-        .test(url)
-    ) {
-
-      type = "hls";
-
-    }
-
-    else if (
-      /\.flv(?:[?#]|$)/i
-        .test(url)
-    ) {
-
-      type = "flv";
+      return "iframe";
 
     }
 
 
-    /*
-     * ==========================
-     * KID / KEY
-     * ==========================
-     */
+    if (
+      /\.flv(?:[?#]|$)/i.test(lower)
+    ) {
+
+      return "flv";
+
+    }
+
+
+    if (
+      /\.mpd(?:[?#]|$)/i.test(lower)
+    ) {
+
+      return "dash";
+
+    }
+
+
+    if (
+      /\.m3u8(?:[?#]|$)/i.test(lower)
+    ) {
+
+      return "hls";
+
+    }
+
+
+    return type;
+
+  }
+
+
+  /* =========================================================
+     AMBIL KID / KEY
+  ========================================================= */
+
+  function getDRMData(item) {
+
+    let kid = "";
+    let key = "";
+    let clearKeys = null;
+
 
     if (
       item &&
@@ -4542,12 +4534,6 @@ function extractVideos(result) {
     }
 
 
-    /*
-     * ==========================
-     * CLEARKEY
-     * ==========================
-     */
-
     if (
       !clearKeys &&
       kid &&
@@ -4571,6 +4557,43 @@ function extractVideos(result) {
     }
 
 
+    return {
+      kid,
+      key,
+      clearKeys
+    };
+
+  }
+
+
+  /* =========================================================
+     ADD SERVER
+  ========================================================= */
+
+  function addVideo(
+    item,
+    index
+  ) {
+
+    const url =
+      getVideoURL(item);
+
+    if (!url) {
+      return;
+    }
+
+
+    const type =
+      getVideoType(
+        item,
+        url
+      );
+
+
+    const drm =
+      getDRMData(item);
+
+
     const name =
       getVideoName(
         item,
@@ -4590,15 +4613,15 @@ function extractVideos(result) {
 
       kid:
 
-        kid,
+        drm.kid,
 
       key:
 
-        key,
+        drm.key,
 
       clearKeys:
 
-        clearKeys,
+        drm.clearKeys,
 
       name:
 
@@ -4618,8 +4641,7 @@ function extractVideos(result) {
 
 
   /* =========================================================
-     CARI HANYA DATA "VIDEOS"
-     MILIK MATCH INI
+     CARI SEMUA KEMUNGKINAN LIST SERVER
   ========================================================= */
 
   let videoSource = null;
@@ -4637,7 +4659,15 @@ function extractVideos(result) {
 
     result?.data?.servers,
 
-    result?.servers
+    result?.servers,
+
+    result?.data?.sources,
+
+    result?.sources,
+
+    result?.data?.channels,
+
+    result?.channels
 
   ];
 
@@ -4653,20 +4683,15 @@ function extractVideos(result) {
       videoSource =
         candidate;
 
+      console.log(
+        "[IKOTV] SERVER ARRAY FOUND:",
+        candidate
+      );
+
       break;
 
     }
 
-    /*
-     * Kalau videos berupa object:
-     *
-     * {
-     *   "HD": {...},
-     *   "SD 1": {...}
-     * }
-     *
-     * tetap ambil value-nya.
-     */
 
     if (
       candidate &&
@@ -4682,6 +4707,11 @@ function extractVideos(result) {
 
         videoSource =
           values;
+
+        console.log(
+          "[IKOTV] SERVER OBJECT FOUND:",
+          candidate
+        );
 
         break;
 
@@ -4715,8 +4745,106 @@ function extractVideos(result) {
 
 
   /* =========================================================
+     FALLBACK:
+     KALAU API MENGIRIM OBJECT YANG TIDAK
+     LANGSUNG BERADA DI videos/servers
+  ========================================================= */
+
+  if (
+    !videos.length &&
+    result &&
+    typeof result === "object"
+  ) {
+
+    function scanObject(
+      object,
+      depth
+    ) {
+
+      if (
+        depth > 4 ||
+        !object ||
+        typeof object !== "object"
+      ) {
+        return;
+      }
+
+
+      Object.entries(object)
+        .forEach(([key, value]) => {
+
+          /*
+           * Jangan scan metadata
+           * yang jelas bukan server.
+           */
+
+          const lowerKey =
+            String(key)
+              .toLowerCase();
+
+          if (
+            lowerKey.includes("logo") ||
+            lowerKey.includes("image") ||
+            lowerKey.includes("icon")
+          ) {
+            return;
+          }
+
+
+          if (
+            typeof value === "string"
+          ) {
+
+            const url =
+              normalizeURL(value);
+
+            if (url) {
+
+              addVideo(
+                {
+                  url: url,
+                  name:
+                    key
+                },
+                videos.length
+              );
+
+            }
+
+            return;
+
+          }
+
+
+          if (
+            value &&
+            typeof value === "object"
+          ) {
+
+            scanObject(
+              value,
+              depth + 1
+            );
+
+          }
+
+        });
+
+    }
+
+
+    scanObject(
+      result,
+      0
+    );
+
+  }
+
+
+  /* =========================================================
      UNIQUE SERVER
-     HANYA BERDASARKAN URL
+     
+     HANYA HILANGKAN URL YANG BENAR-BENAR SAMA
   ========================================================= */
 
   const unique = [];
@@ -4729,9 +4857,12 @@ function extractVideos(result) {
     video => {
 
       const key =
-        String(video.url)
-          .trim()
-          .toLowerCase();
+        String(
+          video.url
+        )
+        .trim()
+        .toLowerCase();
+
 
       if (
         !seen.has(key)
