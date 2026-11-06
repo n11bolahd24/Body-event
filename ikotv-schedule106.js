@@ -2177,21 +2177,22 @@ const result =
   }
 
   async function fetchStreamURL(matchId) {
-    const result = await postJSON(
-      CONFIG.api.streamUrl,
-      {
-        matchid: String(matchId),
-        sport: "football"
-      }
-    );
 
-    console.log(
-      "[IKOTV] stream-url:",
-      result
-    );
+  console.log(
+    "[IKOTV] Mengambil server dari match-info:",
+    matchId
+  );
 
-    return result;
-  }
+  const result =
+    await fetchMatchInfo(matchId);
+
+  console.log(
+    "[IKOTV] SERVER DATA DARI MATCH-INFO:",
+    result
+  );
+
+  return result;
+}
 
 
 /* =========================================================
