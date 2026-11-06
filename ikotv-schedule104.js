@@ -9,10 +9,10 @@
 
   const CONFIG = {
     api: {
-  matches: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/api/matches",
-  matchInfo: "https://ikotv.cc/api/match-info",
-  streamUrl: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/stream-url"
-},
+      matches: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/api/matches",
+      matchInfo: "https://ikotv.cc/api/match-info",
+      streamUrl: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/stream-url"
+    },
 
     // Change these only if you want another placement.
     scheduleSelector: "#ikotvSchedule",
@@ -1857,6 +1857,143 @@ await loadScript(
   }
 }
 
+
+/* =========================================================
+   GET API MATCHES
+   /api/matches IKOTV menggunakan GET
+========================================================= */
+
+async function getMatchesAPI(filter) {
+
+  const url =
+    CONFIG.api.matches +
+    "?date=" +
+    encodeURIComponent("") +
+    "&filter=" +
+    encodeURIComponent(filter) +
+    "&sport=football" +
+    "&_=" +
+    Date.now();
+
+  console.log(
+    "[IKOTV] GET REQUEST:",
+    url
+  );
+
+  const controller =
+    new AbortController();
+
+  const timeout =
+    setTimeout(() => {
+      controller.abort();
+    }, 30000);
+
+  try {
+
+    const response =
+      await fetch(
+        url,
+        {
+          method: "GET",
+
+          headers: {
+            "Accept":
+              "application/json"
+          },
+
+          mode: "cors",
+
+          cache: "no-store",
+
+          signal:
+            controller.signal
+        }
+      );
+
+    console.log(
+      "[IKOTV] GET STATUS:",
+      response.status
+    );
+
+    const text =
+      await response.text();
+
+    console.log(
+      "[IKOTV] GET RESPONSE:",
+      text
+    );
+
+    if (!response.ok) {
+
+      throw new Error(
+        "HTTP " +
+        response.status +
+        " - " +
+        text.substring(
+          0,
+          200
+        )
+      );
+
+    }
+
+    if (!text) {
+
+      throw new Error(
+        "Response API kosong"
+      );
+
+    }
+
+    try {
+
+      return JSON.parse(
+        text
+      );
+
+    } catch (error) {
+
+      throw new Error(
+        "Response API bukan JSON: " +
+        text.substring(
+          0,
+          200
+        )
+      );
+
+    }
+
+  } catch (error) {
+
+    if (
+      error.name ===
+      "AbortError"
+    ) {
+
+      throw new Error(
+        "Request timeout 30s"
+      );
+
+    }
+
+    console.error(
+      "[IKOTV] GET FETCH ERROR:",
+      error
+    );
+
+    throw error;
+
+  } finally {
+
+    clearTimeout(
+      timeout
+    );
+
+  }
+
+}
+
+
   async function fetchMatches() {
 
   console.log("[IKOTV] Mengambil ALL + LIVE...");
@@ -1867,26 +2004,12 @@ await loadScript(
       // ==========================
       // SEMUA JADWAL
       // ==========================
-      postJSON(
-        CONFIG.api.matches,
-        {
-          date: null,
-          filter: "all",
-          sport: "football"
-        }
-      ),
+      getMatchesAPI("all"),
 
       // ==========================
       // MATCH YANG SEDANG LIVE
       // ==========================
-      postJSON(
-        CONFIG.api.matches,
-        {
-          date: null,
-          filter: "live",
-          sport: "football"
-        }
-      )
+      getMatchesAPI("live")
 
     ]);
 
