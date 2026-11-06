@@ -4178,88 +4178,276 @@ function extractVideos(result) {
 
   const videos = [];
 
+  /* =========================================================
+     CEK URL VIDEO / STREAM
+     HANYA TERIMA SOURCE PLAYER
+  ========================================================= */
 
-  function addVideo(
-    item,
-    fallbackName = ""
-  ) {
+  function isImageURL(url) {
 
-    if (!item) return;
+    return /\.(jpg|jpeg|png|webp|gif|svg|ico|bmp|avif)(?:[?#]|$)/i
+      .test(String(url || ""));
 
+  }
+
+  function isVideoURL(url) {
+
+    if (!url || typeof url !== "string") {
+      return false;
+    }
+
+    const value = url.trim();
+
+    if (!/^https?:\/\//i.test(value)) {
+      return false;
+    }
+
+    /* JANGAN MASUKKAN GAMBAR */
+    if (isImageURL(value)) {
+      return false;
+    }
 
     /*
-     * ==========================
-     * STRING URL
-     * ==========================
+     * FORMAT VIDEO / STREAM LANGSUNG
      */
-
     if (
-      typeof item === "string"
+      /\.(m3u8|flv|mpd|mp4)(?:[?#]|$)/i
+        .test(value)
     ) {
+      return true;
+    }
+
+    /*
+     * IFRAME / PLAYER
+     */
+    if (
+      /\/(iframe|embed|player|stream)\b/i
+        .test(value)
+    ) {
+      return true;
+    }
+
+    /*
+     * URL yang mengandung parameter
+     * stream/video/player
+     */
+    if (
+      /[?&](m3u8|mpd|stream|video|player|url)=/i
+        .test(value)
+    ) {
+      return true;
+    }
+
+    return false;
+  }
+
+
+  /* =========================================================
+     AMBIL URL DARI 1 ITEM SERVER
+  ========================================================= */
+
+  function getVideoURL(item) {
+
+    if (!item) {
+      return "";
+    }
+
+    /*
+     * Kalau item langsung berupa string
+     */
+    if (typeof item === "string") {
 
       const url =
         safeURL(item);
 
+      return isVideoURL(url)
+        ? url
+        : "";
 
-      if (url) {
+    }
 
-        videos.push({
+    if (typeof item !== "object") {
+      return "";
+    }
 
-          url: url,
+    /*
+     * Field yang memang berhubungan
+     * dengan source player.
+     *
+     * JANGAN scan Object.values()
+     * secara bebas karena bisa mengambil
+     * logo / gambar / URL metadata.
+     */
 
-          name:
-            fallbackName,
+    const fields = [
 
-          display_name:
-            fallbackName,
+      "url",
+      "src",
 
-          type_name: ""
+      "stream_url",
+      "streamUrl",
 
-        });
+      "play_url",
+      "playUrl",
+
+      "m3u8",
+
+      "flv",
+
+      "mpd",
+
+      "manifest",
+      "manifest_url",
+      "manifestUrl",
+
+      "iframe",
+      "iframe_url",
+      "iframeUrl",
+
+      "embed",
+      "embed_url",
+      "embedUrl",
+
+      "player",
+      "player_url",
+      "playerUrl",
+
+      "link"
+
+    ];
+
+    for (
+      const field of fields
+    ) {
+
+      const value =
+        item[field];
+
+      if (
+        typeof value !== "string"
+      ) {
+        continue;
+      }
+
+      const url =
+        safeURL(value);
+
+      if (
+        isVideoURL(url)
+      ) {
+
+        return url;
 
       }
 
-      return;
     }
-
-
-    if (
-      typeof item !== "object"
-    ) {
-      return;
-    }
-
 
     /*
-     * ==========================
-     * URL
-     * ==========================
+     * Beberapa API kadang menaruh
+     * source di dalam object khusus.
+     *
+     * Hanya cek object yang memang
+     * bernama source / stream / video.
      */
 
+    const nestedFields = [
+
+      "source",
+      "stream",
+      "video"
+
+    ];
+
+    for (
+      const field of nestedFields
+    ) {
+
+      const nested =
+        item[field];
+
+      if (
+        nested &&
+        typeof nested === "object"
+      ) {
+
+        const nestedURL =
+          getVideoURL(nested);
+
+        if (nestedURL) {
+          return nestedURL;
+        }
+
+      }
+
+    }
+
+    return "";
+
+  }
+
+
+  /* =========================================================
+     AMBIL NAMA SERVER
+  ========================================================= */
+
+  function getVideoName(
+    item,
+    index
+  ) {
+
+    if (
+      item &&
+      typeof item === "object"
+    ) {
+
+      const name =
+        item.display_name ||
+        item.displayName ||
+        item.server_name ||
+        item.serverName ||
+        item.name ||
+        item.title ||
+        item.label ||
+        item.channel ||
+        "";
+
+      if (
+        String(name).trim()
+      ) {
+
+        return String(name).trim();
+
+      }
+
+    }
+
+    return `LIVE ${index + 1}`;
+
+  }
+
+
+  /* =========================================================
+     AMBIL DATA VIDEO
+  ========================================================= */
+
+  function addVideo(
+    item,
+    index
+  ) {
+
     const url =
-      item.url ||
-      item.play_url ||
-      item.playUrl ||
-      item.stream_url ||
-      item.streamUrl ||
-      item.m3u8 ||
-      item.mpd ||
-      item.manifest ||
-      item.manifest_url ||
-      item.manifestUrl ||
-      item.src ||
-      item.file ||
-      item.link ||
-      "";
+      getVideoURL(item);
 
-
-    const validURL =
-      safeURL(url);
-
-
-    if (!validURL) {
+    if (!url) {
       return;
     }
+
+    let type = "";
+
+    let kid = "";
+    let key = "";
+
+    let clearKeys = null;
 
 
     /*
@@ -4268,39 +4456,52 @@ function extractVideos(result) {
      * ==========================
      */
 
-    let type =
-      item.type ||
-      item.format ||
-      item.protocol ||
-      "";
+    if (
+      item &&
+      typeof item === "object"
+    ) {
+
+      type =
+        item.type ||
+        item.format ||
+        item.protocol ||
+        item.type_name ||
+        item.typeName ||
+        "";
+
+    }
 
 
     /*
-     * MPD otomatis DASH
+     * ==========================
+     * AUTO TYPE DARI URL
+     * ==========================
      */
 
     if (
-      /\.mpd(?:[?#]|$)/i.test(
-        validURL
-      )
+      /\.mpd(?:[?#]|$)/i
+        .test(url)
     ) {
 
       type = "dash";
 
     }
 
-
-    /*
-     * M3U8 otomatis HLS
-     */
-
     else if (
-      /\.m3u8(?:[?#]|$)/i.test(
-        validURL
-      )
+      /\.m3u8(?:[?#]|$)/i
+        .test(url)
     ) {
 
       type = "hls";
+
+    }
+
+    else if (
+      /\.flv(?:[?#]|$)/i
+        .test(url)
+    ) {
+
+      type = "flv";
 
     }
 
@@ -4311,40 +4512,40 @@ function extractVideos(result) {
      * ==========================
      */
 
-    const kid =
-      item.kid ||
-      item.KID ||
-      item.kid_hex ||
-      item.kidHex ||
-      item.default_kid ||
-      item.defaultKID ||
-      "";
+    if (
+      item &&
+      typeof item === "object"
+    ) {
 
+      kid =
+        item.kid ||
+        item.KID ||
+        item.kid_hex ||
+        item.kidHex ||
+        item.default_kid ||
+        item.defaultKID ||
+        "";
 
-    const key =
-      item.key ||
-      item.KEY ||
-      item.key_hex ||
-      item.keyHex ||
-      "";
+      key =
+        item.key ||
+        item.KEY ||
+        item.key_hex ||
+        item.keyHex ||
+        "";
+
+      clearKeys =
+        item.clearKeys ||
+        item.clear_keys ||
+        item.clearkeys ||
+        null;
+
+    }
 
 
     /*
      * ==========================
-     * CLEARKEY OBJECT
+     * CLEARKEY
      * ==========================
-     */
-
-    let clearKeys =
-      item.clearKeys ||
-      item.clear_keys ||
-      item.clearkeys ||
-      null;
-
-
-    /*
-     * Kalau API memberi kid/key
-     * ubah menjadi clearKeys
      */
 
     if (
@@ -4370,73 +4571,73 @@ function extractVideos(result) {
     }
 
 
-    /*
-     * ==========================
-     * VIDEO OBJECT
-     * ==========================
-     */
+    const name =
+      getVideoName(
+        item,
+        index
+      );
+
 
     videos.push({
 
       url:
-        validURL,
+
+        url,
 
       type:
+
         type,
 
       kid:
+
         kid,
 
       key:
+
         key,
 
       clearKeys:
+
         clearKeys,
 
       name:
-        item.name ||
-        item.server_name ||
-        item.serverName ||
-        fallbackName,
+
+        name,
 
       display_name:
-        item.display_name ||
-        item.displayName ||
-        item.server_name ||
-        item.serverName ||
-        item.name ||
-        fallbackName,
+
+        name,
 
       type_name:
-        item.type_name ||
-        item.typeName ||
-        item.type ||
-        ""
+
+        type
 
     });
 
   }
 
 
-  /*
-   * ==========================
-   * CANDIDATES
-   * ==========================
-   */
+  /* =========================================================
+     CARI HANYA DATA "VIDEOS"
+     MILIK MATCH INI
+  ========================================================= */
+
+  let videoSource = null;
+
 
   const candidates = [
 
     result?.data?.videos,
-    result?.data?.streams,
-    result?.data?.servers,
-    result?.data?.list,
 
     result?.videos,
-    result?.streams,
-    result?.servers,
-    result?.list,
 
-    result?.data
+    result?.data?.streams,
+
+    result?.streams,
+
+    result?.data?.servers,
+
+    result?.servers
 
   ];
 
@@ -4449,16 +4650,41 @@ function extractVideos(result) {
       Array.isArray(candidate)
     ) {
 
-      candidate.forEach(
-        item =>
-          addVideo(item)
-      );
+      videoSource =
+        candidate;
 
+      break;
+
+    }
+
+    /*
+     * Kalau videos berupa object:
+     *
+     * {
+     *   "HD": {...},
+     *   "SD 1": {...}
+     * }
+     *
+     * tetap ambil value-nya.
+     */
+
+    if (
+      candidate &&
+      typeof candidate === "object"
+    ) {
+
+      const values =
+        Object.values(candidate);
 
       if (
-        videos.length
+        values.length
       ) {
+
+        videoSource =
+          values;
+
         break;
+
       }
 
     }
@@ -4466,86 +4692,32 @@ function extractVideos(result) {
   }
 
 
-  /*
-   * ==========================
-   * RECURSIVE FALLBACK
-   * ==========================
-   */
+  /* =========================================================
+     PARSE SERVER
+  ========================================================= */
 
   if (
-    !videos.length
+    Array.isArray(videoSource)
   ) {
 
-    const recursiveScan =
-      value => {
+    videoSource.forEach(
+      (item, index) => {
 
-        if (
-          !value ||
-          typeof value !== "object"
-        ) {
-          return;
-        }
+        addVideo(
+          item,
+          index
+        );
 
-
-        if (
-          Array.isArray(value)
-        ) {
-
-          value.forEach(
-            item =>
-              recursiveScan(item)
-          );
-
-          return;
-        }
-
-
-        const possibleURL =
-          value.url ||
-          value.play_url ||
-          value.playUrl ||
-          value.stream_url ||
-          value.streamUrl ||
-          value.m3u8 ||
-          value.mpd ||
-          value.manifest ||
-          value.manifest_url ||
-          value.manifestUrl ||
-          value.src ||
-          value.file ||
-          value.link;
-
-
-        if (
-          typeof possibleURL ===
-          "string" &&
-          safeURL(possibleURL)
-        ) {
-
-          addVideo(value);
-
-        }
-
-
-        Object.values(value)
-          .forEach(
-            child =>
-              recursiveScan(child)
-          );
-
-      };
-
-
-    recursiveScan(result);
+      }
+    );
 
   }
 
 
-  /*
-   * ==========================
-   * UNIQUE URL
-   * ==========================
-   */
+  /* =========================================================
+     UNIQUE SERVER
+     HANYA BERDASARKAN URL
+  ========================================================= */
 
   const unique = [];
 
@@ -4556,13 +4728,16 @@ function extractVideos(result) {
   videos.forEach(
     video => {
 
+      const key =
+        String(video.url)
+          .trim()
+          .toLowerCase();
+
       if (
-        !seen.has(video.url)
+        !seen.has(key)
       ) {
 
-        seen.add(
-          video.url
-        );
+        seen.add(key);
 
         unique.push(
           video
@@ -4575,12 +4750,19 @@ function extractVideos(result) {
 
 
   console.log(
-    "[IKOTV] PARSED VIDEOS:",
+    "[IKOTV] PARSED MATCH SERVERS:",
     unique
   );
 
 
+  console.log(
+    "[IKOTV] MATCH SERVER COUNT:",
+    unique.length
+  );
+
+
   return unique;
+
 }
   
     /* =========================================================
