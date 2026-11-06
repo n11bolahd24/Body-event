@@ -3977,6 +3977,11 @@ async function openIKOMatch(matchId) {
       result
     );
 
+    console.log(
+  "[IKOTV] STREAM-URL RAW RESULT:",
+  JSON.stringify(result, null, 2)
+);
+
     /* ==========================================
        PARSE SERVER
     ========================================== */
