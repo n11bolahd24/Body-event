@@ -3983,10 +3983,31 @@ async function openIKOMatch(matchId) {
 
     const videos = extractVideos(result);
 
-    console.log(
-      "[IKOTV] EXTRACTED VIDEOS:",
-      videos
-    );
+console.log("========== IKOTV ALL STREAM URL ==========");
+
+videos.forEach((video, index) => {
+
+  console.log(
+    `[IKOTV STREAM ${index + 1}]`,
+    video.display_name ||
+    video.name ||
+    video.type_name ||
+    `LIVE ${index + 1}`
+  );
+
+  console.log(
+    `[IKOTV URL ${index + 1}]`,
+    video.url
+  );
+
+});
+
+console.log(
+  "[IKOTV TOTAL STREAM]:",
+  videos.length
+);
+
+console.log("==========================================");
 
     /* ==========================================
        SERVER TIDAK DITEMUKAN
