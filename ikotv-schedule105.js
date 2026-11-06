@@ -11,7 +11,7 @@
     api: {
       matches: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/api/matches",
       matchInfo: "https://ikotv.cc/api/match-info",
-      streamUrl: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/stream-url"
+      streamUrl: "https://ikotv.cc/api/stream-url"
     },
 
     // Change these only if you want another placement.
