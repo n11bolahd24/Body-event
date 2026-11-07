@@ -2073,6 +2073,214 @@ async function getMatchesAPI(filter) {
 }
 
 
+  // ==========================
+// AMBIL CHANNEL IKOTV
+// ==========================
+
+async function getIKOTVChannels() {
+
+  const channelSlugs = [
+    "live-streaming-motogp",
+    "live-streaming-badminton"
+  ];
+
+  const results = [];
+
+  for (const slug of channelSlugs) {
+
+    const url =
+      "https://ikotv.cc/channels/" +
+      slug +
+      "?_=" +
+      Date.now();
+
+    console.log(
+      "[IKOTV] GET CHANNEL:",
+      url
+    );
+
+    try {
+
+      const response =
+        await fetch(
+          url,
+          {
+            method: "GET",
+            cache: "no-store"
+          }
+        );
+
+      console.log(
+        "[IKOTV] CHANNEL STATUS:",
+        slug,
+        response.status
+      );
+
+      const html =
+        await response.text();
+
+      if (!response.ok) {
+
+        console.warn(
+          "[IKOTV] CHANNEL HTTP ERROR:",
+          slug,
+          response.status
+        );
+
+        continue;
+
+      }
+
+      // Cari object channel di halaman IKOTV
+      const match =
+        html.match(
+          /"channel"\s*:\s*(\{[\s\S]*?\})\s*(?:,|})/
+        );
+
+      if (!match) {
+
+        console.warn(
+          "[IKOTV] CHANNEL DATA TIDAK DITEMUKAN:",
+          slug
+        );
+
+        continue;
+
+      }
+
+      let channel;
+
+      try {
+
+        channel =
+          JSON.parse(
+            match[1]
+          );
+
+      } catch (error) {
+
+        console.warn(
+          "[IKOTV] GAGAL PARSE CHANNEL:",
+          slug,
+          error
+        );
+
+        continue;
+
+      }
+
+      if (!channel) {
+        continue;
+      }
+
+      console.log(
+        "[IKOTV] CHANNEL FOUND:",
+        channel
+      );
+
+      results.push({
+
+        id:
+          "channel-" +
+          String(
+            channel.id
+          ),
+
+        title:
+          channel.name ||
+          "Live Channel",
+
+        league:
+          "EVENTS",
+
+        category:
+          "",
+
+        teams: {
+
+          home: {
+
+            name:
+              channel.name ||
+              "Live Channel",
+
+            logo: {
+
+              imageUrl:
+                channel.logo_url ||
+                ""
+
+            }
+
+          },
+
+          away: {
+
+            name:
+              channel.event_name ||
+              "",
+
+            logo: {
+
+              imageUrl:
+                ""
+
+            }
+
+          }
+
+        },
+
+        score: {
+
+          home: 0,
+          away: 0
+
+        },
+
+        time:
+          "LIVE TV",
+
+        isLive: true,
+
+        status: 2,
+
+        kickoff_time: 0,
+
+        isChannel: true,
+
+        channelSlug:
+          "/channels/" +
+          slug
+
+      });
+
+    } catch (error) {
+
+      console.error(
+        "[IKOTV] CHANNEL FETCH ERROR:",
+        slug,
+        error
+      );
+
+    }
+
+  }
+
+  console.log(
+    "[IKOTV] CHANNEL TOTAL:",
+    results.length
+  );
+
+  console.log(
+    "[IKOTV] CHANNEL MATCHES:",
+    results
+  );
+
+  return results;
+
+}
+
   async function fetchMatches() {
 
   console.log("[IKOTV] Mengambil ALL + LIVE...");
