@@ -2046,7 +2046,10 @@ async function getMatchesAPI(filter) {
       .filter(
         match =>
           match.id &&
-          match.time > 0
+          (
+            match.isChannel === true ||
+            match.time > 0
+          )
       );
 
   // ==========================
@@ -2059,7 +2062,10 @@ async function getMatchesAPI(filter) {
       .filter(
         match =>
           match.id &&
-          match.time > 0
+          (
+            match.isChannel === true ||
+            match.time > 0
+          )
       );
 
   console.log(
