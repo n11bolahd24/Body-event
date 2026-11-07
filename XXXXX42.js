@@ -14,19 +14,6 @@
       streamUrl: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/stream-url"
     },
 
-    channels: {
-  motogp: {
-    id: 2,
-    name: "MotoGP",
-    slug: "/channels/live-streaming-motogp"
-  },
-  badminton: {
-    id: 1,
-    name: "Badminton",
-    slug: "/channels/live-streaming-badminton"
-  }
-},
-
     // Change these only if you want another placement.
     scheduleSelector: "#ikotvSchedule",
     playerSelector: "#tv",
@@ -207,158 +194,7 @@
   return "waiting";
 }
 
-
-// ==========================
-// AMBIL CHANNEL IKOTV
-// ==========================
-
-async function getIKOTVChannels() {
-
-  const url =
-    CONFIG.api.matches
-      .replace(
-        "/api/matches",
-        "/api/channels"
-      ) +
-    "?_=" +
-    Date.now();
-
-  console.log(
-    "[IKOTV] GET CHANNEL API:",
-    url
-  );
-
-  try {
-
-    const response =
-      await fetch(
-        url,
-        {
-          method: "GET",
-
-          headers: {
-            "Accept":
-              "application/json"
-          },
-
-          mode: "cors",
-
-          cache: "no-store"
-        }
-      );
-
-    console.log(
-      "[IKOTV] CHANNEL API STATUS:",
-      response.status
-    );
-
-    const text =
-      await response.text();
-
-    console.log(
-      "[IKOTV] CHANNEL API RESPONSE:",
-      text.substring(
-        0,
-        1000
-      )
-    );
-
-    if (!response.ok) {
-
-      throw new Error(
-        "HTTP " +
-        response.status
-      );
-
-    }
-
-    return JSON.parse(
-      text
-    );
-
-  } catch (error) {
-
-    console.error(
-      "[IKOTV] CHANNEL API ERROR:",
-      error
-    );
-
-    return [];
-
-  }
-
-}
-
-  
-function normalizeMatch(match) {
-
-  // ==========================
-  // CHANNEL IKOTV
-  // ==========================
-
-  if (match?.isChannel === true) {
-
-    return {
-
-      id: String(
-        match?.id ??
-        ""
-      ),
-
-      time: "LIVE TV",
-
-      statusRaw: Number(
-        match?.status ??
-        2
-      ),
-
-      isLive: true,
-
-      isChannel: true,
-
-      channelSlug:
-        match?.channelSlug ||
-        "",
-
-      home:
-        match?.title ||
-        match?.name ||
-        match?.teams?.home?.name ||
-        "Live Channel",
-
-      away:
-        match?.teams?.away?.name ||
-        "",
-
-      homeLogo: safeURL(
-        match?.teams?.home?.logo?.imageUrl ||
-        match?.logo_url ||
-        ""
-      ),
-
-      awayLogo: safeURL(
-        match?.teams?.away?.logo?.imageUrl ||
-        ""
-      ),
-
-      competition:
-        match?.league ||
-        "EVENTS",
-
-      competitionLogo: "",
-
-      title:
-        match?.title ||
-        match?.name ||
-        "Live Channel"
-
-    };
-
-  }
-
-  // ==========================
-  // MATCH FOOTBALL
-  // ==========================
+  function normalizeMatch(match) {
 
   const home =
     match?.hometeam ||
@@ -439,7 +275,9 @@ function normalizeMatch(match) {
     )
 
   };
-}  /* =========================================================
+}
+
+  /* =========================================================
      DOM
   ========================================================= */
 
@@ -2156,10 +1994,6 @@ async function getMatchesAPI(filter) {
 }
 
 
-  // ==========================
-// AMBIL CHANNEL IKOTV
-// ==========================
-
   async function fetchMatches() {
 
   console.log("[IKOTV] Mengambil ALL + LIVE...");
@@ -2179,54 +2013,41 @@ async function getMatchesAPI(filter) {
 
     ]);
 
+  console.log(
+    "[IKOTV] ALL:",
+    allResult
+  );
 
-  console.log("[IKOTV] ALL:", allResult);
-  console.log("[IKOTV] LIVE:", liveResult);
+  console.log(
+    "[IKOTV] LIVE:",
+    liveResult
+  );
 
-
-  // ==========================================================
-  // AMBIL ARRAY MATCH DENGAN AMAN
-  // ==========================================================
+  // ==========================
+  // PARSE ALL
+  // ==========================
 
   const allMatches =
-    Array.isArray(allResult)
-      ? allResult
-      : Array.isArray(allResult?.data?.matchs)
-        ? allResult.data.matchs
-        : Array.isArray(allResult?.data?.matches)
-          ? allResult.data.matches
-          : [];
-
-
-  const liveMatches =
-    Array.isArray(liveResult)
-      ? liveResult
-      : Array.isArray(liveResult?.data?.matchs)
-        ? liveResult.data.matchs
-        : Array.isArray(liveResult?.data?.matches)
-          ? liveResult.data.matches
-          : [];
-
-
-  // ==========================================================
-  // AMBIL CHANNEL LANGSUNG DARI ALL
-  // ==========================================================
-
-  const channelResult =
-    allMatches.filter(match => {
-
-      return (
-        match?.is_channel === true ||
-        match?.is_channel === 1 ||
-        match?.isChannel === true
+    getArray(allResult)
+      .map(normalizeMatch)
+      .filter(
+        match =>
+          match.id &&
+          match.time > 0
       );
 
-    });
+  // ==========================
+  // PARSE LIVE
+  // ==========================
 
-
-  // ==========================================================
-  // LOG
-  // ==========================================================
+  const liveMatches =
+    getArray(liveResult)
+      .map(normalizeMatch)
+      .filter(
+        match =>
+          match.id &&
+          match.time > 0
+      );
 
   console.log(
     "[IKOTV] ALL COUNT:",
@@ -2238,224 +2059,105 @@ async function getMatchesAPI(filter) {
     liveMatches.length
   );
 
-  console.log(
-    "[IKOTV] CHANNEL:",
-    channelResult
+  // ==========================
+  // GABUNG ALL + LIVE
+  // ==========================
+
+  const merged =
+    new Map();
+
+  // Masukkan semua jadwal
+  allMatches.forEach(match => {
+
+    merged.set(
+      String(match.id),
+      match
+    );
+
+  });
+
+  // Masukkan LIVE
+  // Kalau pertandingan sudah hilang
+  // dari ALL tetapi muncul di LIVE,
+  // pertandingan tersebut tetap masuk.
+  liveMatches.forEach(match => {
+
+  const id =
+    String(match.id);
+
+  if (merged.has(id)) {
+
+    const old =
+      merged.get(id);
+
+    merged.set(id, {
+      ...old,
+      ...match,
+      isLive: true
+    });
+
+  } else {
+
+    merged.set(id, {
+      ...match,
+      isLive: true
+    });
+
+  }
+
+});
+    
+  const now =
+  Math.floor(Date.now() / 1000);
+
+const result =
+  Array.from(
+    merged.values()
+  )
+  .filter(match => {
+
+    if (
+      !match.id ||
+      !match.time
+    ) {
+      return false;
+    }
+
+    const start =
+      Number(match.time);
+
+    // Belum kickoff → tetap tampil
+    if (now < start) {
+      return true;
+    }
+
+    // Sudah kickoff tetapi belum terdeteksi LIVE
+    // → TETAP tampil sebagai WAITING
+    if (!match.isLive) {
+      return true;
+    }
+
+    // Sudah LIVE → tetap tampil
+    return true;
+
+  })
+  .sort(
+    (a, b) =>
+      a.time - b.time
   );
-
-  console.log(
-    "[IKOTV] CHANNEL COUNT:",
-    channelResult.length
-  );
-
-
-  // ==========================================================
-  // GABUNG
-  // ==========================================================
-
-  const mergedRaw = [
-    ...allMatches,
-    ...liveMatches
-  ];
-
 
   console.log(
     "[IKOTV] MERGED COUNT:",
-    mergedRaw.length
+    result.length
   );
-
-
-  // ==========================================================
-  // NORMALIZE
-  // ==========================================================
-
-  const normalized =
-    mergedRaw
-      .map(normalizeMatch)
-      .filter(Boolean);
-
-
-  // ==========================================================
-  // FILTER + SORT
-  // ==========================================================
-
-  const now = Date.now();
-
-
-  const filtered =
-    normalized
-      .filter(match => {
-
-        if (!match?.id || !match?.time) {
-          return false;
-        }
-
-        // CHANNEL SELALU TAMPIL
-        if (match.isChannel) {
-          return true;
-        }
-
-        const start =
-          Number(match.time);
-
-        if (now < start) {
-          return true;
-        }
-
-        if (!match.isLive) {
-          return true;
-        }
-
-        return true;
-
-      })
-
-      .sort((a, b) => {
-
-        // CHANNEL DI ATAS
-        if (
-          a.isChannel &&
-          !b.isChannel
-        ) {
-          return -1;
-        }
-
-        if (
-          !a.isChannel &&
-          b.isChannel
-        ) {
-          return 1;
-        }
-
-        // SESAMA CHANNEL
-        if (
-          a.isChannel &&
-          b.isChannel
-        ) {
-          return 0;
-        }
-
-        return (
-          Number(a.time) -
-          Number(b.time)
-        );
-
-      });
-
-
-  // ==========================================================
-  // RENDER
-  // ==========================================================
 
   console.log(
-    "[IKOTV] Schedule loaded:",
-    filtered.length
+    "[IKOTV] MERGED MATCHES:",
+    result
   );
 
-
-  // PENTING:
-  // channelResult TIDAK perlu digabung lagi di sini
-  // karena channel sudah termasuk di allMatches.
-  //
-  // allMatches -> sudah berisi MotoGP channel
-  // normalizeMatch() -> sudah punya isChannel support
-  //
-
-
-  renderSchedule(filtered);
-
+  return result;
 }
-
-
-async function fetchIKOTVChannels() {
-  const channels = [];
-
-  const channelPages = [
-    {
-      id: 2,
-      name: "MotoGP",
-      slug: "live-streaming-motogp"
-    },
-    {
-      id: 1,
-      name: "Badminton",
-      slug: "live-streaming-badminton"
-    }
-  ];
-
-  for (const ch of channelPages) {
-    try {
-      console.log(
-        "[IKOTV CHANNEL] Fetch:",
-        ch.name,
-        "https://ikotv.cc/channels/" + ch.slug
-      );
-
-      const res = await fetch(
-        "https://ikotv.cc/channels/" +
-        ch.slug +
-        "?_=" + Date.now(),
-        {
-          method: "GET",
-          cache: "no-store"
-        }
-      );
-
-      if (!res.ok) {
-        console.warn(
-          "[IKOTV CHANNEL] HTTP",
-          ch.name,
-          res.status
-        );
-        continue;
-      }
-
-      const html = await res.text();
-
-      console.log(
-        "[IKOTV CHANNEL] HTML:",
-        ch.name,
-        html.length
-      );
-
-      /*
-       * Channel data di halaman iKOTV berada
-       * di object Next.js / server-rendered data.
-       *
-       * Kita cari object channel berdasarkan
-       * channel_id / name / slug.
-       */
-      const channelMatch =
-        html.match(
-          new RegExp(
-            `"channel"\\s*:\\s*\\{[^]*?"id"\\s*:\\s*${ch.id}[^]*?\\}`
-          )
-        );
-
-      if (!channelMatch) {
-        console.warn(
-          "[IKOTV CHANNEL] Data channel tidak ditemukan:",
-          ch.name
-        );
-        continue;
-      }
-
-      console.log(
-        "[IKOTV CHANNEL] Found:",
-        ch.name
-      );
-
-    } catch (err) {
-      console.error(
-        "[IKOTV CHANNEL] Error:",
-        ch.name,
-        err
-      );
-    }
-  }
-
-  return channels;
-}  
 
   async function fetchMatchInfo(matchId) {
   const url =
