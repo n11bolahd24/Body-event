@@ -214,327 +214,79 @@
 
 async function getIKOTVChannels() {
 
-  const slugs = [
-    "live-streaming-motogp",
-    "live-streaming-badminton"
-  ];
-
-  const results = [];
-
-  for (const slug of slugs) {
-
-    const url =
-      "https://ikotv.cc/channels/" +
-      slug +
-      "?_=" +
-      Date.now();
-
-    console.log(
-      "[IKOTV] GET CHANNEL:",
-      url
-    );
-
-    try {
-
-      const response =
-        await fetch(
-          url,
-          {
-            method: "GET",
-            cache: "no-store"
-          }
-        );
-
-      console.log(
-        "[IKOTV] CHANNEL STATUS:",
-        slug,
-        response.status
-      );
-
-      const html =
-        await response.text();
-
-      if (!response.ok) {
-
-        console.warn(
-          "[IKOTV] CHANNEL HTTP ERROR:",
-          slug,
-          response.status
-        );
-
-        continue;
-
-      }
-
-      // ==================================
-      // CARI "channel":{ ... } DI HTML
-      // ==================================
-
-      const marker =
-        '"channel":';
-
-      const start =
-        html.indexOf(marker);
-
-      if (start === -1) {
-
-        console.warn(
-          "[IKOTV] CHANNEL DATA TIDAK DITEMUKAN:",
-          slug
-        );
-
-        continue;
-
-      }
-
-      let objectStart =
-        html.indexOf(
-          "{",
-          start + marker.length
-        );
-
-      if (objectStart === -1) {
-        continue;
-      }
-
-      // ==================================
-      // CARI AKHIR OBJECT JSON
-      // DENGAN BRACE BALANCING
-      // ==================================
-
-      let depth = 0;
-      let inString = false;
-      let escaped = false;
-      let objectEnd = -1;
-
-      for (
-        let i = objectStart;
-        i < html.length;
-        i++
-      ) {
-
-        const char =
-          html[i];
-
-        if (inString) {
-
-          if (escaped) {
-
-            escaped = false;
-
-          } else if (char === "\\") {
-
-            escaped = true;
-
-          } else if (char === '"') {
-
-            inString = false;
-
-          }
-
-          continue;
-
-        }
-
-        if (char === '"') {
-
-          inString = true;
-          continue;
-
-        }
-
-        if (char === "{") {
-
-          depth++;
-
-        } else if (char === "}") {
-
-          depth--;
-
-          if (depth === 0) {
-
-            objectEnd = i;
-            break;
-
-          }
-
-        }
-
-      }
-
-      if (objectEnd === -1) {
-
-        console.warn(
-          "[IKOTV] AKHIR CHANNEL OBJECT TIDAK DITEMUKAN:",
-          slug
-        );
-
-        continue;
-
-      }
-
-      let rawChannel =
-        html.substring(
-          objectStart,
-          objectEnd + 1
-        );
-
-      // ==================================
-      // DECODE HTML / NEXT.JS ESCAPE
-      // ==================================
-
-      rawChannel =
-        rawChannel
-          .replace(/\\u0026/g, "&")
-          .replace(/\\u003d/g, "=")
-          .replace(/\\u002f/g, "/")
-          .replace(/\\u003c/g, "<")
-          .replace(/\\u003e/g, ">")
-          .replace(/\\"/g, '"');
-
-      let channel;
-
-      try {
-
-        channel =
-          JSON.parse(
-            rawChannel
-          );
-
-      } catch (error) {
-
-        console.warn(
-          "[IKOTV] GAGAL PARSE CHANNEL:",
-          slug,
-          error
-        );
-
-        continue;
-
-      }
-
-      if (
-        !channel ||
-        !channel.id
-      ) {
-        continue;
-      }
-
-      console.log(
-        "[IKOTV] CHANNEL FOUND:",
-        channel
-      );
-
-      // ==================================
-      // UBAH CHANNEL → FORMAT MATCH
-      // ==================================
-
-      results.push({
-
-        id:
-          "channel-" +
-          String(
-            channel.id
-          ),
-
-        title:
-          channel.name ||
-          "Live Channel",
-
-        league:
-          "EVENTS",
-
-        category:
-          "",
-
-        teams: {
-
-          home: {
-
-            name:
-              channel.name ||
-              "Live Channel",
-
-            logo: {
-
-              imageUrl:
-                channel.logo_url ||
-                ""
-
-            }
-
+  const url =
+    CONFIG.api.matches
+      .replace(
+        "/api/matches",
+        "/api/channels"
+      ) +
+    "?_=" +
+    Date.now();
+
+  console.log(
+    "[IKOTV] GET CHANNEL API:",
+    url
+  );
+
+  try {
+
+    const response =
+      await fetch(
+        url,
+        {
+          method: "GET",
+
+          headers: {
+            "Accept":
+              "application/json"
           },
 
-          away: {
+          mode: "cors",
 
-            name:
-              channel.event_name ||
-              "",
+          cache: "no-store"
+        }
+      );
 
-            logo: {
+    console.log(
+      "[IKOTV] CHANNEL API STATUS:",
+      response.status
+    );
 
-              imageUrl:
-                ""
+    const text =
+      await response.text();
 
-            }
+    console.log(
+      "[IKOTV] CHANNEL API RESPONSE:",
+      text.substring(
+        0,
+        1000
+      )
+    );
 
-          }
+    if (!response.ok) {
 
-        },
-
-        score: {
-
-          home: 0,
-          away: 0
-
-        },
-
-        time:
-          "LIVE TV",
-
-        isLive: true,
-
-        status: 2,
-
-        kickoff_time: 0,
-
-        isChannel: true,
-
-        channelSlug:
-          "/channels/" +
-          String(
-            channel.slug ||
-            slug
-          ),
-
-        // Simpan server channel
-        servers:
-          Array.isArray(
-            channel.servers
-          )
-            ? channel.servers
-            : []
-
-      });
-
-    } catch (error) {
-
-      console.error(
-        "[IKOTV] CHANNEL FETCH ERROR:",
-        slug,
-        error
+      throw new Error(
+        "HTTP " +
+        response.status
       );
 
     }
 
+    return JSON.parse(
+      text
+    );
+
+  } catch (error) {
+
+    console.error(
+      "[IKOTV] CHANNEL API ERROR:",
+      error
+    );
+
+    return [];
+
   }
 
-  console.log(
-    "[IKOTV] CHANNEL TOTAL:",
-    results.length
-  );
-
-  return results;
 }
   
 function normalizeMatch(match) {
