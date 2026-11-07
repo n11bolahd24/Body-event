@@ -3964,34 +3964,34 @@ async function openIKOMatch(matchId) {
 
   await testMatchInfo(id);
 
-  try {
+ try {
 
     /* ==========================================
        REQUEST STREAM URL
     ========================================== */
 
-   const result = await fetchStreamURL(id);
+    const result = await fetchStreamURL(id);
 
-console.log(
-  "[IKOTV] FULL MATCH RESULT:",
-  result
-);
+    console.log(
+      "[IKOTV] FULL MATCH RESULT:",
+      result
+    );
 
-console.log(
-  "[IKOTV] STREAM-URL RAW RESULT:",
-  JSON.stringify(result, null, 2)
-);
-
-console.log(
-  "[IKOTV] EXTRACTED SERVERS:",
-  extractVideos(result)
-);
+    console.log(
+      "[IKOTV] STREAM-URL RAW RESULT:",
+      JSON.stringify(result, null, 2)
+    );
 
     /* ==========================================
        PARSE SERVER
     ========================================== */
 
     const videos = extractVideos(result);
+
+    console.log(
+      "[IKOTV] EXTRACTED SERVERS:",
+      videos
+    );
 
 console.log("========== IKOTV ALL STREAM URL ==========");
 
