@@ -2449,6 +2449,24 @@ async function getIKOTVChannels() {
       const html =
         await response.text();
 
+      console.log(
+  "[IKOTV] CHANNEL HTML LENGTH:",
+  slug,
+  html.length
+);
+
+console.log(
+  "[IKOTV] CHANNEL HAS CHANNEL OBJECT:",
+  slug,
+  html.includes('"channel"')
+);
+
+console.log(
+  "[IKOTV] CHANNEL HAS MOTOGP:",
+  slug,
+  html.includes("MotoGP")
+);
+
       if (!response.ok) {
 
         console.warn(
