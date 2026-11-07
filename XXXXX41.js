@@ -2180,19 +2180,37 @@ async function getMatchesAPI(filter) {
     ]);
 
 
-  // ==========================
-  // AMBIL DATA ALL
-  // ==========================
+  console.log("[IKOTV] ALL:", allResult);
+  console.log("[IKOTV] LIVE:", liveResult);
+
+
+  // ==========================================================
+  // AMBIL ARRAY MATCH DENGAN AMAN
+  // ==========================================================
 
   const allMatches =
     Array.isArray(allResult)
       ? allResult
-      : allResult?.data?.matchs || [];
+      : Array.isArray(allResult?.data?.matchs)
+        ? allResult.data.matchs
+        : Array.isArray(allResult?.data?.matches)
+          ? allResult.data.matches
+          : [];
 
 
-  // ==========================
-  // AMBIL CHANNEL DARI ALL
-  // ==========================
+  const liveMatches =
+    Array.isArray(liveResult)
+      ? liveResult
+      : Array.isArray(liveResult?.data?.matchs)
+        ? liveResult.data.matchs
+        : Array.isArray(liveResult?.data?.matches)
+          ? liveResult.data.matches
+          : [];
+
+
+  // ==========================================================
+  // AMBIL CHANNEL LANGSUNG DARI ALL
+  // ==========================================================
 
   const channelResult =
     allMatches.filter(match => {
@@ -2206,9 +2224,9 @@ async function getMatchesAPI(filter) {
     });
 
 
-  console.log("[IKOTV] ALL:", allResult);
-  console.log("[IKOTV] LIVE:", liveResult);
-  console.log("[IKOTV] CHANNEL:", channelResult);
+  // ==========================================================
+  // LOG
+  // ==========================================================
 
   console.log(
     "[IKOTV] ALL COUNT:",
@@ -2217,9 +2235,12 @@ async function getMatchesAPI(filter) {
 
   console.log(
     "[IKOTV] LIVE COUNT:",
-    Array.isArray(liveResult)
-      ? liveResult.length
-      : (liveResult?.data?.matchs || []).length
+    liveMatches.length
+  );
+
+  console.log(
+    "[IKOTV] CHANNEL:",
+    channelResult
   );
 
   console.log(
@@ -2228,20 +2249,13 @@ async function getMatchesAPI(filter) {
   );
 
 
-  // ==========================
-  // GABUNG DATA
-  // ==========================
-
-  const liveMatches =
-    Array.isArray(liveResult)
-      ? liveResult
-      : liveResult?.data?.matchs || [];
-
+  // ==========================================================
+  // GABUNG
+  // ==========================================================
 
   const mergedRaw = [
     ...allMatches,
-    ...liveMatches,
-    ...channelResult
+    ...liveMatches
   ];
 
 
@@ -2251,9 +2265,9 @@ async function getMatchesAPI(filter) {
   );
 
 
-  // ==========================
+  // ==========================================================
   // NORMALIZE
-  // ==========================
+  // ==========================================================
 
   const normalized =
     mergedRaw
@@ -2261,19 +2275,18 @@ async function getMatchesAPI(filter) {
       .filter(Boolean);
 
 
-  // ==========================
-  // FILTER
-  // ==========================
+  // ==========================================================
+  // FILTER + SORT
+  // ==========================================================
 
-  const now =
-    Date.now();
+  const now = Date.now();
 
 
   const filtered =
     normalized
       .filter(match => {
 
-        if (!match.id || !match.time) {
+        if (!match?.id || !match?.time) {
           return false;
         }
 
@@ -2296,11 +2309,6 @@ async function getMatchesAPI(filter) {
         return true;
 
       })
-
-
-      // ==========================
-      // SORT
-      // ==========================
 
       .sort((a, b) => {
 
@@ -2335,14 +2343,23 @@ async function getMatchesAPI(filter) {
       });
 
 
-  // ==========================
+  // ==========================================================
   // RENDER
-  // ==========================
+  // ==========================================================
 
   console.log(
     "[IKOTV] Schedule loaded:",
     filtered.length
   );
+
+
+  // PENTING:
+  // channelResult TIDAK perlu digabung lagi di sini
+  // karena channel sudah termasuk di allMatches.
+  //
+  // allMatches -> sudah berisi MotoGP channel
+  // normalizeMatch() -> sudah punya isChannel support
+  //
 
 
   renderSchedule(filtered);
