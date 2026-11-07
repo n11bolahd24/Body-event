@@ -3970,16 +3970,21 @@ async function openIKOMatch(matchId) {
        REQUEST STREAM URL
     ========================================== */
 
-    const result = await fetchStreamURL(id);
+   const result = await fetchStreamURL(id);
 
-    console.log(
-      "[IKOTV] STREAM-URL RESULT:",
-      result
-    );
+console.log(
+  "[IKOTV] FULL MATCH RESULT:",
+  result
+);
 
-    console.log(
+console.log(
   "[IKOTV] STREAM-URL RAW RESULT:",
   JSON.stringify(result, null, 2)
+);
+
+console.log(
+  "[IKOTV] EXTRACTED SERVERS:",
+  extractVideos(result)
 );
 
     /* ==========================================
