@@ -207,7 +207,75 @@
   return "waiting";
 }
 
-  function normalizeMatch(match) {
+function normalizeMatch(match) {
+
+  // ==========================
+  // CHANNEL IKOTV
+  // ==========================
+
+  if (match?.isChannel === true) {
+
+    return {
+
+      id: String(
+        match?.id ??
+        ""
+      ),
+
+      time: "LIVE TV",
+
+      statusRaw: Number(
+        match?.status ??
+        2
+      ),
+
+      isLive: true,
+
+      isChannel: true,
+
+      channelSlug:
+        match?.channelSlug ||
+        "",
+
+      home:
+        match?.title ||
+        match?.name ||
+        match?.teams?.home?.name ||
+        "Live Channel",
+
+      away:
+        match?.teams?.away?.name ||
+        "",
+
+      homeLogo: safeURL(
+        match?.teams?.home?.logo?.imageUrl ||
+        match?.logo_url ||
+        ""
+      ),
+
+      awayLogo: safeURL(
+        match?.teams?.away?.logo?.imageUrl ||
+        ""
+      ),
+
+      competition:
+        match?.league ||
+        "EVENTS",
+
+      competitionLogo: "",
+
+      title:
+        match?.title ||
+        match?.name ||
+        "Live Channel"
+
+    };
+
+  }
+
+  // ==========================
+  // MATCH FOOTBALL
+  // ==========================
 
   const home =
     match?.hometeam ||
@@ -288,9 +356,7 @@
     )
 
   };
-}
-
-  /* =========================================================
+}  /* =========================================================
      DOM
   ========================================================= */
 
