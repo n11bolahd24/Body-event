@@ -2164,24 +2164,10 @@ async function getMatchesAPI(filter) {
 
   console.log("[IKOTV] Mengambil ALL + LIVE...");
 
-  const [allResult, liveResult, channelResult] =
+  const [allResult, liveResult] =
   await Promise.all([
-
-    // ==========================
-    // SEMUA JADWAL
-    // ==========================
     getMatchesAPI("all"),
-
-    // ==========================
-    // MATCH YANG SEDANG LIVE
-    // ==========================
-    getMatchesAPI("live"),
-
-    // ==========================
-    // CHANNEL LIVE IKOTV
-    // ==========================
-    getIKOTVChannels()
-
+    getMatchesAPI("live")
   ]);
 
   console.log(
