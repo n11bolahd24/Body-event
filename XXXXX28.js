@@ -2203,34 +2203,50 @@ const result =
   return result;
 }
 
-  async function fetchStreamURL(matchId) {
-  console.log("[IKOTV] Mengambil server dari match-info:", matchId);
-
-  const result = await fetchMatchInfo(matchId);
-
-  console.log("[IKOTV] SERVER DATA DARI MATCH-INFO:", result);
-
-  if (
-    result &&
-    result.data &&
-    Array.isArray(result.data.videos)
-  ) {
+ async function fetchStreamURL(matchId) {
+  try {
+    const url =
+      `${CONFIG.api.streamUrl}?id=${encodeURIComponent(matchId)}`;
 
     console.log(
-      "[IKOTV] VIDEO SERVER COUNT:",
-      result.data.videos.length
+      "[IKOTV] MENGAMBIL STREAM URL:",
+      url
+    );
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json"
+      }
+    });
+
+    console.log(
+      "[IKOTV] STREAM URL STATUS:",
+      response.status
+    );
+
+    const result = await response.json();
+
+    console.log(
+      "[IKOTV] STREAM URL RESPONSE:",
+      result
     );
 
     console.log(
-      "[IKOTV] VIDEO SERVERS:",
-      result.data.videos
+      "[IKOTV] STREAM URL RAW:",
+      JSON.stringify(result, null, 2)
     );
 
-    return result.data;
+    return result;
 
+  } catch (error) {
+    console.error(
+      "[IKOTV] STREAM URL ERROR:",
+      error
+    );
+
+    return null;
   }
-
-  return result;
 }
 
 
