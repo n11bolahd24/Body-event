@@ -2165,57 +2165,50 @@ async function getMatchesAPI(filter) {
   console.log("[IKOTV] Mengambil ALL + LIVE...");
 
   const [allResult, liveResult] =
-  await Promise.all([
-    getMatchesAPI("all"),
-    getMatchesAPI("live")
-  ]);
+    await Promise.all([
 
-  console.log(
-    "[IKOTV] ALL:",
-    allResult
-  );
+      // ==========================
+      // SEMUA JADWAL
+      // ==========================
+      getMatchesAPI("all"),
 
-  console.log(
-    "[IKOTV] LIVE:",
-    liveResult
-  );
+      // ==========================
+      // MATCH YANG SEDANG LIVE
+      // ==========================
+      getMatchesAPI("live")
 
-  console.log(
-  "[IKOTV] CHANNEL:",
-  channelResult
-);  
+    ]);
+
 
   // ==========================
-  // PARSE ALL
+  // AMBIL DATA ALL
   // ==========================
 
   const allMatches =
-    getArray(allResult)
-      .map(normalizeMatch)
-      .filter(
-        match =>
-          match.id &&
-          (
-            match.isChannel === true ||
-            match.time > 0
-          )
-      );
+    Array.isArray(allResult)
+      ? allResult
+      : allResult?.data?.matchs || [];
+
 
   // ==========================
-  // PARSE LIVE
+  // AMBIL CHANNEL DARI ALL
   // ==========================
 
-  const liveMatches =
-    getArray(liveResult)
-      .map(normalizeMatch)
-      .filter(
-        match =>
-          match.id &&
-          (
-            match.isChannel === true ||
-            match.time > 0
-          )
+  const channelResult =
+    allMatches.filter(match => {
+
+      return (
+        match?.is_channel === true ||
+        match?.is_channel === 1 ||
+        match?.isChannel === true
       );
+
+    });
+
+
+  console.log("[IKOTV] ALL:", allResult);
+  console.log("[IKOTV] LIVE:", liveResult);
+  console.log("[IKOTV] CHANNEL:", channelResult);
 
   console.log(
     "[IKOTV] ALL COUNT:",
@@ -2224,156 +2217,136 @@ async function getMatchesAPI(filter) {
 
   console.log(
     "[IKOTV] LIVE COUNT:",
-    liveMatches.length
+    Array.isArray(liveResult)
+      ? liveResult.length
+      : (liveResult?.data?.matchs || []).length
   );
 
-  // ==========================
-  // GABUNG ALL + LIVE
-  // ==========================
+  console.log(
+    "[IKOTV] CHANNEL COUNT:",
+    channelResult.length
+  );
 
-  const merged =
-    new Map();
-
-  // Masukkan semua jadwal
-  allMatches.forEach(match => {
-
-    merged.set(
-      String(match.id),
-      match
-    );
-
-  });
-
-  // Masukkan LIVE
-  // Kalau pertandingan sudah hilang
-  // dari ALL tetapi muncul di LIVE,
-  // pertandingan tersebut tetap masuk.
-  liveMatches.forEach(match => {
-
-  const id =
-    String(match.id);
-
-  if (merged.has(id)) {
-
-    const old =
-      merged.get(id);
-
-    merged.set(id, {
-      ...old,
-      ...match,
-      isLive: true
-    });
-
-  } else {
-
-    merged.set(id, {
-      ...match,
-      isLive: true
-    });
-
-  }
-
-});
 
   // ==========================
-  // MASUKKAN CHANNEL IKOTV
+  // GABUNG DATA
   // ==========================
 
-  channelResult
-    .map(normalizeMatch)
-    .forEach(channel => {
+  const liveMatches =
+    Array.isArray(liveResult)
+      ? liveResult
+      : liveResult?.data?.matchs || [];
 
-      if (
-        channel.id &&
-        channel.isChannel === true
-      ) {
 
-        merged.set(
-          String(channel.id),
-          channel
-        );
+  const mergedRaw = [
+    ...allMatches,
+    ...liveMatches,
+    ...channelResult
+  ];
 
-      }
-
-    });
-    
-  const now =
-  Math.floor(Date.now() / 1000);
-
-const result =
-  Array.from(
-    merged.values()
-  )
-  .filter(match => {
-
-    if (
-      !match.id ||
-      !match.time
-    ) {
-      return false;
-    }
-
-    const start =
-      Number(match.time);
-
-    // Belum kickoff → tetap tampil
-    if (now < start) {
-      return true;
-    }
-
-    // Sudah kickoff tetapi belum terdeteksi LIVE
-    // → TETAP tampil sebagai WAITING
-    if (!match.isLive) {
-      return true;
-    }
-
-    // Sudah LIVE → tetap tampil
-    return true;
-
-  })
-  .sort(
-  (a, b) => {
-
-    if (
-      a.isChannel &&
-      !b.isChannel
-    ) {
-      return -1;
-    }
-
-    if (
-      !a.isChannel &&
-      b.isChannel
-    ) {
-      return 1;
-    }
-
-    if (
-      a.isChannel &&
-      b.isChannel
-    ) {
-      return 0;
-    }
-
-    return (
-      Number(a.time) -
-      Number(b.time)
-    );
-
-  }
-);
 
   console.log(
     "[IKOTV] MERGED COUNT:",
-    result.length
+    mergedRaw.length
   );
+
+
+  // ==========================
+  // NORMALIZE
+  // ==========================
+
+  const normalized =
+    mergedRaw
+      .map(normalizeMatch)
+      .filter(Boolean);
+
+
+  // ==========================
+  // FILTER
+  // ==========================
+
+  const now =
+    Date.now();
+
+
+  const filtered =
+    normalized
+      .filter(match => {
+
+        if (!match.id || !match.time) {
+          return false;
+        }
+
+        // CHANNEL SELALU TAMPIL
+        if (match.isChannel) {
+          return true;
+        }
+
+        const start =
+          Number(match.time);
+
+        if (now < start) {
+          return true;
+        }
+
+        if (!match.isLive) {
+          return true;
+        }
+
+        return true;
+
+      })
+
+
+      // ==========================
+      // SORT
+      // ==========================
+
+      .sort((a, b) => {
+
+        // CHANNEL DI ATAS
+        if (
+          a.isChannel &&
+          !b.isChannel
+        ) {
+          return -1;
+        }
+
+        if (
+          !a.isChannel &&
+          b.isChannel
+        ) {
+          return 1;
+        }
+
+        // SESAMA CHANNEL
+        if (
+          a.isChannel &&
+          b.isChannel
+        ) {
+          return 0;
+        }
+
+        return (
+          Number(a.time) -
+          Number(b.time)
+        );
+
+      });
+
+
+  // ==========================
+  // RENDER
+  // ==========================
 
   console.log(
-    "[IKOTV] MERGED MATCHES:",
-    result
+    "[IKOTV] Schedule loaded:",
+    filtered.length
   );
 
-  return result;
+
+  renderSchedule(filtered);
+
 }
 
 
