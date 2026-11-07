@@ -2203,50 +2203,92 @@ const result =
   return result;
 }
 
- async function fetchStreamURL(matchId) {
+  async function fetchStreamURL(matchId) {
+
+  console.log(
+    "[IKOTV] Mengambil STREAM URL untuk match:",
+    matchId
+  );
+
+  const url =
+    CONFIG.api.streamUrl +
+    "?matchid=" +
+    encodeURIComponent(String(matchId)) +
+    "&sport=football&_=" +
+    Date.now();
+
+  console.log(
+    "[IKOTV] STREAM-URL REQUEST:",
+    url
+  );
+
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Accept": "application/json"
+    },
+    mode: "cors",
+    cache: "no-store"
+  });
+
+  const text =
+    await response.text();
+
+  console.log(
+    "[IKOTV] STREAM-URL STATUS:",
+    response.status
+  );
+
+  console.log(
+    "[IKOTV] STREAM-URL RESPONSE:",
+    text
+  );
+
+  if (!response.ok) {
+
+    throw new Error(
+      "HTTP " +
+      response.status +
+      " - " +
+      text.substring(0, 300)
+    );
+
+  }
+
+  if (!text) {
+
+    throw new Error(
+      "Response stream-url kosong"
+    );
+
+  }
+
+  let result;
+
   try {
-    const url =
-      `${CONFIG.api.streamUrl}?id=${encodeURIComponent(matchId)}`;
 
-    console.log(
-      "[IKOTV] MENGAMBIL STREAM URL:",
-      url
-    );
-
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Accept": "application/json"
-      }
-    });
-
-    console.log(
-      "[IKOTV] STREAM URL STATUS:",
-      response.status
-    );
-
-    const result = await response.json();
-
-    console.log(
-      "[IKOTV] STREAM URL RESPONSE:",
-      result
-    );
-
-    console.log(
-      "[IKOTV] STREAM URL RAW:",
-      JSON.stringify(result, null, 2)
-    );
-
-    return result;
+    result =
+      JSON.parse(text);
 
   } catch (error) {
+
     console.error(
-      "[IKOTV] STREAM URL ERROR:",
-      error
+      "[IKOTV] STREAM-URL bukan JSON:",
+      text
     );
 
-    return null;
+    throw new Error(
+      "Response stream-url bukan JSON"
+    );
+
   }
+
+  console.log(
+    "[IKOTV] STREAM-URL RESULT:",
+    result
+  );
+
+  return result;
 }
 
 
