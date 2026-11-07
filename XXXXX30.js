@@ -14,6 +14,19 @@
       streamUrl: "https://rough-bread-fac0-ikotv-api.novendibagus5.workers.dev/stream-url"
     },
 
+    channels: {
+  motogp: {
+    id: 2,
+    name: "MotoGP",
+    slug: "/channels/live-streaming-motogp"
+  },
+  badminton: {
+    id: 1,
+    name: "Badminton",
+    slug: "/channels/live-streaming-badminton"
+  }
+},
+
     // Change these only if you want another placement.
     scheduleSelector: "#ikotvSchedule",
     playerSelector: "#tv",
@@ -2158,6 +2171,97 @@ const result =
 
   return result;
 }
+
+
+async function fetchIKOTVChannels() {
+  const channels = [];
+
+  const channelPages = [
+    {
+      id: 2,
+      name: "MotoGP",
+      slug: "live-streaming-motogp"
+    },
+    {
+      id: 1,
+      name: "Badminton",
+      slug: "live-streaming-badminton"
+    }
+  ];
+
+  for (const ch of channelPages) {
+    try {
+      console.log(
+        "[IKOTV CHANNEL] Fetch:",
+        ch.name,
+        "https://ikotv.cc/channels/" + ch.slug
+      );
+
+      const res = await fetch(
+        "https://ikotv.cc/channels/" +
+        ch.slug +
+        "?_=" + Date.now(),
+        {
+          method: "GET",
+          cache: "no-store"
+        }
+      );
+
+      if (!res.ok) {
+        console.warn(
+          "[IKOTV CHANNEL] HTTP",
+          ch.name,
+          res.status
+        );
+        continue;
+      }
+
+      const html = await res.text();
+
+      console.log(
+        "[IKOTV CHANNEL] HTML:",
+        ch.name,
+        html.length
+      );
+
+      /*
+       * Channel data di halaman iKOTV berada
+       * di object Next.js / server-rendered data.
+       *
+       * Kita cari object channel berdasarkan
+       * channel_id / name / slug.
+       */
+      const channelMatch =
+        html.match(
+          new RegExp(
+            `"channel"\\s*:\\s*\\{[^]*?"id"\\s*:\\s*${ch.id}[^]*?\\}`
+          )
+        );
+
+      if (!channelMatch) {
+        console.warn(
+          "[IKOTV CHANNEL] Data channel tidak ditemukan:",
+          ch.name
+        );
+        continue;
+      }
+
+      console.log(
+        "[IKOTV CHANNEL] Found:",
+        ch.name
+      );
+
+    } catch (err) {
+      console.error(
+        "[IKOTV CHANNEL] Error:",
+        ch.name,
+        err
+      );
+    }
+  }
+
+  return channels;
+}  
 
   async function fetchMatchInfo(matchId) {
   const url =
