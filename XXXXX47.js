@@ -213,17 +213,6 @@
     match?.competition ||
     {};
 
-    console.log(
-  "[IKOTV STATUS]",
-  match?.id,
-  "time:", match?.time,
-  "status:", match?.status,
-  "match_status:", match?.match_status,
-  "isLive:", match?.isLive,
-  "is_live:", match?.is_live,
-  "live:", match?.live
-);
-
   return {
 
     id: String(
@@ -245,11 +234,6 @@
       match?.match_status ??
       0
     ),
-
-    isLive:
-  match?.isLive === true ||
-  match?.is_live === true ||
-  match?.live === true,
 
     home:
       home.name_en ||
@@ -1891,47 +1875,136 @@ async function getMatchesAPI(filter, date = "") {
     "&_=" +
     Date.now();
 
+  console.log(
+    "[IKOTV] GET REQUEST:",
+    url
+  );
+
+  const controller =
+    new AbortController();
+
+  const timeout =
+    setTimeout(() => {
+      controller.abort();
+    }, 30000);
+
   try {
 
-    const res = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Accept": "application/json"
-      },
-      cache: "no-store"
-    });
+    const response =
+      await fetch(
+        url,
+        {
+          method: "GET",
 
-    if (!res.ok) {
-      throw new Error("HTTP " + res.status);
-    }
+          headers: {
+            "Accept":
+              "application/json"
+          },
 
-    return await res.json();
+          mode: "cors",
 
-  } catch (err) {
+          cache: "no-store",
 
-    console.error(
-      "[IKOTV] " + filter + " ERROR:",
-      err
+          signal:
+            controller.signal
+        }
+      );
+
+    console.log(
+      "[IKOTV] GET STATUS:",
+      response.status
     );
 
-    return {
-      data: {
-        matchs: []
-      }
-    };
+    const text =
+      await response.text();
+
+    console.log(
+      "[IKOTV] GET RESPONSE:",
+      text
+    );
+
+    if (!response.ok) {
+
+      throw new Error(
+        "HTTP " +
+        response.status +
+        " - " +
+        text.substring(
+          0,
+          200
+        )
+      );
+
+    }
+
+    if (!text) {
+
+      throw new Error(
+        "Response API kosong"
+      );
+
+    }
+
+    try {
+
+      return JSON.parse(
+        text
+      );
+
+    } catch (error) {
+
+      throw new Error(
+        "Response API bukan JSON: " +
+        text.substring(
+          0,
+          200
+        )
+      );
+
+    }
+
+  } catch (error) {
+
+    if (
+      error.name ===
+      "AbortError"
+    ) {
+
+      throw new Error(
+        "Request timeout 30s"
+      );
+
+    }
+
+    console.error(
+      "[IKOTV] GET FETCH ERROR:",
+      error
+    );
+
+    throw error;
+
+  } finally {
+
+    clearTimeout(
+      timeout
+    );
 
   }
+
 }
 
   async function fetchMatches() {
 
-  console.log("[IKOTV] Mengambil ALL + LIVE + TOMORROW...");
+  console.log(
+    "[IKOTV] Mengambil ALL + LIVE + TOMORROW..."
+  );
 
   // ==========================================================
   // TANGGAL BESOK
   // ==========================================================
 
-  const tomorrow = new Date();
+  const tomorrow =
+    new Date();
 
   tomorrow.setDate(
     tomorrow.getDate() + 1
@@ -1976,7 +2049,7 @@ async function getMatchesAPI(filter, date = "") {
     ),
 
     // ==========================
-    // JADWAL TOMORROW IKOTV
+    // JADWAL TOMORROW
     // ==========================
 
     getMatchesAPI(
@@ -2013,10 +2086,7 @@ async function getMatchesAPI(filter, date = "") {
       .filter(
         match =>
           match.id &&
-          (
-            match.isChannel === true ||
-            match.time > 0
-          )
+          match.time > 0
       );
 
 
@@ -2030,10 +2100,7 @@ async function getMatchesAPI(filter, date = "") {
       .filter(
         match =>
           match.id &&
-          (
-            match.isChannel === true ||
-            match.time > 0
-          )
+          match.time > 0
       );
 
 
@@ -2047,10 +2114,7 @@ async function getMatchesAPI(filter, date = "") {
       .filter(
         match =>
           match.id &&
-          (
-            match.isChannel === true ||
-            match.time > 0
-          )
+          match.time > 0
       );
 
 
@@ -2078,9 +2142,9 @@ async function getMatchesAPI(filter, date = "") {
     new Map();
 
 
-  // ==========================
+  // ==========================================================
   // MASUKKAN ALL
-  // ==========================
+  // ==========================================================
 
   allMatches.forEach(
     match => {
@@ -2094,9 +2158,38 @@ async function getMatchesAPI(filter, date = "") {
   );
 
 
-  // ==========================
-  // MASUKKAN LIVE
-  // ==========================
+  // ==========================================================
+  // MASUKKAN TOMORROW
+  // ==========================================================
+
+  tomorrowMatches.forEach(
+    match => {
+
+      const id =
+        String(match.id);
+
+      // Hanya tambahkan jika belum ada
+      // di ALL
+
+      if (!merged.has(id)) {
+
+        merged.set(
+          id,
+          match
+        );
+
+      }
+
+    }
+  );
+
+
+  // ==========================================================
+  // MASUKKAN LIVE TERAKHIR
+  // ==========================================================
+  // LIVE harus diproses terakhir supaya
+  // status LIVE selalu menang.
+  // ==========================================================
 
   liveMatches.forEach(
     match => {
@@ -2122,30 +2215,10 @@ async function getMatchesAPI(filter, date = "") {
 
         merged.set(
           id,
-          match
-        );
-
-      }
-
-    }
-  );
-
-
-  // ==========================
-  // MASUKKAN TOMORROW
-  // ==========================
-
-  tomorrowMatches.forEach(
-    match => {
-
-      const id =
-        String(match.id);
-
-      if (!merged.has(id)) {
-
-        merged.set(
-          id,
-          match
+          {
+            ...match,
+            isLive: true
+          }
         );
 
       }
@@ -2169,18 +2242,17 @@ async function getMatchesAPI(filter, date = "") {
       )
       .sort(
         (a, b) =>
-          Number(a.time) -
-          Number(b.time)
+          a.time - b.time
       );
 
 
   console.log(
-    "[IKOTV] TOTAL FINAL:",
+    "[IKOTV] MERGED COUNT:",
     result.length
   );
 
   console.log(
-    "[IKOTV] FINAL MATCHES:",
+    "[IKOTV] MERGED MATCHES:",
     result
   );
 
