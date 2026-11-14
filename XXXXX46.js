@@ -213,6 +213,17 @@
     match?.competition ||
     {};
 
+    console.log(
+  "[IKOTV STATUS]",
+  match?.id,
+  "time:", match?.time,
+  "status:", match?.status,
+  "match_status:", match?.match_status,
+  "isLive:", match?.isLive,
+  "is_live:", match?.is_live,
+  "live:", match?.live
+);
+
   return {
 
     id: String(
