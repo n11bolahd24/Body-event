@@ -235,6 +235,11 @@
       0
     ),
 
+    isLive:
+  match?.isLive === true ||
+  match?.is_live === true ||
+  match?.live === true,
+
     home:
       home.name_en ||
       home.short_name_en ||
