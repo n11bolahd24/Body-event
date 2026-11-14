@@ -1916,14 +1916,21 @@ async function getMatchesAPI(filter, date = "") {
   // ==========================================================
 
   const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  tomorrow.setDate(
+    tomorrow.getDate() + 1
+  );
 
   const tomorrowDate =
     tomorrow.getFullYear() +
     "-" +
-    String(tomorrow.getMonth() + 1).padStart(2, "0") +
+    String(
+      tomorrow.getMonth() + 1
+    ).padStart(2, "0") +
     "-" +
-    String(tomorrow.getDate()).padStart(2, "0");
+    String(
+      tomorrow.getDate()
+    ).padStart(2, "0");
 
 
   // ==========================================================
@@ -1936,9 +1943,25 @@ async function getMatchesAPI(filter, date = "") {
     tomorrowResult
   ] = await Promise.all([
 
-    getMatchesAPI("all"),
+    // ==========================
+    // SEMUA JADWAL
+    // ==========================
 
-    getMatchesAPI("live"),
+    getMatchesAPI(
+      "all"
+    ),
+
+    // ==========================
+    // MATCH YANG SEDANG LIVE
+    // ==========================
+
+    getMatchesAPI(
+      "live"
+    ),
+
+    // ==========================
+    // JADWAL TOMORROW IKOTV
+    // ==========================
 
     getMatchesAPI(
       "tomorrow",
@@ -1948,80 +1971,191 @@ async function getMatchesAPI(filter, date = "") {
   ]);
 
 
-  // ==========================================================
-  // NORMALIZE
-  // ==========================================================
-
-  const allMatches =
-    normalizeMatches(allResult);
-
-  const liveMatches =
-    normalizeMatches(liveResult);
-
-  const tomorrowMatches =
-    normalizeMatches(tomorrowResult);
-
-
   console.log(
     "[IKOTV] ALL:",
-    allMatches.length
+    allResult
   );
 
   console.log(
     "[IKOTV] LIVE:",
-    liveMatches.length
+    liveResult
   );
 
   console.log(
     "[IKOTV] TOMORROW:",
+    tomorrowResult
+  );
+
+
+  // ==========================================================
+  // PARSE ALL
+  // ==========================================================
+
+  const allMatches =
+    getArray(allResult)
+      .map(normalizeMatch)
+      .filter(
+        match =>
+          match.id &&
+          (
+            match.isChannel === true ||
+            match.time > 0
+          )
+      );
+
+
+  // ==========================================================
+  // PARSE LIVE
+  // ==========================================================
+
+  const liveMatches =
+    getArray(liveResult)
+      .map(normalizeMatch)
+      .filter(
+        match =>
+          match.id &&
+          (
+            match.isChannel === true ||
+            match.time > 0
+          )
+      );
+
+
+  // ==========================================================
+  // PARSE TOMORROW
+  // ==========================================================
+
+  const tomorrowMatches =
+    getArray(tomorrowResult)
+      .map(normalizeMatch)
+      .filter(
+        match =>
+          match.id &&
+          (
+            match.isChannel === true ||
+            match.time > 0
+          )
+      );
+
+
+  console.log(
+    "[IKOTV] ALL COUNT:",
+    allMatches.length
+  );
+
+  console.log(
+    "[IKOTV] LIVE COUNT:",
+    liveMatches.length
+  );
+
+  console.log(
+    "[IKOTV] TOMORROW COUNT:",
     tomorrowMatches.length
   );
 
 
   // ==========================================================
-  // GABUNG
+  // GABUNG ALL + LIVE + TOMORROW
   // ==========================================================
 
-  const merged = new Map();
+  const merged =
+    new Map();
 
-  [
-    ...allMatches,
-    ...liveMatches,
-    ...tomorrowMatches
-  ].forEach(match => {
 
-    if (!match || !match.id) {
-      return;
+  // ==========================
+  // MASUKKAN ALL
+  // ==========================
+
+  allMatches.forEach(
+    match => {
+
+      merged.set(
+        String(match.id),
+        match
+      );
+
     }
+  );
 
-    merged.set(
-      String(match.id),
-      match
-    );
 
-  });
+  // ==========================
+  // MASUKKAN LIVE
+  // ==========================
+
+  liveMatches.forEach(
+    match => {
+
+      const id =
+        String(match.id);
+
+      if (merged.has(id)) {
+
+        const old =
+          merged.get(id);
+
+        merged.set(
+          id,
+          {
+            ...old,
+            ...match,
+            isLive: true
+          }
+        );
+
+      } else {
+
+        merged.set(
+          id,
+          match
+        );
+
+      }
+
+    }
+  );
+
+
+  // ==========================
+  // MASUKKAN TOMORROW
+  // ==========================
+
+  tomorrowMatches.forEach(
+    match => {
+
+      const id =
+        String(match.id);
+
+      if (!merged.has(id)) {
+
+        merged.set(
+          id,
+          match
+        );
+
+      }
+
+    }
+  );
 
 
   // ==========================================================
-  // SORT BERDASARKAN WAKTU
+  // SORT SEMUA BERDASARKAN WAKTU
   // ==========================================================
 
   const result =
-    Array.from(merged.values())
-      .filter(match => {
-
-        if (!match.id || !match.time) {
-          return false;
-        }
-
-        return true;
-
-      })
-      .sort((a, b) => {
-
-        return Number(a.time) - Number(b.time);
-
-      });
+    Array.from(
+      merged.values()
+    )
+      .filter(
+        match =>
+          match.id &&
+          match.time
+      )
+      .sort(
+        (a, b) =>
+          Number(a.time) -
+          Number(b.time)
+      );
 
 
   console.log(
@@ -2029,7 +2163,14 @@ async function getMatchesAPI(filter, date = "") {
     result.length
   );
 
+  console.log(
+    "[IKOTV] FINAL MATCHES:",
+    result
+  );
+
+
   return result;
+
 }
 
   async function fetchMatchInfo(matchId) {
