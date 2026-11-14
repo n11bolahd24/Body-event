@@ -1863,211 +1863,136 @@ await loadScript(
    /api/matches IKOTV menggunakan GET
 ========================================================= */
 
-async function getMatchesAPI(filter) {
+async function getMatchesAPI(filter, date = "") {
 
   const url =
     CONFIG.api.matches +
     "?date=" +
-    encodeURIComponent("") +
+    encodeURIComponent(date) +
     "&filter=" +
     encodeURIComponent(filter) +
     "&sport=football" +
     "&_=" +
     Date.now();
 
-  console.log(
-    "[IKOTV] GET REQUEST:",
-    url
-  );
-
-  const controller =
-    new AbortController();
-
-  const timeout =
-    setTimeout(() => {
-      controller.abort();
-    }, 30000);
-
   try {
 
-    const response =
-      await fetch(
-        url,
-        {
-          method: "GET",
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json"
+      },
+      cache: "no-store"
+    });
 
-          headers: {
-            "Accept":
-              "application/json"
-          },
-
-          mode: "cors",
-
-          cache: "no-store",
-
-          signal:
-            controller.signal
-        }
-      );
-
-    console.log(
-      "[IKOTV] GET STATUS:",
-      response.status
-    );
-
-    const text =
-      await response.text();
-
-    console.log(
-      "[IKOTV] GET RESPONSE:",
-      text
-    );
-
-    if (!response.ok) {
-
-      throw new Error(
-        "HTTP " +
-        response.status +
-        " - " +
-        text.substring(
-          0,
-          200
-        )
-      );
-
+    if (!res.ok) {
+      throw new Error("HTTP " + res.status);
     }
 
-    if (!text) {
+    return await res.json();
 
-      throw new Error(
-        "Response API kosong"
-      );
-
-    }
-
-    try {
-
-      return JSON.parse(
-        text
-      );
-
-    } catch (error) {
-
-      throw new Error(
-        "Response API bukan JSON: " +
-        text.substring(
-          0,
-          200
-        )
-      );
-
-    }
-
-  } catch (error) {
-
-    if (
-      error.name ===
-      "AbortError"
-    ) {
-
-      throw new Error(
-        "Request timeout 30s"
-      );
-
-    }
+  } catch (err) {
 
     console.error(
-      "[IKOTV] GET FETCH ERROR:",
-      error
+      "[IKOTV] " + filter + " ERROR:",
+      err
     );
 
-    throw error;
-
-  } finally {
-
-    clearTimeout(
-      timeout
-    );
+    return {
+      data: {
+        matchs: []
+      }
+    };
 
   }
-
 }
-
 
   async function fetchMatches() {
 
-  console.log("[IKOTV] Mengambil ALL + LIVE...");
+  console.log("[IKOTV] Mengambil ALL + LIVE + TOMORROW...");
 
-  const [allResult, liveResult] =
-    await Promise.all([
+  // ==========================================================
+  // TANGGAL BESOK
+  // ==========================================================
 
-      // ==========================
-      // SEMUA JADWAL
-      // ==========================
-      getMatchesAPI("all"),
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
 
-      // ==========================
-      // MATCH YANG SEDANG LIVE
-      // ==========================
-      getMatchesAPI("live")
+  const tomorrowDate =
+    tomorrow.getFullYear() +
+    "-" +
+    String(tomorrow.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(tomorrow.getDate()).padStart(2, "0");
 
-    ]);
+
+  // ==========================================================
+  // AMBIL ALL + LIVE + TOMORROW
+  // ==========================================================
+
+  const [
+    allResult,
+    liveResult,
+    tomorrowResult
+  ] = await Promise.all([
+
+    getMatchesAPI("all"),
+
+    getMatchesAPI("live"),
+
+    getMatchesAPI(
+      "tomorrow",
+      tomorrowDate
+    )
+
+  ]);
+
+
+  // ==========================================================
+  // NORMALIZE
+  // ==========================================================
+
+  const allMatches =
+    normalizeMatches(allResult);
+
+  const liveMatches =
+    normalizeMatches(liveResult);
+
+  const tomorrowMatches =
+    normalizeMatches(tomorrowResult);
+
 
   console.log(
     "[IKOTV] ALL:",
-    allResult
-  );
-
-  console.log(
-    "[IKOTV] LIVE:",
-    liveResult
-  );
-
-  // ==========================
-  // PARSE ALL
-  // ==========================
-
-  const allMatches =
-    getArray(allResult)
-      .map(normalizeMatch)
-      .filter(
-        match =>
-          match.id &&
-          match.time > 0
-      );
-
-  // ==========================
-  // PARSE LIVE
-  // ==========================
-
-  const liveMatches =
-    getArray(liveResult)
-      .map(normalizeMatch)
-      .filter(
-        match =>
-          match.id &&
-          match.time > 0
-      );
-
-  console.log(
-    "[IKOTV] ALL COUNT:",
     allMatches.length
   );
 
   console.log(
-    "[IKOTV] LIVE COUNT:",
+    "[IKOTV] LIVE:",
     liveMatches.length
   );
 
-  // ==========================
-  // GABUNG ALL + LIVE
-  // ==========================
+  console.log(
+    "[IKOTV] TOMORROW:",
+    tomorrowMatches.length
+  );
 
-  const merged =
-    new Map();
 
-  // Masukkan semua jadwal
-  allMatches.forEach(match => {
+  // ==========================================================
+  // GABUNG
+  // ==========================================================
+
+  const merged = new Map();
+
+  [
+    ...allMatches,
+    ...liveMatches,
+    ...tomorrowMatches
+  ].forEach(match => {
+
+    if (!match || !match.id) {
+      return;
+    }
 
     merged.set(
       String(match.id),
@@ -2076,84 +2001,32 @@ async function getMatchesAPI(filter) {
 
   });
 
-  // Masukkan LIVE
-  // Kalau pertandingan sudah hilang
-  // dari ALL tetapi muncul di LIVE,
-  // pertandingan tersebut tetap masuk.
-  liveMatches.forEach(match => {
 
-  const id =
-    String(match.id);
+  // ==========================================================
+  // SORT BERDASARKAN WAKTU
+  // ==========================================================
 
-  if (merged.has(id)) {
+  const result =
+    Array.from(merged.values())
+      .filter(match => {
 
-    const old =
-      merged.get(id);
+        if (!match.id || !match.time) {
+          return false;
+        }
 
-    merged.set(id, {
-      ...old,
-      ...match,
-      isLive: true
-    });
+        return true;
 
-  } else {
+      })
+      .sort((a, b) => {
 
-    merged.set(id, {
-      ...match,
-      isLive: true
-    });
+        return Number(a.time) - Number(b.time);
 
-  }
+      });
 
-});
-    
-  const now =
-  Math.floor(Date.now() / 1000);
-
-const result =
-  Array.from(
-    merged.values()
-  )
-  .filter(match => {
-
-    if (
-      !match.id ||
-      !match.time
-    ) {
-      return false;
-    }
-
-    const start =
-      Number(match.time);
-
-    // Belum kickoff → tetap tampil
-    if (now < start) {
-      return true;
-    }
-
-    // Sudah kickoff tetapi belum terdeteksi LIVE
-    // → TETAP tampil sebagai WAITING
-    if (!match.isLive) {
-      return true;
-    }
-
-    // Sudah LIVE → tetap tampil
-    return true;
-
-  })
-  .sort(
-    (a, b) =>
-      a.time - b.time
-  );
 
   console.log(
-    "[IKOTV] MERGED COUNT:",
+    "[IKOTV] TOTAL FINAL:",
     result.length
-  );
-
-  console.log(
-    "[IKOTV] MERGED MATCHES:",
-    result
   );
 
   return result;
